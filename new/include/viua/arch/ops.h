@@ -212,6 +212,8 @@ enum class OPCODE : opcode_type {
     AND = (FORMAT_T | 0x0012),
     OR  = (FORMAT_T | 0x0013),
 
+    BUFFER_POP  = (FORMAT_T | 0x0014),
+
     CALL   = (FORMAT_D | 0x0001),
     BITNOT = (FORMAT_D | 0x0002),
     NOT    = (FORMAT_D | 0x0003),
@@ -219,6 +221,9 @@ enum class OPCODE : opcode_type {
     COPY = (FORMAT_D | 0x0004),
     MOVE = (FORMAT_D | 0x0005),
     SWAP = (FORMAT_D | 0x0006),
+
+    BUFFER_PUSH = (FORMAT_D | 0x0007),
+    BUFFER_SIZE = (FORMAT_D | 0x0008),
 
     FRAME  = (FORMAT_S | 0x0001),
     RETURN = (FORMAT_S | 0x0002),
@@ -268,6 +273,7 @@ enum class OPCODE_T : opcode_type {
     CMP     = static_cast<opcode_type>(OPCODE::CMP),
     AND     = static_cast<opcode_type>(OPCODE::AND),
     OR      = static_cast<opcode_type>(OPCODE::OR),
+    BUFFER_POP      = static_cast<opcode_type>(OPCODE::BUFFER_POP),
 };
 enum class OPCODE_D : opcode_type {
     CALL   = static_cast<opcode_type>(OPCODE::CALL),
@@ -276,6 +282,8 @@ enum class OPCODE_D : opcode_type {
     COPY   = static_cast<opcode_type>(OPCODE::COPY),
     MOVE   = static_cast<opcode_type>(OPCODE::MOVE),
     SWAP   = static_cast<opcode_type>(OPCODE::SWAP),
+    BUFFER_PUSH    = static_cast<opcode_type>(OPCODE::BUFFER_PUSH),
+    BUFFER_SIZE    = static_cast<opcode_type>(OPCODE::BUFFER_SIZE),
 };
 enum class OPCODE_S : opcode_type {
     FRAME  = static_cast<opcode_type>(OPCODE::FRAME),

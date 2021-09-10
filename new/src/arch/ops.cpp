@@ -315,6 +315,12 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "move";
     case OPCODE::SWAP:
         return greedy + "swap";
+    case OPCODE::BUFFER_PUSH:
+        return greedy + "buffer_push";
+    case OPCODE::BUFFER_SIZE:
+        return greedy + "buffer_size";
+    case OPCODE::BUFFER_POP:
+        return greedy + "buffer_pop";
     }
 
     return "<unknown>";
@@ -421,6 +427,12 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::MOVE));
     } else if (sv == "swap") {
         return (op | static_cast<opcode_type>(OPCODE::SWAP));
+    } else if (sv == "buffer_push") {
+        return (op | static_cast<opcode_type>(OPCODE::BUFFER_PUSH));
+    } else if (sv == "buffer_size") {
+        return (op | static_cast<opcode_type>(OPCODE::BUFFER_SIZE));
+    } else if (sv == "buffer_pop") {
+        return (op | static_cast<opcode_type>(OPCODE::BUFFER_POP));
     } else {
         throw std::invalid_argument{"viua::arch::ops::parse_opcode: "
                                     + std::string{raw}};

@@ -358,6 +358,25 @@ struct DIVIU : Instruction {
     DIVIU(viua::arch::ops::R i) : instruction{i}
     {}
 };
+
+struct BUFFER_PUSH : Instruction {
+    viua::arch::ops::D instruction;
+
+    BUFFER_PUSH(viua::arch::ops::D i) : instruction{i}
+    {}
+};
+struct BUFFER_SIZE : Instruction {
+    viua::arch::ops::D instruction;
+
+    BUFFER_SIZE(viua::arch::ops::D i) : instruction{i}
+    {}
+};
+struct BUFFER_POP : Instruction {
+    viua::arch::ops::T instruction;
+
+    BUFFER_POP(viua::arch::ops::T i) : instruction{i}
+    {}
+};
 }  // namespace viua::arch::ins
 
 #endif

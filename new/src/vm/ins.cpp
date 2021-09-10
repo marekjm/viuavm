@@ -929,6 +929,89 @@ auto execute(DIVIU const op, Stack& stack, ip_type const ip) -> void
     execute_arithmetic_immediate_op(op, stack, ip);
 }
 
+auto execute(BUFFER_PUSH const op, Stack& stack, ip_type const ip) -> void
+{
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.in.index))
+               + "\n";
+
+    auto dst = get_slot(op.instruction.out, stack, ip);
+    auto src  = get_slot(op.instruction.in, stack, ip);
+
+    if (not src.has_value()) {
+        throw abort_execution{ip, "cannot buffer_push out of void"};
+    }
+
+    std::cerr << dst.has_value()
+        << " " << dst.value()->boxed_value().type_name()
+        << " " << dst.value()->holds<viua::vm::types::Buffer>()
+        << "\n";
+
+    if (not dst.value()->holds<viua::vm::types::Buffer>()) {
+        throw abort_execution{ip, "invalid destination operand for buffer_push"};
+    }
+    static_cast<viua::vm::types::Buffer&>(dst.value()->boxed_value()).push(src.value()->value_cell());
+}
+auto execute(BUFFER_SIZE const op, Stack& stack, ip_type const ip) -> void
+{
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.in.index))
+               + "\n";
+
+    auto dst = get_slot(op.instruction.out, stack, ip);
+    auto src  = get_slot(op.instruction.in, stack, ip);
+
+    if (not src.has_value()) {
+        throw abort_execution{ip, "cannot take buffer_size of void"};
+    }
+    *dst.value() = static_cast<viua::vm::types::Buffer&>(src.value()->boxed_value()).size();
+}
+auto execute(BUFFER_POP const op, Stack& stack, ip_type const ip) -> void
+{
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+
+    auto dst = get_slot(op.instruction.out, stack, ip);
+    auto src  = get_slot(op.instruction.lhs, stack, ip);
+    auto idx  = get_slot(op.instruction.rhs, stack, ip);
+
+    if (not src.has_value()) {
+        throw abort_execution{ip, "cannot buffer_pop out of void"};
+    }
+
+    auto& buf = static_cast<viua::vm::types::Buffer&>(src.value()->boxed_value());
+    auto off = (buf.size() - 1);
+    if (idx.has_value()) {
+        off = std::get<uint64_t>(idx.value()->value);
+    }
+
+    auto v = buf.pop(off);
+    if (std::holds_alternative<int64_t>(v)) {
+        *dst.value() = std::get<int64_t>(v);
+    } else if (std::holds_alternative<uint64_t>(v)) {
+        *dst.value() = std::get<uint64_t>(v);
+    } else if (std::holds_alternative<float>(v)) {
+        *dst.value() = std::get<float>(v);
+    } else if (std::holds_alternative<double>(v)) {
+        *dst.value() = std::get<double>(v);
+    } else if (std::holds_alternative<std::unique_ptr<viua::vm::types::Value>>(v)) {
+        dst.value()->value
+            = std::move(std::get<std::unique_ptr<viua::vm::types::Value>>(v));
+    }
+}
+
 auto execute(EBREAK const, Stack& stack, ip_type const) -> void
 {
     std::cerr << "[ebreak.stack]\n";

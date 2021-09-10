@@ -122,6 +122,9 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
         case viua::arch::ops::OPCODE_T::OR:
             execute(OR{instruction}, stack, ip);
             break;
+        case viua::arch::ops::OPCODE_T::BUFFER_POP:
+            execute(BUFFER_POP{instruction}, stack, ip);
+            break;
         }
         break;
     }
@@ -241,6 +244,12 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
             break;
         case viua::arch::ops::OPCODE_D::SWAP:
             execute(SWAP{instruction}, stack, ip);
+            break;
+        case viua::arch::ops::OPCODE_D::BUFFER_PUSH:
+            execute(BUFFER_PUSH{instruction}, stack, ip);
+            break;
+        case viua::arch::ops::OPCODE_D::BUFFER_SIZE:
+            execute(BUFFER_SIZE{instruction}, stack, ip);
             break;
         }
         break;

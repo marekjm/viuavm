@@ -208,6 +208,13 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "swap",
     "g.swap",
 
+    "buffer_push",
+    "g.buffer_push",
+    "buffer_size",
+    "g.buffer_size",
+    "buffer_pop",
+    "g.buffer_pop",
+
     /*
      * Pseudoinstructions listed below.
      */
