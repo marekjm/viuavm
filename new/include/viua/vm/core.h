@@ -103,6 +103,10 @@ struct Value {
     {
         return *std::get<boxed_type>(value);
     }
+    inline auto boxed_value() -> boxed_type::element_type&
+    {
+        return *std::get<boxed_type>(value);
+    }
 
     template<typename T> auto holds() const -> bool
     {
