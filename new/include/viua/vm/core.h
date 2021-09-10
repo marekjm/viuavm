@@ -133,6 +133,11 @@ struct Value {
                 boxed_type> and std::holds_alternative<boxed_type>(value)) {
             return true;
         }
+        if (std::is_convertible_v<
+                T*,
+                viua::vm::types::Value*> and std::holds_alternative<boxed_type>(value)) {
+            return true;
+        }
         return false;
     }
     template<typename T> auto cast_to() const -> T
