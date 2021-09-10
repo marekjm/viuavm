@@ -63,6 +63,9 @@ struct Struct
 struct Buffer
         : Value
         , traits::To_string {
+    std::vector<Value_cell> values;
+    using size_type = decltype(values)::size_type;
+
     auto type_name() const -> std::string override;
     auto to_string() const -> std::string override;
 };

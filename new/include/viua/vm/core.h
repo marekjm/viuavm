@@ -107,6 +107,32 @@ struct Value {
     {
         return *std::get<boxed_type>(value);
     }
+    inline auto value_cell() -> viua::vm::types::Value_cell
+    {
+        if (holds<int64_t>()) {
+            auto t = std::get<int64_t>(value);
+            make_void();
+            return t;
+        } else if (holds<uint64_t>()) {
+            auto t = std::get<uint64_t>(value);
+            make_void();
+            return t;
+        } else if (holds<float>()) {
+            auto t = std::get<float>(value);
+            make_void();
+            return t;
+        } else if (holds<double>()) {
+            auto t = std::get<double>(value);
+            make_void();
+            return t;
+        } else if (holds<boxed_type>()) {
+            auto t = std::move(std::get<boxed_type>(value));
+            make_void();
+            return t;
+        } else {
+            throw std::bad_cast{};
+        }
+    }
 
     template<typename T> auto holds() const -> bool
     {

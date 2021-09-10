@@ -36,6 +36,11 @@ using Register_cell = std::variant<std::monostate,
                                    float,
                                    double,
                                    std::unique_ptr<class Value>>;
+using Value_cell = std::variant<int64_t,
+                                   uint64_t,
+                                   float,
+                                   double,
+                                   std::unique_ptr<class Value>>;
 
 class Value {
   public:
