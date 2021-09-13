@@ -3,10 +3,32 @@
 
 #include <viua/vm/types.h>
 
+
 namespace viua::vm::types {
 Value::~Value()
 {}
+}
 
+namespace viua::vm::types {
+auto Signed_integer::type_name() const -> std::string
+{
+    return "int";
+}
+auto Unsigned_integer::type_name() const -> std::string
+{
+    return "uint";
+}
+auto Float_single::type_name() const -> std::string
+{
+    return "float";
+}
+auto Float_double::type_name() const -> std::string
+{
+    return "double";
+}
+}
+
+namespace viua::vm::types {
 auto String::type_name() const -> std::string
 {
     return "string";

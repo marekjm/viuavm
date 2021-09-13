@@ -23,6 +23,50 @@
 #include <viua/vm/types/traits.h>
 #include <viua/vm/types/value.h>
 
+#include <stdint.h>
+
+
+/*
+ * The following types are primitive, and usually unboxed. However, due to
+ * certain constraints (ie, pointers) they need boxed variants. A boxed variant
+ * is undistinguishable from the programmer's point of view without expliting
+ * the instrucpection interfaces provided by Viua.
+ */
+namespace viua::vm::types {
+struct Signed_integer : Value {
+    using value_type = int64_t;
+    value_type value {};
+
+    auto type_name() const -> std::string override;
+};
+struct Unsigned_integer : Value {
+    using value_type = uint64_t;
+    value_type value {};
+
+    auto type_name() const -> std::string override;
+};
+struct Float_single : Value {
+    using value_type = float;
+    value_type value {};
+
+    auto type_name() const -> std::string override;
+};
+struct Float_double : Value {
+    using value_type = double;
+    value_type value {};
+
+    auto type_name() const -> std::string override;
+};
+}
+
+/*
+ * The following types are primitive, but boxed. This is due to the fact that a
+ * register has fixed size while they all have a size defined by the programmer
+ * who is writing the code to be run by Viua virtual machine.
+ *
+ * Their varying size makes it impossible to store them in a fixed-size memory
+ * area which is a register.
+ */
 namespace viua::vm::types {
 struct String
         : Value
