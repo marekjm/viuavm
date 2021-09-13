@@ -20,10 +20,10 @@
 #ifndef VIUA_VM_TYPES_H
 #define VIUA_VM_TYPES_H
 
+#include <stdint.h>
+
 #include <viua/vm/types/traits.h>
 #include <viua/vm/types/value.h>
-
-#include <stdint.h>
 
 
 /*
@@ -35,29 +35,29 @@
 namespace viua::vm::types {
 struct Signed_integer : Value {
     using value_type = int64_t;
-    value_type value {};
+    value_type value{};
 
     auto type_name() const -> std::string override;
 };
 struct Unsigned_integer : Value {
     using value_type = uint64_t;
-    value_type value {};
+    value_type value{};
 
     auto type_name() const -> std::string override;
 };
 struct Float_single : Value {
     using value_type = float;
-    value_type value {};
+    value_type value{};
 
     auto type_name() const -> std::string override;
 };
 struct Float_double : Value {
     using value_type = double;
-    value_type value {};
+    value_type value{};
 
     auto type_name() const -> std::string override;
 };
-}
+}  // namespace viua::vm::types
 
 /*
  * The following types are primitive, but boxed. This is due to the fact that a

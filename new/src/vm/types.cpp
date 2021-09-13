@@ -7,7 +7,7 @@
 namespace viua::vm::types {
 Value::~Value()
 {}
-}
+}  // namespace viua::vm::types
 
 namespace viua::vm::types {
 auto Signed_integer::type_name() const -> std::string
@@ -26,7 +26,7 @@ auto Float_double::type_name() const -> std::string
 {
     return "double";
 }
-}
+}  // namespace viua::vm::types
 
 namespace viua::vm::types {
 auto Pointer::type_name() const -> std::string
@@ -129,8 +129,10 @@ auto stringify_cell(Value_cell const& vc) -> std::string
     } else if (std::holds_alternative<double>(vc)) {
         return std::to_string(std::get<double>(vc));
     } else {
-        auto const* v = std::get<std::unique_ptr<viua::vm::types::Value>>(vc).get();
-        auto const* s = dynamic_cast<viua::vm::types::traits::To_string const*>(v);
+        auto const* v =
+            std::get<std::unique_ptr<viua::vm::types::Value>>(vc).get();
+        auto const* s =
+            dynamic_cast<viua::vm::types::traits::To_string const*>(v);
         if (s) {
             return s->to_string();
         } else {

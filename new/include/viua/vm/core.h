@@ -165,7 +165,8 @@ struct Value {
         }
         if (std::is_convertible_v<
                 T*,
-                viua::vm::types::Value*> and std::holds_alternative<boxed_type>(value)) {
+                viua::vm::types::
+                    Value*> and std::holds_alternative<boxed_type>(value)) {
             return true;
         }
         return false;
@@ -189,21 +190,25 @@ struct Value {
             return static_cast<T>(std::get<double>(value));
         }
 
+        using viua::vm::types::Float_double;
+        using viua::vm::types::Float_single;
         using viua::vm::types::Signed_integer;
         using viua::vm::types::Unsigned_integer;
-        using viua::vm::types::Float_single;
-        using viua::vm::types::Float_double;
         if (holds<Signed_integer>()) {
-            return static_cast<T>(static_cast<Signed_integer const&>(boxed_value()).value);
+            return static_cast<T>(
+                static_cast<Signed_integer const&>(boxed_value()).value);
         }
         if (holds<Unsigned_integer>()) {
-            return static_cast<T>(static_cast<Unsigned_integer const&>(boxed_value()).value);
+            return static_cast<T>(
+                static_cast<Unsigned_integer const&>(boxed_value()).value);
         }
         if (holds<Float_single>()) {
-            return static_cast<T>(static_cast<Float_single const&>(boxed_value()).value);
+            return static_cast<T>(
+                static_cast<Float_single const&>(boxed_value()).value);
         }
         if (holds<Float_double>()) {
-            return static_cast<T>(static_cast<Float_double const&>(boxed_value()).value);
+            return static_cast<T>(
+                static_cast<Float_double const&>(boxed_value()).value);
         }
 
         throw std::bad_cast{};
