@@ -68,6 +68,13 @@ struct Float_double : Value {
  * area which is a register.
  */
 namespace viua::vm::types {
+struct Pointer : Value {
+    using value_type = Value*;
+    value_type value;
+
+    auto type_name() const -> std::string override;
+};
+
 struct String
         : Value
         , traits::To_string

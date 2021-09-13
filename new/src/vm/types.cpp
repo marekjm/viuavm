@@ -29,6 +29,11 @@ auto Float_double::type_name() const -> std::string
 }
 
 namespace viua::vm::types {
+auto Pointer::type_name() const -> std::string
+{
+    return "pointer";
+}
+
 auto String::type_name() const -> std::string
 {
     return "string";
