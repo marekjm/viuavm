@@ -644,10 +644,9 @@ Closures.
 
 Message sends and receives. Actor rendez-vous.
 
-- actor %rp, %rf        Call the function from register %rf in a new actor, and
-                        store PID of the actor in register %rp. The process is
-                        "monitored" by default, it is unmonitored by default if
-                        the %rp operand is void.
+- actor %rp, <fn>, %rf  Call the function in a new actor, and store PID of the
+                        actor in register %rp. Any additional flags are supplied
+                        in the register %rf (if not void).
 - actor_link %rold, %rp, %rnew
                         Instruct the VM to deliver signals to calling actor when
                         status of the actor described by PID in register %rp
