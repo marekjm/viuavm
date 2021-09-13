@@ -542,8 +542,6 @@ Copies, moves, deletes.
 - copy %ro, %ri         Copy a value from register %ro, to register %ri.
 - move %ro, %ri         Move a value from register %ro, to register %ri.
 - swap %ro, %ri         Swap values between registers %ro and %ri.
-- delete %ri            Delete a value from register %ri.
-                        viua::traits::Delete
 
 --------------------------------------------------------------------------------
 
