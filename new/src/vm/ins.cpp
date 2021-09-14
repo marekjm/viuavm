@@ -1017,6 +1017,43 @@ auto execute(BUFFER_POP const op, Stack& stack, ip_type const ip) -> void
     }
 }
 
+auto execute(PTR const op, Stack& stack, ip_type const ip) -> void
+{
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.in.index))
+               + "\n";
+
+    auto dst = get_slot(op.instruction.out, stack, ip);
+    auto src = get_slot(op.instruction.in, stack, ip);
+
+    if (not src.has_value()) {
+        throw abort_execution{ip, "cannot take pointer to void"};
+    }
+
+    using viua::vm::types::Float_double;
+    using viua::vm::types::Float_single;
+    using viua::vm::types::Signed_integer;
+    using viua::vm::types::Unsigned_integer;
+    if (src.value()->holds<int64_t>()) {
+        src.value()->value = std::make_unique<Signed_integer>(
+            std::get<int64_t>(src.value()->value));
+    } else if (src.value()->holds<uint64_t>()) {
+        src.value()->value = std::make_unique<Unsigned_integer>(
+            std::get<uint64_t>(src.value()->value));
+    } else if (src.value()->holds<float>()) {
+        src.value()->value =
+            std::make_unique<Float_single>(std::get<float>(src.value()->value));
+    } else if (src.value()->holds<double>()) {
+        src.value()->value = std::make_unique<Float_double>(
+            std::get<double>(src.value()->value));
+    }
+
+    dst.value()->value = src.value()->boxed_value().pointer_to();
+}
+
 auto execute(EBREAK const, Stack& stack, ip_type const) -> void
 {
     std::cerr << "[ebreak.stack]\n";

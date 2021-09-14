@@ -225,6 +225,8 @@ enum class OPCODE : opcode_type {
     BUFFER_PUSH = (FORMAT_D | 0x0007),
     BUFFER_SIZE = (FORMAT_D | 0x0008),
 
+    PTR = (FORMAT_D | 0x0009),
+
     FRAME  = (FORMAT_S | 0x0001),
     RETURN = (FORMAT_S | 0x0002),
     ATOM   = (FORMAT_S | 0x0003),
@@ -284,6 +286,7 @@ enum class OPCODE_D : opcode_type {
     SWAP        = static_cast<opcode_type>(OPCODE::SWAP),
     BUFFER_PUSH = static_cast<opcode_type>(OPCODE::BUFFER_PUSH),
     BUFFER_SIZE = static_cast<opcode_type>(OPCODE::BUFFER_SIZE),
+    PTR         = static_cast<opcode_type>(OPCODE::PTR),
 };
 enum class OPCODE_S : opcode_type {
     FRAME  = static_cast<opcode_type>(OPCODE::FRAME),

@@ -321,6 +321,8 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "buffer_size";
     case OPCODE::BUFFER_POP:
         return greedy + "buffer_pop";
+    case OPCODE::PTR:
+        return greedy + "ptr";
     }
 
     return "<unknown>";
@@ -433,6 +435,8 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::BUFFER_SIZE));
     } else if (sv == "buffer_pop") {
         return (op | static_cast<opcode_type>(OPCODE::BUFFER_POP));
+    } else if (sv == "ptr") {
+        return (op | static_cast<opcode_type>(OPCODE::PTR));
     } else {
         throw std::invalid_argument{"viua::arch::ops::parse_opcode: "
                                     + std::string{raw}};

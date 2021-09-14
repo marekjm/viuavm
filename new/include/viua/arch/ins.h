@@ -377,6 +377,13 @@ struct BUFFER_POP : Instruction {
     BUFFER_POP(viua::arch::ops::T i) : instruction{i}
     {}
 };
+
+struct PTR : Instruction {
+    viua::arch::ops::D instruction;
+
+    PTR(viua::arch::ops::D i) : instruction{i}
+    {}
+};
 }  // namespace viua::arch::ins
 
 #endif

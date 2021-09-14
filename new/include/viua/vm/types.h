@@ -37,11 +37,17 @@ struct Signed_integer : Value {
     using value_type = int64_t;
     value_type value{};
 
+    inline Signed_integer(value_type const v) : value{v}
+    {}
+
     auto type_name() const -> std::string override;
 };
 struct Unsigned_integer : Value {
     using value_type = uint64_t;
     value_type value{};
+
+    inline Unsigned_integer(value_type const v) : value{v}
+    {}
 
     auto type_name() const -> std::string override;
 };
@@ -49,11 +55,17 @@ struct Float_single : Value {
     using value_type = float;
     value_type value{};
 
+    inline Float_single(value_type const v) : value{v}
+    {}
+
     auto type_name() const -> std::string override;
 };
 struct Float_double : Value {
     using value_type = double;
     value_type value{};
+
+    inline Float_double(value_type const v) : value{v}
+    {}
 
     auto type_name() const -> std::string override;
 };
@@ -71,6 +83,9 @@ namespace viua::vm::types {
 struct Pointer : Value {
     using value_type = Value*;
     value_type value;
+
+    inline Pointer(value_type const p) : value{p}
+    {}
 
     auto type_name() const -> std::string override;
 };

@@ -82,6 +82,8 @@ class Value {
     {
         return (dynamic_cast<Trait const*>(this) != nullptr);
     }
+
+    auto pointer_to() -> std::unique_ptr<class Pointer>;
 };
 }  // namespace viua::vm::types
 

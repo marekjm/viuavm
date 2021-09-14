@@ -7,6 +7,11 @@
 namespace viua::vm::types {
 Value::~Value()
 {}
+
+auto Value::pointer_to() -> std::unique_ptr<Pointer>
+{
+    return std::make_unique<Pointer>(this);
+}
 }  // namespace viua::vm::types
 
 namespace viua::vm::types {

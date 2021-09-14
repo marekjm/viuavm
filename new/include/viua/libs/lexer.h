@@ -215,6 +215,9 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "buffer_pop",
     "g.buffer_pop",
 
+    "ptr",
+    "g.ptr",
+
     /*
      * Pseudoinstructions listed below.
      */

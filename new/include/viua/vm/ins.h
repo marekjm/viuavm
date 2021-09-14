@@ -93,6 +93,8 @@ Work_instruction(BUFFER_PUSH);
 Work_instruction(BUFFER_SIZE);
 Work_instruction(BUFFER_POP);
 
+Work_instruction(PTR);
+
 Work_instruction(EBREAK);
 }  // namespace viua::vm::ins
 

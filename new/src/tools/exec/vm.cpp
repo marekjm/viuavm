@@ -251,6 +251,9 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
         case viua::arch::ops::OPCODE_D::BUFFER_SIZE:
             execute(BUFFER_SIZE{instruction}, stack, ip);
             break;
+        case viua::arch::ops::OPCODE_D::PTR:
+            execute(PTR{instruction}, stack, ip);
+            break;
         }
         break;
     }
