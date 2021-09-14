@@ -57,6 +57,14 @@ auto Pointer::type_name() const -> std::string
 {
     return ('*' + value->type_name());
 }
+auto Pointer::to_string() const -> std::string
+{
+    return value->as_trait<traits::To_string, std::string>(
+        [](traits::To_string const& ts) -> std::string {
+            return ts.to_string();
+        },
+        type_name());
+}
 
 auto String::type_name() const -> std::string
 {
