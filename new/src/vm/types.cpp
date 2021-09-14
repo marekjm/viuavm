@@ -19,17 +19,36 @@ auto Signed_integer::type_name() const -> std::string
 {
     return "int";
 }
+auto Signed_integer::to_string() const -> std::string
+{
+    return std::to_string(value);
+}
+
 auto Unsigned_integer::type_name() const -> std::string
 {
     return "uint";
 }
+auto Unsigned_integer::to_string() const -> std::string
+{
+    return std::to_string(value);
+}
+
 auto Float_single::type_name() const -> std::string
 {
     return "float";
 }
+auto Float_single::to_string() const -> std::string
+{
+    return std::to_string(value);
+}
+
 auto Float_double::type_name() const -> std::string
 {
     return "double";
+}
+auto Float_double::to_string() const -> std::string
+{
+    return std::to_string(value);
 }
 }  // namespace viua::vm::types
 

@@ -33,7 +33,9 @@
  * the instrucpection interfaces provided by Viua.
  */
 namespace viua::vm::types {
-struct Signed_integer : Value {
+struct Signed_integer
+        : Value
+        , traits::To_string {
     using value_type = int64_t;
     value_type value{};
 
@@ -41,8 +43,11 @@ struct Signed_integer : Value {
     {}
 
     auto type_name() const -> std::string override;
+    auto to_string() const -> std::string override;
 };
-struct Unsigned_integer : Value {
+struct Unsigned_integer
+        : Value
+        , traits::To_string {
     using value_type = uint64_t;
     value_type value{};
 
@@ -50,8 +55,11 @@ struct Unsigned_integer : Value {
     {}
 
     auto type_name() const -> std::string override;
+    auto to_string() const -> std::string override;
 };
-struct Float_single : Value {
+struct Float_single
+        : Value
+        , traits::To_string {
     using value_type = float;
     value_type value{};
 
@@ -59,8 +67,11 @@ struct Float_single : Value {
     {}
 
     auto type_name() const -> std::string override;
+    auto to_string() const -> std::string override;
 };
-struct Float_double : Value {
+struct Float_double
+        : Value
+        , traits::To_string {
     using value_type = double;
     value_type value{};
 
@@ -68,6 +79,7 @@ struct Float_double : Value {
     {}
 
     auto type_name() const -> std::string override;
+    auto to_string() const -> std::string override;
 };
 }  // namespace viua::vm::types
 
