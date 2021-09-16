@@ -163,11 +163,11 @@ struct Value {
                 boxed_type> and std::holds_alternative<boxed_type>(value)) {
             return true;
         }
-        if (std::is_convertible_v<
-                T*,
-                viua::vm::types::
-                    Value*> and std::holds_alternative<boxed_type>(value)) {
-            return true;
+        if constexpr (std::is_convertible_v<T*, viua::vm::types::Value*>) {
+            if (std::holds_alternative<boxed_type>(value)
+                and dynamic_cast<T*>(std::get<boxed_type>(value).get())) {
+                return true;
+            }
         }
         return false;
     }
