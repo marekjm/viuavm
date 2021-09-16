@@ -52,6 +52,10 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
 
+    using viua::vm::types::Float_double;
+    using viua::vm::types::Float_single;
+    using viua::vm::types::Signed_integer;
+    using viua::vm::types::Unsigned_integer;
     if (lhs.template holds<int64_t>()) {
         out = typename Op::functor_type{}(std::get<int64_t>(lhs.value),
                                           rhs.template cast_to<int64_t>());
@@ -63,6 +67,18 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
                                           rhs.template cast_to<float>());
     } else if (lhs.template holds<double>()) {
         out = typename Op::functor_type{}(std::get<double>(lhs.value),
+                                          rhs.template cast_to<double>());
+    } else if (lhs.template holds<Signed_integer>()) {
+        out = typename Op::functor_type{}(lhs.template cast_to<int64_t>(),
+                                          rhs.template cast_to<int64_t>());
+    } else if (lhs.template holds<Unsigned_integer>()) {
+        out = typename Op::functor_type{}(lhs.template cast_to<uint64_t>(),
+                                          rhs.template cast_to<uint64_t>());
+    } else if (lhs.template holds<Float_single>()) {
+        out = typename Op::functor_type{}(lhs.template cast_to<float>(),
+                                          rhs.template cast_to<float>());
+    } else if (lhs.template holds<Float_double>()) {
+        out = typename Op::functor_type{}(lhs.template cast_to<double>(),
                                           rhs.template cast_to<double>());
     } else if (lhs.template has_trait<Trait>()) {
         out.value = lhs.boxed_value().template as_trait<Trait>(rhs.value);
