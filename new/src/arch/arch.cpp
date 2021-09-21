@@ -64,4 +64,31 @@ auto Register_access::make_void() -> Register_access
 {
     return Register_access{viua::arch::REGISTER_SET::VOID, true, 0};
 }
+
+auto Register_access::to_string() const -> std::string
+{
+    if (is_void()) {
+        return "void";
+    }
+
+    auto out = std::ostringstream{};
+    out << (direct ? '$' : '*');
+    out << static_cast<int>(index);
+    out << '.';
+    switch (set) {
+        using enum viua::arch::REGISTER_SET;
+    case VOID:
+        return "void";
+    case LOCAL:
+        out << 'l';
+        break;
+    case ARGUMENT:
+        out << 'a';
+        break;
+    case PARAMETER:
+        out << 'p';
+        break;
+    }
+    return out.str();
+}
 }  // namespace viua::arch

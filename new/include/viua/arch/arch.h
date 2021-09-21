@@ -23,6 +23,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <sstream>
+#include <string>
+
 
 namespace viua::arch {
 /*
@@ -136,6 +139,8 @@ struct Register_access {
     static auto make_parameter(uint8_t const, bool const = true)
         -> Register_access;
     static auto make_void() -> Register_access;
+
+    auto to_string() const -> std::string;
 };
 }  // namespace viua::arch
 
