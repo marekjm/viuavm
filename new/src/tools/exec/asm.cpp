@@ -325,6 +325,13 @@ auto look_ahead(
 {
     return (not lexemes.empty()) and (lexemes.front() == tk);
 }
+auto look_ahead(
+    std::set<viua::libs::lexer::TOKEN> const ts,
+    viua::support::vector_view<viua::libs::lexer::Lexeme> const& lexemes)
+    -> bool
+{
+    return (not lexemes.empty()) and (ts.count(lexemes.front().token) != 0);
+}
 
 auto parse_attr_list(
     viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes)
