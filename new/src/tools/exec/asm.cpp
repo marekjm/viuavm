@@ -169,25 +169,26 @@ auto Operand::make_access() const -> viua::arch::Register_access
     }
 
     using viua::libs::lexer::TOKEN;
-    if ((ingredients.front().token != TOKEN::RA_DIRECT)
-        and (ingredients.front().token != TOKEN::RA_DIRECT)) {
+    auto const lx = ingredients.front();
+    if (lx != TOKEN::RA_DIRECT and lx != TOKEN::RA_PTR_DEREF) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
         throw Error{ingredients.front(), Cause::Invalid_register_access};
     }
 
+    auto const direct = (lx == TOKEN::RA_DIRECT);
     auto const index = std::stoul(ingredients.at(1).text);
     if (ingredients.size() == 2) {
-        return viua::arch::Register_access::make_local(index);
+        return viua::arch::Register_access::make_local(index, direct);
     }
 
     auto const rs = ingredients.back();
     if (rs == "l") {
-        return viua::arch::Register_access::make_local(index);
+        return viua::arch::Register_access::make_local(index, direct);
     } else if (rs == "a") {
-        return viua::arch::Register_access::make_argument(index);
+        return viua::arch::Register_access::make_argument(index, direct);
     } else if (rs == "p") {
-        return viua::arch::Register_access::make_parameter(index);
+        return viua::arch::Register_access::make_parameter(index, direct);
     } else {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
@@ -448,8 +449,8 @@ auto parse_function_definition(
             if (lexemes.front() == TOKEN::RA_VOID) {
                 operand.ingredients.push_back(
                     consume_token_of(TOKEN::RA_VOID, lexemes));
-            } else if (look_ahead(TOKEN::RA_DIRECT, lexemes)) {
-                auto const access = consume_token_of(TOKEN::RA_DIRECT, lexemes);
+            } else if (look_ahead({ TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF }, lexemes)) {
+                auto const access = consume_token_of({ TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF }, lexemes);
                 auto index        = viua::libs::lexer::Lexeme{};
                 try {
                     index = consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
