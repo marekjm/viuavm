@@ -116,10 +116,10 @@ struct String
     auto type_name() const -> std::string override;
     auto to_string() const -> std::string override;
     operator bool() const override;
-    auto operator()(traits::Plus::tag_type const, Register_cell const&) const
-        -> Register_cell override;
-    auto operator()(traits::Eq::tag_type const, Register_cell const&) const
-        -> Register_cell override;
+    auto operator()(traits::Plus::tag_type const, Cell const&) const
+        -> Cell override;
+    auto operator()(traits::Eq::tag_type const, Cell const&) const
+        -> Cell override;
 };
 
 struct Atom
@@ -130,8 +130,8 @@ struct Atom
 
     auto type_name() const -> std::string override;
     auto to_string() const -> std::string override;
-    auto operator()(traits::Eq::tag_type const, Register_cell const&) const
-        -> Register_cell override;
+    auto operator()(traits::Eq::tag_type const, Cell const&) const
+        -> Cell override;
 };
 
 struct Struct
@@ -144,11 +144,13 @@ struct Struct
 struct Buffer
         : Value
         , traits::To_string {
-    std::vector<Value_cell> values;
+    using value_type = Cell;
+
+    std::vector<value_type> values;
     using size_type = decltype(values)::size_type;
 
-    auto push(Value_cell&&) -> void;
-    auto pop(size_type) -> Value_cell;
+    auto push(value_type&&) -> void;
+    auto pop(size_type) -> value_type;
     auto size() const -> size_type;
 
     auto type_name() const -> std::string override;

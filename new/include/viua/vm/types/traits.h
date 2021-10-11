@@ -34,11 +34,10 @@ namespace viua::vm::types::traits {
     static constexpr tag_type tag \
     {}
 
-#define VIUA_TRAIT_BODY(Trait)                                    \
-    VIUA_TRAIT_TAG();                                             \
-    virtual auto operator()(tag_type const, Register_cell const&) \
-        const->Register_cell = 0;                                 \
-    virtual ~Trait()         = default
+#define VIUA_TRAIT_BODY(Trait)                                            \
+    VIUA_TRAIT_TAG();                                                     \
+    virtual auto operator()(tag_type const, Cell const&) const->Cell = 0; \
+    virtual ~Trait()                                                 = default
 
 #define VIUA_TRAIT(Trait)       \
     struct Trait {              \

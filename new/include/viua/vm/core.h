@@ -46,8 +46,8 @@ struct Env {
 };
 
 struct Value {
-    using boxed_type = std::unique_ptr<viua::vm::types::Value>;
-    using value_type = viua::vm::types::Register_cell;
+    using value_type = viua::vm::types::Cell;
+    using boxed_type = value_type::boxed_type;
     value_type value;
 
     Value()             = default;
@@ -67,105 +67,90 @@ struct Value {
     }
     inline auto operator=(int64_t const v) -> Value&
     {
-        value = v;
+        value.content = v;
         return *this;
     }
     inline auto operator=(uint64_t const v) -> Value&
     {
-        value = v;
+        value.content = v;
         return *this;
     }
     inline auto operator=(float const v) -> Value&
     {
-        value = v;
+        value.content = v;
         return *this;
     }
     inline auto operator=(double const v) -> Value&
     {
-        value = v;
+        value.content = v;
         return *this;
     }
 
     inline auto is_boxed() const -> bool
     {
-        return std::holds_alternative<boxed_type>(value);
+        return std::holds_alternative<boxed_type>(value.content);
     }
     inline auto is_void() const -> bool
     {
-        return std::holds_alternative<std::monostate>(value);
+        return std::holds_alternative<std::monostate>(value.content);
     }
     inline auto make_void() -> void
     {
-        value = std::monostate{};
+        value.content = std::monostate{};
     }
 
     inline auto boxed_value() const -> boxed_type::element_type const&
     {
-        return *std::get<boxed_type>(value);
+        return *std::get<boxed_type>(value.content);
     }
     inline auto boxed_value() -> boxed_type::element_type&
     {
-        return *std::get<boxed_type>(value);
+        return *std::get<boxed_type>(value.content);
     }
-    inline auto value_cell() -> viua::vm::types::Value_cell
+    inline auto value_cell() -> viua::vm::types::Cell&
     {
-        if (holds<int64_t>()) {
-            auto t = std::get<int64_t>(value);
-            make_void();
-            return t;
-        } else if (holds<uint64_t>()) {
-            auto t = std::get<uint64_t>(value);
-            make_void();
-            return t;
-        } else if (holds<float>()) {
-            auto t = std::get<float>(value);
-            make_void();
-            return t;
-        } else if (holds<double>()) {
-            auto t = std::get<double>(value);
-            make_void();
-            return t;
-        } else if (holds<boxed_type>()) {
-            auto t = std::move(std::get<boxed_type>(value));
-            make_void();
-            return t;
-        } else {
+        if (is_void()) {
             throw std::bad_cast{};
         }
+        return value;
     }
 
     template<typename T> auto holds() const -> bool
     {
         if (std::is_same_v<
                 T,
-                void> and std::holds_alternative<std::monostate>(value)) {
+                void> and std::holds_alternative<std::monostate>(value.content)) {
             return true;
         }
         if (std::is_same_v<
                 T,
-                int64_t> and std::holds_alternative<int64_t>(value)) {
+                int64_t> and std::holds_alternative<int64_t>(value.content)) {
             return true;
         }
         if (std::is_same_v<
                 T,
-                uint64_t> and std::holds_alternative<uint64_t>(value)) {
-            return true;
-        }
-        if (std::is_same_v<T, float> and std::holds_alternative<float>(value)) {
-            return true;
-        }
-        if (std::is_same_v<T,
-                           double> and std::holds_alternative<double>(value)) {
+                uint64_t> and std::holds_alternative<uint64_t>(value.content)) {
             return true;
         }
         if (std::is_same_v<
                 T,
-                boxed_type> and std::holds_alternative<boxed_type>(value)) {
+                float> and std::holds_alternative<float>(value.content)) {
+            return true;
+        }
+        if (std::is_same_v<
+                T,
+                double> and std::holds_alternative<double>(value.content)) {
+            return true;
+        }
+        if (std::is_same_v<
+                T,
+                boxed_type> and std::holds_alternative<boxed_type>(value.content)) {
             return true;
         }
         if constexpr (std::is_convertible_v<T*, viua::vm::types::Value*>) {
-            if (std::holds_alternative<boxed_type>(value)
-                and dynamic_cast<T*>(std::get<boxed_type>(value).get())) {
+            if (std::holds_alternative<boxed_type>(value.content)
+                and dynamic_cast<T*>(
+                    std::get<boxed_type>(value.content).get())) {
                 return true;
             }
         }
@@ -173,21 +158,21 @@ struct Value {
     }
     template<typename T> auto cast_to() const -> T
     {
-        if (std::holds_alternative<T>(value)) {
-            return std::get<T>(value);
+        if (std::holds_alternative<T>(value.content)) {
+            return std::get<T>(value.content);
         }
 
-        if (std::holds_alternative<int64_t>(value)) {
-            return static_cast<T>(std::get<int64_t>(value));
+        if (std::holds_alternative<int64_t>(value.content)) {
+            return static_cast<T>(std::get<int64_t>(value.content));
         }
-        if (std::holds_alternative<uint64_t>(value)) {
-            return static_cast<T>(std::get<uint64_t>(value));
+        if (std::holds_alternative<uint64_t>(value.content)) {
+            return static_cast<T>(std::get<uint64_t>(value.content));
         }
-        if (std::holds_alternative<float>(value)) {
-            return static_cast<T>(std::get<float>(value));
+        if (std::holds_alternative<float>(value.content)) {
+            return static_cast<T>(std::get<float>(value.content));
         }
-        if (std::holds_alternative<double>(value)) {
-            return static_cast<T>(std::get<double>(value));
+        if (std::holds_alternative<double>(value.content)) {
+            return static_cast<T>(std::get<double>(value.content));
         }
 
         using viua::vm::types::Float_double;

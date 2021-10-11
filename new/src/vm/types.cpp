@@ -5,6 +5,21 @@
 
 
 namespace viua::vm::types {
+Cell_view::Cell_view(Cell& cell) : content{std::monostate{}}
+{
+    if (std::holds_alternative<int64_t>(cell.content)) {
+        content =
+            std::reference_wrapper<int64_t>{std::get<int64_t>(cell.content)};
+    } else if (std::holds_alternative<Cell::boxed_type>(cell.content)) {
+        content = std::reference_wrapper<boxed_type>{
+            *std::get<Cell::boxed_type>(cell.content)};
+    } else {
+        content = std::monostate{};
+    }
+}
+Cell_view::Cell_view(boxed_type& v) : content{v}
+{}
+
 Value::~Value()
 {}
 
@@ -78,41 +93,38 @@ String::operator bool() const
 {
     return (not content.empty());
 }
-auto String::operator()(traits::Plus::tag_type const,
-                        Register_cell const& c) const -> Register_cell
+auto String::operator()(traits::Plus::tag_type const, Cell const& c) const
+    -> Cell
 {
-    if (not std::holds_alternative<std::unique_ptr<Value>>(c)) {
+    if (not std::holds_alternative<Cell::boxed_type>(c.content)) {
         throw std::runtime_error{"cannot add unboxed value to String"};
     }
 
-    auto const v =
-        dynamic_cast<String*>(std::get<std::unique_ptr<Value>>(c).get());
+    auto const v = dynamic_cast<String*>(c.get<Cell::boxed_type>().get());
     if (not v) {
-        throw std::runtime_error{
-            "cannot add " + std::get<std::unique_ptr<Value>>(c)->type_name()
-            + " value to String"};
+        throw std::runtime_error{"cannot add "
+                                 + c.get<Cell::boxed_type>()->type_name()
+                                 + " value to String"};
     }
 
     auto s     = std::make_unique<String>();
     s->content = (content + v->content);
-    return s;
+    return Cell{std::move(s)};
 }
-auto String::operator()(traits::Eq::tag_type const,
-                        Register_cell const& c) const -> Register_cell
+auto String::operator()(traits::Eq::tag_type const, Cell const& c) const -> Cell
 {
-    if (not std::holds_alternative<std::unique_ptr<Value>>(c)) {
+    if (not std::holds_alternative<Cell::boxed_type>(c.content)) {
         throw std::runtime_error{"cannot compare unboxed value to String"};
     }
 
-    auto const v =
-        dynamic_cast<String*>(std::get<std::unique_ptr<Value>>(c).get());
+    auto const v = dynamic_cast<String*>(c.get<Cell::boxed_type>().get());
     if (not v) {
-        throw std::runtime_error{
-            "cannot compare " + std::get<std::unique_ptr<Value>>(c)->type_name()
-            + " value to String"};
+        throw std::runtime_error{"cannot compare "
+                                 + c.get<Cell::boxed_type>()->type_name()
+                                 + " value to String"};
     }
 
-    return static_cast<uint64_t>(v->content == content);
+    return Cell{static_cast<uint64_t>(v->content == content)};
 }
 
 auto Atom::type_name() const -> std::string
@@ -123,22 +135,20 @@ auto Atom::to_string() const -> std::string
 {
     return viua::vm::types::traits::To_string::quote_and_escape(content);
 }
-auto Atom::operator()(traits::Eq::tag_type const, Register_cell const& c) const
-    -> Register_cell
+auto Atom::operator()(traits::Eq::tag_type const, Cell const& c) const -> Cell
 {
-    if (not std::holds_alternative<std::unique_ptr<Value>>(c)) {
+    if (not std::holds_alternative<Cell::boxed_type>(c.content)) {
         throw std::runtime_error{"cannot compare unboxed value to Atom"};
     }
 
-    auto const v =
-        dynamic_cast<Atom*>(std::get<std::unique_ptr<Value>>(c).get());
+    auto const v = dynamic_cast<Atom*>(c.get<Cell::boxed_type>().get());
     if (not v) {
-        throw std::runtime_error{
-            "cannot compare " + std::get<std::unique_ptr<Value>>(c)->type_name()
-            + " value to Atom"};
+        throw std::runtime_error{"cannot compare "
+                                 + c.get<Cell::boxed_type>()->type_name()
+                                 + " value to Atom"};
     }
 
-    return static_cast<uint64_t>(v->content == content);
+    return Cell{static_cast<uint64_t>(v->content == content)};
 }
 
 auto Struct::type_name() const -> std::string
@@ -150,19 +160,18 @@ auto Struct::to_string() const -> std::string
     return "{}";
 }
 
-auto stringify_cell(Value_cell const& vc) -> std::string
+auto stringify_cell(Cell const& vc) -> std::string
 {
-    if (std::holds_alternative<int64_t>(vc)) {
-        return std::to_string(std::get<int64_t>(vc));
-    } else if (std::holds_alternative<uint64_t>(vc)) {
-        return std::to_string(std::get<uint64_t>(vc));
-    } else if (std::holds_alternative<float>(vc)) {
-        return std::to_string(std::get<float>(vc));
-    } else if (std::holds_alternative<double>(vc)) {
-        return std::to_string(std::get<double>(vc));
+    if (std::holds_alternative<int64_t>(vc.content)) {
+        return std::to_string(std::get<int64_t>(vc.content));
+    } else if (std::holds_alternative<uint64_t>(vc.content)) {
+        return std::to_string(std::get<uint64_t>(vc.content));
+    } else if (std::holds_alternative<float>(vc.content)) {
+        return std::to_string(std::get<float>(vc.content));
+    } else if (std::holds_alternative<double>(vc.content)) {
+        return std::to_string(std::get<double>(vc.content));
     } else {
-        auto const* v =
-            std::get<std::unique_ptr<viua::vm::types::Value>>(vc).get();
+        auto const* v = vc.get<Cell::boxed_type>().get();
         auto const* s =
             dynamic_cast<viua::vm::types::traits::To_string const*>(v);
         if (s) {
@@ -192,11 +201,11 @@ auto Buffer::to_string() const -> std::string
     out << "]";
     return out.str();
 }
-auto Buffer::push(Value_cell&& v) -> void
+auto Buffer::push(value_type&& v) -> void
 {
     values.push_back(std::move(v));
 }
-auto Buffer::pop(size_t const n) -> Value_cell
+auto Buffer::pop(size_t const n) -> value_type
 {
     auto v = std::move(values.at(n));
     values.erase(values.begin() + n);

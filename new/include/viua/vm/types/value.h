@@ -30,14 +30,76 @@
 
 
 namespace viua::vm::types {
-using Register_cell = std::variant<std::monostate,
-                                   int64_t,
-                                   uint64_t,
-                                   float,
-                                   double,
-                                   std::unique_ptr<class Value>>;
-using Value_cell    = std::
-    variant<int64_t, uint64_t, float, double, std::unique_ptr<class Value>>;
+struct Cell_view {
+    using boxed_type = class Value;
+    using void_type  = std::monostate;
+    using value_type = std::variant<void_type,
+                                    std::reference_wrapper<int64_t>,
+                                    std::reference_wrapper<uint64_t>,
+                                    std::reference_wrapper<float>,
+                                    std::reference_wrapper<double>,
+                                    std::reference_wrapper<boxed_type>>;
+
+    value_type content;
+
+    Cell_view() = delete;
+    Cell_view(class Cell&);
+    explicit Cell_view(boxed_type&);
+
+    template<typename T> auto holds() const -> bool
+    {
+        if (std::is_same_v<
+                T,
+                void> and std::holds_alternative<void_type>(content)) {
+            return true;
+        }
+
+        using Tr = std::reference_wrapper<T>;
+        return std::holds_alternative<Tr>(content);
+    }
+
+    template<typename T> auto get() -> T&
+    {
+        return std::get<std::reference_wrapper<T>>(content);
+    }
+    template<typename T> auto get() const -> T const&
+    {
+        return std::get<std::reference_wrapper<T>>(content);
+    }
+};
+
+struct Cell {
+    using boxed_type = std::unique_ptr<class Value>;
+    using void_type  = std::monostate;
+    using value_type =
+        std::variant<void_type, int64_t, uint64_t, float, double, boxed_type>;
+
+    value_type content;
+
+    Cell() = default;
+    template<typename T> explicit Cell(T&& v) : content{std::move(v)}
+    {}
+
+    auto view() -> Cell_view
+    {
+        return Cell_view{*this};
+    }
+
+    template<typename T> auto operator=(T&& v) -> Cell&
+    {
+        content = std::move(v);
+        return *this;
+    }
+
+    template<typename T> auto get() -> T&
+    {
+        return std::get<T>(content);
+    }
+    template<typename T> auto get() const -> T const&
+    {
+        return std::get<T>(content);
+    }
+};
 
 class Value {
   public:
@@ -62,8 +124,7 @@ class Value {
 
         return fn(*dynamic_cast<Trait const*>(this));
     }
-    template<typename Trait>
-    auto as_trait(Register_cell const& cell) const -> Register_cell
+    template<typename Trait> auto as_trait(Cell const& cell) const -> Cell
     {
         if (not has_trait<Trait>()) {
             throw std::runtime_error{type_name()

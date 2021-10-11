@@ -35,13 +35,89 @@ using namespace viua::arch::ins;
 using viua::vm::Stack;
 using ip_type = viua::arch::instruction_type const*;
 
+auto get_value(std::vector<viua::vm::Value>& registers, size_t const i)
+    -> viua::vm::types::Cell_view
+{
+    using viua::vm::types::Cell;
+    using viua::vm::types::Cell_view;
+
+    auto& c = registers.at(i);
+    if (std::holds_alternative<Cell::boxed_type>(c.value.content)) {
+        auto& b = std::get<Cell::boxed_type>(c.value.content);
+        if (auto p = dynamic_cast<types::Pointer*>(b.get()); p) {
+            return Cell_view{*p->value};
+        }
+    }
+
+    return c.value.view();
+}
+
+template<typename T> auto cast_to(viua::vm::types::Cell_view value) -> T
+{
+    using viua::vm::types::Cell_view;
+
+    using Tr = std::reference_wrapper<T>;
+
+    if (std::holds_alternative<Tr>(value.content)) {
+        return value.template get<T>();
+    }
+
+    if (value.template holds<int64_t>()) {
+        return static_cast<T>(value.template get<int64_t>());
+    }
+    if (value.template holds<uint64_t>()) {
+        return static_cast<T>(value.template get<uint64_t>());
+    }
+    if (value.template holds<float>()) {
+        return static_cast<T>(value.template get<float>());
+    }
+    if (value.template holds<double>()) {
+        return static_cast<T>(value.template get<double>());
+    }
+
+    if (not value.template holds<Cell_view::boxed_type>()) {
+        throw std::bad_cast{};
+    }
+
+    auto const bv = &value.template get<Cell_view::boxed_type>();
+
+    using viua::vm::types::Float_double;
+    using viua::vm::types::Float_single;
+    using viua::vm::types::Signed_integer;
+    using viua::vm::types::Unsigned_integer;
+    if (auto x = dynamic_cast<Signed_integer const*>(bv); x) {
+        return static_cast<T>(x->value);
+    }
+
+    /*
+    if (holds<Signed_integer>()) {
+        return static_cast<T>(
+            static_cast<Signed_integer const&>(boxed_value()).value);
+    }
+    if (holds<Unsigned_integer>()) {
+        return static_cast<T>(
+            static_cast<Unsigned_integer const&>(boxed_value()).value);
+    }
+    if (holds<Float_single>()) {
+        return static_cast<T>(
+            static_cast<Float_single const&>(boxed_value()).value);
+    }
+    if (holds<Float_double>()) {
+        return static_cast<T>(
+            static_cast<Float_double const&>(boxed_value()).value);
+    }
+    */
+
+    throw std::bad_cast{};
+}
+
 template<typename Op, typename Trait>
 auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
 {
     auto& registers = stack.frames.back().registers;
     auto& out       = registers.at(op.instruction.out.index);
     auto& lhs       = registers.at(op.instruction.lhs.index);
-    auto& rhs       = registers.at(op.instruction.rhs.index);
+    auto rhs        = get_value(registers, op.instruction.rhs.index);
 
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
                      + " " + op.instruction.out.to_string() + ", "
@@ -53,32 +129,33 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
     using viua::vm::types::Signed_integer;
     using viua::vm::types::Unsigned_integer;
     if (lhs.template holds<int64_t>()) {
-        out = typename Op::functor_type{}(std::get<int64_t>(lhs.value),
-                                          rhs.template cast_to<int64_t>());
+        out = typename Op::functor_type{}(lhs.value.template get<int64_t>(),
+                                          cast_to<int64_t>(rhs));
     } else if (lhs.template holds<uint64_t>()) {
-        out = typename Op::functor_type{}(std::get<uint64_t>(lhs.value),
-                                          rhs.template cast_to<uint64_t>());
+        out = typename Op::functor_type{}(lhs.value.template get<uint64_t>(),
+                                          cast_to<uint64_t>(rhs));
     } else if (lhs.template holds<float>()) {
-        out = typename Op::functor_type{}(std::get<float>(lhs.value),
-                                          rhs.template cast_to<float>());
+        out = typename Op::functor_type{}(lhs.value.template get<float>(),
+                                          cast_to<float>(rhs));
     } else if (lhs.template holds<double>()) {
-        out = typename Op::functor_type{}(std::get<double>(lhs.value),
-                                          rhs.template cast_to<double>());
+        out = typename Op::functor_type{}(lhs.value.template get<double>(),
+                                          cast_to<double>(rhs));
     } else if (lhs.template holds<Signed_integer>()) {
         out = typename Op::functor_type{}(lhs.template cast_to<int64_t>(),
-                                          rhs.template cast_to<int64_t>());
+                                          cast_to<int64_t>(rhs));
     } else if (lhs.template holds<Unsigned_integer>()) {
         out = typename Op::functor_type{}(lhs.template cast_to<uint64_t>(),
-                                          rhs.template cast_to<uint64_t>());
+                                          cast_to<uint64_t>(rhs));
     } else if (lhs.template holds<Float_single>()) {
         out = typename Op::functor_type{}(lhs.template cast_to<float>(),
-                                          rhs.template cast_to<float>());
+                                          cast_to<float>(rhs));
     } else if (lhs.template holds<Float_double>()) {
         out = typename Op::functor_type{}(lhs.template cast_to<double>(),
-                                          rhs.template cast_to<double>());
-    } else if (lhs.template has_trait<Trait>()) {
-        out.value = lhs.boxed_value().template as_trait<Trait>(rhs.value);
-    } else {
+                                          cast_to<double>(rhs));
+    } /* else if (lhs.template has_trait<Trait>()) {
+        out.value = lhs.boxed_value().template as_trait<Trait>(rhs.content);
+    } */
+    else {
         throw abort_execution{
             ip, "unsupported operand types for arithmetic operation"};
     }
@@ -97,16 +174,16 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
                      + op.instruction.rhs.to_string() + "\n";
 
     if (lhs.template holds<int64_t>()) {
-        out = typename Op::functor_type{}(std::get<int64_t>(lhs.value),
+        out = typename Op::functor_type{}(lhs.value.template get<int64_t>(),
                                           rhs.template cast_to<int64_t>());
     } else if (lhs.template holds<uint64_t>()) {
-        out = typename Op::functor_type{}(std::get<uint64_t>(lhs.value),
+        out = typename Op::functor_type{}(lhs.value.template get<uint64_t>(),
                                           rhs.template cast_to<uint64_t>());
     } else if (lhs.template holds<float>()) {
-        out = typename Op::functor_type{}(std::get<float>(lhs.value),
+        out = typename Op::functor_type{}(lhs.value.template get<float>(),
                                           rhs.template cast_to<float>());
     } else if (lhs.template holds<double>()) {
-        out = typename Op::functor_type{}(std::get<double>(lhs.value),
+        out = typename Op::functor_type{}(lhs.value.template get<double>(),
                                           rhs.template cast_to<double>());
     } else {
         throw abort_execution{
@@ -148,9 +225,9 @@ auto execute(MOD const op, Stack& stack, ip_type const ip) -> void
     }
 
     if (lhs.holds<int64_t>()) {
-        out = std::get<int64_t>(lhs.value) % rhs.cast_to<int64_t>();
+        out = lhs.value.get<int64_t>() % rhs.cast_to<int64_t>();
     } else if (lhs.holds<uint64_t>()) {
-        out = std::get<uint64_t>(lhs.value) % rhs.cast_to<uint64_t>();
+        out = lhs.value.get<uint64_t>() % rhs.cast_to<uint64_t>();
     } else {
         throw abort_execution{ip,
                               "unsupported operand types for modulo operation"};
@@ -164,8 +241,7 @@ auto execute(BITSHL const op, Stack& stack, ip_type const) -> void
     auto& lhs       = registers.at(op.instruction.lhs.index);
     auto& rhs       = registers.at(op.instruction.rhs.index);
 
-    out.value =
-        (std::get<uint64_t>(lhs.value) << std::get<uint64_t>(rhs.value));
+    out.value = (lhs.value.get<uint64_t>() << rhs.value.get<uint64_t>());
 
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
                      + " " + op.instruction.out.to_string() + ", "
@@ -179,8 +255,7 @@ auto execute(BITSHR const op, Stack& stack, ip_type const) -> void
     auto& lhs       = registers.at(op.instruction.lhs.index);
     auto& rhs       = registers.at(op.instruction.rhs.index);
 
-    out.value =
-        (std::get<uint64_t>(lhs.value) >> std::get<uint64_t>(rhs.value));
+    out.value = (lhs.value.get<uint64_t>() >> rhs.value.get<uint64_t>());
 
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
                      + " " + op.instruction.out.to_string() + ", "
@@ -194,8 +269,8 @@ auto execute(BITASHR const op, Stack& stack, ip_type const) -> void
     auto& lhs       = registers.at(op.instruction.lhs.index);
     auto& rhs       = registers.at(op.instruction.rhs.index);
 
-    auto const tmp = static_cast<int64_t>(std::get<uint64_t>(lhs.value));
-    out.value = static_cast<uint64_t>(tmp >> std::get<uint64_t>(rhs.value));
+    auto const tmp = static_cast<int64_t>(lhs.value.get<uint64_t>());
+    out.value      = static_cast<uint64_t>(tmp >> rhs.value.get<uint64_t>());
 
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
                      + " " + op.instruction.out.to_string() + ", "
@@ -213,7 +288,7 @@ auto execute(BITAND const op, Stack& stack, ip_type const) -> void
     auto& lhs       = registers.at(op.instruction.lhs.index);
     auto& rhs       = registers.at(op.instruction.rhs.index);
 
-    out.value = (std::get<uint64_t>(lhs.value) & std::get<uint64_t>(rhs.value));
+    out.value = (lhs.value.get<uint64_t>() & rhs.value.get<uint64_t>());
 
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
                      + " " + op.instruction.out.to_string() + ", "
@@ -227,7 +302,7 @@ auto execute(BITOR const op, Stack& stack, ip_type const) -> void
     auto& lhs       = registers.at(op.instruction.lhs.index);
     auto& rhs       = registers.at(op.instruction.rhs.index);
 
-    out.value = (std::get<uint64_t>(lhs.value) | std::get<uint64_t>(rhs.value));
+    out.value = (lhs.value.get<uint64_t>() | rhs.value.get<uint64_t>());
 
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
                      + " " + op.instruction.out.to_string() + ", "
@@ -241,7 +316,7 @@ auto execute(BITXOR const op, Stack& stack, ip_type const) -> void
     auto& lhs       = registers.at(op.instruction.lhs.index);
     auto& rhs       = registers.at(op.instruction.rhs.index);
 
-    out.value = (std::get<uint64_t>(lhs.value) ^ std::get<uint64_t>(rhs.value));
+    out.value = (lhs.value.get<uint64_t>() ^ rhs.value.get<uint64_t>());
 
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
                      + " " + op.instruction.out.to_string() + ", "
@@ -254,7 +329,7 @@ auto execute(BITNOT const op, Stack& stack, ip_type const) -> void
     auto& out       = registers.at(op.instruction.out.index);
     auto& in        = registers.at(op.instruction.in.index);
 
-    out.value = ~std::get<uint64_t>(in.value);
+    out.value = ~in.value.get<uint64_t>();
 
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
                      + " " + op.instruction.out.to_string() + ", "
@@ -275,17 +350,17 @@ auto execute_cmp_op(Op const op, Stack& stack, ip_type const ip) -> void
                      + op.instruction.rhs.to_string() + "\n";
 
     if (lhs.template holds<int64_t>()) {
-        out = typename Op::functor_type{}(std::get<int64_t>(lhs.value),
-                                          std::get<int64_t>(rhs.value));
+        out = typename Op::functor_type{}(lhs.value.template get<int64_t>(),
+                                          rhs.value.template get<int64_t>());
     } else if (lhs.template holds<uint64_t>()) {
-        out = typename Op::functor_type{}(std::get<uint64_t>(lhs.value),
-                                          std::get<uint64_t>(rhs.value));
+        out = typename Op::functor_type{}(lhs.value.template get<uint64_t>(),
+                                          rhs.value.template get<uint64_t>());
     } else if (lhs.template holds<float>()) {
-        out = typename Op::functor_type{}(std::get<float>(lhs.value),
-                                          std::get<float>(rhs.value));
+        out = typename Op::functor_type{}(lhs.value.template get<float>(),
+                                          rhs.value.template get<float>());
     } else if (lhs.template holds<double>()) {
-        out = typename Op::functor_type{}(std::get<double>(lhs.value),
-                                          std::get<double>(rhs.value));
+        out = typename Op::functor_type{}(lhs.value.template get<double>(),
+                                          rhs.value.template get<double>());
     } else if (lhs.template has_trait<Trait>()) {
         out.value = lhs.boxed_value().template as_trait<Trait>(rhs.value);
     } else {
@@ -332,8 +407,8 @@ auto execute(CMP const op, Stack& stack, ip_type const) -> void
             out = Cmp::CMP_LT;
         }
     } else {
-        auto const lv = std::get<uint64_t>(lhs.value);
-        auto const rv = std::get<uint64_t>(rhs.value);
+        auto const lv = lhs.value.get<uint64_t>();
+        auto const rv = rhs.value.get<uint64_t>();
         if (lv == rv) {
             out = Cmp::CMP_EQ;
         } else if (lv > rv) {
@@ -368,7 +443,7 @@ auto execute(AND const op, Stack& stack, ip_type const) -> void
             [](Bool const& v) -> bool { return static_cast<bool>(v); }, false);
         out = use_lhs ? std::move(lhs) : std::move(rhs);
     } else {
-        auto const use_lhs = (std::get<uint64_t>(lhs.value) == 0);
+        auto const use_lhs = (lhs.value.get<uint64_t>() == 0);
         out                = use_lhs ? std::move(lhs) : std::move(rhs);
     }
 
@@ -395,7 +470,7 @@ auto execute(OR const op, Stack& stack, ip_type const) -> void
             [](Bool const& v) -> bool { return static_cast<bool>(v); }, false);
         out = use_lhs ? std::move(lhs) : std::move(rhs);
     } else {
-        auto const use_lhs = (std::get<uint64_t>(lhs.value) != 0);
+        auto const use_lhs = (lhs.value.get<uint64_t>() != 0);
         out                = use_lhs ? std::move(lhs) : std::move(rhs);
     }
 
@@ -420,7 +495,7 @@ auto execute(NOT const op, Stack& stack, ip_type const) -> void
         out = in.boxed_value().as_trait<Bool, bool>(
             [](Bool const& v) -> bool { return static_cast<bool>(v); }, false);
     } else {
-        out = static_cast<bool>(std::get<uint64_t>(in.value));
+        out = static_cast<bool>(in.value.get<uint64_t>());
     }
 
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
@@ -429,20 +504,20 @@ auto execute(NOT const op, Stack& stack, ip_type const) -> void
 }
 
 namespace {
-auto type_name(viua::vm::types::Register_cell const& c) -> std::string
+auto type_name(viua::vm::types::Cell const& c) -> std::string
 {
-    if (std::holds_alternative<std::monostate>(c)) {
+    if (std::holds_alternative<std::monostate>(c.content)) {
         return "void";
-    } else if (std::holds_alternative<int64_t>(c)) {
+    } else if (std::holds_alternative<int64_t>(c.content)) {
         return "int";
-    } else if (std::holds_alternative<uint64_t>(c)) {
+    } else if (std::holds_alternative<uint64_t>(c.content)) {
         return "uint";
-    } else if (std::holds_alternative<float>(c)) {
+    } else if (std::holds_alternative<float>(c.content)) {
         return "float";
-    } else if (std::holds_alternative<double>(c)) {
+    } else if (std::holds_alternative<double>(c.content)) {
         return "double";
     } else {
-        return std::get<std::unique_ptr<viua::vm::types::Value>>(c)
+        return std::get<std::unique_ptr<viua::vm::types::Value>>(c.content)
             ->type_name();
     }
 }
@@ -483,13 +558,13 @@ auto execute(COPY const op, Stack& stack, ip_type const) -> void
     }
 
     if (in.holds<int64_t>()) {
-        out = std::get<int64_t>(in.value);
+        out = in.value.get<int64_t>();
     } else if (in.holds<uint64_t>()) {
-        out = std::get<uint64_t>(in.value);
+        out = in.value.get<uint64_t>();
     } else if (in.holds<float>()) {
-        out = std::get<float>(in.value);
+        out = in.value.get<float>();
     } else if (in.holds<double>()) {
-        out = std::get<double>(in.value);
+        out = in.value.get<double>();
     } else {
         out.value = in.boxed_value().as_trait<Copy>().copy();
     }
@@ -530,7 +605,7 @@ auto execute(ATOM const op, Stack& stack, ip_type const) -> void
     auto& target    = registers.at(op.instruction.out.index);
 
     auto const& env        = stack.environment;
-    auto const data_offset = std::get<uint64_t>(target.value);
+    auto const data_offset = target.value.get<uint64_t>();
     auto const data_size   = [env, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
@@ -554,7 +629,7 @@ auto execute(STRING const op, Stack& stack, ip_type const) -> void
     auto& target    = registers.at(op.instruction.out.index);
 
     auto const& env        = stack.environment;
-    auto const data_offset = std::get<uint64_t>(target.value);
+    auto const data_offset = target.value.get<uint64_t>();
     auto const data_size   = [env, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
@@ -581,7 +656,7 @@ auto execute(FRAME const op, Stack& stack, ip_type const ip) -> void
     auto capacity = viua::arch::register_index_type{};
     if (rs == viua::arch::RS::LOCAL) {
         capacity = static_cast<viua::arch::register_index_type>(
-            std::get<uint64_t>(stack.back().registers.at(index).value));
+            stack.back().registers.at(index).value.get<uint64_t>());
     } else if (rs == viua::arch::RS::ARGUMENT) {
         capacity = index;
     } else {
@@ -613,7 +688,7 @@ auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
         }
 
         std::tie(fn_name, fn_addr) =
-            stack.environment.function_at(std::get<uint64_t>(fn_offset.value));
+            stack.environment.function_at(fn_offset.value.get<uint64_t>());
     }
 
     std::cerr << "    " << viua::arch::ops::to_string(op.instruction.opcode)
@@ -685,7 +760,7 @@ auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
 
     auto& target = registers.at(op.instruction.out.index);
 
-    auto const data_offset = std::get<uint64_t>(target.value);
+    auto const data_offset = target.value.get<uint64_t>();
     auto const data_size   = [&stack, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
@@ -714,7 +789,7 @@ auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
 
     auto& target = registers.at(op.instruction.out.index);
 
-    auto const data_offset = std::get<uint64_t>(target.value);
+    auto const data_offset = target.value.get<uint64_t>();
     auto const data_size   = [&stack, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
@@ -788,16 +863,17 @@ auto execute_arithmetic_immediate_op(Op const op,
     if (in.template holds<void>()) {
         out = typename Op::functor_type{}(0, immediate);
     } else if (in.template holds<uint64_t>()) {
-        out = typename Op::functor_type{}(std::get<uint64_t>(in.value),
+        out = typename Op::functor_type{}(in.value.template get<uint64_t>(),
                                           immediate);
     } else if (in.template holds<int64_t>()) {
-        out =
-            typename Op::functor_type{}(std::get<int64_t>(in.value), immediate);
+        out = typename Op::functor_type{}(in.value.template get<int64_t>(),
+                                          immediate);
     } else if (in.template holds<float>()) {
-        out = typename Op::functor_type{}(std::get<float>(in.value), immediate);
+        out = typename Op::functor_type{}(in.value.template get<float>(),
+                                          immediate);
     } else if (in.template holds<double>()) {
-        out =
-            typename Op::functor_type{}(std::get<double>(in.value), immediate);
+        out = typename Op::functor_type{}(in.value.template get<double>(),
+                                          immediate);
     } else {
         throw abort_execution{
             ip,
@@ -860,7 +936,7 @@ auto execute(BUFFER_PUSH const op, Stack& stack, ip_type const ip) -> void
                               "invalid destination operand for buffer_push"};
     }
     static_cast<viua::vm::types::Buffer&>(dst.value()->boxed_value())
-        .push(src.value()->value_cell());
+        .push(std::move(src.value()->value_cell()));
 }
 auto execute(BUFFER_SIZE const op, Stack& stack, ip_type const ip) -> void
 {
@@ -897,22 +973,22 @@ auto execute(BUFFER_POP const op, Stack& stack, ip_type const ip) -> void
         static_cast<viua::vm::types::Buffer&>(src.value()->boxed_value());
     auto off = (buf.size() - 1);
     if (idx.has_value()) {
-        off = std::get<uint64_t>(idx.value()->value);
+        off = idx.value()->value.get<uint64_t>();
     }
 
+    using viua::vm::types::Cell;
     auto v = buf.pop(off);
-    if (std::holds_alternative<int64_t>(v)) {
-        *dst.value() = std::get<int64_t>(v);
-    } else if (std::holds_alternative<uint64_t>(v)) {
-        *dst.value() = std::get<uint64_t>(v);
-    } else if (std::holds_alternative<float>(v)) {
-        *dst.value() = std::get<float>(v);
-    } else if (std::holds_alternative<double>(v)) {
-        *dst.value() = std::get<double>(v);
-    } else if (std::holds_alternative<std::unique_ptr<viua::vm::types::Value>>(
-                   v)) {
-        dst.value()->value =
-            std::move(std::get<std::unique_ptr<viua::vm::types::Value>>(v));
+
+    if (std::holds_alternative<int64_t>(v.content)) {
+        *dst.value() = v.get<int64_t>();
+    } else if (std::holds_alternative<uint64_t>(v.content)) {
+        *dst.value() = v.get<uint64_t>();
+    } else if (std::holds_alternative<float>(v.content)) {
+        *dst.value() = v.get<float>();
+    } else if (std::holds_alternative<double>(v.content)) {
+        *dst.value() = v.get<double>();
+    } else if (std::holds_alternative<Cell::boxed_type>(v.content)) {
+        dst.value()->value = std::move(v.get<Cell::boxed_type>());
     }
 }
 
@@ -934,17 +1010,17 @@ auto execute(PTR const op, Stack& stack, ip_type const ip) -> void
     using viua::vm::types::Signed_integer;
     using viua::vm::types::Unsigned_integer;
     if (src.value()->holds<int64_t>()) {
-        src.value()->value = std::make_unique<Signed_integer>(
-            std::get<int64_t>(src.value()->value));
+        src.value()->value =
+            std::make_unique<Signed_integer>(src.value()->value.get<int64_t>());
     } else if (src.value()->holds<uint64_t>()) {
         src.value()->value = std::make_unique<Unsigned_integer>(
-            std::get<uint64_t>(src.value()->value));
+            src.value()->value.get<uint64_t>());
     } else if (src.value()->holds<float>()) {
         src.value()->value =
-            std::make_unique<Float_single>(std::get<float>(src.value()->value));
+            std::make_unique<Float_single>(src.value()->value.get<float>());
     } else if (src.value()->holds<double>()) {
-        src.value()->value = std::make_unique<Float_double>(
-            std::get<double>(src.value()->value));
+        src.value()->value =
+            std::make_unique<Float_double>(src.value()->value.get<double>());
     }
 
     dst.value()->value = src.value()->boxed_value().pointer_to();
@@ -982,28 +1058,25 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
             } else if (each.holds<int64_t>()) {
                 std::cerr
                     << "is " << std::hex << std::setw(16) << std::setfill('0')
-                    << std::get<uint64_t>(each.value) << " " << std::dec
-                    << static_cast<int64_t>(std::get<uint64_t>(each.value))
-                    << "\n";
+                    << each.value.get<uint64_t>() << " " << std::dec
+                    << static_cast<int64_t>(each.value.get<uint64_t>()) << "\n";
             } else if (each.holds<uint64_t>()) {
                 std::cerr << "iu " << std::hex << std::setw(16)
-                          << std::setfill('0') << std::get<uint64_t>(each.value)
-                          << " " << std::dec << std::get<uint64_t>(each.value)
+                          << std::setfill('0') << each.value.get<uint64_t>()
+                          << " " << std::dec << each.value.get<uint64_t>()
                           << "\n";
             } else if (each.holds<float>()) {
-                std::cerr << "fl " << std::hex << std::setw(8)
-                          << std::setfill('0')
-                          << static_cast<float>(std::get<uint64_t>(each.value))
-                          << " " << std::dec
-                          << static_cast<float>(std::get<uint64_t>(each.value))
-                          << "\n";
+                std::cerr
+                    << "fl " << std::hex << std::setw(8) << std::setfill('0')
+                    << static_cast<float>(each.value.get<uint64_t>()) << " "
+                    << std::dec
+                    << static_cast<float>(each.value.get<uint64_t>()) << "\n";
             } else if (each.holds<double>()) {
-                std::cerr << "db " << std::hex << std::setw(16)
-                          << std::setfill('0')
-                          << static_cast<double>(std::get<uint64_t>(each.value))
-                          << " " << std::dec
-                          << static_cast<double>(std::get<uint64_t>(each.value))
-                          << "\n";
+                std::cerr
+                    << "db " << std::hex << std::setw(16) << std::setfill('0')
+                    << static_cast<double>(each.value.get<uint64_t>()) << " "
+                    << std::dec
+                    << static_cast<double>(each.value.get<uint64_t>()) << "\n";
             }
         }
     }
@@ -1034,28 +1107,25 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
             } else if (each.holds<int64_t>()) {
                 std::cerr
                     << "is " << std::hex << std::setw(16) << std::setfill('0')
-                    << std::get<uint64_t>(each.value) << " " << std::dec
-                    << static_cast<int64_t>(std::get<uint64_t>(each.value))
-                    << "\n";
+                    << each.value.get<uint64_t>() << " " << std::dec
+                    << static_cast<int64_t>(each.value.get<uint64_t>()) << "\n";
             } else if (each.holds<uint64_t>()) {
                 std::cerr << "iu " << std::hex << std::setw(16)
-                          << std::setfill('0') << std::get<uint64_t>(each.value)
-                          << " " << std::dec << std::get<uint64_t>(each.value)
+                          << std::setfill('0') << each.value.get<uint64_t>()
+                          << " " << std::dec << each.value.get<uint64_t>()
                           << "\n";
             } else if (each.holds<float>()) {
-                std::cerr << "fl " << std::hex << std::setw(8)
-                          << std::setfill('0')
-                          << static_cast<float>(std::get<uint64_t>(each.value))
-                          << " " << std::dec
-                          << static_cast<float>(std::get<uint64_t>(each.value))
-                          << "\n";
+                std::cerr
+                    << "fl " << std::hex << std::setw(8) << std::setfill('0')
+                    << static_cast<float>(each.value.get<uint64_t>()) << " "
+                    << std::dec
+                    << static_cast<float>(each.value.get<uint64_t>()) << "\n";
             } else if (each.holds<double>()) {
-                std::cerr << "db " << std::hex << std::setw(16)
-                          << std::setfill('0')
-                          << static_cast<double>(std::get<uint64_t>(each.value))
-                          << " " << std::dec
-                          << static_cast<double>(std::get<uint64_t>(each.value))
-                          << "\n";
+                std::cerr
+                    << "db " << std::hex << std::setw(16) << std::setfill('0')
+                    << static_cast<double>(each.value.get<uint64_t>()) << " "
+                    << std::dec
+                    << static_cast<double>(each.value.get<uint64_t>()) << "\n";
             }
         }
     }
@@ -1085,31 +1155,29 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
                 /* do nothing */
             } else if (each.holds<int64_t>()) {
                 std::cerr << "is " << std::hex << std::setw(16)
-                          << std::setfill('0') << std::get<int64_t>(each.value)
-                          << " " << std::dec << std::get<int64_t>(each.value)
+                          << std::setfill('0') << each.value.get<int64_t>()
+                          << " " << std::dec << each.value.get<int64_t>()
                           << "\n";
             } else if (each.holds<uint64_t>()) {
                 std::cerr << "iu " << std::hex << std::setw(16)
-                          << std::setfill('0') << std::get<uint64_t>(each.value)
-                          << " " << std::dec << std::get<uint64_t>(each.value)
+                          << std::setfill('0') << each.value.get<uint64_t>()
+                          << " " << std::dec << each.value.get<uint64_t>()
                           << "\n";
             } else if (each.holds<float>()) {
                 auto const precision = std::cerr.precision();
-                std::cerr << "fl " << std::hexfloat
-                          << std::get<float>(each.value) << " "
-                          << std::defaultfloat
+                std::cerr << "fl " << std::hexfloat << each.value.get<float>()
+                          << " " << std::defaultfloat
                           << std::setprecision(
                                  std::numeric_limits<float>::digits10 + 1)
-                          << std::get<float>(each.value) << "\n";
+                          << each.value.get<float>() << "\n";
                 std::cerr << std::setprecision(precision);
             } else if (each.holds<double>()) {
                 auto const precision = std::cerr.precision();
-                std::cerr << "db " << std::hexfloat
-                          << std::get<double>(each.value) << " "
-                          << std::defaultfloat
+                std::cerr << "db " << std::hexfloat << each.value.get<double>()
+                          << " " << std::defaultfloat
                           << std::setprecision(
                                  std::numeric_limits<double>::digits10 + 1)
-                          << std::get<double>(each.value) << "\n";
+                          << each.value.get<double>() << "\n";
                 std::cerr << std::setprecision(precision);
             }
         }

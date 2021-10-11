@@ -177,7 +177,7 @@ auto Operand::make_access() const -> viua::arch::Register_access
     }
 
     auto const direct = (lx == TOKEN::RA_DIRECT);
-    auto const index = std::stoul(ingredients.at(1).text);
+    auto const index  = std::stoul(ingredients.at(1).text);
     if (ingredients.size() == 2) {
         return viua::arch::Register_access::make_local(index, direct);
     }
@@ -449,9 +449,11 @@ auto parse_function_definition(
             if (lexemes.front() == TOKEN::RA_VOID) {
                 operand.ingredients.push_back(
                     consume_token_of(TOKEN::RA_VOID, lexemes));
-            } else if (look_ahead({ TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF }, lexemes)) {
-                auto const access = consume_token_of({ TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF }, lexemes);
-                auto index        = viua::libs::lexer::Lexeme{};
+            } else if (look_ahead({TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF},
+                                  lexemes)) {
+                auto const access = consume_token_of(
+                    {TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF}, lexemes);
+                auto index = viua::libs::lexer::Lexeme{};
                 try {
                     index = consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
                 } catch (viua::libs::lexer::Lexeme const& e) {
