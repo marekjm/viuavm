@@ -77,6 +77,10 @@ struct Cell {
     value_type content;
 
     Cell() = default;
+    Cell(Cell&& c) : content{std::move(c.content)}
+    {
+        c.content = void_type{};
+    }
     template<typename T> explicit Cell(T&& v) : content{std::move(v)}
     {}
 
@@ -85,6 +89,12 @@ struct Cell {
         return Cell_view{*this};
     }
 
+    auto operator=(Cell&& v) -> Cell&
+    {
+        content = std::move(v.content);
+        v.content = void_type{};
+        return *this;
+    }
     template<typename T> auto operator=(T&& v) -> Cell&
     {
         content = std::move(v);
