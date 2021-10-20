@@ -122,6 +122,9 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
         case viua::arch::ops::OPCODE_T::OR:
             execute(OR{instruction}, stack, ip);
             break;
+        case viua::arch::ops::OPCODE_T::BUFFER_AT:
+            execute(BUFFER_AT{instruction}, stack, ip);
+            break;
         case viua::arch::ops::OPCODE_T::BUFFER_POP:
             execute(BUFFER_POP{instruction}, stack, ip);
             break;

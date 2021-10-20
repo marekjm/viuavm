@@ -954,6 +954,47 @@ auto execute(BUFFER_SIZE const op, Stack& stack, ip_type const ip) -> void
         static_cast<viua::vm::types::Buffer&>(src.value()->boxed_value())
             .size();
 }
+auto execute(BUFFER_AT const op, Stack& stack, ip_type const ip) -> void
+{
+    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
+                     + " " + op.instruction.out.to_string() + ", "
+                     + op.instruction.lhs.to_string() + ", "
+                     + op.instruction.rhs.to_string() + "\n";
+
+    auto dst = get_slot(op.instruction.out, stack, ip);
+    auto src = get_slot(op.instruction.lhs, stack, ip);
+    auto idx = get_slot(op.instruction.rhs, stack, ip);
+
+    if (not src.has_value()) {
+        throw abort_execution{ip, "cannot buffer_at out of void"};
+    }
+
+    auto& buf =
+        static_cast<viua::vm::types::Buffer&>(src.value()->boxed_value());
+    auto off = (buf.size() - 1);
+    if (idx.has_value()) {
+        off = idx.value()->value.get<uint64_t>();
+    }
+
+    auto& v = buf.at(off);
+
+    using viua::vm::types::Float_double;
+    using viua::vm::types::Float_single;
+    using viua::vm::types::Signed_integer;
+    using viua::vm::types::Unsigned_integer;
+    if (std::holds_alternative<int64_t>(v.content)) {
+        v.content = std::make_unique<Signed_integer>(v.get<int64_t>());
+    } else if (std::holds_alternative<uint64_t>(v.content)) {
+        v.content = std::make_unique<Unsigned_integer>(v.get<uint64_t>());
+    } else if (std::holds_alternative<float>(v.content)) {
+        v.content = std::make_unique<Float_single>(v.get<float>());
+    } else if (std::holds_alternative<double>(v.content)) {
+        v.content = std::make_unique<Float_double>(v.get<double>());
+    }
+
+    using viua::vm::types::Cell;
+    dst.value()->value = v.get<Cell::boxed_type>()->pointer_to();
+}
 auto execute(BUFFER_POP const op, Stack& stack, ip_type const ip) -> void
 {
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)

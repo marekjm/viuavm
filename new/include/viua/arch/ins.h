@@ -371,6 +371,12 @@ struct BUFFER_SIZE : Instruction {
     BUFFER_SIZE(viua::arch::ops::D i) : instruction{i}
     {}
 };
+struct BUFFER_AT : Instruction {
+    viua::arch::ops::T instruction;
+
+    BUFFER_AT(viua::arch::ops::T i) : instruction{i}
+    {}
+};
 struct BUFFER_POP : Instruction {
     viua::arch::ops::T instruction;
 

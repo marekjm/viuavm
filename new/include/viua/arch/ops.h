@@ -212,7 +212,8 @@ enum class OPCODE : opcode_type {
     AND = (FORMAT_T | 0x0012),
     OR  = (FORMAT_T | 0x0013),
 
-    BUFFER_POP = (FORMAT_T | 0x0014),
+    BUFFER_AT = (FORMAT_T | 0x0014),
+    BUFFER_POP = (FORMAT_T | 0x0015),
 
     CALL   = (FORMAT_D | 0x0001),
     BITNOT = (FORMAT_D | 0x0002),
@@ -275,6 +276,7 @@ enum class OPCODE_T : opcode_type {
     CMP        = static_cast<opcode_type>(OPCODE::CMP),
     AND        = static_cast<opcode_type>(OPCODE::AND),
     OR         = static_cast<opcode_type>(OPCODE::OR),
+    BUFFER_AT  = static_cast<opcode_type>(OPCODE::BUFFER_AT),
     BUFFER_POP = static_cast<opcode_type>(OPCODE::BUFFER_POP),
 };
 enum class OPCODE_D : opcode_type {

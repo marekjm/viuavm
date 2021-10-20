@@ -212,6 +212,8 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "g.buffer_push",
     "buffer_size",
     "g.buffer_size",
+    "buffer_at",
+    "g.buffer_at",
     "buffer_pop",
     "g.buffer_pop",
 

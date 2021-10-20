@@ -205,6 +205,10 @@ auto Buffer::push(value_type&& v) -> void
 {
     values.push_back(std::move(v));
 }
+auto Buffer::at(size_t const n) -> value_type&
+{
+    return values.at(n);
+}
 auto Buffer::pop(size_t const n) -> value_type
 {
     auto v = std::move(values.at(n));

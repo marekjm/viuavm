@@ -150,6 +150,8 @@ struct Buffer
     using size_type = decltype(values)::size_type;
 
     auto push(value_type&&) -> void;
+    auto at(size_type) -> value_type&;
+    auto at(size_type) const -> value_type const&;
     auto pop(size_type) -> value_type;
     auto size() const -> size_type;
 

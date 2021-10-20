@@ -91,6 +91,7 @@ Work_instruction(DIVIU);
 
 Work_instruction(BUFFER_PUSH);
 Work_instruction(BUFFER_SIZE);
+Work_instruction(BUFFER_AT);
 Work_instruction(BUFFER_POP);
 
 Work_instruction(PTR);

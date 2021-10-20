@@ -319,6 +319,8 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "buffer_push";
     case OPCODE::BUFFER_SIZE:
         return greedy + "buffer_size";
+    case OPCODE::BUFFER_AT:
+        return greedy + "buffer_at";
     case OPCODE::BUFFER_POP:
         return greedy + "buffer_pop";
     case OPCODE::PTR:
@@ -433,6 +435,8 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::BUFFER_PUSH));
     } else if (sv == "buffer_size") {
         return (op | static_cast<opcode_type>(OPCODE::BUFFER_SIZE));
+    } else if (sv == "buffer_at") {
+        return (op | static_cast<opcode_type>(OPCODE::BUFFER_AT));
     } else if (sv == "buffer_pop") {
         return (op | static_cast<opcode_type>(OPCODE::BUFFER_POP));
     } else if (sv == "ptr") {
