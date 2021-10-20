@@ -927,10 +927,6 @@ auto execute(BUFFER_PUSH const op, Stack& stack, ip_type const ip) -> void
         throw abort_execution{ip, "cannot buffer_push out of void"};
     }
 
-    std::cerr << dst.has_value() << " "
-              << dst.value()->boxed_value().type_name() << " "
-              << dst.value()->holds<viua::vm::types::Buffer>() << "\n";
-
     if (not dst.value()->holds<viua::vm::types::Buffer>()) {
         throw abort_execution{ip,
                               "invalid destination operand for buffer_push"};
