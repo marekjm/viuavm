@@ -151,15 +151,6 @@ auto Atom::operator()(traits::Eq::tag_type const, Cell const& c) const -> Cell
     return Cell{static_cast<uint64_t>(v->content == content)};
 }
 
-auto Struct::type_name() const -> std::string
-{
-    return "struct";
-}
-auto Struct::to_string() const -> std::string
-{
-    return "{}";
-}
-
 auto stringify_cell(Cell const& vc) -> std::string
 {
     if (std::holds_alternative<int64_t>(vc.content)) {
@@ -180,6 +171,37 @@ auto stringify_cell(Cell const& vc) -> std::string
             return ("<value of " + v->type_name() + ">");
         }
     }
+}
+
+auto Struct::insert(key_type const key, value_type&& value) -> void
+{
+    values[key] = std::move(value);
+}
+auto Struct::type_name() const -> std::string
+{
+    return "struct";
+}
+auto Struct::to_string() const -> std::string
+{
+    if (values.empty()) {
+        return "{}";
+    }
+
+    auto out = std::ostringstream{};
+    out << "{";
+
+    auto first = true;
+    for (auto const& [k, v] : values) {
+        if (not first) {
+            out << ", ";
+        }
+        first = false;
+
+        out << k << " = " << stringify_cell(v);
+    }
+
+    out << "}";
+    return out.str();
 }
 
 auto Buffer::type_name() const -> std::string

@@ -1029,6 +1029,50 @@ auto execute(BUFFER_POP const op, Stack& stack, ip_type const ip) -> void
     }
 }
 
+auto execute(STRUCT_AT const op, Stack&, ip_type const) -> void
+{
+    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
+                     + " " + op.instruction.out.to_string() + ", "
+                     + op.instruction.lhs.to_string() + ", "
+                     + op.instruction.rhs.to_string() + "\n";
+}
+auto execute(STRUCT_INSERT const op, Stack& stack, ip_type const ip) -> void
+{
+    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
+                     + " " + op.instruction.out.to_string() + ", "
+                     + op.instruction.lhs.to_string() + ", "
+                     + op.instruction.rhs.to_string() + "\n";
+
+    auto dst      = get_slot(op.instruction.out, stack, ip);
+    auto key_slot = get_slot(op.instruction.lhs, stack, ip);
+    auto src      = get_slot(op.instruction.rhs, stack, ip);
+
+    if (not key_slot.has_value()) {
+        throw abort_execution{ip, "cannot struct_insert with a void key"};
+    }
+    if (not src.has_value()) {
+        throw abort_execution{ip, "cannot struct_insert with a void value"};
+    }
+
+    if (not dst.value()->holds<viua::vm::types::Struct>()) {
+        throw abort_execution{ip,
+                              "invalid destination operand for struct_insert"};
+    }
+
+    auto key =
+        static_cast<viua::vm::types::Atom&>(key_slot.value()->boxed_value())
+            .to_string();
+    static_cast<viua::vm::types::Struct&>(dst.value()->boxed_value())
+        .insert(key, std::move(src.value()->value_cell()));
+}
+auto execute(STRUCT_REMOVE const op, Stack&, ip_type const) -> void
+{
+    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
+                     + " " + op.instruction.out.to_string() + ", "
+                     + op.instruction.lhs.to_string() + ", "
+                     + op.instruction.rhs.to_string() + "\n";
+}
+
 auto execute(PTR const op, Stack& stack, ip_type const ip) -> void
 {
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)

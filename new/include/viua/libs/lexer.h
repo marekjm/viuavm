@@ -220,6 +220,13 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "ptr",
     "g.ptr",
 
+    "struct_at",
+    "g.struct_at",
+    "struct_insert",
+    "g.struct_insert",
+    "struct_remove",
+    "g.struct_remove",
+
     /*
      * Pseudoinstructions listed below.
      */

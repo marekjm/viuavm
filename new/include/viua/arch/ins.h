@@ -384,6 +384,25 @@ struct BUFFER_POP : Instruction {
     {}
 };
 
+struct STRUCT_AT : Instruction {
+    viua::arch::ops::T instruction;
+
+    STRUCT_AT(viua::arch::ops::T i) : instruction{i}
+    {}
+};
+struct STRUCT_INSERT : Instruction {
+    viua::arch::ops::T instruction;
+
+    STRUCT_INSERT(viua::arch::ops::T i) : instruction{i}
+    {}
+};
+struct STRUCT_REMOVE : Instruction {
+    viua::arch::ops::T instruction;
+
+    STRUCT_REMOVE(viua::arch::ops::T i) : instruction{i}
+    {}
+};
+
 struct PTR : Instruction {
     viua::arch::ops::D instruction;
 

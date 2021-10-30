@@ -91,7 +91,7 @@ struct Cell {
 
     auto operator=(Cell&& v) -> Cell&
     {
-        content = std::move(v.content);
+        content   = std::move(v.content);
         v.content = void_type{};
         return *this;
     }

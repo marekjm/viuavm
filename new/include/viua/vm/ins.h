@@ -94,6 +94,10 @@ Work_instruction(BUFFER_SIZE);
 Work_instruction(BUFFER_AT);
 Work_instruction(BUFFER_POP);
 
+Work_instruction(STRUCT_AT);
+Work_instruction(STRUCT_INSERT);
+Work_instruction(STRUCT_REMOVE);
+
 Work_instruction(PTR);
 
 Work_instruction(EBREAK);

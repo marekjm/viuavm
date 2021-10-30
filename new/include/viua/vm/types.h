@@ -22,6 +22,9 @@
 
 #include <stdint.h>
 
+#include <map>
+#include <vector>
+
 #include <viua/vm/types/traits.h>
 #include <viua/vm/types/value.h>
 
@@ -137,6 +140,13 @@ struct Atom
 struct Struct
         : Value
         , traits::To_string {
+    using value_type = Cell;
+    using key_type   = std::string;
+
+    std::map<key_type, value_type> values;
+
+    auto insert(key_type const, value_type&&) -> void;
+
     auto type_name() const -> std::string override;
     auto to_string() const -> std::string override;
 };

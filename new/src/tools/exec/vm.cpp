@@ -128,6 +128,15 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
         case viua::arch::ops::OPCODE_T::BUFFER_POP:
             execute(BUFFER_POP{instruction}, stack, ip);
             break;
+        case viua::arch::ops::OPCODE_T::STRUCT_AT:
+            execute(STRUCT_AT{instruction}, stack, ip);
+            break;
+        case viua::arch::ops::OPCODE_T::STRUCT_INSERT:
+            execute(STRUCT_INSERT{instruction}, stack, ip);
+            break;
+        case viua::arch::ops::OPCODE_T::STRUCT_REMOVE:
+            execute(STRUCT_REMOVE{instruction}, stack, ip);
+            break;
         }
         break;
     }

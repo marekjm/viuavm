@@ -323,6 +323,12 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "buffer_at";
     case OPCODE::BUFFER_POP:
         return greedy + "buffer_pop";
+    case OPCODE::STRUCT_AT:
+        return greedy + "struct_at";
+    case OPCODE::STRUCT_INSERT:
+        return greedy + "struct_insert";
+    case OPCODE::STRUCT_REMOVE:
+        return greedy + "struct_remove";
     case OPCODE::PTR:
         return greedy + "ptr";
     }
@@ -441,6 +447,12 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::BUFFER_POP));
     } else if (sv == "ptr") {
         return (op | static_cast<opcode_type>(OPCODE::PTR));
+    } else if (sv == "struct_at") {
+        return (op | static_cast<opcode_type>(OPCODE::STRUCT_AT));
+    } else if (sv == "struct_insert") {
+        return (op | static_cast<opcode_type>(OPCODE::STRUCT_INSERT));
+    } else if (sv == "struct_remove") {
+        return (op | static_cast<opcode_type>(OPCODE::STRUCT_REMOVE));
     } else {
         throw std::invalid_argument{"viua::arch::ops::parse_opcode: "
                                     + std::string{raw}};
