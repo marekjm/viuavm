@@ -177,6 +177,10 @@ auto Struct::insert(key_type const key, value_type&& value) -> void
 {
     values[key] = std::move(value);
 }
+auto Struct::at(key_type const key) -> value_type&
+{
+    return values.at(key);
+}
 auto Struct::type_name() const -> std::string
 {
     return "struct";
@@ -227,11 +231,11 @@ auto Buffer::push(value_type&& v) -> void
 {
     values.push_back(std::move(v));
 }
-auto Buffer::at(size_t const n) -> value_type&
+auto Buffer::at(size_type const n) -> value_type&
 {
     return values.at(n);
 }
-auto Buffer::pop(size_t const n) -> value_type
+auto Buffer::pop(size_type const n) -> value_type
 {
     auto v = std::move(values.at(n));
     values.erase(values.begin() + n);

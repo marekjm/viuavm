@@ -146,6 +146,8 @@ struct Struct
     std::map<key_type, value_type> values;
 
     auto insert(key_type const, value_type&&) -> void;
+    auto at(key_type const) -> value_type&;
+    auto at(key_type const) const -> value_type const&;
 
     auto type_name() const -> std::string override;
     auto to_string() const -> std::string override;

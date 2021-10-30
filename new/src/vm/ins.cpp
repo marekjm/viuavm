@@ -1029,12 +1029,47 @@ auto execute(BUFFER_POP const op, Stack& stack, ip_type const ip) -> void
     }
 }
 
-auto execute(STRUCT_AT const op, Stack&, ip_type const) -> void
+auto execute(STRUCT_AT const op, Stack& stack, ip_type const ip) -> void
 {
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
                      + " " + op.instruction.out.to_string() + ", "
                      + op.instruction.lhs.to_string() + ", "
                      + op.instruction.rhs.to_string() + "\n";
+
+    auto dst      = get_slot(op.instruction.out, stack, ip);
+    auto src      = get_slot(op.instruction.lhs, stack, ip);
+    auto key_slot = get_slot(op.instruction.rhs, stack, ip);
+
+    if (not src.has_value()) {
+        throw abort_execution{ip, "cannot struct_at out of void"};
+    }
+    if (not key_slot.has_value()) {
+        throw abort_execution{ip, "cannot struct_at with a void key"};
+    }
+
+    auto& str =
+        static_cast<viua::vm::types::Struct&>(src.value()->boxed_value());
+    auto key =
+        static_cast<viua::vm::types::Atom&>(key_slot.value()->boxed_value())
+            .to_string();
+    auto& v = str.at(key);
+
+    using viua::vm::types::Float_double;
+    using viua::vm::types::Float_single;
+    using viua::vm::types::Signed_integer;
+    using viua::vm::types::Unsigned_integer;
+    if (std::holds_alternative<int64_t>(v.content)) {
+        v.content = std::make_unique<Signed_integer>(v.get<int64_t>());
+    } else if (std::holds_alternative<uint64_t>(v.content)) {
+        v.content = std::make_unique<Unsigned_integer>(v.get<uint64_t>());
+    } else if (std::holds_alternative<float>(v.content)) {
+        v.content = std::make_unique<Float_single>(v.get<float>());
+    } else if (std::holds_alternative<double>(v.content)) {
+        v.content = std::make_unique<Float_double>(v.get<double>());
+    }
+
+    using viua::vm::types::Cell;
+    dst.value()->value = v.get<Cell::boxed_type>()->pointer_to();
 }
 auto execute(STRUCT_INSERT const op, Stack& stack, ip_type const ip) -> void
 {
