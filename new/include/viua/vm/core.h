@@ -25,6 +25,7 @@
 
 #include <exception>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -106,6 +107,15 @@ struct Value {
     inline auto boxed_value() -> boxed_type::element_type&
     {
         return *std::get<boxed_type>(value.content);
+    }
+    template<typename T>
+    inline auto boxed_of() -> std::optional<std::reference_wrapper<T>>
+    {
+        if (holds<T>()) {
+            return static_cast<T&>(*std::get<boxed_type>(value.content));
+        } else {
+            return {};
+        }
     }
     inline auto value_cell() -> viua::vm::types::Cell&
     {

@@ -860,6 +860,10 @@ auto execute_arithmetic_immediate_op(Op const op,
                      + std::to_string(op.instruction.immediate)
                      + (signed_immediate ? "" : "u") + "\n";
 
+    using viua::vm::types::Float_double;
+    using viua::vm::types::Float_single;
+    using viua::vm::types::Signed_integer;
+    using viua::vm::types::Unsigned_integer;
     if (in.template holds<void>()) {
         out = typename Op::functor_type{}(0, immediate);
     } else if (in.template holds<uint64_t>()) {
@@ -874,10 +878,46 @@ auto execute_arithmetic_immediate_op(Op const op,
     } else if (in.template holds<double>()) {
         out = typename Op::functor_type{}(in.value.template get<double>(),
                                           immediate);
+    } else if (in.template holds<Signed_integer>()) {
+        if (auto b = out.template boxed_of<Signed_integer>(); b.has_value()) {
+            auto& boxed = b.value().get();
+            boxed.value = typename Op::functor_type{}(
+                in.template cast_to<int64_t>(), immediate);
+        } else {
+            out = typename Op::functor_type{}(in.template cast_to<int64_t>(),
+                                              immediate);
+        }
+    } else if (in.template holds<Unsigned_integer>()) {
+        if (auto b = out.template boxed_of<Unsigned_integer>(); b.has_value()) {
+            auto& boxed = b.value().get();
+            boxed.value = typename Op::functor_type{}(
+                in.template cast_to<int64_t>(), immediate);
+        } else {
+            out = typename Op::functor_type{}(in.template cast_to<int64_t>(),
+                                              immediate);
+        }
+    } else if (in.template holds<Float_single>()) {
+        if (auto b = out.template boxed_of<Float_single>(); b.has_value()) {
+            auto& boxed = b.value().get();
+            boxed.value = typename Op::functor_type{}(
+                in.template cast_to<int64_t>(), immediate);
+        } else {
+            out = typename Op::functor_type{}(in.template cast_to<int64_t>(),
+                                              immediate);
+        }
+    } else if (in.template holds<Float_double>()) {
+        if (auto b = out.template boxed_of<Float_double>(); b.has_value()) {
+            auto& boxed = b.value().get();
+            boxed.value = typename Op::functor_type{}(
+                in.template cast_to<int64_t>(), immediate);
+        } else {
+            out = typename Op::functor_type{}(in.template cast_to<int64_t>(),
+                                              immediate);
+        }
     } else {
         throw abort_execution{
             ip,
-            "unsupported operand type for immediate arithmetic operation: "
+            "unsupported lhs operand type for immediate arithmetic operation: "
                 + type_name(in.value)};
     }
 }
