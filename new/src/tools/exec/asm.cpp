@@ -1081,15 +1081,25 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes,
                                 Cause::Value_out_of_range,
                                 "unsigned integer used for signed immediate"};
                 }
-                *ip++ =
-                    viua::arch::ops::R{
-                        opcode,
-                        insn.operands.at(0).make_access(),
-                        insn.operands.at(1).make_access(),
-                        (is_unsigned
-                             ? static_cast<uint32_t>(std::stoul(imm.text))
-                             : static_cast<uint32_t>(std::stoi(imm.text)))}
-                        .encode();
+                try {
+                    *ip++ =
+                        viua::arch::ops::R{
+                            opcode,
+                            insn.operands.at(0).make_access(),
+                            insn.operands.at(1).make_access(),
+                            (is_unsigned
+                                 ? static_cast<uint32_t>(std::stoul(imm.text))
+                                 : static_cast<uint32_t>(std::stoi(imm.text)))}
+                            .encode();
+                } catch (std::invalid_argument const&) {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+                    // FIXME make the error more precise, maybe encapsulate
+                    // just the immediate operand conversion
+                    throw Error{imm,
+                                Cause::Invalid_operand,
+                                "expected integer as immediate operand"};
+                }
                 break;
             }
             }
