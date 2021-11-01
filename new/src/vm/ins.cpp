@@ -51,6 +51,24 @@ auto get_value(std::vector<viua::vm::Value>& registers, size_t const i)
 
     return c.value.view();
 }
+auto get_value(std::vector<viua::vm::Value>& registers,
+               viua::arch::Register_access const a)
+    -> viua::vm::types::Cell_view
+{
+    using viua::vm::types::Cell;
+    using viua::vm::types::Cell_view;
+
+    auto& c = registers.at(a.index);
+    if (std::holds_alternative<Cell::boxed_type>(c.value.content)) {
+        auto& b = std::get<Cell::boxed_type>(c.value.content);
+        if (auto p = dynamic_cast<types::Pointer*>(b.get());
+            p and not a.direct) {
+            return Cell_view{*p->value};
+        }
+    }
+
+    return c.value.view();
+}
 
 template<typename T> auto cast_to(viua::vm::types::Cell_view value) -> T
 {
@@ -504,21 +522,29 @@ auto execute(NOT const op, Stack& stack, ip_type const) -> void
 }
 
 namespace {
-auto type_name(viua::vm::types::Cell const& c) -> std::string
+auto type_name(viua::vm::types::Cell_view const c) -> std::string
 {
+    using viua::vm::types::Cell_view;
+
     if (std::holds_alternative<std::monostate>(c.content)) {
         return "void";
-    } else if (std::holds_alternative<int64_t>(c.content)) {
+    } else if (std::holds_alternative<std::reference_wrapper<int64_t>>(
+                   c.content)) {
         return "int";
-    } else if (std::holds_alternative<uint64_t>(c.content)) {
+    } else if (std::holds_alternative<std::reference_wrapper<uint64_t>>(
+                   c.content)) {
         return "uint";
-    } else if (std::holds_alternative<float>(c.content)) {
+    } else if (std::holds_alternative<std::reference_wrapper<float>>(
+                   c.content)) {
         return "float";
-    } else if (std::holds_alternative<double>(c.content)) {
+    } else if (std::holds_alternative<std::reference_wrapper<double>>(
+                   c.content)) {
         return "double";
     } else {
-        return std::get<std::unique_ptr<viua::vm::types::Value>>(c.content)
-            ->type_name();
+        return std::get<std::reference_wrapper<Cell_view::boxed_type>>(
+                   c.content)
+            .get()
+            .type_name();
     }
 }
 auto get_slot(viua::arch::Register_access const ra,
@@ -842,7 +868,7 @@ auto execute_arithmetic_immediate_op(Op const op,
 {
     auto& registers = stack.frames.back().registers;
     auto& out       = registers.at(op.instruction.out.index);
-    auto& in        = registers.at(op.instruction.in.index);
+    auto in         = get_value(registers, op.instruction.in);
 
     constexpr auto const signed_immediate =
         std::is_signed_v<typename Op::value_type>;
@@ -867,58 +893,52 @@ auto execute_arithmetic_immediate_op(Op const op,
     if (in.template holds<void>()) {
         out = typename Op::functor_type{}(0, immediate);
     } else if (in.template holds<uint64_t>()) {
-        out = typename Op::functor_type{}(in.value.template get<uint64_t>(),
-                                          immediate);
+        out =
+            typename Op::functor_type{}(in.template get<uint64_t>(), immediate);
     } else if (in.template holds<int64_t>()) {
-        out = typename Op::functor_type{}(in.value.template get<int64_t>(),
-                                          immediate);
+        out =
+            typename Op::functor_type{}(in.template get<int64_t>(), immediate);
     } else if (in.template holds<float>()) {
-        out = typename Op::functor_type{}(in.value.template get<float>(),
-                                          immediate);
+        out = typename Op::functor_type{}(in.template get<float>(), immediate);
     } else if (in.template holds<double>()) {
-        out = typename Op::functor_type{}(in.value.template get<double>(),
-                                          immediate);
+        out = typename Op::functor_type{}(in.template get<double>(), immediate);
     } else if (in.template holds<Signed_integer>()) {
         if (auto b = out.template boxed_of<Signed_integer>(); b.has_value()) {
             auto& boxed = b.value().get();
-            boxed.value = typename Op::functor_type{}(
-                in.template cast_to<int64_t>(), immediate);
+            boxed.value =
+                typename Op::functor_type{}(cast_to<int64_t>(in), immediate);
         } else {
-            out = typename Op::functor_type{}(in.template cast_to<int64_t>(),
-                                              immediate);
+            out = typename Op::functor_type{}(cast_to<int64_t>(in), immediate);
         }
     } else if (in.template holds<Unsigned_integer>()) {
         if (auto b = out.template boxed_of<Unsigned_integer>(); b.has_value()) {
             auto& boxed = b.value().get();
-            boxed.value = typename Op::functor_type{}(
-                in.template cast_to<int64_t>(), immediate);
+            boxed.value =
+                typename Op::functor_type{}(cast_to<uint64_t>(in), immediate);
         } else {
-            out = typename Op::functor_type{}(in.template cast_to<int64_t>(),
-                                              immediate);
+            out = typename Op::functor_type{}(cast_to<uint64_t>(in), immediate);
         }
     } else if (in.template holds<Float_single>()) {
         if (auto b = out.template boxed_of<Float_single>(); b.has_value()) {
             auto& boxed = b.value().get();
-            boxed.value = typename Op::functor_type{}(
-                in.template cast_to<int64_t>(), immediate);
+            boxed.value =
+                typename Op::functor_type{}(cast_to<float>(in), immediate);
         } else {
-            out = typename Op::functor_type{}(in.template cast_to<int64_t>(),
-                                              immediate);
+            out = typename Op::functor_type{}(cast_to<float>(in), immediate);
         }
     } else if (in.template holds<Float_double>()) {
         if (auto b = out.template boxed_of<Float_double>(); b.has_value()) {
             auto& boxed = b.value().get();
-            boxed.value = typename Op::functor_type{}(
-                in.template cast_to<int64_t>(), immediate);
+            boxed.value =
+                typename Op::functor_type{}(cast_to<double>(in), immediate);
         } else {
-            out = typename Op::functor_type{}(in.template cast_to<int64_t>(),
-                                              immediate);
+            out = typename Op::functor_type{}(cast_to<double>(in), immediate);
         }
     } else {
         throw abort_execution{
             ip,
             "unsupported lhs operand type for immediate arithmetic operation: "
-                + type_name(in.value)};
+                + type_name(in)};
     }
 }
 auto execute(ADDI const op, Stack& stack, ip_type const ip) -> void
