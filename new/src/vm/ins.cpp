@@ -35,22 +35,6 @@ using namespace viua::arch::ins;
 using viua::vm::Stack;
 using ip_type = viua::arch::instruction_type const*;
 
-auto get_value(std::vector<viua::vm::Value>& registers, size_t const i)
-    -> viua::vm::types::Cell_view
-{
-    using viua::vm::types::Cell;
-    using viua::vm::types::Cell_view;
-
-    auto& c = registers.at(i);
-    if (std::holds_alternative<Cell::boxed_type>(c.value.content)) {
-        auto& b = std::get<Cell::boxed_type>(c.value.content);
-        if (auto p = dynamic_cast<types::Pointer*>(b.get()); p) {
-            return Cell_view{*p->value};
-        }
-    }
-
-    return c.value.view();
-}
 auto get_value(std::vector<viua::vm::Value>& registers,
                viua::arch::Register_access const a)
     -> viua::vm::types::Cell_view
@@ -134,8 +118,8 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
 {
     auto& registers = stack.frames.back().registers;
     auto& out       = registers.at(op.instruction.out.index);
-    auto& lhs       = registers.at(op.instruction.lhs.index);
-    auto rhs        = get_value(registers, op.instruction.rhs.index);
+    auto lhs        = get_value(registers, op.instruction.lhs);
+    auto rhs        = get_value(registers, op.instruction.rhs);
 
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
                      + " " + op.instruction.out.to_string() + ", "
@@ -147,28 +131,28 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
     using viua::vm::types::Signed_integer;
     using viua::vm::types::Unsigned_integer;
     if (lhs.template holds<int64_t>()) {
-        out = typename Op::functor_type{}(lhs.value.template get<int64_t>(),
+        out = typename Op::functor_type{}(lhs.template get<int64_t>(),
                                           cast_to<int64_t>(rhs));
     } else if (lhs.template holds<uint64_t>()) {
-        out = typename Op::functor_type{}(lhs.value.template get<uint64_t>(),
+        out = typename Op::functor_type{}(lhs.template get<uint64_t>(),
                                           cast_to<uint64_t>(rhs));
     } else if (lhs.template holds<float>()) {
-        out = typename Op::functor_type{}(lhs.value.template get<float>(),
+        out = typename Op::functor_type{}(lhs.template get<float>(),
                                           cast_to<float>(rhs));
     } else if (lhs.template holds<double>()) {
-        out = typename Op::functor_type{}(lhs.value.template get<double>(),
+        out = typename Op::functor_type{}(lhs.template get<double>(),
                                           cast_to<double>(rhs));
     } else if (lhs.template holds<Signed_integer>()) {
-        out = typename Op::functor_type{}(lhs.template cast_to<int64_t>(),
+        out = typename Op::functor_type{}(cast_to<int64_t>(lhs),
                                           cast_to<int64_t>(rhs));
     } else if (lhs.template holds<Unsigned_integer>()) {
-        out = typename Op::functor_type{}(lhs.template cast_to<uint64_t>(),
+        out = typename Op::functor_type{}(cast_to<uint64_t>(lhs),
                                           cast_to<uint64_t>(rhs));
     } else if (lhs.template holds<Float_single>()) {
-        out = typename Op::functor_type{}(lhs.template cast_to<float>(),
+        out = typename Op::functor_type{}(cast_to<float>(lhs),
                                           cast_to<float>(rhs));
     } else if (lhs.template holds<Float_double>()) {
-        out = typename Op::functor_type{}(lhs.template cast_to<double>(),
+        out = typename Op::functor_type{}(cast_to<double>(lhs),
                                           cast_to<double>(rhs));
     } /* else if (lhs.template has_trait<Trait>()) {
         out.value = lhs.boxed_value().template as_trait<Trait>(rhs.content);
@@ -183,8 +167,8 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
 {
     auto& registers = stack.frames.back().registers;
     auto& out       = registers.at(op.instruction.out.index);
-    auto& lhs       = registers.at(op.instruction.lhs.index);
-    auto& rhs       = registers.at(op.instruction.rhs.index);
+    auto lhs        = get_value(registers, op.instruction.lhs);
+    auto rhs        = get_value(registers, op.instruction.rhs);
 
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
                      + " " + op.instruction.out.to_string() + ", "
@@ -192,17 +176,17 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
                      + op.instruction.rhs.to_string() + "\n";
 
     if (lhs.template holds<int64_t>()) {
-        out = typename Op::functor_type{}(lhs.value.template get<int64_t>(),
-                                          rhs.template cast_to<int64_t>());
+        out = typename Op::functor_type{}(lhs.template get<int64_t>(),
+                                          cast_to<int64_t>(rhs));
     } else if (lhs.template holds<uint64_t>()) {
-        out = typename Op::functor_type{}(lhs.value.template get<uint64_t>(),
-                                          rhs.template cast_to<uint64_t>());
+        out = typename Op::functor_type{}(lhs.template get<uint64_t>(),
+                                          cast_to<uint64_t>(rhs));
     } else if (lhs.template holds<float>()) {
-        out = typename Op::functor_type{}(lhs.value.template get<float>(),
-                                          rhs.template cast_to<float>());
+        out = typename Op::functor_type{}(lhs.template get<float>(),
+                                          cast_to<float>(rhs));
     } else if (lhs.template holds<double>()) {
-        out = typename Op::functor_type{}(lhs.value.template get<double>(),
-                                          rhs.template cast_to<double>());
+        out = typename Op::functor_type{}(lhs.template get<double>(),
+                                          cast_to<double>(rhs));
     } else {
         throw abort_execution{
             ip, "unsupported operand types for arithmetic operation"};
