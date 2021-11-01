@@ -48,14 +48,30 @@ struct Cell_view {
 
     template<typename T> auto holds() const -> bool
     {
-        if (std::is_same_v<
-                T,
-                void> and std::holds_alternative<void_type>(content)) {
-            return true;
+        if constexpr (std::is_same_v<T, void>) {
+            return std::holds_alternative<void_type>(content);
         }
 
         using Tr = std::reference_wrapper<T>;
-        return std::holds_alternative<Tr>(content);
+
+        if constexpr (std::is_same_v<T, int64_t>) {
+            return std::holds_alternative<Tr>(content);
+        }
+        if constexpr (std::is_same_v<T, uint64_t>) {
+            return std::holds_alternative<Tr>(content);
+        }
+        if constexpr (std::is_same_v<T, float>) {
+            return std::holds_alternative<Tr>(content);
+        }
+        if constexpr (std::is_same_v<T, double>) {
+            return std::holds_alternative<Tr>(content);
+        }
+        if constexpr (std::is_convertible_v<T*, viua::vm::types::Value*>) {
+            using Br = std::reference_wrapper<boxed_type>;
+            return (std::holds_alternative<Br>(content)
+                    and dynamic_cast<T*>(&std::get<Br>(content).get()));
+        }
+        return false;
     }
 
     template<typename T> auto get() -> T&
