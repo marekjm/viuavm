@@ -98,7 +98,7 @@ Work_instruction(STRUCT_AT);
 Work_instruction(STRUCT_INSERT);
 Work_instruction(STRUCT_REMOVE);
 
-Work_instruction(PTR);
+Work_instruction(REF);
 
 Work_instruction(EBREAK);
 }  // namespace viua::vm::ins

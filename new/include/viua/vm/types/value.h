@@ -27,6 +27,7 @@
 #include <memory>
 #include <string>
 #include <variant>
+#include <optional>
 
 
 namespace viua::vm::types {
@@ -181,7 +182,7 @@ class Value {
         return (dynamic_cast<Trait const*>(this) != nullptr);
     }
 
-    auto pointer_to() -> std::unique_ptr<class Pointer>;
+    auto reference_to() -> std::unique_ptr<class Ref>;
 };
 }  // namespace viua::vm::types
 

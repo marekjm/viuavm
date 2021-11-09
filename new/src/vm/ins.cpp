@@ -149,7 +149,7 @@ auto get_proxy(std::vector<viua::vm::Value>& registers,
     }
 
     auto& boxed = std::get<Cell::boxed_type>(c.value.content);
-    if (auto p = dynamic_cast<types::Pointer*>(boxed.get()); p) {
+    if (auto p = dynamic_cast<types::Ref*>(boxed.get()); p) {
         return Proxy{Cell_view{*p->value}};
     }
 
@@ -180,7 +180,7 @@ auto get_value(std::vector<viua::vm::Value>& registers,
     }
 
     auto& boxed = std::get<Cell::boxed_type>(c.value.content);
-    if (auto p = dynamic_cast<types::Pointer*>(boxed.get()); p) {
+    if (auto p = dynamic_cast<types::Ref*>(boxed.get()); p) {
         return Cell_view{*p->value};
     }
 
@@ -1127,7 +1127,7 @@ auto execute(BUFFER_AT const op, Stack& stack, ip_type const ip) -> void
     }
 
     using viua::vm::types::Cell;
-    dst.value()->value = v.get<Cell::boxed_type>()->pointer_to();
+    dst.value()->value = v.get<Cell::boxed_type>()->reference_to();
 }
 auto execute(BUFFER_POP const op, Stack& stack, ip_type const ip) -> void
 {
@@ -1207,7 +1207,7 @@ auto execute(STRUCT_AT const op, Stack& stack, ip_type const ip) -> void
     }
 
     using viua::vm::types::Cell;
-    dst.value()->value = v.get<Cell::boxed_type>()->pointer_to();
+    dst.value()->value = v.get<Cell::boxed_type>()->reference_to();
 }
 auto execute(STRUCT_INSERT const op, Stack& stack, ip_type const ip) -> void
 {
@@ -1246,7 +1246,7 @@ auto execute(STRUCT_REMOVE const op, Stack&, ip_type const) -> void
                      + op.instruction.rhs.to_string() + "\n";
 }
 
-auto execute(PTR const op, Stack& stack, ip_type const ip) -> void
+auto execute(REF const op, Stack& stack, ip_type const ip) -> void
 {
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
                      + " " + op.instruction.out.to_string() + ", "
@@ -1277,7 +1277,7 @@ auto execute(PTR const op, Stack& stack, ip_type const ip) -> void
             std::make_unique<Float_double>(src.value()->value.get<double>());
     }
 
-    dst.value()->value = src.value()->boxed_value().pointer_to();
+    dst.value()->value = src.value()->boxed_value().reference_to();
 }
 
 auto execute(EBREAK const, Stack& stack, ip_type const) -> void

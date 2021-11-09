@@ -545,16 +545,16 @@ Copies, moves, deletes.
 
 --------------------------------------------------------------------------------
 
-# Pointers
+# References
 
-Pointers make it possible to pass values without copying, and add a degree of
+References make it possible to pass values without copying, and add a degree of
 indirection to other places in the ISA. There are two main instructions for
 this:
 
-- ptr %rp, %rs          Create a pointer to a value located in register %rs and
-                        put the pointer in register %rp.
-- ptrlive %rl, %rp      Check if the pointer in register %rp is live, and return
-                        the result in register %rl.
+- ref %rp, %rs          Create a reference to a value located in register %rs
+                        and put the reference in register %rp.
+- reflive %rl, %rp      Check if the reference in register %rp is live, and
+                        return the result in register %rl.
 
 --------------------------------------------------------------------------------
 
@@ -564,10 +564,10 @@ Allocation, field access.
 
 - struct %rx            Store an empty struct in register %rx.
 - struct_at %rr, %rs, %rf
-                        Get a pointer to the value of a field in the struct in
+                        Get a reference to the value of a field in the struct in
                         register %rs. The name of the field is specified by the
-                        atom in register %rf. The pointer is stored in register
-                        %rr.
+                        atom in register %rf. The reference is stored in
+                        register %rr.
 - struct_insert %rs, %rf, %rv
                         Set value of a field in the struct in register %rr. The
                         name of the field is specified by the atom in register
@@ -595,9 +595,10 @@ values (usually of the same type).
                         moved. If %ri is void the value is inserted at the
                         beginning of the buffer.
 - buffer_at %rp, %rb, %ri
-                        Get a pointer to the value of an index in the buffer in
-                        register %rb. The index is specified by the integer in
-                        register %ri. The pointer is stored in register %rp.
+                        Get a reference to the value of an index in the buffer
+                        in register %rb. The index is specified by the integer
+                        in register %ri. The reference is stored in register
+                        %rp.
 - buffer_pop %rv, %rb, %ri
                         Remove a value from the buffer in register %rb. The
                         value is removed from the index specified by the integer

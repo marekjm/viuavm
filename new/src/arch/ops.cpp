@@ -329,8 +329,8 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "struct_insert";
     case OPCODE::STRUCT_REMOVE:
         return greedy + "struct_remove";
-    case OPCODE::PTR:
-        return greedy + "ptr";
+    case OPCODE::REF:
+        return greedy + "ref";
     }
 
     return "<unknown>";
@@ -445,8 +445,8 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::BUFFER_AT));
     } else if (sv == "buffer_pop") {
         return (op | static_cast<opcode_type>(OPCODE::BUFFER_POP));
-    } else if (sv == "ptr") {
-        return (op | static_cast<opcode_type>(OPCODE::PTR));
+    } else if (sv == "ref") {
+        return (op | static_cast<opcode_type>(OPCODE::REF));
     } else if (sv == "struct_at") {
         return (op | static_cast<opcode_type>(OPCODE::STRUCT_AT));
     } else if (sv == "struct_insert") {

@@ -403,10 +403,10 @@ struct STRUCT_REMOVE : Instruction {
     {}
 };
 
-struct PTR : Instruction {
+struct REF : Instruction {
     viua::arch::ops::D instruction;
 
-    PTR(viua::arch::ops::D i) : instruction{i}
+    REF(viua::arch::ops::D i) : instruction{i}
     {}
 };
 }  // namespace viua::arch::ins

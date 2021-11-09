@@ -23,9 +23,9 @@ Cell_view::Cell_view(boxed_type& v) : content{v}
 Value::~Value()
 {}
 
-auto Value::pointer_to() -> std::unique_ptr<Pointer>
+auto Value::reference_to() -> std::unique_ptr<Ref>
 {
-    return std::make_unique<Pointer>(this);
+    return std::make_unique<Ref>(this);
 }
 }  // namespace viua::vm::types
 
@@ -68,11 +68,11 @@ auto Float_double::to_string() const -> std::string
 }  // namespace viua::vm::types
 
 namespace viua::vm::types {
-auto Pointer::type_name() const -> std::string
+auto Ref::type_name() const -> std::string
 {
     return ('*' + value->type_name());
 }
-auto Pointer::to_string() const -> std::string
+auto Ref::to_string() const -> std::string
 {
     return value->as_trait<traits::To_string, std::string>(
         [](traits::To_string const& ts) -> std::string {
