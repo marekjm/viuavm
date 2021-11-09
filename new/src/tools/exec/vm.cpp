@@ -485,13 +485,20 @@ auto main(int argc, char* argv[]) -> int
 
     auto const ip_begin = &text[0];
     auto const ip_end   = (ip_begin + text.size());
-    try {
+
+    if constexpr (true) {
         run(stack,
             stack.back().entry_address,
             {(executable_path + "[.text]"), ip_begin, ip_end});
-    } catch (viua::vm::abort_execution const& e) {
-        std::cerr << "Aborted execution: " << e.what() << "\n";
-        return 1;
+    } else {
+        try {
+            run(stack,
+                stack.back().entry_address,
+                {(executable_path + "[.text]"), ip_begin, ip_end});
+        } catch (viua::vm::abort_execution const& e) {
+            std::cerr << "Aborted execution: " << e.what() << "\n";
+            return 1;
+        }
     }
 
     return 0;
