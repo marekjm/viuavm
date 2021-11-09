@@ -82,6 +82,17 @@ struct Cell_view {
     {
         return std::get<std::reference_wrapper<T>>(content);
     }
+
+    template<typename T>
+    inline auto boxed_of() -> std::optional<std::reference_wrapper<T>>
+    {
+        if (holds<T>()) {
+            using Rt = std::reference_wrapper<boxed_type>;
+            return static_cast<T&>(std::get<Rt>(content).get());
+        } else {
+            return {};
+        }
+    }
 };
 
 struct Cell {

@@ -35,23 +35,156 @@ using namespace viua::arch::ins;
 using viua::vm::Stack;
 using ip_type = viua::arch::instruction_type const*;
 
+namespace {
+auto type_name(viua::vm::types::Cell_view const c) -> std::string
+{
+    using viua::vm::types::Cell_view;
+
+    if (std::holds_alternative<std::monostate>(c.content)) {
+        return "void";
+    } else if (std::holds_alternative<std::reference_wrapper<int64_t>>(
+                   c.content)) {
+        return "int";
+    } else if (std::holds_alternative<std::reference_wrapper<uint64_t>>(
+                   c.content)) {
+        return "uint";
+    } else if (std::holds_alternative<std::reference_wrapper<float>>(
+                   c.content)) {
+        return "float";
+    } else if (std::holds_alternative<std::reference_wrapper<double>>(
+                   c.content)) {
+        return "double";
+    } else {
+        return std::get<std::reference_wrapper<Cell_view::boxed_type>>(
+                   c.content)
+            .get()
+            .type_name();
+    }
+}
+auto get_slot(viua::arch::Register_access const ra,
+              Stack& stack,
+              ip_type const ip) -> std::optional<viua::vm::Value*>
+{
+    switch (ra.set) {
+        using enum viua::arch::RS;
+    case VOID:
+        return {};
+    case LOCAL:
+        return &stack.frames.back().registers.at(ra.index);
+    case ARGUMENT:
+        return &stack.args.at(ra.index);
+    case PARAMETER:
+        return &stack.frames.back().parameters.at(ra.index);
+    }
+
+    throw abort_execution{ip, "impossible"};
+}
+
+struct Proxy {
+    using slot_type = std::reference_wrapper<viua::vm::Value>;
+    using cell_type = viua::vm::types::Cell_view;
+
+    std::variant<slot_type, cell_type> slot;
+
+    explicit Proxy(slot_type s): slot{s} {}
+    explicit Proxy(cell_type c): slot{c} {}
+
+    auto hard() const -> bool
+    {
+        return std::holds_alternative<slot_type>(slot);
+    }
+    auto soft() const -> bool
+    {
+        return not hard();
+    }
+
+    auto view() const -> cell_type const
+    {
+        if (hard()) {
+            return std::get<slot_type>(slot).get().value.view();
+        } else {
+            return std::get<cell_type>(slot);
+        }
+    }
+    auto view() -> cell_type
+    {
+        if (hard()) {
+            return std::get<slot_type>(slot).get().value.view();
+        } else {
+            return std::get<cell_type>(slot);
+        }
+    }
+    auto overwrite() -> slot_type::type&
+    {
+        return std::get<slot_type>(slot).get();
+    }
+
+    template<typename T>
+    auto operator=(T&& v) -> Proxy&
+    {
+        overwrite() = std::move(v);
+        return *this;
+    }
+
+    template<typename T>
+    inline auto boxed_of() -> std::optional<std::reference_wrapper<T>>
+    {
+        return view().boxed_of<T>();
+    }
+};
+auto get_proxy(std::vector<viua::vm::Value>& registers,
+               viua::arch::Register_access const a,
+               ip_type const ip) -> Proxy
+{
+    auto& c = registers.at(a.index);
+    if (a.direct) {
+        return Proxy{c};
+    }
+
+    using viua::vm::types::Cell;
+    using viua::vm::types::Cell_view;
+
+    if (not std::holds_alternative<Cell::boxed_type>(c.value.content)) {
+        throw abort_execution{ip, "cannot dereference a value of type " + type_name(c.value)};
+    }
+
+    auto& boxed = std::get<Cell::boxed_type>(c.value.content);
+    if (auto p = dynamic_cast<types::Pointer*>(boxed.get()); p) {
+        return Proxy{Cell_view{*p->value}};
+    }
+
+    throw abort_execution{ip, "cannot dereference a value of type " + type_name(c.value)};
+}
+
+auto type_name(Proxy const& p) -> std::string
+{
+    return type_name(p.view());
+}
+}  // namespace
+
 auto get_value(std::vector<viua::vm::Value>& registers,
-               viua::arch::Register_access const a)
+               viua::arch::Register_access const a,
+               ip_type const ip)
     -> viua::vm::types::Cell_view
 {
     using viua::vm::types::Cell;
     using viua::vm::types::Cell_view;
 
     auto& c = registers.at(a.index);
-    if (std::holds_alternative<Cell::boxed_type>(c.value.content)) {
-        auto& b = std::get<Cell::boxed_type>(c.value.content);
-        if (auto p = dynamic_cast<types::Pointer*>(b.get());
-            p and not a.direct) {
-            return Cell_view{*p->value};
-        }
+    if (a.direct) {
+        return c.value.view();
     }
 
-    return c.value.view();
+    if (not std::holds_alternative<Cell::boxed_type>(c.value.content)) {
+        throw abort_execution{ip, "cannot dereference a value of type " + type_name(c.value)};
+    }
+
+    auto& boxed = std::get<Cell::boxed_type>(c.value.content);
+    if (auto p = dynamic_cast<types::Pointer*>(boxed.get()); p) {
+        return Cell_view{*p->value};
+    }
+
+    throw abort_execution{ip, "cannot dereference a value of type " + type_name(c.value)};
 }
 
 template<typename T> auto cast_to(viua::vm::types::Cell_view value) -> T
@@ -117,9 +250,9 @@ template<typename Op, typename Trait>
 auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
 {
     auto& registers = stack.frames.back().registers;
-    auto& out       = registers.at(op.instruction.out.index);
-    auto lhs        = get_value(registers, op.instruction.lhs);
-    auto rhs        = get_value(registers, op.instruction.rhs);
+    auto out       = get_proxy(registers, op.instruction.out, ip);
+    auto lhs        = get_value(registers, op.instruction.lhs, ip);
+    auto rhs        = get_value(registers, op.instruction.rhs, ip);
 
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
                      + " " + op.instruction.out.to_string() + ", "
@@ -131,8 +264,14 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
     using viua::vm::types::Signed_integer;
     using viua::vm::types::Unsigned_integer;
     if (lhs.template holds<int64_t>()) {
-        out = typename Op::functor_type{}(lhs.template get<int64_t>(),
+        auto r = typename Op::functor_type{}(lhs.template get<int64_t>(),
                                           cast_to<int64_t>(rhs));
+        if (out.hard()) {
+            out = std::move(r);
+        } else {
+            throw abort_execution{
+                ip, ("cannot store i64 through a reference to " + type_name(out))};
+        }
     } else if (lhs.template holds<uint64_t>()) {
         out = typename Op::functor_type{}(lhs.template get<uint64_t>(),
                                           cast_to<uint64_t>(rhs));
@@ -167,8 +306,8 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
 {
     auto& registers = stack.frames.back().registers;
     auto& out       = registers.at(op.instruction.out.index);
-    auto lhs        = get_value(registers, op.instruction.lhs);
-    auto rhs        = get_value(registers, op.instruction.rhs);
+    auto lhs        = get_value(registers, op.instruction.lhs, ip);
+    auto rhs        = get_value(registers, op.instruction.rhs, ip);
 
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
                      + " " + op.instruction.out.to_string() + ", "
@@ -505,51 +644,6 @@ auto execute(NOT const op, Stack& stack, ip_type const) -> void
                      + op.instruction.in.to_string() + "\n";
 }
 
-namespace {
-auto type_name(viua::vm::types::Cell_view const c) -> std::string
-{
-    using viua::vm::types::Cell_view;
-
-    if (std::holds_alternative<std::monostate>(c.content)) {
-        return "void";
-    } else if (std::holds_alternative<std::reference_wrapper<int64_t>>(
-                   c.content)) {
-        return "int";
-    } else if (std::holds_alternative<std::reference_wrapper<uint64_t>>(
-                   c.content)) {
-        return "uint";
-    } else if (std::holds_alternative<std::reference_wrapper<float>>(
-                   c.content)) {
-        return "float";
-    } else if (std::holds_alternative<std::reference_wrapper<double>>(
-                   c.content)) {
-        return "double";
-    } else {
-        return std::get<std::reference_wrapper<Cell_view::boxed_type>>(
-                   c.content)
-            .get()
-            .type_name();
-    }
-}
-auto get_slot(viua::arch::Register_access const ra,
-              Stack& stack,
-              ip_type const ip) -> std::optional<viua::vm::Value*>
-{
-    switch (ra.set) {
-        using enum viua::arch::RS;
-    case VOID:
-        return {};
-    case LOCAL:
-        return &stack.frames.back().registers.at(ra.index);
-    case ARGUMENT:
-        return &stack.args.at(ra.index);
-    case PARAMETER:
-        return &stack.frames.back().parameters.at(ra.index);
-    }
-
-    throw abort_execution{ip, "impossible"};
-}
-}  // namespace
 auto execute(COPY const op, Stack& stack, ip_type const) -> void
 {
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
@@ -851,8 +945,8 @@ auto execute_arithmetic_immediate_op(Op const op,
                                      ip_type const ip) -> void
 {
     auto& registers = stack.frames.back().registers;
-    auto& out       = registers.at(op.instruction.out.index);
-    auto in         = get_value(registers, op.instruction.in);
+    auto out       = get_proxy(registers, op.instruction.out, ip);
+    auto in         = get_value(registers, op.instruction.in, ip);
 
     constexpr auto const signed_immediate =
         std::is_signed_v<typename Op::value_type>;
