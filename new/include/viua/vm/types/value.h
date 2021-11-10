@@ -75,6 +75,11 @@ struct Cell_view {
         return false;
     }
 
+    auto is_void() const -> bool
+    {
+        return holds<void>();
+    }
+
     template<typename T> auto get() -> T&
     {
         return std::get<std::reference_wrapper<T>>(content);

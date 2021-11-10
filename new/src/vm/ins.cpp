@@ -155,6 +155,12 @@ auto get_proxy(std::vector<viua::vm::Value>& registers,
 
     throw abort_execution{ip, "cannot dereference a value of type " + type_name(c.value)};
 }
+auto get_proxy(Stack& stack,
+               viua::arch::Register_access const a,
+               ip_type const ip) -> Proxy
+{
+    return get_proxy(stack.frames.back().registers, a, ip);
+}
 
 auto type_name(Proxy const& p) -> std::string
 {
@@ -185,6 +191,13 @@ auto get_value(std::vector<viua::vm::Value>& registers,
     }
 
     throw abort_execution{ip, "cannot dereference a value of type " + type_name(c.value)};
+}
+auto get_value(Stack& stack,
+               viua::arch::Register_access const a,
+               ip_type const ip)
+    -> viua::vm::types::Cell_view
+{
+    return get_value(stack.frames.back().registers, a, ip);
 }
 
 template<typename T> auto cast_to(viua::vm::types::Cell_view value) -> T
@@ -1174,23 +1187,20 @@ auto execute(STRUCT_AT const op, Stack& stack, ip_type const ip) -> void
                      + op.instruction.lhs.to_string() + ", "
                      + op.instruction.rhs.to_string() + "\n";
 
-    auto dst      = get_slot(op.instruction.out, stack, ip);
-    auto src      = get_slot(op.instruction.lhs, stack, ip);
-    auto key_slot = get_slot(op.instruction.rhs, stack, ip);
+    auto dst      = get_proxy(stack, op.instruction.out, ip);
+    auto src      = get_value(stack, op.instruction.lhs, ip);
+    auto key = get_value(stack, op.instruction.rhs, ip);
 
-    if (not src.has_value()) {
+    if (src.is_void()) {
         throw abort_execution{ip, "cannot struct_at out of void"};
     }
-    if (not key_slot.has_value()) {
+    if (key.is_void()) {
         throw abort_execution{ip, "cannot struct_at with a void key"};
     }
 
-    auto& str =
-        static_cast<viua::vm::types::Struct&>(src.value()->boxed_value());
-    auto key =
-        static_cast<viua::vm::types::Atom&>(key_slot.value()->boxed_value())
-            .to_string();
-    auto& v = str.at(key);
+    auto& str = src.boxed_of<viua::vm::types::Struct>().value().get();
+    auto k = key.boxed_of<viua::vm::types::Atom>().value().get().to_string();
+    auto& v = str.at(k);
 
     using viua::vm::types::Float_double;
     using viua::vm::types::Float_single;
@@ -1207,7 +1217,7 @@ auto execute(STRUCT_AT const op, Stack& stack, ip_type const ip) -> void
     }
 
     using viua::vm::types::Cell;
-    dst.value()->value = v.get<Cell::boxed_type>()->reference_to();
+    dst = v.get<Cell::boxed_type>()->reference_to();
 }
 auto execute(STRUCT_INSERT const op, Stack& stack, ip_type const ip) -> void
 {
@@ -1216,27 +1226,25 @@ auto execute(STRUCT_INSERT const op, Stack& stack, ip_type const ip) -> void
                      + op.instruction.lhs.to_string() + ", "
                      + op.instruction.rhs.to_string() + "\n";
 
-    auto dst      = get_slot(op.instruction.out, stack, ip);
-    auto key_slot = get_slot(op.instruction.lhs, stack, ip);
-    auto src      = get_slot(op.instruction.rhs, stack, ip);
+    auto dst = get_proxy(stack, op.instruction.out, ip);
+    auto key = get_value(stack, op.instruction.lhs, ip);
+    auto src = get_proxy(stack, op.instruction.rhs, ip);
 
-    if (not key_slot.has_value()) {
+    if (key.is_void()) {
         throw abort_execution{ip, "cannot struct_insert with a void key"};
     }
-    if (not src.has_value()) {
+    if (src.view().is_void()) {
         throw abort_execution{ip, "cannot struct_insert with a void value"};
     }
 
-    if (not dst.value()->holds<viua::vm::types::Struct>()) {
+    if (not dst.view().holds<viua::vm::types::Struct>()) {
         throw abort_execution{ip,
                               "invalid destination operand for struct_insert"};
     }
 
-    auto key =
-        static_cast<viua::vm::types::Atom&>(key_slot.value()->boxed_value())
-            .to_string();
-    static_cast<viua::vm::types::Struct&>(dst.value()->boxed_value())
-        .insert(key, std::move(src.value()->value_cell()));
+    auto k = key.boxed_of<viua::vm::types::Atom>().value().get().to_string();
+    auto& str = dst.boxed_of<viua::vm::types::Struct>().value().get();
+    str.insert(k, std::move(src.overwrite().value_cell()));
 }
 auto execute(STRUCT_REMOVE const op, Stack&, ip_type const) -> void
 {

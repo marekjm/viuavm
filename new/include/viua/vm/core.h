@@ -86,6 +86,11 @@ struct Value {
         value.content = v;
         return *this;
     }
+    template<typename T> inline auto operator=(T&& v) -> Value&
+    {
+        value.content = std::move(v);
+        return *this;
+    }
 
     inline auto is_boxed() const -> bool
     {
