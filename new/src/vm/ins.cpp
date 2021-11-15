@@ -86,8 +86,10 @@ struct Proxy {
 
     std::variant<slot_type, cell_type> slot;
 
-    explicit Proxy(slot_type s): slot{s} {}
-    explicit Proxy(cell_type c): slot{c} {}
+    explicit Proxy(slot_type s) : slot{s}
+    {}
+    explicit Proxy(cell_type c) : slot{c}
+    {}
 
     auto hard() const -> bool
     {
@@ -119,8 +121,7 @@ struct Proxy {
         return std::get<slot_type>(slot).get();
     }
 
-    template<typename T>
-    auto operator=(T&& v) -> Proxy&
+    template<typename T> auto operator=(T&& v) -> Proxy&
     {
         overwrite() = std::move(v);
         return *this;
@@ -145,7 +146,8 @@ auto get_proxy(std::vector<viua::vm::Value>& registers,
     using viua::vm::types::Cell_view;
 
     if (not std::holds_alternative<Cell::boxed_type>(c.value.content)) {
-        throw abort_execution{ip, "cannot dereference a value of type " + type_name(c.value)};
+        throw abort_execution{
+            ip, "cannot dereference a value of type " + type_name(c.value)};
     }
 
     auto& boxed = std::get<Cell::boxed_type>(c.value.content);
@@ -153,7 +155,8 @@ auto get_proxy(std::vector<viua::vm::Value>& registers,
         return Proxy{Cell_view{*p->value}};
     }
 
-    throw abort_execution{ip, "cannot dereference a value of type " + type_name(c.value)};
+    throw abort_execution{
+        ip, "cannot dereference a value of type " + type_name(c.value)};
 }
 auto get_proxy(Stack& stack,
                viua::arch::Register_access const a,
@@ -166,12 +169,10 @@ auto type_name(Proxy const& p) -> std::string
 {
     return type_name(p.view());
 }
-}  // namespace
 
 auto get_value(std::vector<viua::vm::Value>& registers,
                viua::arch::Register_access const a,
-               ip_type const ip)
-    -> viua::vm::types::Cell_view
+               ip_type const ip) -> viua::vm::types::Cell_view
 {
     using viua::vm::types::Cell;
     using viua::vm::types::Cell_view;
@@ -182,7 +183,8 @@ auto get_value(std::vector<viua::vm::Value>& registers,
     }
 
     if (not std::holds_alternative<Cell::boxed_type>(c.value.content)) {
-        throw abort_execution{ip, "cannot dereference a value of type " + type_name(c.value)};
+        throw abort_execution{
+            ip, "cannot dereference a value of type " + type_name(c.value)};
     }
 
     auto& boxed = std::get<Cell::boxed_type>(c.value.content);
@@ -190,15 +192,16 @@ auto get_value(std::vector<viua::vm::Value>& registers,
         return Cell_view{*p->value};
     }
 
-    throw abort_execution{ip, "cannot dereference a value of type " + type_name(c.value)};
+    throw abort_execution{
+        ip, "cannot dereference a value of type " + type_name(c.value)};
 }
 auto get_value(Stack& stack,
                viua::arch::Register_access const a,
-               ip_type const ip)
-    -> viua::vm::types::Cell_view
+               ip_type const ip) -> viua::vm::types::Cell_view
 {
     return get_value(stack.frames.back().registers, a, ip);
 }
+}  // namespace
 
 template<typename T> auto cast_to(viua::vm::types::Cell_view value) -> T
 {

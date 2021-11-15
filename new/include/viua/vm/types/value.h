@@ -25,9 +25,9 @@
 #include <exception>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <variant>
-#include <optional>
 
 
 namespace viua::vm::types {
