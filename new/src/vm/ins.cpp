@@ -265,10 +265,9 @@ template<typename T> auto cast_to(viua::vm::types::Cell_view value) -> T
 template<typename Op, typename Trait>
 auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto out       = get_proxy(registers, op.instruction.out, ip);
-    auto lhs        = get_value(registers, op.instruction.lhs, ip);
-    auto rhs        = get_value(registers, op.instruction.rhs, ip);
+    auto out = get_proxy(stack, op.instruction.out, ip);
+    auto lhs = get_value(stack, op.instruction.lhs, ip);
+    auto rhs = get_value(stack, op.instruction.rhs, ip);
 
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
                      + " " + op.instruction.out.to_string() + ", "
@@ -281,12 +280,13 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
     using viua::vm::types::Unsigned_integer;
     if (lhs.template holds<int64_t>()) {
         auto r = typename Op::functor_type{}(lhs.template get<int64_t>(),
-                                          cast_to<int64_t>(rhs));
+                                             cast_to<int64_t>(rhs));
         if (out.hard()) {
             out = std::move(r);
         } else {
             throw abort_execution{
-                ip, ("cannot store i64 through a reference to " + type_name(out))};
+                ip,
+                ("cannot store i64 through a reference to " + type_name(out))};
         }
     } else if (lhs.template holds<uint64_t>()) {
         out = typename Op::functor_type{}(lhs.template get<uint64_t>(),
@@ -298,8 +298,19 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
         out = typename Op::functor_type{}(lhs.template get<double>(),
                                           cast_to<double>(rhs));
     } else if (lhs.template holds<Signed_integer>()) {
-        out = typename Op::functor_type{}(cast_to<int64_t>(lhs),
-                                          cast_to<int64_t>(rhs));
+        auto r = typename Op::functor_type{}(cast_to<int64_t>(lhs),
+                                             cast_to<int64_t>(rhs));
+
+        if (out.hard()) {
+            out = std::move(r);
+        } else if (not out.view().template holds<Signed_integer>()) {
+            throw abort_execution{
+                ip,
+                ("cannot store i64 through a reference to " + type_name(out))};
+        } else {
+            auto b = out.view().template boxed_of<Signed_integer>();
+            b.value().get().value = std::move(r);
+        }
     } else if (lhs.template holds<Unsigned_integer>()) {
         out = typename Op::functor_type{}(cast_to<uint64_t>(lhs),
                                           cast_to<uint64_t>(rhs));
@@ -320,10 +331,9 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
 template<typename Op>
 auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto& out       = registers.at(op.instruction.out.index);
-    auto lhs        = get_value(registers, op.instruction.lhs, ip);
-    auto rhs        = get_value(registers, op.instruction.rhs, ip);
+    auto out = get_proxy(stack, op.instruction.out, ip);
+    auto lhs = get_value(stack, op.instruction.lhs, ip);
+    auto rhs = get_value(stack, op.instruction.rhs, ip);
 
     std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
                      + " " + op.instruction.out.to_string() + ", "
@@ -695,16 +705,16 @@ auto execute(MOVE const op, Stack& stack, ip_type const ip) -> void
                      + " " + op.instruction.out.to_string() + ", "
                      + op.instruction.in.to_string() + "\n";
 
-    auto in  = get_slot(op.instruction.in, stack, ip);
-    auto out = get_slot(op.instruction.out, stack, ip);
+    auto in  = get_proxy(stack, op.instruction.in, ip);
+    auto out = get_proxy(stack, op.instruction.out, ip);
 
-    if (not in.has_value()) {
+    if (in.view().is_void()) {
         throw abort_execution{ip, "cannot move out of void"};
     }
-    if (out.has_value()) {
-        **out = std::move(**in);
+    if (not out.view().is_void()) {
+        out.overwrite() = std::move(in.overwrite());
     }
-    in.value()->make_void();
+    in.overwrite().make_void();
 }
 auto execute(SWAP const op, Stack& stack, ip_type const) -> void
 {
@@ -961,7 +971,7 @@ auto execute_arithmetic_immediate_op(Op const op,
                                      ip_type const ip) -> void
 {
     auto& registers = stack.frames.back().registers;
-    auto out       = get_proxy(registers, op.instruction.out, ip);
+    auto out        = get_proxy(registers, op.instruction.out, ip);
     auto in         = get_value(registers, op.instruction.in, ip);
 
     constexpr auto const signed_immediate =
@@ -1074,19 +1084,19 @@ auto execute(BUFFER_PUSH const op, Stack& stack, ip_type const ip) -> void
                      + " " + op.instruction.out.to_string() + ", "
                      + op.instruction.in.to_string() + "\n";
 
-    auto dst = get_slot(op.instruction.out, stack, ip);
-    auto src = get_slot(op.instruction.in, stack, ip);
+    auto dst = get_value(stack, op.instruction.out, ip);
+    auto src = get_proxy(stack, op.instruction.in, ip);
 
-    if (not src.has_value()) {
+    if (src.view().is_void()) {
         throw abort_execution{ip, "cannot buffer_push out of void"};
     }
 
-    if (not dst.value()->holds<viua::vm::types::Buffer>()) {
+    if (not dst.holds<viua::vm::types::Buffer>()) {
         throw abort_execution{ip,
                               "invalid destination operand for buffer_push"};
     }
-    static_cast<viua::vm::types::Buffer&>(dst.value()->boxed_value())
-        .push(std::move(src.value()->value_cell()));
+    auto& b = dst.boxed_of<viua::vm::types::Buffer>().value().get();
+    b.push(std::move(src.overwrite().value_cell()));
 }
 auto execute(BUFFER_SIZE const op, Stack& stack, ip_type const ip) -> void
 {
@@ -1094,15 +1104,15 @@ auto execute(BUFFER_SIZE const op, Stack& stack, ip_type const ip) -> void
                      + " " + op.instruction.out.to_string() + ", "
                      + op.instruction.in.to_string() + "\n";
 
-    auto dst = get_slot(op.instruction.out, stack, ip);
-    auto src = get_slot(op.instruction.in, stack, ip);
+    auto dst = get_proxy(stack, op.instruction.out, ip);
+    auto src = get_proxy(stack, op.instruction.in, ip);
 
-    if (not src.has_value()) {
+    if (src.view().is_void()) {
         throw abort_execution{ip, "cannot take buffer_size of void"};
     }
-    *dst.value() =
-        static_cast<viua::vm::types::Buffer&>(src.value()->boxed_value())
-            .size();
+    auto const& b =
+        src.view().boxed_of<viua::vm::types::Buffer>().value().get();
+    dst.overwrite() = b.size();
 }
 auto execute(BUFFER_AT const op, Stack& stack, ip_type const ip) -> void
 {
@@ -1112,18 +1122,17 @@ auto execute(BUFFER_AT const op, Stack& stack, ip_type const ip) -> void
                      + op.instruction.rhs.to_string() + "\n";
 
     auto dst = get_slot(op.instruction.out, stack, ip);
-    auto src = get_slot(op.instruction.lhs, stack, ip);
-    auto idx = get_slot(op.instruction.rhs, stack, ip);
+    auto src = get_value(stack, op.instruction.lhs, ip);
+    auto idx = get_value(stack, op.instruction.rhs, ip);
 
-    if (not src.has_value()) {
+    if (src.is_void()) {
         throw abort_execution{ip, "cannot buffer_at out of void"};
     }
 
-    auto& buf =
-        static_cast<viua::vm::types::Buffer&>(src.value()->boxed_value());
-    auto off = (buf.size() - 1);
-    if (idx.has_value()) {
-        off = idx.value()->value.get<uint64_t>();
+    auto& buf = src.boxed_of<viua::vm::types::Buffer>().value().get();
+    auto off  = (buf.size() - 1);
+    if (not idx.is_void()) {
+        off = idx.get<uint64_t>();
     }
 
     auto& v = buf.at(off);
@@ -1143,7 +1152,7 @@ auto execute(BUFFER_AT const op, Stack& stack, ip_type const ip) -> void
     }
 
     using viua::vm::types::Cell;
-    dst.value()->value = v.get<Cell::boxed_type>()->reference_to();
+    *dst.value() = v.get<Cell::boxed_type>()->reference_to();
 }
 auto execute(BUFFER_POP const op, Stack& stack, ip_type const ip) -> void
 {
@@ -1190,8 +1199,8 @@ auto execute(STRUCT_AT const op, Stack& stack, ip_type const ip) -> void
                      + op.instruction.lhs.to_string() + ", "
                      + op.instruction.rhs.to_string() + "\n";
 
-    auto dst      = get_proxy(stack, op.instruction.out, ip);
-    auto src      = get_value(stack, op.instruction.lhs, ip);
+    auto dst = get_proxy(stack, op.instruction.out, ip);
+    auto src = get_value(stack, op.instruction.lhs, ip);
     auto key = get_value(stack, op.instruction.rhs, ip);
 
     if (src.is_void()) {
@@ -1202,8 +1211,8 @@ auto execute(STRUCT_AT const op, Stack& stack, ip_type const ip) -> void
     }
 
     auto& str = src.boxed_of<viua::vm::types::Struct>().value().get();
-    auto k = key.boxed_of<viua::vm::types::Atom>().value().get().to_string();
-    auto& v = str.at(k);
+    auto k    = key.boxed_of<viua::vm::types::Atom>().value().get().to_string();
+    auto& v   = str.at(k);
 
     using viua::vm::types::Float_double;
     using viua::vm::types::Float_single;
@@ -1245,7 +1254,7 @@ auto execute(STRUCT_INSERT const op, Stack& stack, ip_type const ip) -> void
                               "invalid destination operand for struct_insert"};
     }
 
-    auto k = key.boxed_of<viua::vm::types::Atom>().value().get().to_string();
+    auto k    = key.boxed_of<viua::vm::types::Atom>().value().get().to_string();
     auto& str = dst.boxed_of<viua::vm::types::Struct>().value().get();
     str.insert(k, std::move(src.overwrite().value_cell()));
 }
