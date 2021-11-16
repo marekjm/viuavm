@@ -1299,7 +1299,9 @@ auto dump_registers(std::vector<Value> const& registers, std::string_view const 
             continue;
         }
 
-        std::cerr << "  [" << std::setw(3) << std::setfill(' ') << i << '.' << suffix << "] ";
+        std::cerr << "  "
+                  << std::setw(7) << std::setfill(' ')
+                  << ('[' + std::to_string(i) + '.' + suffix.data() + ']') << ' ';
 
         if (each.is_boxed()) {
             auto const& value = each.boxed_value();
