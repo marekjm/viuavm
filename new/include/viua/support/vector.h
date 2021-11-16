@@ -17,6 +17,9 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef VIUA_SUPPORT_VECTOR_H
+#define VIUA_SUPPORT_VECTOR_H
+
 #include <stddef.h>
 
 #include <iostream>
@@ -114,3 +117,5 @@ template<typename T> struct vector_view {
     }
 };
 }  // namespace viua::support
+
+#endif
