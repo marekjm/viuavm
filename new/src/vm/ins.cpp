@@ -1290,162 +1290,65 @@ auto execute(REF const op, Stack& stack, ip_type const ip) -> void
     dst.value()->value = src.value()->boxed_value().reference_to();
 }
 
+namespace {
+auto dump_registers(std::vector<Value> const& registers, std::string_view const suffix) -> void
+{
+    for (auto i = size_t{0}; i < registers.size(); ++i) {
+        auto const& each = registers.at(i);
+        if (each.is_void()) {
+            continue;
+        }
+
+        std::cerr << "  [" << std::setw(3) << std::setfill(' ') << i << '.' << suffix << "] ";
+
+        if (each.is_boxed()) {
+            auto const& value = each.boxed_value();
+            std::cerr << value.type_name();
+            value.as_trait<viua::vm::types::traits::To_string>(
+                [](viua::vm::types::traits::To_string const& val) -> void {
+                    std::cerr << " = " << val.to_string();
+                });
+            std::cerr << "\n";
+            continue;
+        }
+
+        if (each.is_void()) {
+            /* do nothing */
+        } else if (each.holds<int64_t>()) {
+            std::cerr
+                << "is " << std::hex << std::setw(16) << std::setfill('0')
+                << each.value.get<int64_t>() << " " << std::dec
+                << each.value.get<int64_t>() << "\n";
+        } else if (each.holds<uint64_t>()) {
+            std::cerr << "iu " << std::hex << std::setw(16)
+                      << std::setfill('0') << each.value.get<uint64_t>()
+                      << " " << std::dec << each.value.get<uint64_t>()
+                      << "\n";
+        } else if (each.holds<float>()) {
+            auto const precision = std::cerr.precision();
+            std::cerr << "fl " << std::hexfloat << each.value.get<float>()
+                      << " " << std::defaultfloat
+                      << std::setprecision(
+                             std::numeric_limits<float>::digits10 + 1)
+                      << each.value.get<float>() << "\n";
+            std::cerr << std::setprecision(precision);
+        } else if (each.holds<double>()) {
+            auto const precision = std::cerr.precision();
+            std::cerr << "db " << std::hexfloat << each.value.get<double>()
+                      << " " << std::defaultfloat
+                      << std::setprecision(
+                             std::numeric_limits<double>::digits10 + 1)
+                      << each.value.get<double>() << "\n";
+            std::cerr << std::setprecision(precision);
+        }
+    }
+}
+}
 auto execute(EBREAK const, Stack& stack, ip_type const) -> void
 {
-    std::cerr << "[ebreak.stack]\n";
-    std::cerr << "  depth = " << stack.frames.size() << "\n";
-
-    {
-        std::cerr << "[ebreak.arguments]\n";
-        auto const& registers = stack.args;
-        for (auto i = size_t{0}; i < registers.size(); ++i) {
-            auto const& each = registers.at(i);
-            if (each.is_void()) {
-                continue;
-            }
-
-            std::cerr << "  [" << std::setw(3) << i << "] ";
-
-            if (each.is_boxed()) {
-                auto const& value = each.boxed_value();
-                std::cerr << "<boxed> " << value.type_name();
-                value.as_trait<viua::vm::types::traits::To_string>(
-                    [](viua::vm::types::traits::To_string const& val) -> void {
-                        std::cerr << " = " << val.to_string();
-                    });
-                std::cerr << "\n";
-                continue;
-            }
-
-            if (each.is_void()) {
-                /* do nothing */
-            } else if (each.holds<int64_t>()) {
-                std::cerr
-                    << "is " << std::hex << std::setw(16) << std::setfill('0')
-                    << each.value.get<uint64_t>() << " " << std::dec
-                    << static_cast<int64_t>(each.value.get<uint64_t>()) << "\n";
-            } else if (each.holds<uint64_t>()) {
-                std::cerr << "iu " << std::hex << std::setw(16)
-                          << std::setfill('0') << each.value.get<uint64_t>()
-                          << " " << std::dec << each.value.get<uint64_t>()
-                          << "\n";
-            } else if (each.holds<float>()) {
-                std::cerr
-                    << "fl " << std::hex << std::setw(8) << std::setfill('0')
-                    << static_cast<float>(each.value.get<uint64_t>()) << " "
-                    << std::dec
-                    << static_cast<float>(each.value.get<uint64_t>()) << "\n";
-            } else if (each.holds<double>()) {
-                std::cerr
-                    << "db " << std::hex << std::setw(16) << std::setfill('0')
-                    << static_cast<double>(each.value.get<uint64_t>()) << " "
-                    << std::dec
-                    << static_cast<double>(each.value.get<uint64_t>()) << "\n";
-            }
-        }
-    }
-    {
-        std::cerr << "[ebreak.parameters]\n";
-        auto const& registers = stack.frames.back().parameters;
-        for (auto i = size_t{0}; i < registers.size(); ++i) {
-            auto const& each = registers.at(i);
-            if (each.is_void()) {
-                continue;
-            }
-
-            std::cerr << "  [" << std::setw(3) << i << "] ";
-
-            if (each.is_boxed()) {
-                auto const& value = each.boxed_value();
-                std::cerr << "<boxed> " << value.type_name();
-                value.as_trait<viua::vm::types::traits::To_string>(
-                    [](viua::vm::types::traits::To_string const& val) -> void {
-                        std::cerr << " = " << val.to_string();
-                    });
-                std::cerr << "\n";
-                continue;
-            }
-
-            if (each.is_void()) {
-                /* do nothing */
-            } else if (each.holds<int64_t>()) {
-                std::cerr
-                    << "is " << std::hex << std::setw(16) << std::setfill('0')
-                    << each.value.get<uint64_t>() << " " << std::dec
-                    << static_cast<int64_t>(each.value.get<uint64_t>()) << "\n";
-            } else if (each.holds<uint64_t>()) {
-                std::cerr << "iu " << std::hex << std::setw(16)
-                          << std::setfill('0') << each.value.get<uint64_t>()
-                          << " " << std::dec << each.value.get<uint64_t>()
-                          << "\n";
-            } else if (each.holds<float>()) {
-                std::cerr
-                    << "fl " << std::hex << std::setw(8) << std::setfill('0')
-                    << static_cast<float>(each.value.get<uint64_t>()) << " "
-                    << std::dec
-                    << static_cast<float>(each.value.get<uint64_t>()) << "\n";
-            } else if (each.holds<double>()) {
-                std::cerr
-                    << "db " << std::hex << std::setw(16) << std::setfill('0')
-                    << static_cast<double>(each.value.get<uint64_t>()) << " "
-                    << std::dec
-                    << static_cast<double>(each.value.get<uint64_t>()) << "\n";
-            }
-        }
-    }
-    {
-        std::cerr << "[ebreak.registers]\n";
-        auto const& registers = stack.frames.back().registers;
-        for (auto i = size_t{0}; i < registers.size(); ++i) {
-            auto const& each = registers.at(i);
-            if (each.is_void()) {
-                continue;
-            }
-
-            std::cerr << "  [" << std::setw(3) << i << "] ";
-
-            if (each.is_boxed()) {
-                auto const& value = each.boxed_value();
-                std::cerr << "<boxed> " << value.type_name();
-                value.as_trait<viua::vm::types::traits::To_string>(
-                    [](viua::vm::types::traits::To_string const& val) -> void {
-                        std::cerr << " = " << val.to_string();
-                    });
-                std::cerr << "\n";
-                continue;
-            }
-
-            if (each.is_void()) {
-                /* do nothing */
-            } else if (each.holds<int64_t>()) {
-                std::cerr << "is " << std::hex << std::setw(16)
-                          << std::setfill('0') << each.value.get<int64_t>()
-                          << " " << std::dec << each.value.get<int64_t>()
-                          << "\n";
-            } else if (each.holds<uint64_t>()) {
-                std::cerr << "iu " << std::hex << std::setw(16)
-                          << std::setfill('0') << each.value.get<uint64_t>()
-                          << " " << std::dec << each.value.get<uint64_t>()
-                          << "\n";
-            } else if (each.holds<float>()) {
-                auto const precision = std::cerr.precision();
-                std::cerr << "fl " << std::hexfloat << each.value.get<float>()
-                          << " " << std::defaultfloat
-                          << std::setprecision(
-                                 std::numeric_limits<float>::digits10 + 1)
-                          << each.value.get<float>() << "\n";
-                std::cerr << std::setprecision(precision);
-            } else if (each.holds<double>()) {
-                auto const precision = std::cerr.precision();
-                std::cerr << "db " << std::hexfloat << each.value.get<double>()
-                          << " " << std::defaultfloat
-                          << std::setprecision(
-                                 std::numeric_limits<double>::digits10 + 1)
-                          << each.value.get<double>() << "\n";
-                std::cerr << std::setprecision(precision);
-            }
-        }
-    }
+    dump_registers(stack.args, "a");
+    dump_registers(stack.frames.back().parameters, "p");
+    dump_registers(stack.frames.back().registers, "l");
 }
 
 }  // namespace viua::vm::ins
