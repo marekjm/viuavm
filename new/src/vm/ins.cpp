@@ -239,25 +239,15 @@ template<typename T> auto cast_to(viua::vm::types::Cell_view value) -> T
     if (auto x = dynamic_cast<Signed_integer const*>(bv); x) {
         return static_cast<T>(x->value);
     }
-
-    /*
-    if (holds<Signed_integer>()) {
-        return static_cast<T>(
-            static_cast<Signed_integer const&>(boxed_value()).value);
+    if (auto x = dynamic_cast<Unsigned_integer const*>(bv); x) {
+        return static_cast<T>(x->value);
     }
-    if (holds<Unsigned_integer>()) {
-        return static_cast<T>(
-            static_cast<Unsigned_integer const&>(boxed_value()).value);
+    if (auto x = dynamic_cast<Float_single const*>(bv); x) {
+        return static_cast<T>(x->value);
     }
-    if (holds<Float_single>()) {
-        return static_cast<T>(
-            static_cast<Float_single const&>(boxed_value()).value);
+    if (auto x = dynamic_cast<Float_double const*>(bv); x) {
+        return static_cast<T>(x->value);
     }
-    if (holds<Float_double>()) {
-        return static_cast<T>(
-            static_cast<Float_double const&>(boxed_value()).value);
-    }
-    */
 
     throw std::bad_cast{};
 }
