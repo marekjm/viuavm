@@ -8,25 +8,26 @@
 namespace viua::vm::types {
 Cell_view::Cell_view(Cell& cell) : content{std::monostate{}}
 {
-    std::visit([this](auto&& arg) -> void
-    {
-        using T = std::decay_t<decltype(arg)>;
-        if constexpr (std::is_same_v<T, std::monostate>) {
-            // do nothing
-        } else if constexpr (std::is_same_v<T, int64_t>) {
-            content = std::reference_wrapper<int64_t>(arg);
-        } else if constexpr (std::is_same_v<T, uint64_t>) {
-            content = std::reference_wrapper<uint64_t>(arg);
-        } else if constexpr (std::is_same_v<T, float>) {
-            content = std::reference_wrapper<float>(arg);
-        } else if constexpr (std::is_same_v<T, double>) {
-            content = std::reference_wrapper<double>(arg);
-        } else if constexpr (std::is_same_v<T, Cell::boxed_type>) {
-            content = std::reference_wrapper<boxed_type>(*arg.get());
-        } else {
-            viua::support::non_exhaustive_visitor<T>();
-        }
-    }, cell.content);
+    std::visit(
+        [this](auto&& arg) -> void {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, std::monostate>) {
+                // do nothing
+            } else if constexpr (std::is_same_v<T, int64_t>) {
+                content = std::reference_wrapper<int64_t>(arg);
+            } else if constexpr (std::is_same_v<T, uint64_t>) {
+                content = std::reference_wrapper<uint64_t>(arg);
+            } else if constexpr (std::is_same_v<T, float>) {
+                content = std::reference_wrapper<float>(arg);
+            } else if constexpr (std::is_same_v<T, double>) {
+                content = std::reference_wrapper<double>(arg);
+            } else if constexpr (std::is_same_v<T, Cell::boxed_type>) {
+                content = std::reference_wrapper<boxed_type>(*arg.get());
+            } else {
+                viua::support::non_exhaustive_visitor<T>();
+            }
+        },
+        cell.content);
 }
 Cell_view::Cell_view(boxed_type& v) : content{v}
 {}
