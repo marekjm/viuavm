@@ -73,6 +73,8 @@ struct T {
 
     static auto decode(instruction_type const) -> T;
     auto encode() const -> instruction_type;
+
+    auto to_string() const -> std::string;
 };
 
 /*
@@ -89,6 +91,8 @@ struct D {
 
     static auto decode(instruction_type const) -> D;
     auto encode() const -> instruction_type;
+
+    auto to_string() const -> std::string;
 };
 
 /*
@@ -102,6 +106,8 @@ struct S {
 
     static auto decode(instruction_type const) -> S;
     auto encode() const -> instruction_type;
+
+    auto to_string() const -> std::string;
 };
 
 /*
@@ -130,6 +136,8 @@ struct F {
 
     static auto decode(instruction_type const) -> F;
     auto encode() const -> instruction_type;
+
+    auto to_string() const -> std::string;
 };
 
 /*
@@ -147,6 +155,8 @@ struct E {
 
     static auto decode(instruction_type const) -> E;
     auto encode() const -> instruction_type;
+
+    auto to_string() const -> std::string;
 };
 
 /*
@@ -166,6 +176,8 @@ struct R {
 
     static auto decode(instruction_type const) -> R;
     auto encode() const -> instruction_type;
+
+    auto to_string() const -> std::string;
 };
 
 /*
@@ -178,6 +190,8 @@ struct N {
 
     static auto decode(instruction_type const) -> N;
     auto encode() const -> instruction_type;
+
+    auto to_string() const -> std::string;
 };
 
 constexpr auto GREEDY      = opcode_type{0x8000};

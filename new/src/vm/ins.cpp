@@ -27,6 +27,7 @@
 #include <vector>
 
 #include <viua/arch/arch.h>
+#include <viua/support/fdstream.h>
 #include <viua/vm/ins.h>
 
 
@@ -259,11 +260,6 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
     auto lhs = get_value(stack, op.instruction.lhs, ip);
     auto rhs = get_value(stack, op.instruction.rhs, ip);
 
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
-
     using viua::vm::types::Float_double;
     using viua::vm::types::Float_single;
     using viua::vm::types::Signed_integer;
@@ -325,11 +321,6 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
     auto lhs = get_value(stack, op.instruction.lhs, ip);
     auto rhs = get_value(stack, op.instruction.rhs, ip);
 
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
-
     if (lhs.template holds<int64_t>()) {
         out = typename Op::functor_type{}(lhs.template get<int64_t>(),
                                           cast_to<int64_t>(rhs));
@@ -371,11 +362,6 @@ auto execute(MOD const op, Stack& stack, ip_type const ip) -> void
     auto& lhs       = registers.at(op.instruction.lhs.index);
     auto& rhs       = registers.at(op.instruction.rhs.index);
 
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
-
     if (lhs.is_boxed() or rhs.is_boxed()) {
         throw abort_execution{
             nullptr, "boxed values not supported for modulo operations"};
@@ -399,11 +385,6 @@ auto execute(BITSHL const op, Stack& stack, ip_type const) -> void
     auto& rhs       = registers.at(op.instruction.rhs.index);
 
     out.value = (lhs.value.get<uint64_t>() << rhs.value.get<uint64_t>());
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
 }
 auto execute(BITSHR const op, Stack& stack, ip_type const) -> void
 {
@@ -413,11 +394,6 @@ auto execute(BITSHR const op, Stack& stack, ip_type const) -> void
     auto& rhs       = registers.at(op.instruction.rhs.index);
 
     out.value = (lhs.value.get<uint64_t>() >> rhs.value.get<uint64_t>());
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
 }
 auto execute(BITASHR const op, Stack& stack, ip_type const) -> void
 {
@@ -428,11 +404,6 @@ auto execute(BITASHR const op, Stack& stack, ip_type const) -> void
 
     auto const tmp = static_cast<int64_t>(lhs.value.get<uint64_t>());
     out.value      = static_cast<uint64_t>(tmp >> rhs.value.get<uint64_t>());
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
 }
 auto execute(BITROL const, Stack&, ip_type const) -> void
 {}
@@ -446,11 +417,6 @@ auto execute(BITAND const op, Stack& stack, ip_type const) -> void
     auto& rhs       = registers.at(op.instruction.rhs.index);
 
     out.value = (lhs.value.get<uint64_t>() & rhs.value.get<uint64_t>());
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
 }
 auto execute(BITOR const op, Stack& stack, ip_type const) -> void
 {
@@ -460,11 +426,6 @@ auto execute(BITOR const op, Stack& stack, ip_type const) -> void
     auto& rhs       = registers.at(op.instruction.rhs.index);
 
     out.value = (lhs.value.get<uint64_t>() | rhs.value.get<uint64_t>());
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
 }
 auto execute(BITXOR const op, Stack& stack, ip_type const) -> void
 {
@@ -474,11 +435,6 @@ auto execute(BITXOR const op, Stack& stack, ip_type const) -> void
     auto& rhs       = registers.at(op.instruction.rhs.index);
 
     out.value = (lhs.value.get<uint64_t>() ^ rhs.value.get<uint64_t>());
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
 }
 auto execute(BITNOT const op, Stack& stack, ip_type const) -> void
 {
@@ -487,10 +443,6 @@ auto execute(BITNOT const op, Stack& stack, ip_type const) -> void
     auto& in        = registers.at(op.instruction.in.index);
 
     out.value = ~in.value.get<uint64_t>();
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.in.to_string() + "\n";
 }
 
 template<typename Op, typename Trait>
@@ -500,11 +452,6 @@ auto execute_cmp_op(Op const op, Stack& stack, ip_type const ip) -> void
     auto& out       = registers.at(op.instruction.out.index);
     auto& lhs       = registers.at(op.instruction.lhs.index);
     auto& rhs       = registers.at(op.instruction.rhs.index);
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
 
     if (lhs.template holds<int64_t>()) {
         out = typename Op::functor_type{}(lhs.value.template get<int64_t>(),
@@ -576,11 +523,6 @@ auto execute(CMP const op, Stack& stack, ip_type const) -> void
             throw abort_execution{nullptr, "cmp: incomparable unboxed values"};
         }
     }
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
 }
 auto execute(AND const op, Stack& stack, ip_type const) -> void
 {
@@ -603,11 +545,6 @@ auto execute(AND const op, Stack& stack, ip_type const) -> void
         auto const use_lhs = (lhs.value.get<uint64_t>() == 0);
         out                = use_lhs ? std::move(lhs) : std::move(rhs);
     }
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
 }
 auto execute(OR const op, Stack& stack, ip_type const) -> void
 {
@@ -630,11 +567,6 @@ auto execute(OR const op, Stack& stack, ip_type const) -> void
         auto const use_lhs = (lhs.value.get<uint64_t>() != 0);
         out                = use_lhs ? std::move(lhs) : std::move(rhs);
     }
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
 }
 auto execute(NOT const op, Stack& stack, ip_type const) -> void
 {
@@ -654,18 +586,10 @@ auto execute(NOT const op, Stack& stack, ip_type const) -> void
     } else {
         out = static_cast<bool>(in.value.get<uint64_t>());
     }
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.in.to_string() + "\n";
 }
 
 auto execute(COPY const op, Stack& stack, ip_type const) -> void
 {
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.in.to_string() + "\n";
-
     auto& registers = stack.frames.back().registers;
     auto& in        = registers.at(op.instruction.in.index);
     auto& out       = registers.at(op.instruction.out.index);
@@ -691,10 +615,6 @@ auto execute(COPY const op, Stack& stack, ip_type const) -> void
 }
 auto execute(MOVE const op, Stack& stack, ip_type const ip) -> void
 {
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.in.to_string() + "\n";
-
     auto in  = get_proxy(stack, op.instruction.in, ip);
     auto out = get_proxy(stack, op.instruction.out, ip);
 
@@ -708,10 +628,6 @@ auto execute(MOVE const op, Stack& stack, ip_type const ip) -> void
 }
 auto execute(SWAP const op, Stack& stack, ip_type const) -> void
 {
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.in.to_string() + "\n";
-
     auto& registers = stack.frames.back().registers;
     auto& lhs       = registers.at(op.instruction.in.index);
     auto& rhs       = registers.at(op.instruction.out.index);
@@ -739,9 +655,6 @@ auto execute(ATOM const op, Stack& stack, ip_type const) -> void
         data_size};
 
     target.value = std::move(s);
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + "\n";
 }
 auto execute(STRING const op, Stack& stack, ip_type const) -> void
 {
@@ -763,9 +676,6 @@ auto execute(STRING const op, Stack& stack, ip_type const) -> void
         data_size};
 
     target.value = std::move(s);
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + "\n";
 }
 
 auto execute(FRAME const op, Stack& stack, ip_type const ip) -> void
@@ -785,11 +695,6 @@ auto execute(FRAME const op, Stack& stack, ip_type const ip) -> void
     }
 
     stack.args = std::vector<Value>(capacity);
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string()
-                     + " (frame with args capacity " + std::to_string(capacity)
-                     + ")" + "\n";
 }
 
 auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
@@ -810,11 +715,6 @@ auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
         std::tie(fn_name, fn_addr) =
             stack.environment.function_at(fn_offset.value.get<uint64_t>());
     }
-
-    std::cerr << "    " << viua::arch::ops::to_string(op.instruction.opcode)
-              << ", " << fn_name << " (at +0x" << std::hex << std::setw(8)
-              << std::setfill('0') << fn_addr << std::dec << ")"
-              << "\n";
 
     if (fn_addr % sizeof(viua::arch::instruction_type)) {
         throw abort_execution{ip, "invalid IP after call"};
@@ -847,9 +747,6 @@ auto execute(RETURN const op, Stack& stack, ip_type const ip) -> ip_type
             std::move(fr.registers.at(index));
     }
 
-    std::cerr << "return to " << std::hex << std::setw(16) << std::setfill('0')
-              << fr.return_address << std::dec << "\n";
-
     return fr.return_address;
 }
 
@@ -858,20 +755,12 @@ auto execute(LUI const op, Stack& stack, ip_type const) -> void
     auto& registers = stack.frames.back().registers;
     auto& value     = registers.at(op.instruction.out.index);
     value.value     = static_cast<int64_t>(op.instruction.immediate << 28);
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + std::to_string(op.instruction.immediate) + "\n";
 }
 auto execute(LUIU const op, Stack& stack, ip_type const) -> void
 {
     auto& registers = stack.frames.back().registers;
     auto& value     = registers.at(op.instruction.out.index);
     value.value     = (op.instruction.immediate << 28);
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + std::to_string(op.instruction.immediate) + "\n";
 }
 
 auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
@@ -899,9 +788,6 @@ auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
     memcpy(&v, &tmp, data_size);
 
     target.value = v;
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + "\n";
 }
 auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
 {
@@ -928,9 +814,6 @@ auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
     memcpy(&v, &tmp, data_size);
 
     target.value = v;
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + "\n";
 }
 auto execute(STRUCT const op, Stack& stack, ip_type const) -> void
 {
@@ -939,9 +822,6 @@ auto execute(STRUCT const op, Stack& stack, ip_type const) -> void
 
     auto s       = std::make_unique<viua::vm::types::Struct>();
     target.value = std::move(s);
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + "\n";
 }
 auto execute(BUFFER const op, Stack& stack, ip_type const) -> void
 {
@@ -950,9 +830,6 @@ auto execute(BUFFER const op, Stack& stack, ip_type const) -> void
 
     auto s       = std::make_unique<viua::vm::types::Buffer>();
     target.value = std::move(s);
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + "\n";
 }
 
 template<typename Op>
@@ -973,12 +850,6 @@ auto execute_arithmetic_immediate_op(Op const op,
              ? static_cast<immediate_type>(
                  static_cast<int32_t>(op.instruction.immediate << 8) >> 8)
              : static_cast<immediate_type>(op.instruction.immediate));
-
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.in.to_string() + ", "
-                     + std::to_string(op.instruction.immediate)
-                     + (signed_immediate ? "" : "u") + "\n";
 
     using viua::vm::types::Float_double;
     using viua::vm::types::Float_single;
@@ -1070,10 +941,6 @@ auto execute(DIVIU const op, Stack& stack, ip_type const ip) -> void
 
 auto execute(BUFFER_PUSH const op, Stack& stack, ip_type const ip) -> void
 {
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.in.to_string() + "\n";
-
     auto dst = get_value(stack, op.instruction.out, ip);
     auto src = get_proxy(stack, op.instruction.in, ip);
 
@@ -1090,10 +957,6 @@ auto execute(BUFFER_PUSH const op, Stack& stack, ip_type const ip) -> void
 }
 auto execute(BUFFER_SIZE const op, Stack& stack, ip_type const ip) -> void
 {
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.in.to_string() + "\n";
-
     auto dst = get_proxy(stack, op.instruction.out, ip);
     auto src = get_proxy(stack, op.instruction.in, ip);
 
@@ -1106,11 +969,6 @@ auto execute(BUFFER_SIZE const op, Stack& stack, ip_type const ip) -> void
 }
 auto execute(BUFFER_AT const op, Stack& stack, ip_type const ip) -> void
 {
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
-
     auto dst = get_slot(op.instruction.out, stack, ip);
     auto src = get_value(stack, op.instruction.lhs, ip);
     auto idx = get_value(stack, op.instruction.rhs, ip);
@@ -1146,11 +1004,6 @@ auto execute(BUFFER_AT const op, Stack& stack, ip_type const ip) -> void
 }
 auto execute(BUFFER_POP const op, Stack& stack, ip_type const ip) -> void
 {
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
-
     auto dst = get_slot(op.instruction.out, stack, ip);
     auto src = get_slot(op.instruction.lhs, stack, ip);
     auto idx = get_slot(op.instruction.rhs, stack, ip);
@@ -1184,11 +1037,6 @@ auto execute(BUFFER_POP const op, Stack& stack, ip_type const ip) -> void
 
 auto execute(STRUCT_AT const op, Stack& stack, ip_type const ip) -> void
 {
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
-
     auto dst = get_proxy(stack, op.instruction.out, ip);
     auto src = get_value(stack, op.instruction.lhs, ip);
     auto key = get_value(stack, op.instruction.rhs, ip);
@@ -1223,11 +1071,6 @@ auto execute(STRUCT_AT const op, Stack& stack, ip_type const ip) -> void
 }
 auto execute(STRUCT_INSERT const op, Stack& stack, ip_type const ip) -> void
 {
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
-
     auto dst = get_proxy(stack, op.instruction.out, ip);
     auto key = get_value(stack, op.instruction.lhs, ip);
     auto src = get_proxy(stack, op.instruction.rhs, ip);
@@ -1248,20 +1091,11 @@ auto execute(STRUCT_INSERT const op, Stack& stack, ip_type const ip) -> void
     auto& str = dst.boxed_of<viua::vm::types::Struct>().value().get();
     str.insert(k, std::move(src.overwrite().value_cell()));
 }
-auto execute(STRUCT_REMOVE const op, Stack&, ip_type const) -> void
-{
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.lhs.to_string() + ", "
-                     + op.instruction.rhs.to_string() + "\n";
-}
+auto execute(STRUCT_REMOVE const, Stack&, ip_type const) -> void
+{}
 
 auto execute(REF const op, Stack& stack, ip_type const ip) -> void
 {
-    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-                     + " " + op.instruction.out.to_string() + ", "
-                     + op.instruction.in.to_string() + "\n";
-
     auto dst = get_slot(op.instruction.out, stack, ip);
     auto src = get_slot(op.instruction.in, stack, ip);
 
@@ -1289,9 +1123,19 @@ auto execute(REF const op, Stack& stack, ip_type const ip) -> void
 
     dst.value()->value = src.value()->boxed_value().reference_to();
 }
+}  // namespace viua::vm::ins
 
+namespace viua {
+extern viua::support::fdstream TRACE_STREAM;
+}
+
+namespace viua::vm::ins {
+using namespace viua::arch::ins;
+using viua::vm::Stack;
+using ip_type = viua::arch::instruction_type const*;
 namespace {
-auto dump_registers(std::vector<Value> const& registers, std::string_view const suffix) -> void
+auto dump_registers(std::vector<Value> const& registers,
+                    std::string_view const suffix) -> void
 {
     for (auto i = size_t{0}; i < registers.size(); ++i) {
         auto const& each = registers.at(i);
@@ -1299,58 +1143,57 @@ auto dump_registers(std::vector<Value> const& registers, std::string_view const 
             continue;
         }
 
-        std::cerr << "  "
-                  << std::setw(7) << std::setfill(' ')
-                  << ('[' + std::to_string(i) + '.' + suffix.data() + ']') << ' ';
+        TRACE_STREAM << "  " << std::setw(7) << std::setfill(' ')
+                     << ('[' + std::to_string(i) + '.' + suffix.data() + ']')
+                     << ' ';
 
         if (each.is_boxed()) {
             auto const& value = each.boxed_value();
-            std::cerr << value.type_name();
+            TRACE_STREAM << value.type_name();
             value.as_trait<viua::vm::types::traits::To_string>(
                 [](viua::vm::types::traits::To_string const& val) -> void {
-                    std::cerr << " = " << val.to_string();
+                    TRACE_STREAM << " = " << val.to_string();
                 });
-            std::cerr << "\n";
+            TRACE_STREAM << '\n';
             continue;
         }
 
         if (each.is_void()) {
             /* do nothing */
         } else if (each.holds<int64_t>()) {
-            std::cerr
-                << "is " << std::hex << std::setw(16) << std::setfill('0')
-                << each.value.get<int64_t>() << " " << std::dec
-                << each.value.get<int64_t>() << "\n";
+            TRACE_STREAM << "is " << std::hex << std::setw(16)
+                         << std::setfill('0') << each.value.get<int64_t>()
+                         << " " << std::dec << each.value.get<int64_t>()
+                         << '\n';
         } else if (each.holds<uint64_t>()) {
-            std::cerr << "iu " << std::hex << std::setw(16)
-                      << std::setfill('0') << each.value.get<uint64_t>()
-                      << " " << std::dec << each.value.get<uint64_t>()
-                      << "\n";
+            TRACE_STREAM << "iu " << std::hex << std::setw(16)
+                         << std::setfill('0') << each.value.get<uint64_t>()
+                         << " " << std::dec << each.value.get<uint64_t>()
+                         << '\n';
         } else if (each.holds<float>()) {
             auto const precision = std::cerr.precision();
-            std::cerr << "fl " << std::hexfloat << each.value.get<float>()
-                      << " " << std::defaultfloat
-                      << std::setprecision(
-                             std::numeric_limits<float>::digits10 + 1)
-                      << each.value.get<float>() << "\n";
-            std::cerr << std::setprecision(precision);
+            TRACE_STREAM
+                << "fl " << std::hexfloat << each.value.get<float>() << " "
+                << std::defaultfloat
+                << std::setprecision(std::numeric_limits<float>::digits10 + 1)
+                << each.value.get<float>() << '\n';
+            TRACE_STREAM << std::setprecision(precision);
         } else if (each.holds<double>()) {
             auto const precision = std::cerr.precision();
-            std::cerr << "db " << std::hexfloat << each.value.get<double>()
-                      << " " << std::defaultfloat
-                      << std::setprecision(
-                             std::numeric_limits<double>::digits10 + 1)
-                      << each.value.get<double>() << "\n";
-            std::cerr << std::setprecision(precision);
+            TRACE_STREAM
+                << "db " << std::hexfloat << each.value.get<double>() << " "
+                << std::defaultfloat
+                << std::setprecision(std::numeric_limits<double>::digits10 + 1)
+                << each.value.get<double>() << '\n';
+            TRACE_STREAM << std::setprecision(precision);
         }
     }
 }
-}
+}  // namespace
 auto execute(EBREAK const, Stack& stack, ip_type const) -> void
 {
     dump_registers(stack.args, "a");
     dump_registers(stack.frames.back().parameters, "p");
     dump_registers(stack.frames.back().registers, "l");
 }
-
 }  // namespace viua::vm::ins

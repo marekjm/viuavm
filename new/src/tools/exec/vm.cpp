@@ -1,6 +1,7 @@
 #include <elf.h>
 #include <fcntl.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -21,14 +22,23 @@
 #include <viua/arch/arch.h>
 #include <viua/arch/ins.h>
 #include <viua/arch/ops.h>
+#include <viua/support/fdstream.h>
 #include <viua/support/string.h>
 #include <viua/vm/core.h>
 #include <viua/vm/ins.h>
 #include <viua/vm/types.h>
 
 
+constexpr auto VIUA_TRACE_CYCLES = true;
+
+namespace viua {
+auto TRACE_STREAM = viua::support::fdstream{2};
+}
+
+
 using viua::vm::Env;
 using viua::vm::Stack;
+
 
 auto Env::function_at(size_t const offset) const
     -> std::pair<std::string, size_t>
@@ -58,6 +68,7 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
     auto const format = static_cast<viua::arch::ops::FORMAT>(
         opcode & viua::arch::ops::FORMAT_MASK);
 
+
     switch (format) {
         using viua::vm::ins::execute;
         using namespace viua::arch::ins;
@@ -65,6 +76,9 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
     case T:
     {
         auto instruction = viua::arch::ops::T::decode(raw);
+        if constexpr (VIUA_TRACE_CYCLES) {
+            viua::TRACE_STREAM << "    " << instruction.to_string() << "\n";
+        }
 
         using viua::arch::ops::OPCODE_T;
         switch (static_cast<OPCODE_T>(opcode)) {
@@ -146,6 +160,9 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
     case S:
     {
         auto instruction = viua::arch::ops::S::decode(raw);
+        if constexpr (VIUA_TRACE_CYCLES) {
+            viua::TRACE_STREAM << "    " << instruction.to_string() << "\n";
+        }
 
         using viua::arch::ops::OPCODE_S;
         switch (static_cast<OPCODE_S>(opcode)) {
@@ -178,6 +195,9 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
     case E:
     {
         auto instruction = viua::arch::ops::E::decode(raw);
+        if constexpr (VIUA_TRACE_CYCLES) {
+            viua::TRACE_STREAM << "    " << instruction.to_string() << "\n";
+        }
 
         using viua::arch::ops::OPCODE_E;
         switch (static_cast<OPCODE_E>(opcode)) {
@@ -193,6 +213,9 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
     case R:
     {
         auto instruction = viua::arch::ops::R::decode(raw);
+        if constexpr (VIUA_TRACE_CYCLES) {
+            viua::TRACE_STREAM << "    " << instruction.to_string() << "\n";
+        }
 
         using viua::arch::ops::OPCODE_R;
         switch (static_cast<OPCODE_R>(opcode)) {
@@ -225,7 +248,10 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
     }
     case N:
     {
-        std::cerr << "    " + viua::arch::ops::to_string(opcode) + "\n";
+        if constexpr (VIUA_TRACE_CYCLES) {
+            viua::TRACE_STREAM << "    " << viua::arch::ops::to_string(opcode)
+                               << "\n";
+        }
 
         using viua::arch::ops::OPCODE_N;
         switch (static_cast<OPCODE_N>(opcode)) {
@@ -235,6 +261,7 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
             return nullptr;
         case OPCODE_N::EBREAK:
             execute(EBREAK{viua::arch::ops::N::decode(raw)}, stack, ip);
+            viua::TRACE_STREAM << "    #ebreak" << '\n';
             break;
         }
         break;
@@ -242,6 +269,9 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
     case D:
     {
         auto instruction = viua::arch::ops::D::decode(raw);
+        if constexpr (VIUA_TRACE_CYCLES) {
+            viua::TRACE_STREAM << "    " << instruction.to_string() << "\n";
+        }
 
         using viua::arch::ops::OPCODE_D;
         switch (static_cast<OPCODE_D>(opcode)) {
@@ -314,10 +344,13 @@ auto run(Stack& stack,
     constexpr auto PREEMPTION_THRESHOLD = size_t{2};
 
     while ((ip < ip_end) and (ip >= ip_begin)) {
-        std::cerr << "cycle at " << module << "+0x" << std::hex << std::setw(8)
-                  << std::setfill('0')
-                  << ((ip - ip_begin) * sizeof(viua::arch::instruction_type))
-                  << std::dec << "\n";
+        if constexpr (VIUA_TRACE_CYCLES) {
+            viua::TRACE_STREAM
+                << "cycle at " << module << "+0x" << std::hex << std::setw(8)
+                << std::setfill('0')
+                << ((ip - ip_begin) * sizeof(viua::arch::instruction_type))
+                << std::dec << "\n";
+        }
 
         for (auto i = size_t{0}; i < PREEMPTION_THRESHOLD and ip != ip_end;
              ++i) {
@@ -350,11 +383,11 @@ auto run(Stack& stack,
         }
 
         if (stack.frames.empty()) {
-            std::cerr << "exited\n";
+            // std::cerr << "exited\n";
             break;
         }
         if (ip == ip_end) {
-            std::cerr << "halted\n";
+            // std::cerr << "halted\n";
             break;
         }
 
@@ -485,6 +518,23 @@ auto main(int argc, char* argv[]) -> int
 
     auto const ip_begin = &text[0];
     auto const ip_end   = (ip_begin + text.size());
+
+    if constexpr (VIUA_TRACE_CYCLES) {
+        if (auto trace_fd = getenv("VIUA_VM_TRACE_FD"); trace_fd) {
+            try {
+                /*
+                 * Assume an file descriptor opened for writing was received.
+                 */
+                viua::TRACE_STREAM = viua::support::fdstream{std::stoi(trace_fd)};
+            } catch (std::invalid_argument const&) {
+                /*
+                 * Otherwise, treat the thing received as a filename and open it
+                 * for writing.
+                 */
+                viua::TRACE_STREAM = viua::support::fdstream{open(trace_fd, O_WRONLY|O_CLOEXEC)};
+            }
+        }
+    }
 
     if constexpr (true) {
         run(stack,

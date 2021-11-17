@@ -70,7 +70,7 @@ watch-sample:
 		find ./src -type f ;\
 		find ./include -type f\
 	) |\
-	entr -cs 'make -j && ./build/tools/exec/asm sample.asm && ./build/tools/exec/vm ./a.out'
+	entr -cs 'make -j && ./build/tools/exec/asm sample.asm && VIUA_VM_TRACE_FD=2 ./build/tools/exec/vm ./a.out'
 
 watch-sample-and-install:
 	(\

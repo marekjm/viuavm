@@ -50,6 +50,11 @@ auto T::encode() const -> instruction_type
     return base | (output_register << 16) | (left_hand_register << 32)
            | (right_hand_register << 48);
 }
+auto T::to_string() const -> std::string
+{
+    return (viua::arch::ops::to_string(opcode) + " " + out.to_string() + ", "
+            + lhs.to_string() + ", " + rhs.to_string());
+}
 }  // namespace viua::arch::ops
 namespace viua::arch::ops {
 D::D(viua::arch::opcode_type const op,
@@ -72,6 +77,11 @@ auto D::encode() const -> instruction_type
     auto input_register  = uint64_t{in.encode()};
     return base | (output_register << 16) | (input_register << 32);
 }
+auto D::to_string() const -> std::string
+{
+    return (viua::arch::ops::to_string(opcode) + " " + out.to_string() + ", "
+            + in.to_string());
+}
 }  // namespace viua::arch::ops
 namespace viua::arch::ops {
 S::S(viua::arch::opcode_type const op, Register_access const o)
@@ -89,6 +99,10 @@ auto S::encode() const -> instruction_type
     auto base            = uint64_t{opcode};
     auto output_register = uint64_t{out.encode()};
     return base | (output_register << 16);
+}
+auto S::to_string() const -> std::string
+{
+    return (viua::arch::ops::to_string(opcode) + " " + out.to_string());
 }
 }  // namespace viua::arch::ops
 namespace viua::arch::ops {
@@ -111,6 +125,11 @@ auto F::encode() const -> instruction_type
     auto output_register = uint64_t{out.encode()};
     auto value           = uint64_t{immediate};
     return base | (output_register << 16) | (value << 32);
+}
+auto F::to_string() const -> std::string
+{
+    return (viua::arch::ops::to_string(opcode) + " " + out.to_string() + ", "
+            + std::to_string(immediate));
 }
 }  // namespace viua::arch::ops
 namespace viua::arch::ops {
@@ -136,6 +155,11 @@ auto E::encode() const -> instruction_type
     auto high            = ((immediate & 0x0000000f00000000) >> 32);
     auto low             = (immediate & 0x00000000ffffffff);
     return base | (output_register << 16) | (high << 28) | (low << 32);
+}
+auto E::to_string() const -> std::string
+{
+    return (viua::arch::ops::to_string(opcode) + " " + out.to_string() + ", "
+            + std::to_string(immediate));
 }
 }  // namespace viua::arch::ops
 namespace viua::arch::ops {
@@ -175,6 +199,11 @@ auto R::encode() const -> instruction_type
 
     return base | (output_register << 16) | (input_register << 32)
            | (low_short << 48) | (high_nibble << 28) | (low_nibble << 44);
+}
+auto R::to_string() const -> std::string
+{
+    return (viua::arch::ops::to_string(opcode) + " " + out.to_string() + ", "
+            + in.to_string() + ", " + std::to_string(immediate));
 }
 }  // namespace viua::arch::ops
 namespace viua::arch::ops {
