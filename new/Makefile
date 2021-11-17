@@ -70,7 +70,16 @@ watch-sample:
 		find ./src -type f ;\
 		find ./include -type f\
 	) |\
-	entr -cs 'make -j && make PREFIX=~/.local install && ./build/tools/exec/asm sample.asm && ./a.out'
+	entr -cs 'make -j && ./build/tools/exec/asm sample.asm && ./build/tools/exec/vm ./a.out'
+
+watch-sample-and-install:
+	(\
+		ls -1 Makefile ;\
+		find . -name '*.asm' ;\
+		find ./src -type f ;\
+		find ./include -type f\
+	) |\
+	entr -cs 'make -j && make install && ./build/tools/exec/asm sample.asm && ./a.out'
 
 ################################################################################
 # Template rules
