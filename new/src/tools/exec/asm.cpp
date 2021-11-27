@@ -1493,6 +1493,14 @@ auto main(int argc, char* argv[]) -> int
     auto args = std::vector<std::string_view>{};
     std::copy(argv + 1, argv + argc, std::back_inserter(args));
 
+    auto output_path = std::string{"a.out"};
+    for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
+        auto const& each = args.at(i);
+        if (each == "-o") {
+            output_path = args.at(++i);
+        }
+    }
+
     /*
      * If invoked *with* some arguments, find the path to the source file and
      * assemble it - converting assembly source code into binary. Produced
@@ -1915,7 +1923,7 @@ auto main(int argc, char* argv[]) -> int
      */
     {
         auto const a_out =
-            open("./a.out",
+            open(output_path.c_str(),
                  O_CREAT | O_TRUNC | O_WRONLY,
                  S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
         if (a_out == -1) {
