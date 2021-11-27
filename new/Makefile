@@ -83,6 +83,13 @@ watch-sample-and-install:
 	) |\
 	entr -cs 'make -j && make install && ./build/tools/exec/asm sample.asm && ./a.out'
 
+watch-tests:
+	(\
+		find $(BUILD_EXEC_DIR) -type f ;\
+		find ./tests/asm -type f ;\
+		ls -1 test-suite.py \
+	) | entr -c python3 ./test-suite.py
+
 ################################################################################
 # Template rules
 $(BUILD)/%: $(BUILD)/%.o
