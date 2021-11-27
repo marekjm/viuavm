@@ -260,7 +260,7 @@ def test_case(case_name, test_program, check_kind):
         for r, content in want_ebreak['registers'].items():
             for index, cell in content.items():
                 if index not in ebreak['registers'][r]:
-                    leader = f'    register {index}.{r}'
+                    leader = f'\n    register {index}.{r}'
                     sys.stderr.write(f'{leader} is void\n')
                     sys.stderr.write('{} expected {} = {}\n'.format(
                         (len(leader) * ' '),
@@ -274,7 +274,7 @@ def test_case(case_name, test_program, check_kind):
                 want_type, want_value = cell
 
                 if want_type != got_type:
-                    leader = f'    register {index}.{r}'
+                    leader = f'\n    register {index}.{r}'
                     sys.stderr.write('{} contains {} = {}\n'.format(
                         leader,
                         colorise('red', got_type.ljust(max(len(want_type), len(got_type)))),
@@ -292,7 +292,7 @@ def test_case(case_name, test_program, check_kind):
                     return False
 
                 if want_value != got_value:
-                    leader = f'    register {index}.{r}'
+                    leader = f'\n    register {index}.{r}'
                     sys.stderr.write('{} contains {} = {}\n'.format(
                         leader,
                         got_type.ljust(max(len(want_type), len(got_type))),
