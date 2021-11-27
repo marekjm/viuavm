@@ -65,6 +65,15 @@ format:
 
 ################################################################################
 # Development quality-of-life targets
+watch:
+	(\
+		ls -1 Makefile ;\
+		find . -name '*.asm' ;\
+		find ./src -type f ;\
+		find ./include -type f\
+	) |\
+	entr -c make -j
+
 watch-sample:
 	(\
 		ls -1 Makefile ;\
