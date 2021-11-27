@@ -1147,7 +1147,19 @@ auto dump_registers(std::vector<Value> const& registers,
                      << ('[' + std::to_string(i) + '.' + suffix.data() + ']')
                      << ' ';
 
-        if (each.is_boxed()) {
+        using viua::vm::types::Signed_integer;
+        using viua::vm::types::Unsigned_integer;
+        if (auto const& is = each.boxed_of<Signed_integer>(); is) {
+            auto const x = is.value().get().value;
+            TRACE_STREAM << "is " << std::hex << std::setw(16)
+                         << std::setfill('0') << x << " " << std::dec << x
+                         << '\n';
+        } else if (auto const& is = each.boxed_of<Unsigned_integer>(); is) {
+            auto const x = is.value().get().value;
+            TRACE_STREAM << "iu " << std::hex << std::setw(16)
+                         << std::setfill('0') << x << " " << std::dec << x
+                         << '\n';
+        } else if (each.is_boxed()) {
             auto const& value = each.boxed_value();
             TRACE_STREAM << value.type_name();
             value.as_trait<viua::vm::types::traits::To_string>(

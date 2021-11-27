@@ -122,6 +122,17 @@ struct Value {
             return {};
         }
     }
+    template<typename T>
+    inline auto boxed_of() const
+        -> std::optional<std::reference_wrapper<T const>>
+    {
+        if (holds<T>()) {
+            return static_cast<T const&>(*std::get<boxed_type>(value.content));
+        } else {
+            return {};
+        }
+    }
+
     inline auto value_cell() -> viua::vm::types::Cell&
     {
         if (is_void()) {
