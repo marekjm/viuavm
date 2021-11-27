@@ -261,7 +261,7 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
             return nullptr;
         case OPCODE_N::EBREAK:
             execute(EBREAK{viua::arch::ops::N::decode(raw)}, stack, ip);
-            viua::TRACE_STREAM << "    #ebreak" << '\n';
+            viua::TRACE_STREAM << "    #ebreak" << viua::TRACE_STREAM.endl;
             break;
         }
         break;
@@ -525,13 +525,15 @@ auto main(int argc, char* argv[]) -> int
                 /*
                  * Assume an file descriptor opened for writing was received.
                  */
-                viua::TRACE_STREAM = viua::support::fdstream{std::stoi(trace_fd)};
+                viua::TRACE_STREAM =
+                    viua::support::fdstream{std::stoi(trace_fd)};
             } catch (std::invalid_argument const&) {
                 /*
                  * Otherwise, treat the thing received as a filename and open it
                  * for writing.
                  */
-                viua::TRACE_STREAM = viua::support::fdstream{open(trace_fd, O_WRONLY|O_CLOEXEC)};
+                viua::TRACE_STREAM = viua::support::fdstream{
+                    open(trace_fd, O_WRONLY | O_CLOEXEC)};
             }
         }
     }
