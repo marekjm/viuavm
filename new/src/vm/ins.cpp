@@ -163,7 +163,20 @@ auto get_proxy(Stack& stack,
                viua::arch::Register_access const a,
                ip_type const ip) -> Proxy
 {
-    return get_proxy(stack.frames.back().registers, a, ip);
+    switch (a.set) {
+        using enum viua::arch::Register_access::set_type;
+    case VOID:
+        throw abort_execution{ip, "cannot access a void register"};
+    case LOCAL:
+        return get_proxy(stack.frames.back().registers, a, ip);
+    case ARGUMENT:
+        std::cerr << "getting proxy for argument register\n";
+        return get_proxy(stack.args, a, ip);
+    case PARAMETER:
+        return get_proxy(stack.frames.back().parameters, a, ip);
+    default:
+        throw abort_execution{ip, "access to invalid register set"};
+    }
 }
 
 auto type_name(Proxy const& p) -> std::string
@@ -616,12 +629,12 @@ auto execute(COPY const op, Stack& stack, ip_type const) -> void
 auto execute(MOVE const op, Stack& stack, ip_type const ip) -> void
 {
     auto in  = get_proxy(stack, op.instruction.in, ip);
-    auto out = get_proxy(stack, op.instruction.out, ip);
 
     if (in.view().is_void()) {
         throw abort_execution{ip, "cannot move out of void"};
     }
-    if (not out.view().is_void()) {
+    if (op.instruction.out.set != viua::arch::Register_access::set_type::VOID) {
+        auto out = get_proxy(stack, op.instruction.out, ip);
         out.overwrite() = std::move(in.overwrite());
     }
     in.overwrite().make_void();
