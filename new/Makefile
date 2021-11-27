@@ -45,6 +45,7 @@ all: \
 clean:
 	find $(BUILD) -type f -delete
 	find $(BUILD) -mindepth 1 -type d -delete
+	find ./tests -type f -name '*.bin' -delete
 
 install: all
 	mkdir -p $(PREFIX)/lib/viua/{core,site}/{bin,lib,share,man}
@@ -96,8 +97,8 @@ watch-tests:
 	(\
 		find $(BUILD_EXEC_DIR) -type f ;\
 		find ./tests/asm -type f ;\
-		ls -1 test-suite.py \
-	) | entr -c python3 ./test-suite.py
+		ls -1 tests/suite.py \
+	) | entr -c python3 ./tests/suite.py
 
 ################################################################################
 # Template rules
