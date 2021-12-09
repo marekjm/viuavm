@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import glob
+import io
 import os
 import re
 import subprocess
@@ -226,7 +227,7 @@ def detect_check_kind(test_path):
 
     raise No_check_file_for(test_path)
 
-def test_case(case_name, test_program, check_kind):
+def test_case(case_name, test_program, check_kind, errors):
     test_executable = (os.path.splitext(test_program)[0] + '.bin')
 
     asm_return = subprocess.call(args = (
@@ -236,7 +237,8 @@ def test_case(case_name, test_program, check_kind):
         test_program,
     ), stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
     if asm_return != 0:
-        sys.stderr.write(f'case {case_name} failed to assemble\n')
+        errors.write(f'case {case_name} failed to assemble\n')
+        return False
 
     result, ebreak = run_and_capture(
         INTERPRETER,
@@ -254,15 +256,15 @@ def test_case(case_name, test_program, check_kind):
         want_ebreak = make_ebreak()
         for line in ebreak_dump:
             if not load_ebreak_line(want_ebreak, line):
-                sys.stderr.write(f'    invalid-want ebreak line: {line}')
+                errors.write(f'    invalid-want ebreak line: {line}')
                 return False
 
         for r, content in want_ebreak['registers'].items():
             for index, cell in content.items():
                 if index not in ebreak['registers'][r]:
-                    leader = f'\n    register {index}.{r}'
-                    sys.stderr.write(f'{leader} is void\n')
-                    sys.stderr.write('{} expected {} = {}\n'.format(
+                    leader = f'    register {index}.{r}'
+                    errors.write(f'{leader} is void\n')
+                    errors.write('{} expected {} = {}\n'.format(
                         (len(leader) * ' '),
                         *cell
                     ))
@@ -274,31 +276,31 @@ def test_case(case_name, test_program, check_kind):
                 want_type, want_value = cell
 
                 if want_type != got_type:
-                    leader = f'\n    register {index}.{r}'
-                    sys.stderr.write('{} contains {} = {}\n'.format(
+                    leader = f'    register {index}.{r}'
+                    errors.write('{} contains {} = {}\n'.format(
                         leader,
                         colorise('red', got_type.ljust(max(len(want_type), len(got_type)))),
                         got_value,
                     ))
-                    sys.stderr.write('{} expected {} = {}\n'.format(
+                    errors.write('{} expected {} = {}\n'.format(
                         (len(leader) * ' '),
                         colorise('green', want_type.ljust(max(len(want_type), len(got_type)))),
                         want_value,
                     ))
-                    sys.stderr.write('{}          {}\n'.format(
+                    errors.write('{}          {}\n'.format(
                         (len(leader) * ' '),
                         colorise('red', (max(len(want_type), len(got_type)) * '^')),
                     ))
                     return False
 
                 if want_value != got_value:
-                    leader = f'\n    register {index}.{r}'
-                    sys.stderr.write('{} contains {} = {}\n'.format(
+                    leader = f'    register {index}.{r}'
+                    errors.write('{} contains {} = {}\n'.format(
                         leader,
                         got_type.ljust(max(len(want_type), len(got_type))),
                         colorise('red', got_value),
                     ))
-                    sys.stderr.write('{} expected {} = {}\n'.format(
+                    errors.write('{} expected {} = {}\n'.format(
                         (len(leader) * ' '),
                         want_type.ljust(max(len(want_type), len(got_type))),
                         colorise('green', want_value),
@@ -333,7 +335,9 @@ def main(args):
     pad_case_name = max(map(lambda _: len(_[0]), cases))
 
     for case_no, (case_name, test_program, check_kind,) in enumerate(cases, start = 1):
-        result = test_case(case_name, test_program, check_kind)
+        error_stream = io.StringIO()
+
+        result = test_case(case_name, test_program, check_kind, error_stream)
 
         if result:
             success_cases += 1
@@ -346,6 +350,11 @@ def main(args):
                 (' ok ' if result else 'fail'),
             ),
         ))
+
+        error_stream.seek(0)
+        if error_report := error_stream.read(None):
+            sys.stderr.write(error_report)
+            sys.stderr.write('\n')
 
     print('run {} test case{} with {}% success rate'.format(
         colorise('white', (len(cases) or 'no')),
