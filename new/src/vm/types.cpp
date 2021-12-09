@@ -193,6 +193,12 @@ auto Struct::at(key_type const key) -> value_type&
 {
     return values.at(key);
 }
+auto Struct::remove(key_type const key) -> value_type
+{
+    auto v = std::move(values.at(key));
+    values.erase(key);
+    return v;
+}
 auto Struct::type_name() const -> std::string
 {
     return "struct";

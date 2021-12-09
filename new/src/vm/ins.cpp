@@ -1104,8 +1104,27 @@ auto execute(STRUCT_INSERT const op, Stack& stack, ip_type const ip) -> void
     auto& str = dst.boxed_of<viua::vm::types::Struct>().value().get();
     str.insert(k, std::move(src.overwrite().value_cell()));
 }
-auto execute(STRUCT_REMOVE const, Stack&, ip_type const) -> void
-{}
+auto execute(STRUCT_REMOVE const op, Stack& stack, ip_type const ip) -> void
+{
+    auto dst = get_slot(op.instruction.out, stack, ip);
+    auto src = get_value(stack, op.instruction.lhs, ip);
+    auto key = get_proxy(stack, op.instruction.rhs, ip);
+
+    if (key.view().is_void()) {
+        throw abort_execution{ip, "cannot struct_remove with a void key"};
+    }
+    if (src.is_void()) {
+        throw abort_execution{ip, "cannot struct_remove with a void value"};
+    }
+
+    auto k    = key.boxed_of<viua::vm::types::Atom>().value().get().to_string();
+    auto& str = src.boxed_of<viua::vm::types::Struct>().value().get();
+
+    auto v = str.remove(k);
+    if (dst) {
+        dst.value()->value = std::move(v);
+    }
+}
 
 auto execute(REF const op, Stack& stack, ip_type const ip) -> void
 {
