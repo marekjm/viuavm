@@ -628,13 +628,13 @@ auto execute(COPY const op, Stack& stack, ip_type const) -> void
 }
 auto execute(MOVE const op, Stack& stack, ip_type const ip) -> void
 {
-    auto in  = get_proxy(stack, op.instruction.in, ip);
+    auto in = get_proxy(stack, op.instruction.in, ip);
 
     if (in.view().is_void()) {
         throw abort_execution{ip, "cannot move out of void"};
     }
     if (op.instruction.out.set != viua::arch::Register_access::set_type::VOID) {
-        auto out = get_proxy(stack, op.instruction.out, ip);
+        auto out        = get_proxy(stack, op.instruction.out, ip);
         out.overwrite() = std::move(in.overwrite());
     }
     in.overwrite().make_void();
@@ -992,8 +992,25 @@ auto execute(BUFFER_AT const op, Stack& stack, ip_type const ip) -> void
 
     auto& buf = src.boxed_of<viua::vm::types::Buffer>().value().get();
     auto off  = (buf.size() - 1);
-    if (not idx.is_void()) {
+    if (idx.is_void()) {
+        // do nothing, and use the default value
+    } else if (idx.holds<uint64_t>()) {
         off = idx.get<uint64_t>();
+    } else if (idx.holds<int64_t>()) {
+        auto const i = idx.get<int64_t>();
+        if (i < 0) {
+            off = (buf.size() + i);
+        } else {
+            off = i;
+        }
+    } else {
+        throw abort_execution{ip, "buffer index must be an integer"};
+    }
+
+    if (buf.size() <= off) {
+        throw abort_execution{ip,
+                              ("index " + std::to_string(off) + " out of range "
+                               + std::to_string(buf.size()))};
     }
 
     auto& v = buf.at(off);
@@ -1018,18 +1035,28 @@ auto execute(BUFFER_AT const op, Stack& stack, ip_type const ip) -> void
 auto execute(BUFFER_POP const op, Stack& stack, ip_type const ip) -> void
 {
     auto dst = get_slot(op.instruction.out, stack, ip);
-    auto src = get_slot(op.instruction.lhs, stack, ip);
-    auto idx = get_slot(op.instruction.rhs, stack, ip);
+    auto src = get_value(stack, op.instruction.lhs, ip);
+    auto idx = get_value(stack, op.instruction.rhs, ip);
 
-    if (not src.has_value()) {
+    if (src.is_void()) {
         throw abort_execution{ip, "cannot buffer_pop out of void"};
     }
 
-    auto& buf =
-        static_cast<viua::vm::types::Buffer&>(src.value()->boxed_value());
-    auto off = (buf.size() - 1);
-    if (idx.has_value()) {
-        off = idx.value()->value.get<uint64_t>();
+    auto& buf = src.boxed_of<viua::vm::types::Buffer>().value().get();
+    auto off  = (buf.size() - 1);
+    if (idx.is_void()) {
+        // do nothing, and use the default value
+    } else if (idx.holds<uint64_t>()) {
+        off = idx.get<uint64_t>();
+    } else if (idx.holds<int64_t>()) {
+        auto const i = idx.get<int64_t>();
+        if (i < 0) {
+            off = (buf.size() + i);
+        } else {
+            off = i;
+        }
+    } else {
+        throw abort_execution{ip, "buffer index must be an integer"};
     }
 
     using viua::vm::types::Cell;
