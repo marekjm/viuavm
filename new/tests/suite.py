@@ -371,7 +371,7 @@ def main(args):
         colorise('white', (len(cases) or 'no')),
         ('s' if (len(cases) != 1) else ''),
         colorise(
-            ('green' if (success_cases == len(cases)) else 'white'),
+            ('green' if (success_cases == len(cases)) else 'red'),
             '{:5.2f}'.format((success_cases / len(cases)) * 100),
         ),
     ))
