@@ -419,32 +419,29 @@ auto execute(BITROL const, Stack&, ip_type const) -> void
 {}
 auto execute(BITROR const, Stack&, ip_type const) -> void
 {}
-auto execute(BITAND const op, Stack& stack, ip_type const) -> void
+auto execute(BITAND const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto& out       = registers.at(op.instruction.out.index);
-    auto& lhs       = registers.at(op.instruction.lhs.index);
-    auto& rhs       = registers.at(op.instruction.rhs.index);
+    auto out = get_slot(op.instruction.out, stack, ip);
+    auto lhs = get_value(stack, op.instruction.lhs, ip);
+    auto rhs = get_value(stack, op.instruction.rhs, ip);
 
-    out.value = (lhs.value.get<uint64_t>() & rhs.value.get<uint64_t>());
+    *out.value() = (lhs.get<uint64_t>() & rhs.get<uint64_t>());
 }
-auto execute(BITOR const op, Stack& stack, ip_type const) -> void
+auto execute(BITOR const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto& out       = registers.at(op.instruction.out.index);
-    auto& lhs       = registers.at(op.instruction.lhs.index);
-    auto& rhs       = registers.at(op.instruction.rhs.index);
+    auto out = get_slot(op.instruction.out, stack, ip);
+    auto lhs = get_value(stack, op.instruction.lhs, ip);
+    auto rhs = get_value(stack, op.instruction.rhs, ip);
 
-    out.value = (lhs.value.get<uint64_t>() | rhs.value.get<uint64_t>());
+    *out.value() = (lhs.get<uint64_t>() | rhs.get<uint64_t>());
 }
-auto execute(BITXOR const op, Stack& stack, ip_type const) -> void
+auto execute(BITXOR const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto& out       = registers.at(op.instruction.out.index);
-    auto& lhs       = registers.at(op.instruction.lhs.index);
-    auto& rhs       = registers.at(op.instruction.rhs.index);
+    auto out = get_slot(op.instruction.out, stack, ip);
+    auto lhs = get_value(stack, op.instruction.lhs, ip);
+    auto rhs = get_value(stack, op.instruction.rhs, ip);
 
-    out.value = (lhs.value.get<uint64_t>() ^ rhs.value.get<uint64_t>());
+    *out.value() = (lhs.get<uint64_t>() ^ rhs.get<uint64_t>());
 }
 auto execute(BITNOT const op, Stack& stack, ip_type const) -> void
 {
