@@ -22,7 +22,7 @@ INTERPRETER = './build/tools/exec/vm'
 ASSEMBLER = './build/tools/exec/asm'
 
 EBREAK_LINE_BOXED = re.compile(r'\[(\d+)\.([lap])\] (\*?[a-zA-Z_][a-zA-Z_0-9]*) = (.*)')
-EBREAK_LINE_PRIMITIVE = re.compile(r'\[(\d+)\.([lap])\] (is|iu|ft|db) (.*)')
+EBREAK_LINE_PRIMITIVE = re.compile(r'\[(\d+)\.([lap])\] (is|iu|fl|db) (.*)')
 
 class uint(int):
     def typename(self):
