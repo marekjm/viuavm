@@ -818,10 +818,10 @@ auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
         return le64toh(tmp);
     }();
 
-    auto tmp = uint32_t{};
+    auto tmp = uint64_t{};
     memcpy(
         &tmp, (&stack.environment.strings_table[0] + data_offset), data_size);
-    tmp = le32toh(tmp);
+    tmp = le64toh(tmp);
 
     auto v = double{};
     memcpy(&v, &tmp, data_size);
