@@ -260,10 +260,13 @@ def test_case(case_name, test_program, errors):
             ebreak_dump = ifstream.readlines()
 
         want_ebreak = make_ebreak()
+
         for line in ebreak_dump:
             if not load_ebreak_line(want_ebreak, line):
                 errors.write(f'    invalid-want ebreak line: {line}')
                 return False
+        if not ebreak_dump:
+            return (False, 'empty ebreak file',)
 
         for r, content in want_ebreak['registers'].items():
             for index, cell in content.items():
