@@ -227,7 +227,13 @@ def detect_check_kind(test_path):
 
     raise No_check_file_for(test_path)
 
-def test_case(case_name, test_program, check_kind, errors):
+def test_case(case_name, test_program, errors):
+    check_kind = None
+    try:
+        check_kind = detect_check_kind(test_program)
+    except No_check_file_for:
+        return (False, 'no check file',)
+
     test_executable = (os.path.splitext(test_program)[0] + '.bin')
 
     asm_return = subprocess.call(args = (
@@ -238,7 +244,7 @@ def test_case(case_name, test_program, check_kind, errors):
     ), stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
     if asm_return != 0:
         errors.write(f'case {case_name} failed to assemble\n')
-        return False
+        return (False, 'failed to assemble',)
 
     result, ebreak = run_and_capture(
         INTERPRETER,
@@ -246,7 +252,7 @@ def test_case(case_name, test_program, check_kind, errors):
     )
 
     if result != 0:
-        return False
+        return (False, 'crashed',)
 
     if check_kind == 'ebreak':
         ebreak_dump = (os.path.splitext(test_program)[0] + '.ebreak')
@@ -318,7 +324,6 @@ def main(args):
         (
             os.path.split(os.path.splitext(each)[0])[1],
             each,
-            detect_check_kind(each),
         )
         for each
         in sorted(raw_cases)
@@ -334,10 +339,14 @@ def main(args):
     pad_case_no = len(str(len(cases) + 1))
     pad_case_name = max(map(lambda _: len(_[0]), cases))
 
-    for case_no, (case_name, test_program, check_kind,) in enumerate(cases, start = 1):
+    for case_no, (case_name, test_program,) in enumerate(cases, start = 1):
         error_stream = io.StringIO()
 
-        result = test_case(case_name, test_program, check_kind, error_stream)
+        rc = lambda: test_case(case_name, test_program, error_stream)
+
+        result, symptom = (False, None,)
+        if type(result := rc()) is tuple:
+            result, symptom = result
 
         if result:
             success_cases += 1
@@ -348,7 +357,7 @@ def main(args):
             colorise(
                 ('green' if result else 'red'),
                 (' ok ' if result else 'fail'),
-            ),
+            ) + ((' => ' + colorise('light_red', symptom)) if symptom else ''),
         ))
 
         error_stream.seek(0)
