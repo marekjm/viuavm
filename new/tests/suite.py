@@ -243,7 +243,6 @@ def test_case(case_name, test_program, errors):
         test_program,
     ), stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
     if asm_return != 0:
-        errors.write(f'case {case_name} failed to assemble\n')
         return (False, 'failed to assemble',)
 
     result, ebreak = run_and_capture(
