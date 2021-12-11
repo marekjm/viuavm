@@ -491,45 +491,110 @@ auto execute(GT const op, Stack& stack, ip_type const ip) -> void
 {
     execute_cmp_op<GT, viua::vm::types::traits::Gt>(op, stack, ip);
 }
-auto execute(CMP const op, Stack& stack, ip_type const) -> void
+auto execute(CMP const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto& out       = registers.at(op.instruction.out.index);
-    auto& lhs       = registers.at(op.instruction.lhs.index);
-    auto& rhs       = registers.at(op.instruction.rhs.index);
-
-    if ((not lhs.is_boxed()) and rhs.is_boxed()) {
-        throw abort_execution{nullptr,
-                              "cmp: unboxed lhs cannot be used with boxed rhs"};
-    }
+    auto lhs = get_value(stack, op.instruction.lhs, ip);
+    auto rhs = get_value(stack, op.instruction.rhs, ip);
 
     using viua::vm::types::traits::Cmp;
-    if (lhs.is_boxed()) {
-        auto const& lhs_value = lhs.boxed_value();
+    auto cmp_result = decltype(Cmp::CMP_EQ){};
 
-        if (lhs_value.has_trait<Cmp>()) {
-            out = lhs_value.as_trait<Cmp, int64_t>(
-                [&rhs](Cmp const& val) -> int64_t {
-                    auto const& rv = rhs.boxed_value();
-                    return val.cmp(rv);
-                },
-                Cmp::CMP_LT);
+    using viua::vm::types::Float_double;
+    using viua::vm::types::Float_single;
+    using viua::vm::types::Signed_integer;
+    using viua::vm::types::Unsigned_integer;
+    if (lhs.holds<int64_t>()) {
+        auto const l = lhs.get<int64_t>();
+        auto const r = cast_to<int64_t>(rhs);
+
+        if (l < r) {
+            cmp_result = Cmp::CMP_LT;
+        } else if (l > r) {
+            cmp_result = Cmp::CMP_GT;
         } else {
-            out = Cmp::CMP_LT;
+            cmp_result = Cmp::CMP_EQ;
         }
-    } else {
-        auto const lv = lhs.value.get<uint64_t>();
-        auto const rv = rhs.value.get<uint64_t>();
-        if (lv == rv) {
-            out = Cmp::CMP_EQ;
-        } else if (lv > rv) {
-            out = Cmp::CMP_GT;
-        } else if (lv < rv) {
-            out = Cmp::CMP_LT;
+    } else if (lhs.holds<uint64_t>()) {
+        auto const l = lhs.get<uint64_t>();
+        auto const r = cast_to<uint64_t>(rhs);
+
+        if (l < r) {
+            cmp_result = Cmp::CMP_LT;
+        } else if (l > r) {
+            cmp_result = Cmp::CMP_GT;
         } else {
-            throw abort_execution{nullptr, "cmp: incomparable unboxed values"};
+            cmp_result = Cmp::CMP_EQ;
+        }
+    } else if (lhs.holds<float>()) {
+        auto const l = lhs.get<float>();
+        auto const r = cast_to<float>(rhs);
+
+        if (l < r) {
+            cmp_result = Cmp::CMP_LT;
+        } else if (l > r) {
+            cmp_result = Cmp::CMP_GT;
+        } else {
+            cmp_result = Cmp::CMP_EQ;
+        }
+    } else if (lhs.holds<double>()) {
+        auto const l = lhs.get<double>();
+        auto const r = cast_to<double>(rhs);
+
+        if (l < r) {
+            cmp_result = Cmp::CMP_LT;
+        } else if (l > r) {
+            cmp_result = Cmp::CMP_GT;
+        } else {
+            cmp_result = Cmp::CMP_EQ;
+        }
+    } else if (lhs.holds<Signed_integer>()) {
+        auto const l = cast_to<int64_t>(lhs);
+        auto const r = cast_to<int64_t>(rhs);
+
+        if (l < r) {
+            cmp_result = Cmp::CMP_LT;
+        } else if (l > r) {
+            cmp_result = Cmp::CMP_GT;
+        } else {
+            cmp_result = Cmp::CMP_EQ;
+        }
+    } else if (lhs.holds<Unsigned_integer>()) {
+        auto const l = cast_to<uint64_t>(lhs);
+        auto const r = cast_to<uint64_t>(rhs);
+
+        if (l < r) {
+            cmp_result = Cmp::CMP_LT;
+        } else if (l > r) {
+            cmp_result = Cmp::CMP_GT;
+        } else {
+            cmp_result = Cmp::CMP_EQ;
+        }
+    } else if (lhs.holds<Float_single>()) {
+        auto const l = cast_to<float>(lhs);
+        auto const r = cast_to<float>(rhs);
+
+        if (l < r) {
+            cmp_result = Cmp::CMP_LT;
+        } else if (l > r) {
+            cmp_result = Cmp::CMP_GT;
+        } else {
+            cmp_result = Cmp::CMP_EQ;
+        }
+    } else if (lhs.holds<Float_double>()) {
+        auto const l = cast_to<double>(lhs);
+        auto const r = cast_to<double>(rhs);
+
+        if (l < r) {
+            cmp_result = Cmp::CMP_LT;
+        } else if (l > r) {
+            cmp_result = Cmp::CMP_GT;
+        } else {
+            cmp_result = Cmp::CMP_EQ;
         }
     }
+
+    auto out = get_proxy(stack, op.instruction.out, ip);
+    out      = cmp_result;
 }
 auto execute(AND const op, Stack& stack, ip_type const) -> void
 {
