@@ -457,54 +457,54 @@ auto execute(EQ const op, Stack& stack, ip_type const ip) -> void
     auto lhs = get_value(stack, op.instruction.lhs, ip);
     auto rhs = get_value(stack, op.instruction.rhs, ip);
 
-    using viua::vm::types::traits::Eq;
     using viua::vm::types::traits::Cmp;
+    using viua::vm::types::traits::Eq;
     auto cmp_result = std::partial_ordering::unordered;
 
+    using viua::vm::types::Atom;
     using viua::vm::types::Float_double;
     using viua::vm::types::Float_single;
     using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
     using viua::vm::types::String;
-    using viua::vm::types::Atom;
+    using viua::vm::types::Unsigned_integer;
     if (lhs.holds<int64_t>()) {
         auto const l = lhs.get<int64_t>();
         auto const r = cast_to<int64_t>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<uint64_t>()) {
         auto const l = lhs.get<uint64_t>();
         auto const r = cast_to<uint64_t>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<float>()) {
         auto const l = lhs.get<float>();
         auto const r = cast_to<float>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<double>()) {
         auto const l = lhs.get<double>();
         auto const r = cast_to<double>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Signed_integer>()) {
         auto const l = cast_to<int64_t>(lhs);
         auto const r = cast_to<int64_t>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Unsigned_integer>()) {
         auto const l = cast_to<uint64_t>(lhs);
         auto const r = cast_to<uint64_t>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Float_single>()) {
         auto const l = cast_to<float>(lhs);
         auto const r = cast_to<float>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Float_double>()) {
         auto const l = cast_to<double>(lhs);
         auto const r = cast_to<double>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Eq>()) {
         auto const& cmp = lhs.boxed_of<Eq>().value().get();
-        cmp_result = cmp(cmp, rhs);
+        cmp_result      = cmp(cmp, rhs);
     } else if (lhs.holds<Cmp>()) {
         auto const& cmp = lhs.boxed_of<Cmp>().value().get();
-        cmp_result = cmp(cmp, rhs);
+        cmp_result      = cmp(cmp, rhs);
     } else {
         throw abort_execution{ip, "invalid operands for eq"};
     }
@@ -514,7 +514,7 @@ auto execute(EQ const op, Stack& stack, ip_type const ip) -> void
     }
 
     auto out = get_proxy(stack, op.instruction.out, ip);
-    out = (cmp_result == 0);
+    out      = (cmp_result == 0);
 }
 auto execute(LT const op, Stack& stack, ip_type const ip) -> void
 {
@@ -524,47 +524,47 @@ auto execute(LT const op, Stack& stack, ip_type const ip) -> void
     using viua::vm::types::traits::Cmp;
     auto cmp_result = std::partial_ordering::unordered;
 
+    using viua::vm::types::Atom;
     using viua::vm::types::Float_double;
     using viua::vm::types::Float_single;
     using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
     using viua::vm::types::String;
-    using viua::vm::types::Atom;
+    using viua::vm::types::Unsigned_integer;
     if (lhs.holds<int64_t>()) {
         auto const l = lhs.get<int64_t>();
         auto const r = cast_to<int64_t>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<uint64_t>()) {
         auto const l = lhs.get<uint64_t>();
         auto const r = cast_to<uint64_t>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<float>()) {
         auto const l = lhs.get<float>();
         auto const r = cast_to<float>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<double>()) {
         auto const l = lhs.get<double>();
         auto const r = cast_to<double>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Signed_integer>()) {
         auto const l = cast_to<int64_t>(lhs);
         auto const r = cast_to<int64_t>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Unsigned_integer>()) {
         auto const l = cast_to<uint64_t>(lhs);
         auto const r = cast_to<uint64_t>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Float_single>()) {
         auto const l = cast_to<float>(lhs);
         auto const r = cast_to<float>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Float_double>()) {
         auto const l = cast_to<double>(lhs);
         auto const r = cast_to<double>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Cmp>()) {
         auto const& cmp = lhs.boxed_of<Cmp>().value().get();
-        cmp_result = cmp(cmp, rhs);
+        cmp_result      = cmp(cmp, rhs);
     } else {
         throw abort_execution{ip, "invalid operands for lt"};
     }
@@ -574,7 +574,7 @@ auto execute(LT const op, Stack& stack, ip_type const ip) -> void
     }
 
     auto out = get_proxy(stack, op.instruction.out, ip);
-    out = (cmp_result < 0);
+    out      = (cmp_result < 0);
 }
 auto execute(GT const op, Stack& stack, ip_type const ip) -> void
 {
@@ -584,47 +584,47 @@ auto execute(GT const op, Stack& stack, ip_type const ip) -> void
     using viua::vm::types::traits::Cmp;
     auto cmp_result = std::partial_ordering::unordered;
 
+    using viua::vm::types::Atom;
     using viua::vm::types::Float_double;
     using viua::vm::types::Float_single;
     using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
     using viua::vm::types::String;
-    using viua::vm::types::Atom;
+    using viua::vm::types::Unsigned_integer;
     if (lhs.holds<int64_t>()) {
         auto const l = lhs.get<int64_t>();
         auto const r = cast_to<int64_t>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<uint64_t>()) {
         auto const l = lhs.get<uint64_t>();
         auto const r = cast_to<uint64_t>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<float>()) {
         auto const l = lhs.get<float>();
         auto const r = cast_to<float>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<double>()) {
         auto const l = lhs.get<double>();
         auto const r = cast_to<double>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Signed_integer>()) {
         auto const l = cast_to<int64_t>(lhs);
         auto const r = cast_to<int64_t>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Unsigned_integer>()) {
         auto const l = cast_to<uint64_t>(lhs);
         auto const r = cast_to<uint64_t>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Float_single>()) {
         auto const l = cast_to<float>(lhs);
         auto const r = cast_to<float>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Float_double>()) {
         auto const l = cast_to<double>(lhs);
         auto const r = cast_to<double>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Cmp>()) {
         auto const& cmp = lhs.boxed_of<Cmp>().value().get();
-        cmp_result = cmp(cmp, rhs);
+        cmp_result      = cmp(cmp, rhs);
     } else {
         throw abort_execution{ip, "invalid operands for gt"};
     }
@@ -634,7 +634,7 @@ auto execute(GT const op, Stack& stack, ip_type const ip) -> void
     }
 
     auto out = get_proxy(stack, op.instruction.out, ip);
-    out = (cmp_result > 0);
+    out      = (cmp_result > 0);
 }
 auto execute(CMP const op, Stack& stack, ip_type const ip) -> void
 {
@@ -644,47 +644,47 @@ auto execute(CMP const op, Stack& stack, ip_type const ip) -> void
     using viua::vm::types::traits::Cmp;
     auto cmp_result = std::partial_ordering::unordered;
 
+    using viua::vm::types::Atom;
     using viua::vm::types::Float_double;
     using viua::vm::types::Float_single;
     using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
     using viua::vm::types::String;
-    using viua::vm::types::Atom;
+    using viua::vm::types::Unsigned_integer;
     if (lhs.holds<int64_t>()) {
         auto const l = lhs.get<int64_t>();
         auto const r = cast_to<int64_t>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<uint64_t>()) {
         auto const l = lhs.get<uint64_t>();
         auto const r = cast_to<uint64_t>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<float>()) {
         auto const l = lhs.get<float>();
         auto const r = cast_to<float>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<double>()) {
         auto const l = lhs.get<double>();
         auto const r = cast_to<double>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Signed_integer>()) {
         auto const l = cast_to<int64_t>(lhs);
         auto const r = cast_to<int64_t>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Unsigned_integer>()) {
         auto const l = cast_to<uint64_t>(lhs);
         auto const r = cast_to<uint64_t>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Float_single>()) {
         auto const l = cast_to<float>(lhs);
         auto const r = cast_to<float>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Float_double>()) {
         auto const l = cast_to<double>(lhs);
         auto const r = cast_to<double>(rhs);
-        cmp_result = (l <=> r);
+        cmp_result   = (l <=> r);
     } else if (lhs.holds<Cmp>()) {
         auto const& cmp = lhs.boxed_of<Cmp>().value().get();
-        cmp_result = cmp(cmp, rhs);
+        cmp_result      = cmp(cmp, rhs);
     } else {
         throw abort_execution{ip, "invalid operands for cmp"};
     }
@@ -694,7 +694,7 @@ auto execute(CMP const op, Stack& stack, ip_type const ip) -> void
     }
 
     auto out = get_proxy(stack, op.instruction.out, ip);
-    out = (cmp_result < 0) ? -1 : (0 < cmp_result) ? 1 : 0;
+    out      = (cmp_result < 0) ? -1 : (0 < cmp_result) ? 1 : 0;
 }
 auto execute(AND const op, Stack& stack, ip_type const) -> void
 {

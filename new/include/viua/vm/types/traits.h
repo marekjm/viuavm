@@ -34,10 +34,10 @@ namespace viua::vm::types::traits {
     static constexpr tag_type tag \
     {}
 
-#define VIUA_TRAIT_BODY(Trait)                                            \
-    VIUA_TRAIT_TAG();                                                     \
-    virtual auto operator()(tag_type, Cell const&) const -> Cell = 0; \
-    virtual ~Trait()                                                 = default
+#define VIUA_TRAIT_BODY(Trait)                                      \
+    VIUA_TRAIT_TAG();                                               \
+    virtual auto operator()(tag_type, Cell const&) const->Cell = 0; \
+    virtual ~Trait()                                           = default
 
 #define VIUA_TRAIT(Trait)       \
     struct Trait {              \
@@ -65,11 +65,13 @@ struct Copy {
 };
 
 struct Cmp {
-    virtual auto operator() (Cmp const&, Cell_view const&) const -> std::strong_ordering = 0;
+    virtual auto operator()(Cmp const&, Cell_view const&) const
+        -> std::strong_ordering = 0;
     virtual ~Cmp();
 };
 struct Eq {
-    virtual auto operator() (Eq const&, Cell_view const&) const -> std::partial_ordering = 0;
+    virtual auto operator()(Eq const&, Cell_view const&) const
+        -> std::partial_ordering = 0;
     virtual ~Eq();
 };
 

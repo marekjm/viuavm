@@ -123,7 +123,8 @@ auto String::operator()(traits::Plus::tag_type const, Cell const& c) const
     s->content = (content + v->content);
     return Cell{std::move(s)};
 }
-auto String::operator() (traits::Cmp const&, Cell_view const& v) const -> std::strong_ordering
+auto String::operator()(traits::Cmp const&, Cell_view const& v) const
+    -> std::strong_ordering
 {
     if (not v.holds<Value>()) {
         throw std::runtime_error{"cannot compare unboxed value to String"};
@@ -148,7 +149,8 @@ auto Atom::to_string() const -> std::string
     return viua::vm::types::traits::To_string::quote_and_escape(content);
 }
 
-auto Atom::operator() (traits::Eq const&, Cell_view const& v) const -> std::partial_ordering
+auto Atom::operator()(traits::Eq const&, Cell_view const& v) const
+    -> std::partial_ordering
 {
     if (not v.holds<Value>()) {
         throw std::runtime_error{"cannot compare unboxed value to Atom"};

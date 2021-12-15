@@ -121,7 +121,8 @@ struct String
     explicit operator bool() const override;
     auto operator()(traits::Plus::tag_type const, Cell const&) const
         -> Cell override;
-    auto operator() (traits::Cmp const&, Cell_view const&) const -> std::strong_ordering override;
+    auto operator()(traits::Cmp const&, Cell_view const&) const
+        -> std::strong_ordering override;
 };
 
 struct Atom
@@ -132,7 +133,8 @@ struct Atom
 
     auto type_name() const -> std::string override;
     auto to_string() const -> std::string override;
-    auto operator() (traits::Eq const&, Cell_view const&) const -> std::partial_ordering override;
+    auto operator()(traits::Eq const&, Cell_view const&) const
+        -> std::partial_ordering override;
 };
 
 struct Struct
