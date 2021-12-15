@@ -36,7 +36,7 @@ namespace viua::vm::types::traits {
 
 #define VIUA_TRAIT_BODY(Trait)                                            \
     VIUA_TRAIT_TAG();                                                     \
-    virtual auto operator()(tag_type const, Cell const&) const->Cell = 0; \
+    virtual auto operator()(tag_type, Cell const&) const -> Cell = 0; \
     virtual ~Trait()                                                 = default
 
 #define VIUA_TRAIT(Trait)       \
@@ -55,7 +55,7 @@ struct To_string {
 };
 
 struct Bool {
-    virtual operator bool() const = 0;
+    explicit virtual operator bool() const = 0;
     virtual ~Bool();
 };
 
@@ -64,17 +64,13 @@ struct Copy {
     virtual ~Copy()                                     = default;
 };
 
-VIUA_TRAIT(Eq);
-VIUA_TRAIT(Lt);
-VIUA_TRAIT(Gt);
-
 struct Cmp {
-    static constexpr int64_t CMP_EQ = 0;
-    static constexpr int64_t CMP_GT = 1;
-    static constexpr int64_t CMP_LT = -1;
-
-    virtual auto cmp(Value const&) const -> int64_t = 0;
+    virtual auto operator() (Cmp const&, Cell_view const&) const -> std::strong_ordering = 0;
     virtual ~Cmp();
+};
+struct Eq {
+    virtual auto operator() (Eq const&, Cell_view const&) const -> std::partial_ordering = 0;
+    virtual ~Eq();
 };
 
 VIUA_TRAIT(Plus);

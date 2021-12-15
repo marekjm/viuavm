@@ -123,20 +123,20 @@ auto String::operator()(traits::Plus::tag_type const, Cell const& c) const
     s->content = (content + v->content);
     return Cell{std::move(s)};
 }
-auto String::operator()(traits::Eq::tag_type const, Cell const& c) const -> Cell
+auto String::operator() (traits::Cmp const&, Cell_view const& v) const -> std::strong_ordering
 {
-    if (not std::holds_alternative<Cell::boxed_type>(c.content)) {
+    if (not v.holds<Value>()) {
         throw std::runtime_error{"cannot compare unboxed value to String"};
     }
 
-    auto const v = dynamic_cast<String*>(c.get<Cell::boxed_type>().get());
-    if (not v) {
+    auto const a = v.boxed_of<String>();
+    if (not a) {
         throw std::runtime_error{"cannot compare "
-                                 + c.get<Cell::boxed_type>()->type_name()
+                                 + v.boxed_of<Value>().value().get().type_name()
                                  + " value to String"};
     }
 
-    return Cell{static_cast<uint64_t>(v->content == content)};
+    return (a.value().get().content <=> content);
 }
 
 auto Atom::type_name() const -> std::string
@@ -147,20 +147,21 @@ auto Atom::to_string() const -> std::string
 {
     return viua::vm::types::traits::To_string::quote_and_escape(content);
 }
-auto Atom::operator()(traits::Eq::tag_type const, Cell const& c) const -> Cell
+
+auto Atom::operator() (traits::Eq const&, Cell_view const& v) const -> std::partial_ordering
 {
-    if (not std::holds_alternative<Cell::boxed_type>(c.content)) {
+    if (not v.holds<Value>()) {
         throw std::runtime_error{"cannot compare unboxed value to Atom"};
     }
 
-    auto const v = dynamic_cast<Atom*>(c.get<Cell::boxed_type>().get());
-    if (not v) {
+    auto const a = v.boxed_of<Atom>();
+    if (not a) {
         throw std::runtime_error{"cannot compare "
-                                 + c.get<Cell::boxed_type>()->type_name()
+                                 + v.boxed_of<Value>().value().get().type_name()
                                  + " value to Atom"};
     }
 
-    return Cell{static_cast<uint64_t>(v->content == content)};
+    return (a.value().get().content <=> content);
 }
 
 auto stringify_cell(Cell const& vc) -> std::string

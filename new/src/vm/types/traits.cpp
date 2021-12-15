@@ -10,6 +10,9 @@ To_string::~To_string()
 Cmp::~Cmp()
 {}
 
+Eq::~Eq()
+{}
+
 Bool::~Bool()
 {}
 }  // namespace viua::vm::types::traits

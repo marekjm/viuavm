@@ -452,44 +452,189 @@ auto execute(BITNOT const op, Stack& stack, ip_type const) -> void
     out.value = ~in.value.get<uint64_t>();
 }
 
-template<typename Op, typename Trait>
-auto execute_cmp_op(Op const op, Stack& stack, ip_type const ip) -> void
-{
-    auto& registers = stack.frames.back().registers;
-    auto& out       = registers.at(op.instruction.out.index);
-    auto& lhs       = registers.at(op.instruction.lhs.index);
-    auto& rhs       = registers.at(op.instruction.rhs.index);
-
-    if (lhs.template holds<int64_t>()) {
-        out = typename Op::functor_type{}(lhs.value.template get<int64_t>(),
-                                          rhs.value.template get<int64_t>());
-    } else if (lhs.template holds<uint64_t>()) {
-        out = typename Op::functor_type{}(lhs.value.template get<uint64_t>(),
-                                          rhs.value.template get<uint64_t>());
-    } else if (lhs.template holds<float>()) {
-        out = typename Op::functor_type{}(lhs.value.template get<float>(),
-                                          rhs.value.template get<float>());
-    } else if (lhs.template holds<double>()) {
-        out = typename Op::functor_type{}(lhs.value.template get<double>(),
-                                          rhs.value.template get<double>());
-    } else if (lhs.template has_trait<Trait>()) {
-        out.value = lhs.boxed_value().template as_trait<Trait>(rhs.value);
-    } else {
-        throw abort_execution{
-            ip, "unsupported operand types for compare operation"};
-    }
-}
 auto execute(EQ const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_cmp_op<EQ, viua::vm::types::traits::Eq>(op, stack, ip);
+    auto lhs = get_value(stack, op.instruction.lhs, ip);
+    auto rhs = get_value(stack, op.instruction.rhs, ip);
+
+    using viua::vm::types::traits::Eq;
+    using viua::vm::types::traits::Cmp;
+    auto cmp_result = std::partial_ordering::unordered;
+
+    using viua::vm::types::Float_double;
+    using viua::vm::types::Float_single;
+    using viua::vm::types::Signed_integer;
+    using viua::vm::types::Unsigned_integer;
+    using viua::vm::types::String;
+    using viua::vm::types::Atom;
+    if (lhs.holds<int64_t>()) {
+        auto const l = lhs.get<int64_t>();
+        auto const r = cast_to<int64_t>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<uint64_t>()) {
+        auto const l = lhs.get<uint64_t>();
+        auto const r = cast_to<uint64_t>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<float>()) {
+        auto const l = lhs.get<float>();
+        auto const r = cast_to<float>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<double>()) {
+        auto const l = lhs.get<double>();
+        auto const r = cast_to<double>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<Signed_integer>()) {
+        auto const l = cast_to<int64_t>(lhs);
+        auto const r = cast_to<int64_t>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<Unsigned_integer>()) {
+        auto const l = cast_to<uint64_t>(lhs);
+        auto const r = cast_to<uint64_t>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<Float_single>()) {
+        auto const l = cast_to<float>(lhs);
+        auto const r = cast_to<float>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<Float_double>()) {
+        auto const l = cast_to<double>(lhs);
+        auto const r = cast_to<double>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<Eq>()) {
+        auto const& cmp = lhs.boxed_of<Eq>().value().get();
+        cmp_result = cmp(cmp, rhs);
+    } else if (lhs.holds<Cmp>()) {
+        auto const& cmp = lhs.boxed_of<Cmp>().value().get();
+        cmp_result = cmp(cmp, rhs);
+    } else {
+        throw abort_execution{ip, "invalid operands for eq"};
+    }
+
+    if (cmp_result == std::partial_ordering::unordered) {
+        throw abort_execution{ip, "cannot eq unordered values"};
+    }
+
+    auto out = get_proxy(stack, op.instruction.out, ip);
+    out = (cmp_result == 0);
 }
 auto execute(LT const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_cmp_op<LT, viua::vm::types::traits::Lt>(op, stack, ip);
+    auto lhs = get_value(stack, op.instruction.lhs, ip);
+    auto rhs = get_value(stack, op.instruction.rhs, ip);
+
+    using viua::vm::types::traits::Cmp;
+    auto cmp_result = std::partial_ordering::unordered;
+
+    using viua::vm::types::Float_double;
+    using viua::vm::types::Float_single;
+    using viua::vm::types::Signed_integer;
+    using viua::vm::types::Unsigned_integer;
+    using viua::vm::types::String;
+    using viua::vm::types::Atom;
+    if (lhs.holds<int64_t>()) {
+        auto const l = lhs.get<int64_t>();
+        auto const r = cast_to<int64_t>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<uint64_t>()) {
+        auto const l = lhs.get<uint64_t>();
+        auto const r = cast_to<uint64_t>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<float>()) {
+        auto const l = lhs.get<float>();
+        auto const r = cast_to<float>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<double>()) {
+        auto const l = lhs.get<double>();
+        auto const r = cast_to<double>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<Signed_integer>()) {
+        auto const l = cast_to<int64_t>(lhs);
+        auto const r = cast_to<int64_t>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<Unsigned_integer>()) {
+        auto const l = cast_to<uint64_t>(lhs);
+        auto const r = cast_to<uint64_t>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<Float_single>()) {
+        auto const l = cast_to<float>(lhs);
+        auto const r = cast_to<float>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<Float_double>()) {
+        auto const l = cast_to<double>(lhs);
+        auto const r = cast_to<double>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<Cmp>()) {
+        auto const& cmp = lhs.boxed_of<Cmp>().value().get();
+        cmp_result = cmp(cmp, rhs);
+    } else {
+        throw abort_execution{ip, "invalid operands for lt"};
+    }
+
+    if (cmp_result == std::partial_ordering::unordered) {
+        throw abort_execution{ip, "cannot lt unordered values"};
+    }
+
+    auto out = get_proxy(stack, op.instruction.out, ip);
+    out = (cmp_result < 0);
 }
 auto execute(GT const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_cmp_op<GT, viua::vm::types::traits::Gt>(op, stack, ip);
+    auto lhs = get_value(stack, op.instruction.lhs, ip);
+    auto rhs = get_value(stack, op.instruction.rhs, ip);
+
+    using viua::vm::types::traits::Cmp;
+    auto cmp_result = std::partial_ordering::unordered;
+
+    using viua::vm::types::Float_double;
+    using viua::vm::types::Float_single;
+    using viua::vm::types::Signed_integer;
+    using viua::vm::types::Unsigned_integer;
+    using viua::vm::types::String;
+    using viua::vm::types::Atom;
+    if (lhs.holds<int64_t>()) {
+        auto const l = lhs.get<int64_t>();
+        auto const r = cast_to<int64_t>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<uint64_t>()) {
+        auto const l = lhs.get<uint64_t>();
+        auto const r = cast_to<uint64_t>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<float>()) {
+        auto const l = lhs.get<float>();
+        auto const r = cast_to<float>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<double>()) {
+        auto const l = lhs.get<double>();
+        auto const r = cast_to<double>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<Signed_integer>()) {
+        auto const l = cast_to<int64_t>(lhs);
+        auto const r = cast_to<int64_t>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<Unsigned_integer>()) {
+        auto const l = cast_to<uint64_t>(lhs);
+        auto const r = cast_to<uint64_t>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<Float_single>()) {
+        auto const l = cast_to<float>(lhs);
+        auto const r = cast_to<float>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<Float_double>()) {
+        auto const l = cast_to<double>(lhs);
+        auto const r = cast_to<double>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<Cmp>()) {
+        auto const& cmp = lhs.boxed_of<Cmp>().value().get();
+        cmp_result = cmp(cmp, rhs);
+    } else {
+        throw abort_execution{ip, "invalid operands for gt"};
+    }
+
+    if (cmp_result == std::partial_ordering::unordered) {
+        throw abort_execution{ip, "cannot gt unordered values"};
+    }
+
+    auto out = get_proxy(stack, op.instruction.out, ip);
+    out = (cmp_result > 0);
 }
 auto execute(CMP const op, Stack& stack, ip_type const ip) -> void
 {
@@ -497,104 +642,59 @@ auto execute(CMP const op, Stack& stack, ip_type const ip) -> void
     auto rhs = get_value(stack, op.instruction.rhs, ip);
 
     using viua::vm::types::traits::Cmp;
-    auto cmp_result = decltype(Cmp::CMP_EQ){};
+    auto cmp_result = std::partial_ordering::unordered;
 
     using viua::vm::types::Float_double;
     using viua::vm::types::Float_single;
     using viua::vm::types::Signed_integer;
     using viua::vm::types::Unsigned_integer;
+    using viua::vm::types::String;
+    using viua::vm::types::Atom;
     if (lhs.holds<int64_t>()) {
         auto const l = lhs.get<int64_t>();
         auto const r = cast_to<int64_t>(rhs);
-
-        if (l < r) {
-            cmp_result = Cmp::CMP_LT;
-        } else if (l > r) {
-            cmp_result = Cmp::CMP_GT;
-        } else {
-            cmp_result = Cmp::CMP_EQ;
-        }
+        cmp_result = (l <=> r);
     } else if (lhs.holds<uint64_t>()) {
         auto const l = lhs.get<uint64_t>();
         auto const r = cast_to<uint64_t>(rhs);
-
-        if (l < r) {
-            cmp_result = Cmp::CMP_LT;
-        } else if (l > r) {
-            cmp_result = Cmp::CMP_GT;
-        } else {
-            cmp_result = Cmp::CMP_EQ;
-        }
+        cmp_result = (l <=> r);
     } else if (lhs.holds<float>()) {
         auto const l = lhs.get<float>();
         auto const r = cast_to<float>(rhs);
-
-        if (l < r) {
-            cmp_result = Cmp::CMP_LT;
-        } else if (l > r) {
-            cmp_result = Cmp::CMP_GT;
-        } else {
-            cmp_result = Cmp::CMP_EQ;
-        }
+        cmp_result = (l <=> r);
     } else if (lhs.holds<double>()) {
         auto const l = lhs.get<double>();
         auto const r = cast_to<double>(rhs);
-
-        if (l < r) {
-            cmp_result = Cmp::CMP_LT;
-        } else if (l > r) {
-            cmp_result = Cmp::CMP_GT;
-        } else {
-            cmp_result = Cmp::CMP_EQ;
-        }
+        cmp_result = (l <=> r);
     } else if (lhs.holds<Signed_integer>()) {
         auto const l = cast_to<int64_t>(lhs);
         auto const r = cast_to<int64_t>(rhs);
-
-        if (l < r) {
-            cmp_result = Cmp::CMP_LT;
-        } else if (l > r) {
-            cmp_result = Cmp::CMP_GT;
-        } else {
-            cmp_result = Cmp::CMP_EQ;
-        }
+        cmp_result = (l <=> r);
     } else if (lhs.holds<Unsigned_integer>()) {
         auto const l = cast_to<uint64_t>(lhs);
         auto const r = cast_to<uint64_t>(rhs);
-
-        if (l < r) {
-            cmp_result = Cmp::CMP_LT;
-        } else if (l > r) {
-            cmp_result = Cmp::CMP_GT;
-        } else {
-            cmp_result = Cmp::CMP_EQ;
-        }
+        cmp_result = (l <=> r);
     } else if (lhs.holds<Float_single>()) {
         auto const l = cast_to<float>(lhs);
         auto const r = cast_to<float>(rhs);
-
-        if (l < r) {
-            cmp_result = Cmp::CMP_LT;
-        } else if (l > r) {
-            cmp_result = Cmp::CMP_GT;
-        } else {
-            cmp_result = Cmp::CMP_EQ;
-        }
+        cmp_result = (l <=> r);
     } else if (lhs.holds<Float_double>()) {
         auto const l = cast_to<double>(lhs);
         auto const r = cast_to<double>(rhs);
+        cmp_result = (l <=> r);
+    } else if (lhs.holds<Cmp>()) {
+        auto const& cmp = lhs.boxed_of<Cmp>().value().get();
+        cmp_result = cmp(cmp, rhs);
+    } else {
+        throw abort_execution{ip, "invalid operands for cmp"};
+    }
 
-        if (l < r) {
-            cmp_result = Cmp::CMP_LT;
-        } else if (l > r) {
-            cmp_result = Cmp::CMP_GT;
-        } else {
-            cmp_result = Cmp::CMP_EQ;
-        }
+    if (cmp_result == std::partial_ordering::unordered) {
+        throw abort_execution{ip, "cannot cmp unordered values"};
     }
 
     auto out = get_proxy(stack, op.instruction.out, ip);
-    out      = cmp_result;
+    out = (cmp_result < 0) ? -1 : (0 < cmp_result) ? 1 : 0;
 }
 auto execute(AND const op, Stack& stack, ip_type const) -> void
 {
