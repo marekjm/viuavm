@@ -233,6 +233,8 @@ enum class OPCODE : opcode_type {
     STRUCT_INSERT = (FORMAT_T | 0x0017),
     STRUCT_REMOVE = (FORMAT_T | 0x0018),
 
+    IF = (FORMAT_T | 0x0019),
+
     CALL   = (FORMAT_D | 0x0001),
     BITNOT = (FORMAT_D | 0x0002),
     NOT    = (FORMAT_D | 0x0003),
@@ -254,6 +256,8 @@ enum class OPCODE : opcode_type {
     DOUBLE = (FORMAT_S | 0x0006),
     STRUCT = (FORMAT_S | 0x0007),
     BUFFER = (FORMAT_S | 0x0008),
+
+    JUMP = (FORMAT_S | 0x0009),
 
     LUI  = (FORMAT_E | 0x0001),
     LUIU = (FORMAT_E | 0x0001 | UNSIGNED),
@@ -299,6 +303,7 @@ enum class OPCODE_T : opcode_type {
     STRUCT_AT     = static_cast<opcode_type>(OPCODE::STRUCT_AT),
     STRUCT_INSERT = static_cast<opcode_type>(OPCODE::STRUCT_INSERT),
     STRUCT_REMOVE = static_cast<opcode_type>(OPCODE::STRUCT_REMOVE),
+    IF            = static_cast<opcode_type>(OPCODE::IF),
 };
 enum class OPCODE_D : opcode_type {
     CALL        = static_cast<opcode_type>(OPCODE::CALL),
@@ -320,6 +325,7 @@ enum class OPCODE_S : opcode_type {
     DOUBLE = static_cast<opcode_type>(OPCODE::DOUBLE),
     STRUCT = static_cast<opcode_type>(OPCODE::STRUCT),
     BUFFER = static_cast<opcode_type>(OPCODE::BUFFER),
+    JUMP = static_cast<opcode_type>(OPCODE::JUMP),
 };
 enum class OPCODE_E : opcode_type {
     LUI  = static_cast<opcode_type>(OPCODE::LUI),

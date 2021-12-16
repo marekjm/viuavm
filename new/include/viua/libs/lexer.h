@@ -227,6 +227,11 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "struct_remove",
     "g.struct_remove",
 
+    "if",
+    "g.if",
+    "jump",
+    "g.jump",
+
     /*
      * Pseudoinstructions listed below.
      */

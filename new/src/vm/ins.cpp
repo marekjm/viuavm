@@ -1341,6 +1341,15 @@ auto execute(REF const op, Stack& stack, ip_type const ip) -> void
 
     dst.value()->value = src.value()->boxed_value().reference_to();
 }
+
+auto execute(IF const, Stack&, ip_type const ip) -> ip_type
+{
+    throw abort_execution{ip, "op not implemented: if"};
+}
+auto execute(JUMP const, Stack&, ip_type const ip) -> ip_type
+{
+    throw abort_execution{ip, "op not implemented: if"};
+}
 }  // namespace viua::vm::ins
 
 namespace viua {

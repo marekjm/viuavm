@@ -935,6 +935,10 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
             }
 
             cooked.push_back(std::move(each));
+        } else if (each.opcode == "if" or each.opcode == "g.if") {
+            // TODO
+        } else if (each.opcode == "jump" or each.opcode == "g.jump") {
+            // TODO
         } else if (immediate_signed_arithmetic.count(each.opcode.text)) {
             if (each.operands.back().ingredients.back().text.back() == 'u') {
                 each.opcode.text += 'u';
