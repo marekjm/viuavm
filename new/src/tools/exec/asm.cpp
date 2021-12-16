@@ -206,6 +206,8 @@ struct Instruction : Node {
     viua::libs::lexer::Lexeme opcode;
     std::vector<Operand> operands;
 
+    size_t physical_index {static_cast<size_t>(-1)};
+
     auto to_string() const -> std::string override;
     auto parse_opcode() const -> viua::arch::opcode_type;
 
@@ -385,6 +387,7 @@ auto parse_function_definition(
     consume_token_of(TOKEN::TERMINATOR, lexemes);
 
     auto instructions = std::vector<std::unique_ptr<ast::Node>>{};
+    auto ins_physical_index = size_t{0};
     while ((not lexemes.empty()) and lexemes.front() != TOKEN::END) {
         auto instruction = ast::Instruction{};
 
@@ -422,6 +425,7 @@ auto parse_function_definition(
         if (lexemes.front() == TOKEN::TERMINATOR) {
             consume_token_of(TOKEN::TERMINATOR, lexemes);
             fn->instructions.push_back(std::move(instruction));
+            fn->instructions.back().physical_index = ins_physical_index++;
             continue;
         }
 
@@ -525,6 +529,7 @@ auto parse_function_definition(
         }
 
         fn->instructions.push_back(std::move(instruction));
+        fn->instructions.back().physical_index = ins_physical_index++;
     }
 
     consume_token_of(TOKEN::END, lexemes);
@@ -562,6 +567,7 @@ auto expand_delete(std::vector<ast::Instruction>& cooked,
     auto synth        = ast::Instruction{};
     synth.opcode      = raw.opcode;
     synth.opcode.text = (raw.opcode.text.find("g.") == 0 ? "g." : "") + "move"s;
+    synth.physical_index = raw.physical_index;
 
     synth.operands.push_back(raw.operands.front());
     synth.operands.push_back(raw.operands.front());
@@ -625,6 +631,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             auto synth        = ast::Instruction{};
             synth.opcode      = each.opcode;
             synth.opcode.text = "g.addiu";
+            synth.physical_index = each.physical_index;
 
             synth.operands.push_back(each.operands.front());
             synth.operands.back().ingredients.at(1).text = std::to_string(
@@ -644,6 +651,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             auto synth        = ast::Instruction{};
             synth.opcode      = each.opcode;
             synth.opcode.text = "g.addiu";
+            synth.physical_index = each.physical_index;
 
             synth.operands.push_back(each.operands.front());
             synth.operands.back().ingredients.at(1).text = std::to_string(
@@ -663,6 +671,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             auto synth        = ast::Instruction{};
             synth.opcode      = each.opcode;
             synth.opcode.text = "g.mul";
+            synth.physical_index = each.physical_index;
 
             synth.operands.push_back(each.operands.front());
             synth.operands.back().ingredients.at(1).text = std::to_string(
@@ -684,6 +693,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             auto synth        = ast::Instruction{};
             synth.opcode      = each.opcode;
             synth.opcode.text = "g.addiu";
+            synth.physical_index = each.physical_index;
 
             synth.operands.push_back(each.operands.front());
             synth.operands.back().ingredients.at(1).text = std::to_string(
@@ -703,6 +713,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             auto synth        = ast::Instruction{};
             synth.opcode      = each.opcode;
             synth.opcode.text = "g.add";
+            synth.physical_index = each.physical_index;
 
             synth.operands.push_back(each.operands.front());
             synth.operands.back().ingredients.at(1).text = std::to_string(
@@ -720,6 +731,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             auto synth        = ast::Instruction{};
             synth.opcode      = each.opcode;
             synth.opcode.text = "g.add";
+            synth.physical_index = each.physical_index;
 
             synth.operands.push_back(each.operands.front());
             synth.operands.push_back(each.operands.front());
@@ -735,6 +747,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             auto synth        = ast::Instruction{};
             synth.opcode      = each.opcode;
             synth.opcode.text = "g.delete";
+            synth.physical_index = each.physical_index;
 
             synth.operands.push_back(each.operands.front());
             synth.operands.back().ingredients.at(1).text = std::to_string(
@@ -747,6 +760,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             auto synth        = ast::Instruction{};
             synth.opcode      = each.opcode;
             synth.opcode.text = (is_greedy ? "g." : "") + "delete"s;
+            synth.physical_index = each.physical_index;
 
             synth.operands.push_back(each.operands.front());
             synth.operands.back().ingredients.at(1).text = std::to_string(
@@ -759,6 +773,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
         auto synth        = ast::Instruction{};
         synth.opcode      = each.opcode;
         synth.opcode.text = (is_greedy ? "g." : "") + "addi"s;
+        synth.physical_index = each.physical_index;
         if (is_unsigned) {
             synth.opcode.text += 'u';
         }
@@ -882,6 +897,8 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
                 auto const fn_off = fn_offsets.at(fn_name.text);
                 li.operands.back().ingredients.front().text =
                     std::to_string(fn_off) + 'u';
+
+                li.physical_index = each.physical_index;
             }
             expand_li(cooked, li);
 
@@ -901,6 +918,7 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
                 call.opcode = each.opcode;
                 call.operands.push_back(ret);
                 call.operands.push_back(fn_offset);
+                call.physical_index = each.physical_index;
             }
             cooked.push_back(call);
         } else if (each.opcode == "return") {
@@ -1747,6 +1765,7 @@ auto main(int argc, char* argv[]) -> int
                 auto synth        = ast::Instruction{};
                 synth.opcode      = insn.opcode;
                 synth.opcode.text = "g.li";
+                synth.physical_index = insn.physical_index;
 
                 synth.operands.push_back(insn.operands.front());
                 synth.operands.push_back(insn.operands.back());
@@ -1766,6 +1785,7 @@ auto main(int argc, char* argv[]) -> int
                 auto synth        = ast::Instruction{};
                 synth.opcode      = insn.opcode;
                 synth.opcode.text = "g.li";
+                synth.physical_index = insn.physical_index;
 
                 synth.operands.push_back(insn.operands.front());
                 synth.operands.push_back(insn.operands.back());
@@ -1787,6 +1807,7 @@ auto main(int argc, char* argv[]) -> int
                 auto synth        = ast::Instruction{};
                 synth.opcode      = insn.opcode;
                 synth.opcode.text = "g.li";
+                synth.physical_index = insn.physical_index;
 
                 synth.operands.push_back(insn.operands.front());
                 synth.operands.push_back(insn.operands.back());
@@ -1808,6 +1829,7 @@ auto main(int argc, char* argv[]) -> int
                 auto synth        = ast::Instruction{};
                 synth.opcode      = insn.opcode;
                 synth.opcode.text = "g.li";
+                synth.physical_index = insn.physical_index;
 
                 synth.operands.push_back(insn.operands.front());
                 synth.operands.push_back(insn.operands.back());
@@ -1851,7 +1873,9 @@ auto main(int argc, char* argv[]) -> int
                       << " raw, " << fn.instructions.size()
                       << " cooked op(s)\n";
             for (auto const& op : fn.instructions) {
-                std::cerr << "  " << op.to_string() << "\n";
+                std::cerr << "  "
+                    << std::setw(8) << std::setfill('0') << std::hex
+                    << op.physical_index << "  " << op.to_string() << "\n";
             }
         }
     }
