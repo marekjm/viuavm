@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import datetime
 import glob
 import io
 import os
@@ -16,6 +17,14 @@ except ImportError:
 def colorise(color, s):
     return '{}{}{}'.format(colored.fg(color), s, colored.attr('reset'))
 
+# CASE_RUNTIME_COLOUR = 'light_gray'
+CASE_RUNTIME_COLOUR = 'grey_42'
+
+def format_run_time(run_time):
+    if not run_time.seconds:
+        ms = (run_time.microseconds / 1000)
+        return '{:6.2f}ms'.format(ms)
+    return '...ms'
 
 ENCODING = 'utf-8'
 INTERPRETER = './build/tools/exec/vm'
@@ -201,15 +210,6 @@ def run_and_capture(interpreter, executable, args = ()):
 
     return (result, (ebreaks[-1] if ebreaks else None),)
 
-result, ebreaks = run_and_capture(
-    INTERPRETER,
-    './a.out',
-)
-
-# check_register(ebreaks[0], make_local(4), uint(41))
-# check_register(ebreaks[0], make_local(2), atom('answer'))
-# check_register(ebreaks[0], make_local(5), ref(uint(41)))
-
 
 CHECK_KINDS = (
     'stdout', # check standard output
@@ -232,9 +232,12 @@ def test_case(case_name, test_program, errors):
     try:
         check_kind = detect_check_kind(test_program)
     except No_check_file_for:
-        return (False, 'no check file',)
+        return (False, 'no check file', None,)
 
     test_executable = (os.path.splitext(test_program)[0] + '.bin')
+
+    start_timepoint = datetime.datetime.now()
+    count_runtime = lambda: (datetime.datetime.now() - start_timepoint)
 
     asm_return = subprocess.call(args = (
         ASSEMBLER,
@@ -243,7 +246,7 @@ def test_case(case_name, test_program, errors):
         test_program,
     ), stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
     if asm_return != 0:
-        return (False, 'failed to assemble',)
+        return (False, 'failed to assemble', count_runtime(),)
 
     result, ebreak = run_and_capture(
         INTERPRETER,
@@ -251,7 +254,7 @@ def test_case(case_name, test_program, errors):
     )
 
     if result != 0:
-        return (False, 'crashed',)
+        return (False, 'crashed', count_runtime(),)
 
     if check_kind == 'ebreak':
         ebreak_dump = (os.path.splitext(test_program)[0] + '.ebreak')
@@ -263,9 +266,9 @@ def test_case(case_name, test_program, errors):
         for line in ebreak_dump:
             if not load_ebreak_line(want_ebreak, line):
                 errors.write(f'    invalid-want ebreak line: {line}')
-                return False
+                return (False, None, count_runtime(),)
         if not ebreak_dump:
-            return (False, 'empty ebreak file',)
+            return (False, 'empty ebreak file', count_runtime(),)
 
         for r, content in want_ebreak['registers'].items():
             for index, cell in content.items():
@@ -276,7 +279,7 @@ def test_case(case_name, test_program, errors):
                         (len(leader) * ' '),
                         *cell
                     ))
-                    return False
+                    return (False, None, count_runtime(),)
 
                 got = ebreak['registers'][r][index]
                 got_type, got_value = got
@@ -315,7 +318,7 @@ def test_case(case_name, test_program, errors):
                     ))
                     return False
 
-    return True
+    return (True, None, count_runtime(),)
 
 
 def main(args):
@@ -341,25 +344,29 @@ def main(args):
     pad_case_no = len(str(len(cases) + 1))
     pad_case_name = max(map(lambda _: len(_[0]), cases))
 
+    run_times = []
+
     for case_no, (case_name, test_program,) in enumerate(cases, start = 1):
         error_stream = io.StringIO()
 
         rc = lambda: test_case(case_name, test_program, error_stream)
 
-        result, symptom = (False, None,)
+        result, symptom, run_time = (False, None, None,)
         if type(result := rc()) is tuple:
-            result, symptom = result
+            result, symptom, run_time = result
+            run_times.append(run_time)
 
         if result:
             success_cases += 1
 
-        print('  case {}. of {}: [{}]'.format(
+        print('  case {}. of {}: [{}] {}'.format(
             colorise('white', str(case_no).rjust(pad_case_no)),
             colorise('white', case_name.ljust(pad_case_name)),
             colorise(
                 ('green' if result else 'red'),
                 (' ok ' if result else 'fail'),
             ) + ((' => ' + colorise('light_red', symptom)) if symptom else ''),
+            colorise(CASE_RUNTIME_COLOUR, '{:6.2f}ms'.format(run_time.microseconds / 1000)),
         ))
 
         error_stream.seek(0)
@@ -374,6 +381,22 @@ def main(args):
             ('green' if (success_cases == len(cases)) else 'red'),
             '{:5.2f}'.format((success_cases / len(cases)) * 100),
         ),
+    ))
+
+    total_run_time = sum(run_times[1:], start=run_times[0])
+    print('total run time was {} ({} ~ {} per case) including assembly'.format(
+        format_run_time(total_run_time),
+        format_run_time(min(run_times)).strip(),
+        format_run_time(max(run_times)).strip(),
+    ))
+    run_times = sorted(run_times)
+    middle = (len(run_times) // 2)
+    print('median run time was {}'.format(
+        format_run_time((
+            run_times[middle]
+            if (len(run_times) % 2) else
+            ((run_times[middle] + run_times[middle]) / 2)
+        )).strip(),
     ))
 
 
