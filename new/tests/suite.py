@@ -22,9 +22,11 @@ CASE_RUNTIME_COLOUR = 'grey_42'
 
 def format_run_time(run_time):
     if not run_time.seconds:
-        ms = (run_time.microseconds / 1000)
+        ms = (run_time.microseconds / 1e3)
         return '{:6.2f}ms'.format(ms)
-    return '...ms'
+
+    secs = run_time.seconds + (run_time.microseconds / 1e6)
+    return '{:8.4f}s'.format(secs)
 
 ENCODING = 'utf-8'
 INTERPRETER = './build/tools/exec/vm'
@@ -354,7 +356,8 @@ def main(args):
         result, symptom, run_time = (False, None, None,)
         if type(result := rc()) is tuple:
             result, symptom, run_time = result
-            run_times.append(run_time)
+            if run_time:
+                run_times.append(run_time)
 
         if result:
             success_cases += 1
@@ -366,7 +369,8 @@ def main(args):
                 ('green' if result else 'red'),
                 (' ok ' if result else 'fail'),
             ) + ((' => ' + colorise('light_red', symptom)) if symptom else ''),
-            colorise(CASE_RUNTIME_COLOUR, '{:6.2f}ms'.format(run_time.microseconds / 1000)),
+            (colorise(CASE_RUNTIME_COLOUR, format_run_time(run_time))
+                if run_time else ''),
         ))
 
         error_stream.seek(0)
