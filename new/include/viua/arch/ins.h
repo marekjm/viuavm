@@ -411,9 +411,9 @@ struct REF : Instruction {
 };
 
 struct IF : Instruction {
-    viua::arch::ops::T instruction;
+    viua::arch::ops::D instruction;
 
-    IF(viua::arch::ops::T i) : instruction{i}
+    IF(viua::arch::ops::D i) : instruction{i}
     {}
 };
 struct JUMP : Instruction {

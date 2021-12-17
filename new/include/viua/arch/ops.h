@@ -233,8 +233,6 @@ enum class OPCODE : opcode_type {
     STRUCT_INSERT = (FORMAT_T | 0x0017),
     STRUCT_REMOVE = (FORMAT_T | 0x0018),
 
-    IF = (FORMAT_T | 0x0019),
-
     CALL   = (FORMAT_D | 0x0001),
     BITNOT = (FORMAT_D | 0x0002),
     NOT    = (FORMAT_D | 0x0003),
@@ -247,6 +245,8 @@ enum class OPCODE : opcode_type {
     BUFFER_SIZE = (FORMAT_D | 0x0008),
 
     REF = (FORMAT_D | 0x0009),
+
+    IF = (FORMAT_D | 0x000a),
 
     FRAME  = (FORMAT_S | 0x0001),
     RETURN = (FORMAT_S | 0x0002),
@@ -303,7 +303,6 @@ enum class OPCODE_T : opcode_type {
     STRUCT_AT     = static_cast<opcode_type>(OPCODE::STRUCT_AT),
     STRUCT_INSERT = static_cast<opcode_type>(OPCODE::STRUCT_INSERT),
     STRUCT_REMOVE = static_cast<opcode_type>(OPCODE::STRUCT_REMOVE),
-    IF            = static_cast<opcode_type>(OPCODE::IF),
 };
 enum class OPCODE_D : opcode_type {
     CALL        = static_cast<opcode_type>(OPCODE::CALL),
@@ -315,6 +314,7 @@ enum class OPCODE_D : opcode_type {
     BUFFER_PUSH = static_cast<opcode_type>(OPCODE::BUFFER_PUSH),
     BUFFER_SIZE = static_cast<opcode_type>(OPCODE::BUFFER_SIZE),
     REF         = static_cast<opcode_type>(OPCODE::REF),
+    IF          = static_cast<opcode_type>(OPCODE::IF),
 };
 enum class OPCODE_S : opcode_type {
     FRAME  = static_cast<opcode_type>(OPCODE::FRAME),

@@ -154,13 +154,6 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
         case OPCODE_T::STRUCT_REMOVE:
             execute(STRUCT_REMOVE{instruction}, stack, ip);
             break;
-        case OPCODE_T::IF:
-            /*
-             * If is a special instruction. It transfers IP to a semi-random
-             * location instead of just increasing it to the next unit. This is
-             * why the return is used instead of break.
-             */
-            return execute(IF{instruction}, stack, ip);
         }
         break;
     }
@@ -318,6 +311,13 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
         case OPCODE_D::REF:
             execute(REF{instruction}, stack, ip);
             break;
+        case OPCODE_D::IF:
+            /*
+             * If is a special instruction. It transfers IP to a semi-random
+             * location instead of just increasing it to the next unit. This is
+             * why the return is used instead of break.
+             */
+            return execute(IF{instruction}, stack, ip);
         }
         break;
     }

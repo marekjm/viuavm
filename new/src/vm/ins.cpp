@@ -1342,15 +1342,23 @@ auto execute(REF const op, Stack& stack, ip_type const ip) -> void
     dst.value()->value = src.value()->boxed_value().reference_to();
 }
 
-auto execute(IF const, Stack&, ip_type const ip) -> ip_type
+auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
 {
-    throw abort_execution{ip, "op not implemented: if"};
+    auto const condition = get_value(stack, op.instruction.out, ip);
+    auto tt = get_proxy(stack, op.instruction.in, ip);
+
+    auto const target = cast_to<uint64_t>(condition)
+        ? (stack.back().entry_address + cast_to<uint64_t>(tt.view()))
+        : (ip + 1);
+
+    tt.overwrite().make_void();
+    return target;
 }
 auto execute(JUMP const op, Stack& stack, ip_type const ip) -> ip_type
 {
-    auto src = get_proxy(stack, op.instruction.out, ip);
-    auto const target = (stack.back().entry_address + cast_to<uint64_t>(src.view()));
-    src.overwrite().make_void();
+    auto tt = get_proxy(stack, op.instruction.out, ip);
+    auto const target = (stack.back().entry_address + cast_to<uint64_t>(tt.view()));
+    tt.overwrite().make_void();
     return target;
 }
 }  // namespace viua::vm::ins

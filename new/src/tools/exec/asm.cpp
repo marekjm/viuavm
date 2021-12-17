@@ -991,7 +991,106 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
 
             cooked.push_back(std::move(each));
         } else if (each.opcode == "if" or each.opcode == "g.if") {
-            // TODO
+            /*
+             * The address to jump to is not cooked directly into the final
+             * instruction sequence because we may have to try several times
+             * before getting the "right" instruction sequence. Why? See the
+             * comment for teh `branch_target' variable in the loop below.
+             *
+             * Basically, it boils down to the fact that:
+             *
+             * - we have to adjust the target instruction sequence based on the
+             *   value of the index of the instruction to jump to
+             * - we have to adjust the target index also by the difference
+             *   between logical and physical instruction count
+             */
+            auto address_load = std::vector<ast::Instruction>{};
+            auto prev_address_load_length = address_load.size();
+            constexpr auto MAX_SIZE_OF_LI = size_t{9};
+            do {
+                prev_address_load_length = address_load.size();
+                address_load.clear();
+
+                /*
+                 * The real branch target is at least one instruction further
+                 * because a
+                 *
+                 *      jump x
+                 *
+                 * expands to
+                 *
+                 *      g.li $253.l, x
+                 *      jump $253.l
+                 *
+                 * which adds between 1 and 9 instructions. It usually is much
+                 * bigger because while logically and instruction may have an
+                 * index I it will have a physical index of I+N in bytecode,
+                 * where N is the number of additional instructions that were
+                 * inserted into the code by previous expansions.
+                 *
+                 * The N can be quite big because common instructions visible to
+                 * programmers eg, call or li, are "pseudoinstructions" and take
+                 * up more than one "real" instruction to actually execute. This
+                 * can be inspected by fetching traces from the VM and comparing
+                 * them with the source code - the trace will usually be longer
+                 * by a sizeable amount of instructions.
+                 */
+                auto const branch_target =
+                    (std::stoull(each.operands.back().to_string())
+                    + (logical_ops - physical_ops)
+                    + std::max(size_t{1}, prev_address_load_length));
+
+                auto li = ast::Instruction{};
+                {
+                    li.opcode      = each.opcode;
+                    li.opcode.text = "g.li";
+                    li.physical_index = each.physical_index;
+
+                    using viua::libs::lexer::TOKEN;
+                    auto const& lx = each.operands.front().ingredients.front();
+                    {
+                        auto reg = ast::Operand{};
+                        reg.ingredients.push_back(lx.make_synth("$", TOKEN::RA_DIRECT));
+                        reg.ingredients.push_back(lx.make_synth("253", TOKEN::LITERAL_INTEGER));
+                        reg.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
+                        reg.ingredients.push_back(lx.make_synth("l", TOKEN::LITERAL_ATOM));
+                        li.operands.push_back(reg);
+                    }
+                    {
+                        auto br = ast::Operand{};
+                        br.ingredients.push_back(lx.make_synth(
+                            std::to_string(branch_target) + 'u',
+                            TOKEN::LITERAL_INTEGER
+                        ));
+                        li.operands.push_back(br);
+                    }
+                }
+
+                /*
+                 * Try cooking the instruction sequence to see what amount of
+                 * instructions we will get. If we get the same instruction
+                 * sequence twice - we got our match and the loop can end. The
+                 * downside of this brute-force algorithm is that we may have to
+                 * cook the same code twice in some cases.
+                 */
+                expand_li(address_load, li);
+            } while (address_load.size() < MAX_SIZE_OF_LI and prev_address_load_length != address_load.size());
+            std::copy(address_load.begin(), address_load.end(), std::back_inserter(cooked));
+
+            using viua::libs::lexer::TOKEN;
+            auto reg = each.operands.back();
+            each.operands.pop_back();
+
+            auto const lx = reg.ingredients.front();
+            reg.ingredients.pop_back();
+
+            reg.ingredients.push_back(lx.make_synth("$", TOKEN::RA_DIRECT));
+            reg.ingredients.push_back(lx.make_synth("253", TOKEN::LITERAL_INTEGER));
+            reg.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
+            reg.ingredients.push_back(lx.make_synth("l", TOKEN::LITERAL_ATOM));
+
+            each.operands.push_back(reg);
+            cooked.push_back(std::move(each));
         } else if (each.opcode == "jump" or each.opcode == "g.jump") {
             /*
              * The address to jump to is not cooked directly into the final
