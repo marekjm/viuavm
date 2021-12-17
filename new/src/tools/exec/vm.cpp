@@ -30,6 +30,7 @@
 
 
 constexpr auto VIUA_TRACE_CYCLES = true;
+constexpr auto VIUA_SLOW_CYCLES = false;
 
 namespace viua {
 auto TRACE_STREAM = viua::support::fdstream{2};
@@ -398,7 +399,7 @@ auto run(Stack& stack,
             break;
         }
 
-        if constexpr (false) {
+        if constexpr (VIUA_SLOW_CYCLES) {
             /*
              * FIXME Limit the amount of instructions executed per second
              * for debugging purposes. Once everything works as it should,
