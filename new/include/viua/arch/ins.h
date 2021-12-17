@@ -416,12 +416,6 @@ struct IF : Instruction {
     IF(viua::arch::ops::D i) : instruction{i}
     {}
 };
-struct JUMP : Instruction {
-    viua::arch::ops::S instruction;
-
-    JUMP(viua::arch::ops::S i) : instruction{i}
-    {}
-};
 }  // namespace viua::arch::ins
 
 #endif

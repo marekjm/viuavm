@@ -189,8 +189,6 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
         case OPCODE_S::BUFFER:
             execute(BUFFER{instruction}, stack, ip);
             break;
-        case OPCODE_S::JUMP:
-            return execute(JUMP{instruction}, stack, ip);
         }
         break;
     }

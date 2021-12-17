@@ -101,7 +101,6 @@ Work_instruction(STRUCT_REMOVE);
 Work_instruction(REF);
 
 Flow_instruction(IF);
-Flow_instruction(JUMP);
 
 Work_instruction(EBREAK);
 }  // namespace viua::vm::ins

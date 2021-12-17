@@ -1347,17 +1347,11 @@ auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
     auto const condition = get_value(stack, op.instruction.out, ip);
     auto tt = get_proxy(stack, op.instruction.in, ip);
 
-    auto const target = cast_to<uint64_t>(condition)
+    auto take_branch = (condition.holds<void>() or cast_to<uint64_t>(condition));
+    auto const target = take_branch
         ? (stack.back().entry_address + cast_to<uint64_t>(tt.view()))
         : (ip + 1);
 
-    tt.overwrite().make_void();
-    return target;
-}
-auto execute(JUMP const op, Stack& stack, ip_type const ip) -> ip_type
-{
-    auto tt = get_proxy(stack, op.instruction.out, ip);
-    auto const target = (stack.back().entry_address + cast_to<uint64_t>(tt.view()));
     tt.overwrite().make_void();
     return target;
 }

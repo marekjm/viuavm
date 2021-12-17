@@ -257,8 +257,6 @@ enum class OPCODE : opcode_type {
     STRUCT = (FORMAT_S | 0x0007),
     BUFFER = (FORMAT_S | 0x0008),
 
-    JUMP = (FORMAT_S | 0x0009),
-
     LUI  = (FORMAT_E | 0x0001),
     LUIU = (FORMAT_E | 0x0001 | UNSIGNED),
 
@@ -325,7 +323,6 @@ enum class OPCODE_S : opcode_type {
     DOUBLE = static_cast<opcode_type>(OPCODE::DOUBLE),
     STRUCT = static_cast<opcode_type>(OPCODE::STRUCT),
     BUFFER = static_cast<opcode_type>(OPCODE::BUFFER),
-    JUMP = static_cast<opcode_type>(OPCODE::JUMP),
 };
 enum class OPCODE_E : opcode_type {
     LUI  = static_cast<opcode_type>(OPCODE::LUI),

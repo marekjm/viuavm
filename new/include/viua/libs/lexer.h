@@ -229,8 +229,6 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
 
     "if",
     "g.if",
-    "jump",
-    "g.jump",
 
     /*
      * Pseudoinstructions listed below.
@@ -239,6 +237,8 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "g.li",
     "delete",
     "g.delete",
+    "jump",
+    "g.jump",
 };
 
 auto lex(std::string_view) -> std::vector<Lexeme>;

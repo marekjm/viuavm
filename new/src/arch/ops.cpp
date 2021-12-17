@@ -362,8 +362,6 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "ref";
     case OPCODE::IF:
         return greedy + "if";
-    case OPCODE::JUMP:
-        return greedy + "jump";
     }
 
     return "<unknown>";
@@ -488,8 +486,6 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::STRUCT_REMOVE));
     } else if (sv == "if") {
         return (op | static_cast<opcode_type>(OPCODE::IF));
-    } else if (sv == "jump") {
-        return (op | static_cast<opcode_type>(OPCODE::JUMP));
     } else {
         throw std::invalid_argument{"viua::arch::ops::parse_opcode: "
                                     + std::string{raw}};
