@@ -933,7 +933,7 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
                 li.opcode.text = "g.li";
 
                 li.operands.push_back(fn_offset);
-                li.operands.push_back(fn_offset);
+                li.operands.push_back(ast::Operand{});
 
                 auto const fn_name = each.operands.back().ingredients.front();
                 if (fn_offsets.count(fn_name.text) == 0) {
@@ -943,8 +943,9 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
                 }
 
                 auto const fn_off = fn_offsets.at(fn_name.text);
-                li.operands.back().ingredients.front().text =
-                    std::to_string(fn_off) + 'u';
+                li.operands.back().ingredients.push_back(fn_name.make_synth(
+                    std::to_string(fn_off) + 'u',
+                    viua::libs::lexer::TOKEN::LITERAL_INTEGER));
 
                 li.physical_index = each.physical_index;
             }
