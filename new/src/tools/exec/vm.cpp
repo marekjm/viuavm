@@ -77,7 +77,7 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
     {
         auto instruction = viua::arch::ops::T::decode(raw);
         if constexpr (VIUA_TRACE_CYCLES) {
-            viua::TRACE_STREAM << "    " << instruction.to_string() << "\n";
+            viua::TRACE_STREAM << "    " << instruction.to_string() << viua::TRACE_STREAM.endl;
         }
 
         using viua::arch::ops::OPCODE_T;
@@ -161,7 +161,7 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
     {
         auto instruction = viua::arch::ops::S::decode(raw);
         if constexpr (VIUA_TRACE_CYCLES) {
-            viua::TRACE_STREAM << "    " << instruction.to_string() << "\n";
+            viua::TRACE_STREAM << "    " << instruction.to_string() << viua::TRACE_STREAM.endl;
         }
 
         using viua::arch::ops::OPCODE_S;
@@ -196,7 +196,7 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
     {
         auto instruction = viua::arch::ops::E::decode(raw);
         if constexpr (VIUA_TRACE_CYCLES) {
-            viua::TRACE_STREAM << "    " << instruction.to_string() << "\n";
+            viua::TRACE_STREAM << "    " << instruction.to_string() << viua::TRACE_STREAM.endl;
         }
 
         using viua::arch::ops::OPCODE_E;
@@ -214,7 +214,7 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
     {
         auto instruction = viua::arch::ops::R::decode(raw);
         if constexpr (VIUA_TRACE_CYCLES) {
-            viua::TRACE_STREAM << "    " << instruction.to_string() << "\n";
+            viua::TRACE_STREAM << "    " << instruction.to_string() << viua::TRACE_STREAM.endl;
         }
 
         using viua::arch::ops::OPCODE_R;
@@ -250,7 +250,7 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
     {
         if constexpr (VIUA_TRACE_CYCLES) {
             viua::TRACE_STREAM << "    " << viua::arch::ops::to_string(opcode)
-                               << "\n";
+                               << viua::TRACE_STREAM.endl;
         }
 
         using viua::arch::ops::OPCODE_N;
@@ -270,7 +270,7 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
     {
         auto instruction = viua::arch::ops::D::decode(raw);
         if constexpr (VIUA_TRACE_CYCLES) {
-            viua::TRACE_STREAM << "    " << instruction.to_string() << "\n";
+            viua::TRACE_STREAM << "    " << instruction.to_string() << viua::TRACE_STREAM.endl;
         }
 
         using viua::arch::ops::OPCODE_D;
@@ -356,7 +356,7 @@ auto run(Stack& stack,
                 << "cycle at " << module << "+0x" << std::hex << std::setw(8)
                 << std::setfill('0')
                 << ((ip - ip_begin) * sizeof(viua::arch::instruction_type))
-                << std::dec << "\n";
+                << std::dec << viua::TRACE_STREAM.endl;
         }
 
         for (auto i = size_t{0}; i < PREEMPTION_THRESHOLD and ip != ip_end;
