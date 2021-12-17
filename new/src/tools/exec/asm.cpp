@@ -65,6 +65,36 @@ auto to_loading_parts_unsigned(uint64_t const value)
 
     return {high_part, {{base, multiplier}, remainder}};
 }
+auto li_cost(uint64_t const value) -> size_t
+{
+    /*
+     * Remember to keep this function in sync with what expand_li() function
+     * does. If this function ie, li_cost() returns a bad value, or expand_li()
+     * starts emitting different instructions -- branch calculations will fail.
+     */
+    auto count = size_t{0};
+
+    auto parts            = to_loading_parts_unsigned(value);
+    if (parts.first) {
+        ++count; // lui
+    }
+
+    auto const multiplier = parts.second.first.second;
+    if (multiplier != 0) {
+        ++count; // g.addiu
+        ++count; // g.addiu
+        ++count; // g.mul
+        ++count; // g.addiu
+        ++count; // g.add
+        ++count; // g.add
+        ++count; // g.delete
+        ++count; // g.delete
+    } else {
+        ++count; // addiu
+    }
+
+    return count;
+}
 
 auto save_string(std::vector<uint8_t>& strings, std::string_view const data)
     -> size_t
@@ -853,10 +883,8 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
 }
 auto expand_if(std::vector<ast::Instruction>& cooked,
                ast::Instruction& each,
-               std::pair<size_t, size_t> ops_count) -> void
+               std::map<size_t, size_t> l2p) -> void
 {
-    auto const [ logical_ops, physical_ops ] = ops_count;
-
     /*
      * The address to jump to is not cooked directly into the final
      * instruction sequence because we may have to try several times
@@ -877,34 +905,7 @@ auto expand_if(std::vector<ast::Instruction>& cooked,
         prev_address_load_length = address_load.size();
         address_load.clear();
 
-        /*
-         * The real branch target is at least one instruction further
-         * because a
-         *
-         *      jump x
-         *
-         * expands to
-         *
-         *      g.li $253.l, x
-         *      jump $253.l
-         *
-         * which adds between 1 and 9 instructions. It usually is much
-         * bigger because while logically and instruction may have an
-         * index I it will have a physical index of I+N in bytecode,
-         * where N is the number of additional instructions that were
-         * inserted into the code by previous expansions.
-         *
-         * The N can be quite big because common instructions visible to
-         * programmers eg, call or li, are "pseudoinstructions" and take
-         * up more than one "real" instruction to actually execute. This
-         * can be inspected by fetching traces from the VM and comparing
-         * them with the source code - the trace will usually be longer
-         * by a sizeable amount of instructions.
-         */
-        auto const branch_target =
-            (std::stoull(each.operands.back().to_string())
-            + (logical_ops - physical_ops)
-            + std::max(size_t{1}, prev_address_load_length));
+        auto const branch_target = l2p.at(std::stoull(each.operands.back().to_string()));
 
         auto li = ast::Instruction{};
         {
@@ -973,12 +974,43 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
         "g.divi",
     };
 
-    auto cooked = std::vector<ast::Instruction>{};
+    /*
+     * We need to maintain accurate mapping of logical to physical instructions
+     * because what the programmer sees is not necessarily what the VM will be
+     * executing. Pseudoinstructions are expanded into sequences of real
+     * instructions and this changes effective addresses (ie, instruction
+     * indexes) which are used as branch targets.
+     *
+     * A single logical instruction can expand into as many as 9 physical
+     * instructions! The worst (and most common) such pseudoinstruction is the
+     * li -- Loading Integer constants. It is used to store integers in
+     * registers, as well as addresses for calls, jumps, and ifs.
+     */
     auto physical_ops = size_t{0};
     auto logical_ops = size_t{0};
+    auto branch_ops_baggage = size_t{0};
+    auto l2p = std::map<size_t, size_t>{};
 
+    /*
+     * First, we cook the sequence of raw instructions expanding non-control
+     * flow instructions and building the mapping of logical to physical
+     * instruction indexes.
+     *
+     * We do it this way because even an early branch can jump to the very last
+     * instruction in a function, but we can't predict the future so we do not
+     * know at this point how many PHYSICAL instructions are there between the
+     * branch and its target -- this means that we do not know how to adjust the
+     * logical target of the branch.
+     *
+     * What we can do, though, is to accrue the "instruction cost" of expanding
+     * the branches and adjust the physical instruction indexes by this value. I
+     * think this may be brittle and error-prone but so far it works... Let's
+     * mark this part as HERE BE DRAGONS to be easier to find in the future.
+     */
+    auto cooked = std::vector<ast::Instruction>{};
     for (auto& each : raw) {
         physical_ops = each.physical_index;
+        l2p.insert({ physical_ops, logical_ops + branch_ops_baggage });
 
         // FIXME remove checking for "g.li" here to test errors with synthesized
         // instructions
@@ -1097,8 +1129,50 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
             }
 
             cooked.push_back(std::move(each));
-        } else if (each.opcode == "if" or each.opcode == "g.if") {
-            expand_if(cooked, each, { logical_ops, physical_ops });
+        } else if (immediate_signed_arithmetic.count(each.opcode.text)) {
+            if (each.operands.back().ingredients.back().text.back() == 'u') {
+                each.opcode.text += 'u';
+            }
+            cooked.push_back(std::move(each));
+        } else {
+            /*
+             * Real instructions should be pushed without any modification.
+             */
+            cooked.push_back(std::move(each));
+        }
+
+        logical_ops += (cooked.size() - logical_ops);
+
+        /*
+         * I think this part of the code might break if the value crosses a
+         * threshold at which the alhorithm governing expansion of li chooses a
+         * different instruction sequence. This code is a potential FIXME.
+         *
+         * Maybe we should do a second pass in which the actual costs are
+         * calculated. After the whole sequence is analysed we know how many
+         * physical instructions are there. Then, we know that eg, Nth logical
+         * instruction will be converted into Mth physical instruction address.
+         * If they have different costs we would have to adjust the mappings for
+         * all instructions after that jump.
+         *
+         * But... this requires the target of the branch just analysed to have
+         * to be recalculated because the physical instrution's layout just
+         * changed. Damn, what a brain-dead design was chosen for the li
+         * expansion. Costant size would be much better.
+         * Another choice is to never REDUCE the cost, but insert a bunch of
+         * g.noop's as padding. Yeah, that could work, I guess.
+         */
+        if (each.opcode == "if" or each.opcode == "g.if") {
+            branch_ops_baggage += li_cost(std::stoull(each.operands.back().to_string()));
+        } else if (each.opcode == "jump" or each.opcode == "g.jump") {
+            branch_ops_baggage += li_cost(std::stoull(each.operands.back().to_string()));
+        }
+    }
+
+    auto baked = std::vector<ast::Instruction>{};
+    for (auto& each : cooked) {
+        if (each.opcode == "if" or each.opcode == "g.if") {
+            expand_if(baked, each, l2p);
         } else if (each.opcode == "jump" or each.opcode == "g.jump") {
             /*
              * Jumps can be safely rewritten as ifs with a void condition
@@ -1136,22 +1210,17 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
              */
             as_if.operands.push_back(each.operands.front());
 
-            expand_if(cooked, as_if, { logical_ops, physical_ops });
-        } else if (immediate_signed_arithmetic.count(each.opcode.text)) {
-            if (each.operands.back().ingredients.back().text.back() == 'u') {
-                each.opcode.text += 'u';
-            }
-            cooked.push_back(std::move(each));
+            expand_if(baked, as_if, l2p);
         } else {
             /*
              * Real instructions should be pushed without any modification.
              */
-            cooked.push_back(std::move(each));
+            baked.push_back(std::move(each));
         }
 
-        logical_ops += (cooked.size() - logical_ops);
     }
-    return cooked;
+
+    return baked;
 }
 }  // namespace
 
@@ -2075,11 +2144,14 @@ auto main(int argc, char* argv[]) -> int
         if constexpr (DEBUG_EXPANSION) {
             std::cerr << "FN " << fn.to_string() << " with " << raw_ops_count
                       << " raw, " << fn.instructions.size()
-                      << " cooked op(s)\n";
+                      << " baked op(s)\n";
+            auto physical_index = size_t{0};
             for (auto const& op : fn.instructions) {
                 std::cerr << "  "
-                    << std::setw(8) << std::setfill('0') << std::hex
-                    << op.physical_index << "  " << op.to_string() << "\n";
+                    << std::setw(4) << std::setfill('0') << std::hex << physical_index++
+                    << " "
+                    << std::setw(4) << std::setfill('0') << std::hex << op.physical_index
+                    << "  " << op.to_string() << "\n";
             }
         }
     }
