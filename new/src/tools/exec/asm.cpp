@@ -1777,9 +1777,9 @@ auto main(int argc, char* argv[]) -> int
     /*
      * String table preparation.
      *
-     * Replace string literals in operands with offsets into the string table.
-     * We want all instructions to fit into 64 bits, so having variable-size
-     * operands is not an option.
+     * Replace string, atom, float, and double literals in operands with offsets
+     * into the string table. We want all instructions to fit into 64 bits, so
+     * having variable-size operands is not an option.
      *
      * Don't move the strings table preparation after the pseudoinstruction
      * expansion stage. li pseudoinstructions are emitted during strings table
