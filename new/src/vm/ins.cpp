@@ -1346,9 +1346,12 @@ auto execute(IF const, Stack&, ip_type const ip) -> ip_type
 {
     throw abort_execution{ip, "op not implemented: if"};
 }
-auto execute(JUMP const, Stack&, ip_type const ip) -> ip_type
+auto execute(JUMP const op, Stack& stack, ip_type const ip) -> ip_type
 {
-    throw abort_execution{ip, "op not implemented: if"};
+    auto src = get_proxy(stack, op.instruction.out, ip);
+    auto const target = (stack.back().entry_address + cast_to<uint64_t>(src.view()));
+    src.overwrite().make_void();
+    return target;
 }
 }  // namespace viua::vm::ins
 
