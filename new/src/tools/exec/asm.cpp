@@ -633,17 +633,33 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             synth.opcode.text = "g.addiu";
             synth.physical_index = each.physical_index;
 
-            synth.operands.push_back(each.operands.front());
-            synth.operands.back().ingredients.at(1).text = std::to_string(
-                std::stoul(synth.operands.back().ingredients.at(1).text) + 1);
+            auto const& lx = each.operands.front().ingredients.at(1);
 
-            synth.operands.push_back(each.operands.front());
-            synth.operands.back().ingredients.front().text = "void";
-            synth.operands.back().ingredients.pop_back();
+            using viua::libs::lexer::TOKEN;
+            {
+                auto dst = ast::Operand{};
+                dst.ingredients.push_back(lx.make_synth("$", TOKEN::RA_DIRECT));
+                dst.ingredients.push_back(lx.make_synth(
+                    std::to_string(std::stoull(lx.text) + 1),
+                    TOKEN::LITERAL_INTEGER));
+                dst.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
+                dst.ingredients.push_back(lx.make_synth("l", TOKEN::LITERAL_ATOM));
 
-            synth.operands.push_back(each.operands.back());
-            synth.operands.back().ingredients.back().text =
-                std::to_string(base);
+                synth.operands.push_back(dst);
+            }
+            {
+                auto src = ast::Operand{};
+                src.ingredients.push_back(lx.make_synth("void", TOKEN::RA_VOID));
+
+                synth.operands.push_back(src);
+            }
+            {
+                auto immediate = ast::Operand{};
+                immediate.ingredients.push_back(lx.make_synth(
+                    std::to_string(base), TOKEN::LITERAL_INTEGER));
+
+                synth.operands.push_back(immediate);
+            }
 
             cooked.push_back(synth);
         }
@@ -653,17 +669,33 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             synth.opcode.text = "g.addiu";
             synth.physical_index = each.physical_index;
 
-            synth.operands.push_back(each.operands.front());
-            synth.operands.back().ingredients.at(1).text = std::to_string(
-                std::stoul(synth.operands.back().ingredients.at(1).text) + 2);
+            auto const& lx = each.operands.front().ingredients.at(1);
 
-            synth.operands.push_back(each.operands.front());
-            synth.operands.back().ingredients.front().text = "void";
-            synth.operands.back().ingredients.pop_back();
+            using viua::libs::lexer::TOKEN;
+            {
+                auto dst = ast::Operand{};
+                dst.ingredients.push_back(lx.make_synth("$", TOKEN::RA_DIRECT));
+                dst.ingredients.push_back(lx.make_synth(
+                    std::to_string(std::stoull(lx.text) + 2),
+                    TOKEN::LITERAL_INTEGER));
+                dst.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
+                dst.ingredients.push_back(lx.make_synth("l", TOKEN::LITERAL_ATOM));
 
-            synth.operands.push_back(each.operands.back());
-            synth.operands.back().ingredients.back().text =
-                std::to_string(multiplier);
+                synth.operands.push_back(dst);
+            }
+            {
+                auto src = ast::Operand{};
+                src.ingredients.push_back(lx.make_synth("void", TOKEN::RA_VOID));
+
+                synth.operands.push_back(src);
+            }
+            {
+                auto immediate = ast::Operand{};
+                immediate.ingredients.push_back(lx.make_synth(
+                    std::to_string(multiplier), TOKEN::LITERAL_INTEGER));
+
+                synth.operands.push_back(immediate);
+            }
 
             cooked.push_back(synth);
         }
@@ -695,17 +727,33 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             synth.opcode.text = "g.addiu";
             synth.physical_index = each.physical_index;
 
-            synth.operands.push_back(each.operands.front());
-            synth.operands.back().ingredients.at(1).text = std::to_string(
-                std::stoul(synth.operands.back().ingredients.at(1).text) + 2);
+            auto const& lx = each.operands.front().ingredients.at(1);
 
-            synth.operands.push_back(each.operands.front());
-            synth.operands.back().ingredients.front().text = "void";
-            synth.operands.back().ingredients.pop_back();
+            using viua::libs::lexer::TOKEN;
+            {
+                auto dst = ast::Operand{};
+                dst.ingredients.push_back(lx.make_synth("$", TOKEN::RA_DIRECT));
+                dst.ingredients.push_back(lx.make_synth(
+                    std::to_string(std::stoull(lx.text) + 2),
+                    TOKEN::LITERAL_INTEGER));
+                dst.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
+                dst.ingredients.push_back(lx.make_synth("l", TOKEN::LITERAL_ATOM));
 
-            synth.operands.push_back(each.operands.back());
-            synth.operands.back().ingredients.back().text =
-                std::to_string(remainder);
+                synth.operands.push_back(dst);
+            }
+            {
+                auto src = ast::Operand{};
+                src.ingredients.push_back(lx.make_synth("void", TOKEN::RA_VOID));
+
+                synth.operands.push_back(src);
+            }
+            {
+                auto immediate = ast::Operand{};
+                immediate.ingredients.push_back(lx.make_synth(
+                    std::to_string(remainder), TOKEN::LITERAL_INTEGER));
+
+                synth.operands.push_back(immediate);
+            }
 
             cooked.push_back(synth);
         }
