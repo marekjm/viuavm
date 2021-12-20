@@ -673,34 +673,92 @@ Message sends and receives. Actor rendez-vous.
 
 # I/O requests
 
-Requesting, awaiting, checking status, cancelling, etc.
+The I/O in Viua VM is asynchronous - the submission of a request to perform an
+I/O operation and fetching its result are separated. Synchronous I/O is built on
+top of asynchronous primitives. The cycle of I/O is separated into three main
+stages: submission, completion, and awaiting. Submission and awaiting are
+performed by the user code, while completion is performed by the VM.
 
-- io_read %rd, %rp, %ro     Request a read-style operation described by object
-                            in register %ro to be performed by I/O port stored
-                            in register %rp. The resulting request descriptor is
-                            stored in register %rd.
-- io_write %rd, %rp, %ro    ditto, for write requests
-- io_do %rd, %rp, %ro       Request an arbitrary I/O operation described by
-                            object in register %ro to be performed by I/O port
-                            stored in register %rp. The resulting request
-                            descriptor is stored in register %rd. This is
-                            similar to the ioctl(2) mechanism of POSIX systems.
-- io_cancel %rd             Cancel an outstanding I/O operation described by
-                            object in register %rd. This is an inherently racy
-                            operation as the I/O request may have already been
-                            carried out and the outside world may have been
-                            affected.
-- io_await %rd, %rt         Wait until the I/O request described by request
-                            descriptor in register %rd changes status, but no
-                            longer than the time specified by limiting object in
-                            register %rt.
-- io_awaitv %rd, %rt        Same as io_await, but %rd is a vector of request
-                            descriptors.
-- io_status %rs, %rd        Fetch status of I/O request described by request
-                            descriptor in register %rd. FIXME Maybe merge this
-                            with the io_await opcode?
-- io_shutdown %rd, %rp
-- io_close %rd, %rp
+Submission is non-blocking. A program prepares and submits an I/O request to the
+VM, which consumes the request and immediately returns a proxy allowing the user
+code to inquire about the status of the in-flight I/O request and, once the
+requires is completed, retrieve its result.
+The basic code is presented below. An I/O request is prepared and stored in
+register %rr. It is submitted to the VM's I/O subsystem to be carried out
+through an I/O port in register %rp. The in-flight operation's descriptor is
+stored in register %rd.
+
+    io_submit %rd, %rp, %ro
+
+Awaiting is non-blocking by default, but can be made to block a calling process
+until a certain timeout passes. The in-flight operation's descriptor is stored
+in register %rd, the timeout in register %rt, and the result is produced in
+register %rs.
+
+    io_wait %rs, %rd, %rt
+
+The io_wait instruction retrieves an I/O operation's result or produces an
+exception if it is unable to do so ie, if the I/O operation in question has not
+completed in time.
+
+To inquire about the status of the I/O operation but not retrieve its result the
+io_peek instruction is used:
+
+    io_peek %rs, %rd
+
+Waiting for state changes a la epoll(7) is not needed because to wait for
+readability it is sufficient to supply a read request and io_wait for its
+completion -- no special instruction is needed.
+
+The I/O request can be in one of the following states:
+
+- in-flight: the request is submitted and is awaiting execution
+- executing: the request is currently being executed
+- finished: the request has completed successfully
+- errored: the request has completed unsuccessfully
+- cancelled: the request has completed without attempting execution
+
+An I/O request can be cancelled while it's in-flight. Once it gets to an
+executing or one of the completed states it's no longer possible to cancel the
+request. This is inherently racy so cancelling should be used sparingly and with
+extreme caution on the user side. On the VM's side, however, cancelling is
+useful error-signalling mechanism.
+
+The I/O port mentioned earlier is a structure that is able to execute I/O
+requests. It may be a proxy for a physical hardware or some kind of a software
+device eg, another process, or a database.
+
+The port is constructed and destroyed in a port-specific manner, as different
+devices have different needs. What is common to all ports, though, is that they
+may be shut down. Even if the logic is port-specific the act of shutting down a
+port MUST appear somewhere in the program.
+
+A port should be shut down implicitly by its destructor, but if destruction is
+required earlier the io_shutdown instruction should be used to trigger the shut
+down:
+
+    io_shutdown %rd, %rp, void
+    io_shutdown %rd, %rp, %ro
+
+If the third operand is void the port should be shut down according to the
+default behaviour, but it may be acceptable for a port to receive a value
+specifying how it should be shut down. For example -- sockets may shut down
+either their read end, write end, or both.
+
+Shutting down is also asynchronous and returns a descriptor of the shutdown
+operation. It may be awaited using the usual methods.
+
+The last, but not least, I/O instruction is the io_ctl. It allows tweaking
+various aspects of ports and descriptors, and its behaviour is entirely defined
+by the objects it acts on. It only acts as a proxy through which this
+configuration is done:
+
+    io_ctl %rv, %rp, %rc
+
+In the example above, register %rc contains some configuration, %rp contains an
+I/O port, and %rv contains the value produced as a response from the port. The
+%rc MUST never be void, but the %rv may be void after the io_ctl instruction is
+retired.
 
 ================================================================================
 
