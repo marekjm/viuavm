@@ -362,6 +362,16 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "ref";
     case OPCODE::IF:
         return greedy + "if";
+    case OPCODE::IO_SUBMIT:
+        return greedy + "io_submit";
+    case OPCODE::IO_WAIT:
+        return greedy + "io_wait";
+    case OPCODE::IO_SHUTDOWN:
+        return greedy + "io_shutdown";
+    case OPCODE::IO_CTL:
+        return greedy + "io_ctl";
+    case OPCODE::IO_PEEK:
+        return greedy + "io_peek";
     }
 
     return "<unknown>";
@@ -486,6 +496,16 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::STRUCT_REMOVE));
     } else if (sv == "if") {
         return (op | static_cast<opcode_type>(OPCODE::IF));
+    } else if (sv == "io_submit") {
+        return (op | static_cast<opcode_type>(OPCODE::IO_SUBMIT));
+    } else if (sv == "io_wait") {
+        return (op | static_cast<opcode_type>(OPCODE::IO_WAIT));
+    } else if (sv == "io_shutdown") {
+        return (op | static_cast<opcode_type>(OPCODE::IO_SHUTDOWN));
+    } else if (sv == "io_ctl") {
+        return (op | static_cast<opcode_type>(OPCODE::IO_CTL));
+    } else if (sv == "io_peek") {
+        return (op | static_cast<opcode_type>(OPCODE::IO_PEEK));
     } else {
         throw std::invalid_argument{"viua::arch::ops::parse_opcode: "
                                     + std::string{raw}};

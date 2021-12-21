@@ -1355,6 +1355,22 @@ auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
     tt.overwrite().make_void();
     return target;
 }
+
+auto execute(IO_SUBMIT const, Stack&, ip_type const) -> void
+{
+}
+auto execute(IO_WAIT const, Stack&, ip_type const) -> void
+{
+}
+auto execute(IO_SHUTDOWN const, Stack&, ip_type const) -> void
+{
+}
+auto execute(IO_CTL const, Stack&, ip_type const) -> void
+{
+}
+auto execute(IO_PEEK const, Stack&, ip_type const) -> void
+{
+}
 }  // namespace viua::vm::ins
 
 namespace viua {

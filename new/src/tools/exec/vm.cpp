@@ -155,6 +155,18 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
         case OPCODE_T::STRUCT_REMOVE:
             execute(STRUCT_REMOVE{instruction}, stack, ip);
             break;
+        case OPCODE_T::IO_SUBMIT:
+            execute(IO_SUBMIT{instruction}, stack, ip);
+            break;
+        case OPCODE_T::IO_WAIT:
+            execute(IO_WAIT{instruction}, stack, ip);
+            break;
+        case OPCODE_T::IO_SHUTDOWN:
+            execute(IO_SHUTDOWN{instruction}, stack, ip);
+            break;
+        case OPCODE_T::IO_CTL:
+            execute(IO_CTL{instruction}, stack, ip);
+            break;
         }
         break;
     }
@@ -317,6 +329,9 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
              * why the return is used instead of break.
              */
             return execute(IF{instruction}, stack, ip);
+        case OPCODE_D::IO_PEEK:
+            execute(IO_PEEK{instruction}, stack, ip);
+            break;
         }
         break;
     }

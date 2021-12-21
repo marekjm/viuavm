@@ -230,6 +230,17 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "if",
     "g.if",
 
+    "g.io_submit",
+    "io_submit",
+    "g.io_wait",
+    "io_wait",
+    "g.io_shutdown",
+    "io_shutdown",
+    "g.io_ctl",
+    "io_ctl",
+    "g.io_peek",
+    "io_peek",
+
     /*
      * Pseudoinstructions listed below.
      */

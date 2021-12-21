@@ -416,6 +416,37 @@ struct IF : Instruction {
     IF(viua::arch::ops::D i) : instruction{i}
     {}
 };
+
+struct IO_SUBMIT : Instruction {
+    viua::arch::ops::T instruction;
+
+    IO_SUBMIT(viua::arch::ops::T i) : instruction{i}
+    {}
+};
+struct IO_WAIT : Instruction {
+    viua::arch::ops::T instruction;
+
+    IO_WAIT(viua::arch::ops::T i) : instruction{i}
+    {}
+};
+struct IO_SHUTDOWN : Instruction {
+    viua::arch::ops::T instruction;
+
+    IO_SHUTDOWN(viua::arch::ops::T i) : instruction{i}
+    {}
+};
+struct IO_CTL : Instruction {
+    viua::arch::ops::T instruction;
+
+    IO_CTL(viua::arch::ops::T i) : instruction{i}
+    {}
+};
+struct IO_PEEK : Instruction {
+    viua::arch::ops::D instruction;
+
+    IO_PEEK(viua::arch::ops::D i) : instruction{i}
+    {}
+};
 }  // namespace viua::arch::ins
 
 #endif

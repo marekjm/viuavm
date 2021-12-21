@@ -103,6 +103,12 @@ Work_instruction(REF);
 Flow_instruction(IF);
 
 Work_instruction(EBREAK);
+
+Work_instruction(IO_SUBMIT);
+Work_instruction(IO_WAIT);
+Work_instruction(IO_SHUTDOWN);
+Work_instruction(IO_CTL);
+Work_instruction(IO_PEEK);
 }  // namespace viua::vm::ins
 
 #endif
