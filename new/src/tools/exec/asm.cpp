@@ -1315,7 +1315,7 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes,
 
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
-                throw Error{e, Cause::Unknown, "invalid opcode: " + e.text};
+                throw Error{e, Cause::Unknown_opcode, e.text};
             }
             auto format = static_cast<FORMAT>(opcode & FORMAT_MASK);
             switch (format) {
@@ -1787,6 +1787,10 @@ auto display_error_in_function(std::string_view source_path,
 
 auto main(int argc, char* argv[]) -> int
 {
+    if (argc == 1) {
+        return 1;
+    }
+
     auto args = std::vector<std::string_view>{};
     std::copy(argv + 1, argv + argc, std::back_inserter(args));
 
@@ -1813,10 +1817,50 @@ auto main(int argc, char* argv[]) -> int
     auto source_text       = std::string{};
     {
         auto const source_fd = open(source_path.data(), O_RDONLY);
+        if (source_fd == -1) {
+            using viua::support::tty::COLOR_FG_WHITE;
+            using viua::support::tty::COLOR_FG_RED;
+            using viua::support::tty::ATTR_RESET;
+            using viua::support::tty::send_escape_seq;
+            constexpr auto esc = send_escape_seq;
+
+            auto const error_message = strerrordesc_np(errno);
+            std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+                      << ": "
+                      << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+                      << ": " << error_message << "\n";
+            return 1;
+        }
 
         struct stat source_stat {
         };
-        fstat(source_fd, &source_stat);
+        if (fstat(source_fd, &source_stat) == -1) {
+            using viua::support::tty::COLOR_FG_WHITE;
+            using viua::support::tty::COLOR_FG_RED;
+            using viua::support::tty::ATTR_RESET;
+            using viua::support::tty::send_escape_seq;
+            constexpr auto esc = send_escape_seq;
+
+            auto const error_message = strerrordesc_np(errno);
+            std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+                      << ": "
+                      << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+                      << ": " << error_message << "\n";
+            return 1;
+        }
+        if (source_stat.st_size == 0) {
+            using viua::support::tty::COLOR_FG_WHITE;
+            using viua::support::tty::COLOR_FG_RED;
+            using viua::support::tty::ATTR_RESET;
+            using viua::support::tty::send_escape_seq;
+            constexpr auto esc = send_escape_seq;
+
+            std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+                      << ": "
+                      << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+                      << ": empty source file\n";
+            return 1;
+        }
 
         std::cerr << source_stat.st_size
                   << " byte(s) of source code to process from " << source_path
