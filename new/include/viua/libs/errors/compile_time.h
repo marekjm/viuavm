@@ -48,6 +48,8 @@ enum class Cause {
 
     Value_out_of_range,
     Invalid_operand,
+
+    Duplicated_entry_point,
 };
 auto to_string(Cause const) -> std::string_view;
 

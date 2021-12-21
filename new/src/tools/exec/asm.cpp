@@ -378,7 +378,7 @@ auto parse_attr_list(
     while ((not lexemes.empty())
            and lexemes.front() != TOKEN::ATTR_LIST_CLOSE) {
         auto key   = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
-        auto value = std::optional<viua::libs::lexer::Lexeme>{};
+        auto value = viua::libs::lexer::Lexeme{};
 
         if (look_ahead(TOKEN::EQ, lexemes)) {
             consume_token_of(TOKEN::EQ, lexemes);
@@ -392,6 +392,12 @@ auto parse_attr_list(
             } else {
                 throw lexemes.front();
             }
+        } else {
+            /*
+             * If the attribute does not have a value, use the key as the value.
+             * This way we never have "valueless" attributes.
+             */
+            value = key;
         }
 
         attrs.emplace_back(std::move(key), std::move(value));
@@ -2167,6 +2173,17 @@ auto main(int argc, char* argv[]) -> int
     auto entry_point_fn = std::optional<viua::libs::lexer::Lexeme>{};
     for (auto const& each : nodes) {
         if (each->has_attr("entry_point")) {
+            if (entry_point_fn.has_value()) {
+                using viua::libs::errors::compile_time::Cause;
+                using viua::libs::errors::compile_time::Error;
+
+                auto const dup = static_cast<ast::Fn_def&>(*each);
+                auto const e = Error{
+                    dup.name, Cause::Duplicated_entry_point, dup.name.text}
+                    .add(dup.attr("entry_point").value())
+                    .note("first entry point was: " + entry_point_fn->text);
+                display_error_and_exit(source_path, source_text, e);
+            }
             entry_point_fn = static_cast<ast::Fn_def&>(*each).name;
         }
     }

@@ -43,6 +43,8 @@ auto to_string(Cause const ce) -> std::string_view
         return "value out of range";
     case Cause::Invalid_operand:
         return "invalid operand";
+    case Cause::Duplicated_entry_point:
+        return "duplicated entry point";
     }
     return "illegal error";
 }
