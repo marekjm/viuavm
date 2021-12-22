@@ -1,2 +1,2 @@
-[1.l] struct = {"key" = 43}
+[1.l] struct = {key = 43}
 [3.l] *int = 43

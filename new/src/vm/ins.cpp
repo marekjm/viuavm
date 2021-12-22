@@ -1248,7 +1248,7 @@ auto execute(STRUCT_AT const op, Stack& stack, ip_type const ip) -> void
     }
 
     auto& str = src.boxed_of<viua::vm::types::Struct>().value().get();
-    auto k    = key.boxed_of<viua::vm::types::Atom>().value().get().to_string();
+    auto k    = key.boxed_of<viua::vm::types::Atom>().value().get().content;
     auto& v   = str.at(k);
 
     using viua::vm::types::Float_double;
@@ -1286,7 +1286,7 @@ auto execute(STRUCT_INSERT const op, Stack& stack, ip_type const ip) -> void
                               "invalid destination operand for struct_insert"};
     }
 
-    auto k    = key.boxed_of<viua::vm::types::Atom>().value().get().to_string();
+    auto k    = key.boxed_of<viua::vm::types::Atom>().value().get().content;
     auto& str = dst.boxed_of<viua::vm::types::Struct>().value().get();
     str.insert(k, std::move(src.overwrite().value_cell()));
 }
@@ -1303,7 +1303,7 @@ auto execute(STRUCT_REMOVE const op, Stack& stack, ip_type const ip) -> void
         throw abort_execution{ip, "cannot struct_remove with a void value"};
     }
 
-    auto k    = key.boxed_of<viua::vm::types::Atom>().value().get().to_string();
+    auto k    = key.boxed_of<viua::vm::types::Atom>().value().get().content;
     auto& str = src.boxed_of<viua::vm::types::Struct>().value().get();
 
     auto v = str.remove(k);
