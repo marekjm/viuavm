@@ -35,6 +35,9 @@ CXXFLAGS=\
 		 $(CXXFLAGS_WARNING) \
 		 $(CXXFLAGS_INCLUDE)
 
+CXXLIBS=\
+		-luring
+
 
 ################################################################################
 # High-level targets
@@ -103,7 +106,7 @@ watch-tests:
 ################################################################################
 # Template rules
 $(BUILD)/%: $(BUILD)/%.o
-	$(CXX) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
 
 $(BUILD)/%.o: ./src/%.cpp
 	@mkdir -p $(shell dirname $@)

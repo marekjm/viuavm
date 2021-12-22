@@ -1356,11 +1356,43 @@ auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
     return target;
 }
 
-auto execute(IO_SUBMIT const, Stack&, ip_type const) -> void
+auto execute(IO_SUBMIT const op, Stack& stack, ip_type const ip) -> void
 {
+    auto dst[[maybe_unused]] = get_proxy(stack, op.instruction.out, ip);
+    auto port = get_value(stack, op.instruction.lhs, ip);
+    auto req = get_value(stack, op.instruction.rhs, ip).boxed_of<viua::vm::types::Struct>();
+
+    io_uring_sqe* sqe {};
+
+    if (not port.holds<int64_t>()) {
+        throw abort_execution{ip, "invalid I/O port"};
+    }
+
+    constexpr auto SQE_MARKER = 42;
+
+    auto& request = req.value().get();
+    switch (request.at("opcode").get<int64_t>()) {
+        case 0:
+            // READ
+            break;
+        case 1: {
+            sqe = io_uring_get_sqe(&stack.ring);
+            sqe->opcode = IORING_OP_WRITE;
+            sqe->fd = port.get<int64_t>();
+            auto const& buf = req.value().get().at("buf").view().boxed_of<viua::vm::types::String>()->get().content;
+            sqe->addr = reinterpret_cast<uint64_t>(buf.c_str());
+            sqe->len = buf.size() + 1;
+            sqe->user_data = SQE_MARKER;
+            io_uring_submit(&stack.ring);
+            break;
+        }
+    }
 }
-auto execute(IO_WAIT const, Stack&, ip_type const) -> void
+auto execute(IO_WAIT const, Stack& stack, ip_type const) -> void
 {
+    io_uring_cqe* cqe {};
+    io_uring_wait_cqe(&stack.ring, &cqe);
+    io_uring_cqe_seen(&stack.ring, cqe);
 }
 auto execute(IO_SHUTDOWN const, Stack&, ip_type const) -> void
 {

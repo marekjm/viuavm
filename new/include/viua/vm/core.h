@@ -23,6 +23,8 @@
 #include <endian.h>
 #include <string.h>
 
+#include <liburing.h>
+
 #include <exception>
 #include <memory>
 #include <optional>
@@ -250,12 +252,21 @@ struct Frame {
 struct Stack {
     using addr_type = viua::arch::instruction_type const*;
 
+    inline static constexpr auto IO_URING_ENTRIES = size_t{4096};
+    io_uring ring;
     Env const& environment;
     std::vector<Frame> frames;
     std::vector<Value> args;
 
     explicit inline Stack(Env const& env) : environment{env}
-    {}
+    {
+        io_uring_queue_init(IO_URING_ENTRIES, &ring, 0);
+    }
+    inline ~Stack()
+    {
+        io_uring_queue_exit(&ring);
+    }
+
     Stack(Stack const&) = delete;
     Stack(Stack&&)      = default;
     auto operator=(Stack const&) -> Stack& = delete;

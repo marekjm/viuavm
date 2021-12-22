@@ -131,6 +131,7 @@ struct Atom
         , traits::Eq {
     std::string content;
 
+    auto atom() const -> std::string_view const;
     auto type_name() const -> std::string override;
     auto to_string() const -> std::string override;
     auto operator()(traits::Eq const&, Cell_view const&) const
