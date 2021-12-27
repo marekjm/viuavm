@@ -25,7 +25,7 @@ namespace viua::vm {
 auto IO_scheduler::schedule(int const fd, opcode_type const opcode, buffer_type buffer) -> IO_request::id_type
 {
     auto const req_id = next_id.fetch_add(1);
-    auto req = std::make_unique<IO_request>(req_id, std::move(buffer));
+    auto req = std::make_unique<IO_request>(req_id, opcode, std::move(buffer));
 
     io_uring_sqe* sqe {};
     sqe = io_uring_get_sqe(&ring);

@@ -255,20 +255,24 @@ struct IO_request {
     using id_type = uint64_t;
     id_type const id {};
 
+    using opcode_type = decltype(io_uring_sqe::opcode);
+    opcode_type const opcode {};
+
     using buffer_type = std::string;
     buffer_type buffer {};
 
     enum class Status {
         In_flight,
         Executing,
-        Finished,
-        Errored,
-        Cancelled,
+        Success,
+        Error,
+        Cancel,
     };
     Status status { Status::In_flight };
 
-    inline IO_request(id_type const i, buffer_type b)
+    inline IO_request(id_type const i, opcode_type const o, buffer_type b)
         : id{i}
+        , opcode{o}
         , buffer{b}
     {}
 };

@@ -116,6 +116,9 @@ struct String
         , traits::Plus {
     std::string content;
 
+    String() = default;
+    inline explicit String(std::string s): content{std::move(s)} {}
+
     auto type_name() const -> std::string override;
     auto to_string() const -> std::string override;
     explicit operator bool() const override;

@@ -1368,21 +1368,46 @@ auto execute(IO_SUBMIT const op, Stack& stack, ip_type const ip) -> void
 
     auto& request = req.value().get();
     switch (request.at("opcode").get<int64_t>()) {
-        case 0:
-            // READ
+        case 0: {
+            auto buf = std::move(req.value().get().at("buf").view().boxed_of<viua::vm::types::String>()->get().content);
+            auto const rd = stack.io.schedule(port.get<int64_t>(), IORING_OP_READ, std::move(buf));
+            dst = rd;
             break;
+        }
         case 1: {
             auto buf = std::move(req.value().get().at("buf").view().boxed_of<viua::vm::types::String>()->get().content);
-            stack.io.schedule(port.get<int64_t>(), IORING_OP_WRITE, std::move(buf));
+            auto const rd = stack.io.schedule(port.get<int64_t>(), IORING_OP_WRITE, std::move(buf));
+            dst = rd;
             break;
         }
     }
 }
-auto execute(IO_WAIT const, Stack& stack, ip_type const) -> void
+auto execute(IO_WAIT const op, Stack& stack, ip_type const ip) -> void
 {
+    auto dst = get_proxy(stack, op.instruction.out, ip);
+    auto req = get_value(stack, op.instruction.lhs, ip);
+
     io_uring_cqe* cqe {};
-    io_uring_wait_cqe(&stack.io.ring, &cqe);
-    io_uring_cqe_seen(&stack.io.ring, cqe);
+    do {
+        io_uring_wait_cqe(&stack.io.ring, &cqe);
+
+        if (cqe->res == -1) {
+            stack.io.requests[cqe->user_data]->status = IO_request::Status::Error;
+        } else {
+            auto& rd = *stack.io.requests[cqe->user_data];
+            rd.status = IO_request::Status::Success;
+
+            if (rd.opcode == IORING_OP_READ) {
+                rd.buffer.resize(cqe->res);
+            } else if (rd.opcode == IORING_OP_WRITE) {
+                rd.buffer = rd.buffer.substr(cqe->res);
+            }
+        }
+
+        io_uring_cqe_seen(&stack.io.ring, cqe);
+    } while (cqe->user_data != req.get<uint64_t>());
+
+    dst = std::make_unique<types::String>(std::move(stack.io.requests[cqe->user_data]->buffer));
 }
 auto execute(IO_SHUTDOWN const, Stack&, ip_type const) -> void
 {
