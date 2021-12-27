@@ -1387,6 +1387,8 @@ auto execute(IO_WAIT const op, Stack& stack, ip_type const ip) -> void
     auto dst = get_proxy(stack, op.instruction.out, ip);
     auto req = get_value(stack, op.instruction.lhs, ip);
 
+    auto const want_id = req.get<uint64_t>();
+
     io_uring_cqe* cqe {};
     do {
         io_uring_wait_cqe(&stack.io.ring, &cqe);
@@ -1405,9 +1407,10 @@ auto execute(IO_WAIT const op, Stack& stack, ip_type const ip) -> void
         }
 
         io_uring_cqe_seen(&stack.io.ring, cqe);
-    } while (cqe->user_data != req.get<uint64_t>());
+    } while (cqe->user_data != want_id);
 
-    dst = std::make_unique<types::String>(std::move(stack.io.requests[cqe->user_data]->buffer));
+    dst = std::make_unique<types::String>(std::move(stack.io.requests[want_id]->buffer));
+    stack.io.requests.erase(want_id);
 }
 auto execute(IO_SHUTDOWN const, Stack&, ip_type const) -> void
 {
