@@ -131,6 +131,7 @@ $(BUILD)/tools/exec/asm.o: \
 
 $(BUILD)/tools/exec/vm: \
 	$(BUILD)/support/string.o \
+	$(BUILD)/vm/core.o \
 	$(BUILD)/vm/ins.o \
 	$(BUILD)/vm/types.o \
 	$(BUILD)/vm/types/traits.o \

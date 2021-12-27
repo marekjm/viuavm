@@ -25,6 +25,8 @@
 
 #include <liburing.h>
 
+#include <atomic>
+#include <unordered_map>
 #include <exception>
 #include <memory>
 #include <optional>
@@ -249,23 +251,63 @@ struct Frame {
     {}
 };
 
+struct IO_request {
+    using id_type = uint64_t;
+    id_type const id {};
+
+    using buffer_type = std::string;
+    buffer_type buffer {};
+
+    enum class Status {
+        In_flight,
+        Executing,
+        Finished,
+        Errored,
+        Cancelled,
+    };
+    Status status { Status::In_flight };
+
+    inline IO_request(id_type const i, buffer_type b)
+        : id{i}
+        , buffer{b}
+    {}
+};
+
+struct IO_scheduler {
+    inline static constexpr auto IO_URING_ENTRIES = size_t{4096};
+    io_uring ring;
+
+    using id_type = std::atomic<IO_request::id_type>;
+    id_type next_id;
+
+    using map_type = std::unordered_map<IO_request::id_type, std::unique_ptr<IO_request>>;
+    map_type requests;
+
+    inline IO_scheduler()
+    {
+        io_uring_queue_init(IO_URING_ENTRIES, &ring, 0);
+    }
+    inline ~IO_scheduler()
+    {
+        io_uring_queue_exit(&ring);
+    }
+
+    using opcode_type = decltype(io_uring_sqe::opcode);
+    using buffer_type = IO_request::buffer_type;
+    auto schedule(int const, opcode_type const, buffer_type) -> IO_request::id_type;
+};
+
 struct Stack {
     using addr_type = viua::arch::instruction_type const*;
 
-    inline static constexpr auto IO_URING_ENTRIES = size_t{4096};
-    io_uring ring;
+    IO_scheduler io;
+
     Env const& environment;
     std::vector<Frame> frames;
     std::vector<Value> args;
 
     explicit inline Stack(Env const& env) : environment{env}
-    {
-        io_uring_queue_init(IO_URING_ENTRIES, &ring, 0);
-    }
-    inline ~Stack()
-    {
-        io_uring_queue_exit(&ring);
-    }
+    {}
 
     Stack(Stack const&) = delete;
     Stack(Stack&&)      = default;
