@@ -50,6 +50,9 @@ enum class Cause {
     Invalid_operand,
 
     Duplicated_entry_point,
+
+    Unknown_type,
+    Unknown_label,
 };
 auto to_string(Cause const) -> std::string_view;
 

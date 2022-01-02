@@ -45,6 +45,10 @@ auto to_string(Cause const ce) -> std::string_view
         return "invalid operand";
     case Cause::Duplicated_entry_point:
         return "duplicated entry point";
+    case Cause::Unknown_type:
+        return "unknown type";
+    case Cause::Unknown_label:
+        return "unknown label";
     }
     return "illegal error";
 }
