@@ -521,6 +521,8 @@ auto main(int argc, char* argv[]) -> int
             read(a_out, fn_table.data(), fn_header.p_filesz);
         }
 
+        close(a_out);
+
         entry_addr = ((elf_header.e_entry - text_header.p_offset)
                       / sizeof(viua::arch::instruction_type));
 
@@ -548,8 +550,6 @@ auto main(int argc, char* argv[]) -> int
             << "[vm] loaded " << fn_header.p_filesz
             << " byte(s) of .rodata (fn table) section from PT_LOAD segment of "
             << executable_path << "\n";
-
-        close(a_out);
     }
 
     auto env            = Env{};
