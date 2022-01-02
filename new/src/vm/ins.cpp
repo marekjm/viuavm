@@ -1345,12 +1345,14 @@ auto execute(REF const op, Stack& stack, ip_type const ip) -> void
 auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
 {
     auto const condition = get_value(stack, op.instruction.out, ip);
-    auto tt = get_proxy(stack, op.instruction.in, ip);
+    auto tt              = get_proxy(stack, op.instruction.in, ip);
 
-    auto take_branch = (condition.holds<void>() or cast_to<uint64_t>(condition));
-    auto const target = take_branch
-        ? (stack.back().entry_address + cast_to<uint64_t>(tt.view()))
-        : (ip + 1);
+    auto take_branch =
+        (condition.holds<void>() or cast_to<uint64_t>(condition));
+    auto const target =
+        take_branch
+            ? (stack.back().entry_address + cast_to<uint64_t>(tt.view()))
+            : (ip + 1);
 
     tt.overwrite().make_void();
     return target;
@@ -1358,9 +1360,10 @@ auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
 
 auto execute(IO_SUBMIT const op, Stack& stack, ip_type const ip) -> void
 {
-    auto dst[[maybe_unused]] = get_proxy(stack, op.instruction.out, ip);
-    auto port = get_value(stack, op.instruction.lhs, ip);
-    auto req = get_value(stack, op.instruction.rhs, ip).boxed_of<viua::vm::types::Struct>();
+    auto dst [[maybe_unused]] = get_proxy(stack, op.instruction.out, ip);
+    auto port                 = get_value(stack, op.instruction.lhs, ip);
+    auto req                  = get_value(stack, op.instruction.rhs, ip)
+                   .boxed_of<viua::vm::types::Struct>();
 
     if (not port.holds<int64_t>()) {
         throw abort_execution{ip, "invalid I/O port"};
@@ -1368,18 +1371,34 @@ auto execute(IO_SUBMIT const op, Stack& stack, ip_type const ip) -> void
 
     auto& request = req.value().get();
     switch (request.at("opcode").get<int64_t>()) {
-        case 0: {
-            auto buf = std::move(req.value().get().at("buf").view().boxed_of<viua::vm::types::String>()->get().content);
-            auto const rd = stack.io.schedule(port.get<int64_t>(), IORING_OP_READ, std::move(buf));
-            dst = rd;
-            break;
-        }
-        case 1: {
-            auto buf = std::move(req.value().get().at("buf").view().boxed_of<viua::vm::types::String>()->get().content);
-            auto const rd = stack.io.schedule(port.get<int64_t>(), IORING_OP_WRITE, std::move(buf));
-            dst = rd;
-            break;
-        }
+    case 0:
+    {
+        auto buf      = std::move(req.value()
+                                 .get()
+                                 .at("buf")
+                                 .view()
+                                 .boxed_of<viua::vm::types::String>()
+                                 ->get()
+                                 .content);
+        auto const rd = stack.io.schedule(
+            port.get<int64_t>(), IORING_OP_READ, std::move(buf));
+        dst = rd;
+        break;
+    }
+    case 1:
+    {
+        auto buf      = std::move(req.value()
+                                 .get()
+                                 .at("buf")
+                                 .view()
+                                 .boxed_of<viua::vm::types::String>()
+                                 ->get()
+                                 .content);
+        auto const rd = stack.io.schedule(
+            port.get<int64_t>(), IORING_OP_WRITE, std::move(buf));
+        dst = rd;
+        break;
+    }
     }
 }
 auto execute(IO_WAIT const op, Stack& stack, ip_type const ip) -> void
@@ -1389,14 +1408,15 @@ auto execute(IO_WAIT const op, Stack& stack, ip_type const ip) -> void
 
     auto const want_id = req.get<uint64_t>();
     if (not stack.io.requests.contains(want_id)) {
-        io_uring_cqe* cqe {};
+        io_uring_cqe* cqe{};
         do {
             io_uring_wait_cqe(&stack.io.ring, &cqe);
 
             if (cqe->res == -1) {
-                stack.io.requests[cqe->user_data]->status = IO_request::Status::Error;
+                stack.io.requests[cqe->user_data]->status =
+                    IO_request::Status::Error;
             } else {
-                auto& rd = *stack.io.requests[cqe->user_data];
+                auto& rd  = *stack.io.requests[cqe->user_data];
                 rd.status = IO_request::Status::Success;
 
                 if (rd.opcode == IORING_OP_READ) {
@@ -1410,18 +1430,16 @@ auto execute(IO_WAIT const op, Stack& stack, ip_type const ip) -> void
         } while (cqe->user_data != want_id);
     }
 
-    dst = std::make_unique<types::String>(std::move(stack.io.requests[want_id]->buffer));
+    dst = std::make_unique<types::String>(
+        std::move(stack.io.requests[want_id]->buffer));
     stack.io.requests.erase(want_id);
 }
 auto execute(IO_SHUTDOWN const, Stack&, ip_type const) -> void
-{
-}
+{}
 auto execute(IO_CTL const, Stack&, ip_type const) -> void
-{
-}
+{}
 auto execute(IO_PEEK const, Stack&, ip_type const) -> void
-{
-}
+{}
 }  // namespace viua::vm::ins
 
 namespace viua {

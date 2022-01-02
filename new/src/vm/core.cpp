@@ -22,18 +22,21 @@
 
 
 namespace viua::vm {
-auto IO_scheduler::schedule(int const fd, opcode_type const opcode, buffer_type buffer) -> IO_request::id_type
+auto IO_scheduler::schedule(int const fd,
+                            opcode_type const opcode,
+                            buffer_type buffer) -> IO_request::id_type
 {
     auto const req_id = next_id.fetch_add(1);
     auto req = std::make_unique<IO_request>(req_id, opcode, std::move(buffer));
 
-    io_uring_sqe* sqe {};
+    io_uring_sqe* sqe{};
     sqe = io_uring_get_sqe(&ring);
 
     sqe->opcode = opcode;
-    sqe->fd = fd;
-    sqe->addr = reinterpret_cast<decltype(io_uring_sqe::addr)>(req->buffer.data());
-    sqe->len = req->buffer.size();
+    sqe->fd     = fd;
+    sqe->addr =
+        reinterpret_cast<decltype(io_uring_sqe::addr)>(req->buffer.data());
+    sqe->len       = req->buffer.size();
     sqe->user_data = req_id;
 
     io_uring_submit(&ring);
@@ -42,4 +45,4 @@ auto IO_scheduler::schedule(int const fd, opcode_type const opcode, buffer_type 
 
     return req_id;
 }
-}
+}  // namespace viua::vm

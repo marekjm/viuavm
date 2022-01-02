@@ -117,7 +117,8 @@ struct String
     std::string content;
 
     String() = default;
-    inline explicit String(std::string s): content{std::move(s)} {}
+    inline explicit String(std::string s) : content{std::move(s)}
+    {}
 
     auto type_name() const -> std::string override;
     auto to_string() const -> std::string override;

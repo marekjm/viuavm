@@ -128,7 +128,7 @@ const auto COMMENT = std::regex{"^[;#].*"};
 
 const auto DEF_FUNCTION = std::regex{"^.function:"};
 const auto END          = std::regex{"^.end"};
-const auto DEF_LABEL = std::regex{"^.label:"};
+const auto DEF_LABEL    = std::regex{"^.label:"};
 const auto DEF_VALUE    = std::regex{"^.value:"};
 
 const auto WHITESPACE = std::regex{"^[ \t]+"};

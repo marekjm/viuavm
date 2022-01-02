@@ -93,23 +93,23 @@ auto li_cost(uint64_t const value) -> size_t
      */
     auto count = size_t{0};
 
-    auto parts            = to_loading_parts_unsigned(value);
+    auto parts = to_loading_parts_unsigned(value);
     if (parts.first) {
-        ++count; // lui
+        ++count;  // lui
     }
 
     auto const multiplier = parts.second.first.second;
     if (multiplier != 0) {
-        ++count; // g.addiu
-        ++count; // g.addiu
-        ++count; // g.mul
-        ++count; // g.addiu
-        ++count; // g.add
-        ++count; // g.add
-        ++count; // g.delete
-        ++count; // g.delete
+        ++count;  // g.addiu
+        ++count;  // g.addiu
+        ++count;  // g.mul
+        ++count;  // g.addiu
+        ++count;  // g.add
+        ++count;  // g.add
+        ++count;  // g.delete
+        ++count;  // g.delete
     } else {
-        ++count; // addiu
+        ++count;  // addiu
     }
 
     return count;
@@ -163,11 +163,13 @@ auto patch_fn_address(std::vector<uint8_t>& strings,
     memcpy((strings.data() + fn_offset + fn_size), &fn_addr, sizeof(fn_addr));
 }
 
-auto did_you_mean(viua::libs::errors::compile_time::Error& e, std::string what) -> viua::libs::errors::compile_time::Error&
+auto did_you_mean(viua::libs::errors::compile_time::Error& e, std::string what)
+    -> viua::libs::errors::compile_time::Error&
 {
     return e.aside("did you mean \"" + what + "\"?");
 }
-auto did_you_mean(viua::libs::errors::compile_time::Error&& e, std::string what) -> viua::libs::errors::compile_time::Error
+auto did_you_mean(viua::libs::errors::compile_time::Error&& e, std::string what)
+    -> viua::libs::errors::compile_time::Error
 {
     did_you_mean(e, what);
     return e;
@@ -266,7 +268,7 @@ struct Instruction : Node {
     viua::libs::lexer::Lexeme opcode;
     std::vector<Operand> operands;
 
-    size_t physical_index {static_cast<size_t>(-1)};
+    size_t physical_index{static_cast<size_t>(-1)};
 
     auto to_string() const -> std::string override;
     auto parse_opcode() const -> viua::arch::opcode_type;
@@ -473,7 +475,7 @@ auto parse_function_definition(
         consume_token_of({TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING}, lexemes);
     consume_token_of(TOKEN::TERMINATOR, lexemes);
 
-    auto instructions = std::vector<std::unique_ptr<ast::Node>>{};
+    auto instructions       = std::vector<std::unique_ptr<ast::Node>>{};
     auto ins_physical_index = size_t{0};
     while ((not lexemes.empty()) and lexemes.front() != TOKEN::END) {
         auto instruction = ast::Instruction{};
@@ -501,7 +503,8 @@ auto parse_function_definition(
 
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw did_you_mean(Error{e, Cause::Unknown_opcode, e.text}, best_candidate.second);
+            throw did_you_mean(Error{e, Cause::Unknown_opcode, e.text},
+                               best_candidate.second);
         }
 
         /*
@@ -677,7 +680,7 @@ auto parse_constant_definition(
         consume_token_of(TOKEN::DEF_VALUE, lexemes);
 
         auto value_type =
-            consume_token_of({ TOKEN::LITERAL_ATOM, TOKEN::OPCODE }, lexemes);
+            consume_token_of({TOKEN::LITERAL_ATOM, TOKEN::OPCODE}, lexemes);
         auto const known_types = std::set<std::string>{
             /*
              * Only strings allowed. Other types may be added later.
@@ -686,35 +689,41 @@ auto parse_constant_definition(
         };
         if (not known_types.contains(value_type.text)) {
             using viua::support::string::levenshtein_filter;
-            auto misspell_candidates = levenshtein_filter(value_type.text, known_types);
+            auto misspell_candidates =
+                levenshtein_filter(value_type.text, known_types);
             if (misspell_candidates.empty()) {
                 throw value_type;
             }
 
             using viua::support::string::levenshtein_best;
-            auto best_candidate = levenshtein_best(
-                value_type.text, misspell_candidates, (value_type.text.size() / 2));
+            auto best_candidate =
+                levenshtein_best(value_type.text,
+                                 misspell_candidates,
+                                 (value_type.text.size() / 2));
             if (best_candidate.second == value_type.text) {
                 throw value_type;
             }
 
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw did_you_mean(Error{value_type, Cause::Unknown_type, value_type.text}, best_candidate.second);
+            throw did_you_mean(
+                Error{value_type, Cause::Unknown_type, value_type.text},
+                best_candidate.second);
         }
 
         if (value_type.text.front() == 'i' or value_type.text.front() == 'u') {
-            ct->value.push_back(consume_token_of(TOKEN::LITERAL_INTEGER, lexemes));
+            ct->value.push_back(
+                consume_token_of(TOKEN::LITERAL_INTEGER, lexemes));
         } else if (value_type == "float" or value_type == "double") {
-            ct->value.push_back(consume_token_of(TOKEN::LITERAL_FLOAT, lexemes));
+            ct->value.push_back(
+                consume_token_of(TOKEN::LITERAL_FLOAT, lexemes));
         } else if (value_type == "string") {
             do {
-                ct->value.push_back(consume_token_of({
-                      TOKEN::LITERAL_ATOM
-                    , TOKEN::LITERAL_STRING
-                    , TOKEN::LITERAL_INTEGER
-                    , TOKEN::RA_PTR_DEREF
-                }, lexemes));
+                ct->value.push_back(consume_token_of({TOKEN::LITERAL_ATOM,
+                                                      TOKEN::LITERAL_STRING,
+                                                      TOKEN::LITERAL_INTEGER,
+                                                      TOKEN::RA_PTR_DEREF},
+                                                     lexemes));
             } while (not look_ahead(TOKEN::TERMINATOR, lexemes));
         } else if (value_type == "atom") {
             ct->value.push_back(consume_token_of(TOKEN::LITERAL_ATOM, lexemes));
@@ -820,9 +829,9 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
 
     if (multiplier != 0) {
         {
-            auto synth        = ast::Instruction{};
-            synth.opcode      = each.opcode;
-            synth.opcode.text = "g.addiu";
+            auto synth           = ast::Instruction{};
+            synth.opcode         = each.opcode;
+            synth.opcode.text    = "g.addiu";
             synth.physical_index = each.physical_index;
 
             auto const& lx = each.operands.front().ingredients.at(1);
@@ -831,17 +840,19 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             {
                 auto dst = ast::Operand{};
                 dst.ingredients.push_back(lx.make_synth("$", TOKEN::RA_DIRECT));
-                dst.ingredients.push_back(lx.make_synth(
-                    std::to_string(std::stoull(lx.text) + 1),
-                    TOKEN::LITERAL_INTEGER));
+                dst.ingredients.push_back(
+                    lx.make_synth(std::to_string(std::stoull(lx.text) + 1),
+                                  TOKEN::LITERAL_INTEGER));
                 dst.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
-                dst.ingredients.push_back(lx.make_synth("l", TOKEN::LITERAL_ATOM));
+                dst.ingredients.push_back(
+                    lx.make_synth("l", TOKEN::LITERAL_ATOM));
 
                 synth.operands.push_back(dst);
             }
             {
                 auto src = ast::Operand{};
-                src.ingredients.push_back(lx.make_synth("void", TOKEN::RA_VOID));
+                src.ingredients.push_back(
+                    lx.make_synth("void", TOKEN::RA_VOID));
 
                 synth.operands.push_back(src);
             }
@@ -856,9 +867,9 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             cooked.push_back(synth);
         }
         {
-            auto synth        = ast::Instruction{};
-            synth.opcode      = each.opcode;
-            synth.opcode.text = "g.addiu";
+            auto synth           = ast::Instruction{};
+            synth.opcode         = each.opcode;
+            synth.opcode.text    = "g.addiu";
             synth.physical_index = each.physical_index;
 
             auto const& lx = each.operands.front().ingredients.at(1);
@@ -867,17 +878,19 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             {
                 auto dst = ast::Operand{};
                 dst.ingredients.push_back(lx.make_synth("$", TOKEN::RA_DIRECT));
-                dst.ingredients.push_back(lx.make_synth(
-                    std::to_string(std::stoull(lx.text) + 2),
-                    TOKEN::LITERAL_INTEGER));
+                dst.ingredients.push_back(
+                    lx.make_synth(std::to_string(std::stoull(lx.text) + 2),
+                                  TOKEN::LITERAL_INTEGER));
                 dst.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
-                dst.ingredients.push_back(lx.make_synth("l", TOKEN::LITERAL_ATOM));
+                dst.ingredients.push_back(
+                    lx.make_synth("l", TOKEN::LITERAL_ATOM));
 
                 synth.operands.push_back(dst);
             }
             {
                 auto src = ast::Operand{};
-                src.ingredients.push_back(lx.make_synth("void", TOKEN::RA_VOID));
+                src.ingredients.push_back(
+                    lx.make_synth("void", TOKEN::RA_VOID));
 
                 synth.operands.push_back(src);
             }
@@ -892,9 +905,9 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             cooked.push_back(synth);
         }
         {
-            auto synth        = ast::Instruction{};
-            synth.opcode      = each.opcode;
-            synth.opcode.text = "g.mul";
+            auto synth           = ast::Instruction{};
+            synth.opcode         = each.opcode;
+            synth.opcode.text    = "g.mul";
             synth.physical_index = each.physical_index;
 
             synth.operands.push_back(each.operands.front());
@@ -914,9 +927,9 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
 
         auto const remainder = parts.second.second;
         {
-            auto synth        = ast::Instruction{};
-            synth.opcode      = each.opcode;
-            synth.opcode.text = "g.addiu";
+            auto synth           = ast::Instruction{};
+            synth.opcode         = each.opcode;
+            synth.opcode.text    = "g.addiu";
             synth.physical_index = each.physical_index;
 
             auto const& lx = each.operands.front().ingredients.at(1);
@@ -925,17 +938,19 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             {
                 auto dst = ast::Operand{};
                 dst.ingredients.push_back(lx.make_synth("$", TOKEN::RA_DIRECT));
-                dst.ingredients.push_back(lx.make_synth(
-                    std::to_string(std::stoull(lx.text) + 2),
-                    TOKEN::LITERAL_INTEGER));
+                dst.ingredients.push_back(
+                    lx.make_synth(std::to_string(std::stoull(lx.text) + 2),
+                                  TOKEN::LITERAL_INTEGER));
                 dst.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
-                dst.ingredients.push_back(lx.make_synth("l", TOKEN::LITERAL_ATOM));
+                dst.ingredients.push_back(
+                    lx.make_synth("l", TOKEN::LITERAL_ATOM));
 
                 synth.operands.push_back(dst);
             }
             {
                 auto src = ast::Operand{};
-                src.ingredients.push_back(lx.make_synth("void", TOKEN::RA_VOID));
+                src.ingredients.push_back(
+                    lx.make_synth("void", TOKEN::RA_VOID));
 
                 synth.operands.push_back(src);
             }
@@ -950,9 +965,9 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             cooked.push_back(synth);
         }
         {
-            auto synth        = ast::Instruction{};
-            synth.opcode      = each.opcode;
-            synth.opcode.text = "g.add";
+            auto synth           = ast::Instruction{};
+            synth.opcode         = each.opcode;
+            synth.opcode.text    = "g.add";
             synth.physical_index = each.physical_index;
 
             synth.operands.push_back(each.operands.front());
@@ -968,9 +983,9 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             cooked.push_back(synth);
         }
         {
-            auto synth        = ast::Instruction{};
-            synth.opcode      = each.opcode;
-            synth.opcode.text = "g.add";
+            auto synth           = ast::Instruction{};
+            synth.opcode         = each.opcode;
+            synth.opcode.text    = "g.add";
             synth.physical_index = each.physical_index;
 
             synth.operands.push_back(each.operands.front());
@@ -984,9 +999,9 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
         }
 
         {
-            auto synth        = ast::Instruction{};
-            synth.opcode      = each.opcode;
-            synth.opcode.text = "g.delete";
+            auto synth           = ast::Instruction{};
+            synth.opcode         = each.opcode;
+            synth.opcode.text    = "g.delete";
             synth.physical_index = each.physical_index;
 
             synth.operands.push_back(each.operands.front());
@@ -997,9 +1012,9 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
         }
         {
             using namespace std::string_literals;
-            auto synth        = ast::Instruction{};
-            synth.opcode      = each.opcode;
-            synth.opcode.text = (is_greedy ? "g." : "") + "delete"s;
+            auto synth           = ast::Instruction{};
+            synth.opcode         = each.opcode;
+            synth.opcode.text    = (is_greedy ? "g." : "") + "delete"s;
             synth.physical_index = each.physical_index;
 
             synth.operands.push_back(each.operands.front());
@@ -1010,9 +1025,9 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
         }
     } else {
         using namespace std::string_literals;
-        auto synth        = ast::Instruction{};
-        synth.opcode      = each.opcode;
-        synth.opcode.text = (is_greedy ? "g." : "") + "addi"s;
+        auto synth           = ast::Instruction{};
+        synth.opcode         = each.opcode;
+        synth.opcode.text    = (is_greedy ? "g." : "") + "addi"s;
         synth.physical_index = each.physical_index;
         if (is_unsigned) {
             synth.opcode.text += 'u';
@@ -1059,19 +1074,20 @@ auto expand_if(std::vector<ast::Instruction>& cooked,
      * - we have to adjust the target index also by the difference
      *   between logical and physical instruction count
      */
-    auto address_load = std::vector<ast::Instruction>{};
+    auto address_load             = std::vector<ast::Instruction>{};
     auto prev_address_load_length = address_load.size();
     constexpr auto MAX_SIZE_OF_LI = size_t{9};
     do {
         prev_address_load_length = address_load.size();
         address_load.clear();
 
-        auto const branch_target = l2p.at(std::stoull(each.operands.back().to_string()));
+        auto const branch_target =
+            l2p.at(std::stoull(each.operands.back().to_string()));
 
         auto li = ast::Instruction{};
         {
-            li.opcode      = each.opcode;
-            li.opcode.text = "g.li";
+            li.opcode         = each.opcode;
+            li.opcode.text    = "g.li";
             li.physical_index = each.physical_index;
 
             using viua::libs::lexer::TOKEN;
@@ -1079,17 +1095,18 @@ auto expand_if(std::vector<ast::Instruction>& cooked,
             {
                 auto reg = ast::Operand{};
                 reg.ingredients.push_back(lx.make_synth("$", TOKEN::RA_DIRECT));
-                reg.ingredients.push_back(lx.make_synth("253", TOKEN::LITERAL_INTEGER));
+                reg.ingredients.push_back(
+                    lx.make_synth("253", TOKEN::LITERAL_INTEGER));
                 reg.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
-                reg.ingredients.push_back(lx.make_synth("l", TOKEN::LITERAL_ATOM));
+                reg.ingredients.push_back(
+                    lx.make_synth("l", TOKEN::LITERAL_ATOM));
                 li.operands.push_back(reg);
             }
             {
                 auto br = ast::Operand{};
-                br.ingredients.push_back(lx.make_synth(
-                    std::to_string(branch_target) + 'u',
-                    TOKEN::LITERAL_INTEGER
-                ));
+                br.ingredients.push_back(
+                    lx.make_synth(std::to_string(branch_target) + 'u',
+                                  TOKEN::LITERAL_INTEGER));
                 li.operands.push_back(br);
             }
         }
@@ -1102,8 +1119,10 @@ auto expand_if(std::vector<ast::Instruction>& cooked,
          * cook the same code twice in some cases.
          */
         expand_li(address_load, li);
-    } while (address_load.size() < MAX_SIZE_OF_LI and prev_address_load_length != address_load.size());
-    std::copy(address_load.begin(), address_load.end(), std::back_inserter(cooked));
+    } while (address_load.size() < MAX_SIZE_OF_LI
+             and prev_address_load_length != address_load.size());
+    std::copy(
+        address_load.begin(), address_load.end(), std::back_inserter(cooked));
 
     using viua::libs::lexer::TOKEN;
     auto reg = each.operands.back();
@@ -1147,10 +1166,10 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
      * li -- Loading Integer constants. It is used to store integers in
      * registers, as well as addresses for calls, jumps, and ifs.
      */
-    auto physical_ops = size_t{0};
-    auto logical_ops = size_t{0};
+    auto physical_ops       = size_t{0};
+    auto logical_ops        = size_t{0};
     auto branch_ops_baggage = size_t{0};
-    auto l2p = std::map<size_t, size_t>{};
+    auto l2p                = std::map<size_t, size_t>{};
 
     /*
      * First, we cook the sequence of raw instructions expanding non-control
@@ -1171,7 +1190,7 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
     auto cooked = std::vector<ast::Instruction>{};
     for (auto& each : raw) {
         physical_ops = each.physical_index;
-        l2p.insert({ physical_ops, logical_ops + branch_ops_baggage });
+        l2p.insert({physical_ops, logical_ops + branch_ops_baggage});
 
         // FIXME remove checking for "g.li" here to test errors with synthesized
         // instructions
@@ -1324,9 +1343,11 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
          * g.noop's as padding. Yeah, that could work, I guess.
          */
         if (each.opcode == "if" or each.opcode == "g.if") {
-            branch_ops_baggage += li_cost(std::stoull(each.operands.back().to_string()));
+            branch_ops_baggage +=
+                li_cost(std::stoull(each.operands.back().to_string()));
         } else if (each.opcode == "jump" or each.opcode == "g.jump") {
-            branch_ops_baggage += li_cost(std::stoull(each.operands.back().to_string()));
+            branch_ops_baggage +=
+                li_cost(std::stoull(each.operands.back().to_string()));
         }
     }
 
@@ -1343,9 +1364,9 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
              * default-value register. Thanks RISC-V for the idea of hardwired
              * r0!
              */
-            auto as_if = ast::Instruction{};
-            as_if.opcode      = each.opcode;
-            as_if.opcode.text = (each.opcode == "jump") ? "if" : "g.if";
+            auto as_if           = ast::Instruction{};
+            as_if.opcode         = each.opcode;
+            as_if.opcode.text    = (each.opcode == "jump") ? "if" : "g.if";
             as_if.physical_index = each.physical_index;
 
             {
@@ -1356,10 +1377,8 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
                  */
                 auto condition = ast::Operand{};
                 auto const& lx = each.operands.front().ingredients.front();
-                condition.ingredients.push_back(lx.make_synth(
-                    "void",
-                    viua::libs::lexer::TOKEN::RA_VOID
-                ));
+                condition.ingredients.push_back(
+                    lx.make_synth("void", viua::libs::lexer::TOKEN::RA_VOID));
                 as_if.operands.push_back(condition);
             }
 
@@ -1378,7 +1397,6 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
              */
             baked.push_back(std::move(each));
         }
-
     }
 
     return baked;
@@ -1989,46 +2007,46 @@ auto main(int argc, char* argv[]) -> int
     {
         auto const source_fd = open(source_path.data(), O_RDONLY);
         if (source_fd == -1) {
-            using viua::support::tty::COLOR_FG_WHITE;
-            using viua::support::tty::COLOR_FG_RED;
             using viua::support::tty::ATTR_RESET;
+            using viua::support::tty::COLOR_FG_RED;
+            using viua::support::tty::COLOR_FG_WHITE;
             using viua::support::tty::send_escape_seq;
             constexpr auto esc = send_escape_seq;
 
             auto const error_message = strerrordesc_np(errno);
-            std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
-                      << ": "
-                      << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                      << ": " << error_message << "\n";
+            std::cerr << esc(2, COLOR_FG_WHITE) << source_path
+                      << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                      << "error" << esc(2, ATTR_RESET) << ": " << error_message
+                      << "\n";
             return 1;
         }
 
         struct stat source_stat {
         };
         if (fstat(source_fd, &source_stat) == -1) {
-            using viua::support::tty::COLOR_FG_WHITE;
-            using viua::support::tty::COLOR_FG_RED;
             using viua::support::tty::ATTR_RESET;
+            using viua::support::tty::COLOR_FG_RED;
+            using viua::support::tty::COLOR_FG_WHITE;
             using viua::support::tty::send_escape_seq;
             constexpr auto esc = send_escape_seq;
 
             auto const error_message = strerrordesc_np(errno);
-            std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
-                      << ": "
-                      << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                      << ": " << error_message << "\n";
+            std::cerr << esc(2, COLOR_FG_WHITE) << source_path
+                      << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                      << "error" << esc(2, ATTR_RESET) << ": " << error_message
+                      << "\n";
             return 1;
         }
         if (source_stat.st_size == 0) {
-            using viua::support::tty::COLOR_FG_WHITE;
-            using viua::support::tty::COLOR_FG_RED;
             using viua::support::tty::ATTR_RESET;
+            using viua::support::tty::COLOR_FG_RED;
+            using viua::support::tty::COLOR_FG_WHITE;
             using viua::support::tty::send_escape_seq;
             constexpr auto esc = send_escape_seq;
 
-            std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
-                      << ": "
-                      << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+            std::cerr << esc(2, COLOR_FG_WHITE) << source_path
+                      << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                      << "error" << esc(2, ATTR_RESET)
                       << ": empty source file\n";
             return 1;
         }
@@ -2240,16 +2258,23 @@ auto main(int argc, char* argv[]) -> int
                 using enum viua::libs::lexer::TOKEN;
                 if (each.token == LITERAL_STRING) {
                     auto tmp = each.text;
-                    tmp = tmp.substr(1, tmp.size() - 2);
-                    tmp = viua::support::string::unescape(tmp);
+                    tmp      = tmp.substr(1, tmp.size() - 2);
+                    tmp      = viua::support::string::unescape(tmp);
                     s += tmp;
                 } else if (each.token == RA_PTR_DEREF) {
                     auto& next = ct.value.at(++i);
                     if (next.token != LITERAL_INTEGER) {
-                        using viua::libs::errors::compile_time::Error;
                         using viua::libs::errors::compile_time::Cause;
+                        using viua::libs::errors::compile_time::Error;
 
-                        auto const e = Error{each, Cause::Invalid_operand, "cannot multiply string constant by non-integer"}.add(next).add(ct.value.at(i - 2)).aside("right-hand side must be an positive integer");
+                        auto const e = Error{each,
+                                             Cause::Invalid_operand,
+                                             "cannot multiply string constant "
+                                             "by non-integer"}
+                                           .add(next)
+                                           .add(ct.value.at(i - 2))
+                                           .aside("right-hand side must be an "
+                                                  "positive integer");
                         display_error_and_exit(source_path, source_text, e);
                     }
 
@@ -2292,9 +2317,9 @@ auto main(int argc, char* argv[]) -> int
                 }
                 auto const saved_at = save_string(strings_table, s);
 
-                auto synth        = ast::Instruction{};
-                synth.opcode      = insn.opcode;
-                synth.opcode.text = "g.li";
+                auto synth           = ast::Instruction{};
+                synth.opcode         = insn.opcode;
+                synth.opcode.text    = "g.li";
                 synth.physical_index = insn.physical_index;
 
                 synth.operands.push_back(insn.operands.front());
@@ -2310,25 +2335,28 @@ auto main(int argc, char* argv[]) -> int
                 auto const lx = insn.operands.back().ingredients.front();
                 auto saved_at = size_t{0};
                 if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
-                    auto s = lx.text;
-                    s      = s.substr(1, s.size() - 2);
-                    s      = viua::support::string::unescape(s);
+                    auto s   = lx.text;
+                    s        = s.substr(1, s.size() - 2);
+                    s        = viua::support::string::unescape(s);
                     saved_at = save_string(strings_table, s);
                 } else if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
                     try {
                         saved_at = var_offsets.at(lx.text);
                     } catch (std::out_of_range const&) {
-                        using viua::libs::errors::compile_time::Error;
                         using viua::libs::errors::compile_time::Cause;
+                        using viua::libs::errors::compile_time::Error;
 
                         auto e = Error{lx, Cause::Unknown_label, lx.text};
 
                         using viua::support::string::levenshtein_filter;
-                        auto misspell_candidates = levenshtein_filter(lx.text, var_offsets);
+                        auto misspell_candidates =
+                            levenshtein_filter(lx.text, var_offsets);
                         if (not misspell_candidates.empty()) {
                             using viua::support::string::levenshtein_best;
-                            auto best_candidate = levenshtein_best(
-                                lx.text, misspell_candidates, (lx.text.size() / 2));
+                            auto best_candidate =
+                                levenshtein_best(lx.text,
+                                                 misspell_candidates,
+                                                 (lx.text.size() / 2));
                             if (best_candidate.second != lx.text) {
                                 did_you_mean(e, best_candidate.second);
                             }
@@ -2338,17 +2366,18 @@ auto main(int argc, char* argv[]) -> int
                         display_error_and_exit(source_path, source_text, e);
                     }
                 } else {
-                    using viua::libs::errors::compile_time::Error;
                     using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
 
-                    auto const e = Error{lx, Cause::Invalid_operand}.aside("expected string literal, or a label");
+                    auto const e = Error{lx, Cause::Invalid_operand}.aside(
+                        "expected string literal, or a label");
                     display_error_in_function(source_path, e, fn.name.text);
                     display_error_and_exit(source_path, source_text, e);
                 }
 
-                auto synth        = ast::Instruction{};
-                synth.opcode      = insn.opcode;
-                synth.opcode.text = "g.li";
+                auto synth           = ast::Instruction{};
+                synth.opcode         = insn.opcode;
+                synth.opcode.text    = "g.li";
                 synth.physical_index = insn.physical_index;
 
                 synth.operands.push_back(insn.operands.front());
@@ -2368,9 +2397,9 @@ auto main(int argc, char* argv[]) -> int
                 memcpy(s.data(), &f, SIZE_OF_SINGLE_PRECISION_FLOAT);
                 auto const saved_at = save_string(strings_table, s);
 
-                auto synth        = ast::Instruction{};
-                synth.opcode      = insn.opcode;
-                synth.opcode.text = "g.li";
+                auto synth           = ast::Instruction{};
+                synth.opcode         = insn.opcode;
+                synth.opcode.text    = "g.li";
                 synth.physical_index = insn.physical_index;
 
                 synth.operands.push_back(insn.operands.front());
@@ -2390,9 +2419,9 @@ auto main(int argc, char* argv[]) -> int
                 memcpy(s.data(), &f, SIZE_OF_DOUBLE_PRECISION_FLOAT);
                 auto const saved_at = save_string(strings_table, s);
 
-                auto synth        = ast::Instruction{};
-                synth.opcode      = insn.opcode;
-                synth.opcode.text = "g.li";
+                auto synth           = ast::Instruction{};
+                synth.opcode         = insn.opcode;
+                synth.opcode.text    = "g.li";
                 synth.physical_index = insn.physical_index;
 
                 synth.operands.push_back(insn.operands.front());
@@ -2434,15 +2463,13 @@ auto main(int argc, char* argv[]) -> int
 
         if constexpr (DEBUG_EXPANSION) {
             std::cerr << "FN " << fn.to_string() << " with " << raw_ops_count
-                      << " raw, " << fn.instructions.size()
-                      << " baked op(s)\n";
+                      << " raw, " << fn.instructions.size() << " baked op(s)\n";
             auto physical_index = size_t{0};
             for (auto const& op : fn.instructions) {
-                std::cerr << "  "
-                    << std::setw(4) << std::setfill('0') << std::hex << physical_index++
-                    << " "
-                    << std::setw(4) << std::setfill('0') << std::hex << op.physical_index
-                    << "  " << op.to_string() << "\n";
+                std::cerr << "  " << std::setw(4) << std::setfill('0')
+                          << std::hex << physical_index++ << " " << std::setw(4)
+                          << std::setfill('0') << std::hex << op.physical_index
+                          << "  " << op.to_string() << "\n";
             }
         }
     }
@@ -2463,10 +2490,11 @@ auto main(int argc, char* argv[]) -> int
                 using viua::libs::errors::compile_time::Error;
 
                 auto const dup = static_cast<ast::Fn_def&>(*each);
-                auto const e = Error{
-                    dup.name, Cause::Duplicated_entry_point, dup.name.text}
-                    .add(dup.attr("entry_point").value())
-                    .note("first entry point was: " + entry_point_fn->text);
+                auto const e =
+                    Error{
+                        dup.name, Cause::Duplicated_entry_point, dup.name.text}
+                        .add(dup.attr("entry_point").value())
+                        .note("first entry point was: " + entry_point_fn->text);
                 display_error_and_exit(source_path, source_text, e);
             }
             entry_point_fn = static_cast<ast::Fn_def&>(*each).name;

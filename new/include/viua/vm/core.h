@@ -21,18 +21,17 @@
 #define VIUA_VM_CORE_H
 
 #include <endian.h>
+#include <liburing.h>
 #include <string.h>
 
-#include <liburing.h>
-
 #include <atomic>
-#include <unordered_map>
 #include <exception>
 #include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <unordered_map>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -253,13 +252,13 @@ struct Frame {
 
 struct IO_request {
     using id_type = uint64_t;
-    id_type const id {};
+    id_type const id{};
 
     using opcode_type = decltype(io_uring_sqe::opcode);
-    opcode_type const opcode {};
+    opcode_type const opcode{};
 
     using buffer_type = std::string;
-    buffer_type buffer {};
+    buffer_type buffer{};
 
     enum class Status {
         In_flight,
@@ -268,12 +267,10 @@ struct IO_request {
         Error,
         Cancel,
     };
-    Status status { Status::In_flight };
+    Status status{Status::In_flight};
 
     inline IO_request(id_type const i, opcode_type const o, buffer_type b)
-        : id{i}
-        , opcode{o}
-        , buffer{b}
+            : id{i}, opcode{o}, buffer{b}
     {}
 };
 
@@ -284,7 +281,8 @@ struct IO_scheduler {
     using id_type = std::atomic<IO_request::id_type>;
     id_type next_id;
 
-    using map_type = std::unordered_map<IO_request::id_type, std::unique_ptr<IO_request>>;
+    using map_type =
+        std::unordered_map<IO_request::id_type, std::unique_ptr<IO_request>>;
     map_type requests;
 
     inline IO_scheduler()
@@ -298,7 +296,8 @@ struct IO_scheduler {
 
     using opcode_type = decltype(io_uring_sqe::opcode);
     using buffer_type = IO_request::buffer_type;
-    auto schedule(int const, opcode_type const, buffer_type) -> IO_request::id_type;
+    auto schedule(int const, opcode_type const, buffer_type)
+        -> IO_request::id_type;
 };
 
 struct Stack {
