@@ -369,8 +369,6 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
             continue;
         }
 
-        std::cerr << viua::support::string::quoted(source_text.substr(0, 40))
-                  << "\n";
         throw Location{line, character, offset};
     }
 

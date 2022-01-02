@@ -2033,10 +2033,6 @@ auto main(int argc, char* argv[]) -> int
             return 1;
         }
 
-        std::cerr << source_stat.st_size
-                  << " byte(s) of source code to process from " << source_path
-                  << "\n";
-
         source_text.resize(source_stat.st_size);
         read(source_fd, source_text.data(), source_text.size());
         close(source_fd);
