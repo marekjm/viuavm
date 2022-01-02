@@ -162,6 +162,16 @@ auto patch_fn_address(std::vector<uint8_t>& strings,
     fn_addr = htole64(fn_addr);
     memcpy((strings.data() + fn_offset + fn_size), &fn_addr, sizeof(fn_addr));
 }
+
+auto did_you_mean(viua::libs::errors::compile_time::Error& e, std::string what) -> viua::libs::errors::compile_time::Error&
+{
+    return e.aside("did you mean \"" + what + "\"?");
+}
+auto did_you_mean(viua::libs::errors::compile_time::Error&& e, std::string what) -> viua::libs::errors::compile_time::Error
+{
+    did_you_mean(e, what);
+    return e;
+}
 }  // anonymous namespace
 
 namespace ast {
@@ -470,8 +480,7 @@ auto parse_function_definition(
 
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{e, Cause::Unknown_opcode, e.text}.aside(
-                "did you mean \"" + best_candidate.second + "\"?");
+            throw did_you_mean(Error{e, Cause::Unknown_opcode, e.text}, best_candidate.second);
         }
 
         /*
