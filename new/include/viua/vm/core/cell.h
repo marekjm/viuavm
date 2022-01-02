@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021 Marek Marecki
+ *  Copyright (C) 2021-2022 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
