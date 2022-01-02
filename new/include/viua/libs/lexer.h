@@ -78,6 +78,8 @@ enum class TOKEN {
      */
     DEF_FUNCTION,
     DEF_BLOCK,
+    DEF_LABEL,
+    DEF_VALUE,
     END,
 
     /*

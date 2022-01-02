@@ -108,6 +108,10 @@ auto to_string(TOKEN const token) -> std::string
         return "DEF_FUNCTION";
     case TOKEN::DEF_BLOCK:
         return "DEF_BLOCK";
+    case TOKEN::DEF_LABEL:
+        return "DEF_LABEL";
+    case TOKEN::DEF_VALUE:
+        return "DEF_VALUE";
     case TOKEN::END:
         return "END";
     case TOKEN::WHITESPACE:
@@ -124,6 +128,8 @@ const auto COMMENT = std::regex{"^[;#].*"};
 
 const auto DEF_FUNCTION = std::regex{"^.function:"};
 const auto END          = std::regex{"^.end"};
+const auto DEF_LABEL = std::regex{"^.label:"};
+const auto DEF_VALUE    = std::regex{"^.value:"};
 
 const auto WHITESPACE = std::regex{"^[ \t]+"};
 
@@ -273,6 +279,12 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
             continue;
         }
         if (try_match(END, TOKEN::END)) {
+            continue;
+        }
+        if (try_match(DEF_LABEL, TOKEN::DEF_LABEL)) {
+            continue;
+        }
+        if (try_match(DEF_VALUE, TOKEN::DEF_VALUE)) {
             continue;
         }
         if (try_match(COMMA, TOKEN::COMMA)) {

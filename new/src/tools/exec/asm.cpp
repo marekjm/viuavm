@@ -320,6 +320,27 @@ auto Fn_def::to_string() const -> std::string
            + name.text;
 }
 
+struct Label_def : Node {
+    viua::libs::lexer::Lexeme name;
+    viua::libs::lexer::Lexeme type;
+    std::vector<viua::libs::lexer::Lexeme> value;
+
+    viua::libs::lexer::Lexeme start;
+    viua::libs::lexer::Lexeme end;
+
+    auto to_string() const -> std::string override;
+
+    virtual ~Label_def() = default;
+};
+auto Label_def::to_string() const -> std::string
+{
+    return viua::libs::lexer::to_string(viua::libs::lexer::TOKEN::DEF_LABEL)
+           + ' ' + std::to_string(name.location.line + 1) + ':'
+           + std::to_string(name.location.character + 1) + '-'
+           + std::to_string(name.location.character + name.text.size()) + ' '
+           + name.text;
+}
+
 auto remove_noise(std::vector<viua::libs::lexer::Lexeme> raw)
     -> std::vector<viua::libs::lexer::Lexeme>
 {
@@ -605,6 +626,109 @@ auto parse_function_definition(
     return fn;
 }
 
+template<typename T> auto ston(std::string const& s) -> T
+{
+    if constexpr (std::is_signed_v<T>) {
+        auto const full_width = std::stoll(s);
+        auto const want_width = static_cast<T>(full_width);
+        if (full_width != want_width) {
+            throw std::out_of_range{"ston"};
+        }
+        return want_width;
+    } else {
+        auto const full_width = std::stoull(s);
+        auto const want_width = static_cast<T>(full_width);
+        if (full_width != want_width) {
+            throw std::out_of_range{"ston"};
+        }
+        return want_width;
+    }
+}
+auto parse_constant_definition(
+    viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes)
+    -> std::unique_ptr<ast::Node>
+{
+    auto ct = std::make_unique<ast::Label_def>();
+
+    using viua::libs::lexer::TOKEN;
+    ct->start = consume_token_of(TOKEN::DEF_LABEL, lexemes);
+
+    if (look_ahead(TOKEN::ATTR_LIST_OPEN, lexemes)) {
+        ct->attributes = parse_attr_list(lexemes);
+    }
+
+    auto ct_name =
+        consume_token_of({TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING}, lexemes);
+    consume_token_of(TOKEN::TERMINATOR, lexemes);
+
+    {
+        /*
+         * Constant definitions are spread on two lines: the first one gives the
+         * name of the constant ie, the symbol by which it can be referenced;
+         * and the second gives the value of the constant. It should look like
+         * this:
+         *
+         *      .const: <name>
+         *      .value: <type> <value-expression>
+         *
+         * Allowed value expressions depend on the type of the value, and each
+         * is special cased to provide features useful for that kind of values.
+         */
+        consume_token_of(TOKEN::DEF_VALUE, lexemes);
+
+        auto value_type =
+            consume_token_of({ TOKEN::LITERAL_ATOM, TOKEN::OPCODE }, lexemes);
+        auto const known_types = std::set<std::string>{
+            /*
+             * Only strings allowed. Other types may be added later.
+             */
+            "string",
+        };
+        if (not known_types.contains(value_type.text)) {
+            using viua::support::string::levenshtein_filter;
+            auto misspell_candidates = levenshtein_filter(value_type.text, known_types);
+            if (misspell_candidates.empty()) {
+                throw value_type;
+            }
+
+            using viua::support::string::levenshtein_best;
+            auto best_candidate = levenshtein_best(
+                value_type.text, misspell_candidates, (value_type.text.size() / 2));
+            if (best_candidate.second == value_type.text) {
+                throw value_type;
+            }
+
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+            throw did_you_mean(Error{value_type, Cause::Unknown_type, value_type.text}, best_candidate.second);
+        }
+
+        if (value_type.text.front() == 'i' or value_type.text.front() == 'u') {
+            ct->value.push_back(consume_token_of(TOKEN::LITERAL_INTEGER, lexemes));
+        } else if (value_type == "float" or value_type == "double") {
+            ct->value.push_back(consume_token_of(TOKEN::LITERAL_FLOAT, lexemes));
+        } else if (value_type == "string") {
+            do {
+                ct->value.push_back(consume_token_of({
+                      TOKEN::LITERAL_ATOM
+                    , TOKEN::LITERAL_STRING
+                    , TOKEN::LITERAL_INTEGER
+                    , TOKEN::RA_PTR_DEREF
+                }, lexemes));
+            } while (not look_ahead(TOKEN::TERMINATOR, lexemes));
+        } else if (value_type == "atom") {
+            ct->value.push_back(consume_token_of(TOKEN::LITERAL_ATOM, lexemes));
+        }
+
+        ct->type = std::move(value_type);
+        consume_token_of(TOKEN::TERMINATOR, lexemes);
+    }
+
+    ct->name = std::move(ct_name);
+
+    return ct;
+}
+
 auto parse(viua::support::vector_view<viua::libs::lexer::Lexeme> lexemes)
     -> std::vector<std::unique_ptr<ast::Node>>
 {
@@ -616,6 +740,9 @@ auto parse(viua::support::vector_view<viua::libs::lexer::Lexeme> lexemes)
         using viua::libs::lexer::TOKEN;
         if (each.token == TOKEN::DEF_FUNCTION) {
             auto node = parse_function_definition(lexemes);
+            nodes.push_back(std::move(node));
+        } else if (each.token == TOKEN::DEF_LABEL) {
+            auto node = parse_constant_definition(lexemes);
             nodes.push_back(std::move(node));
         } else {
             throw each;
@@ -2084,8 +2211,48 @@ auto main(int argc, char* argv[]) -> int
      * preparation so they need to be expanded.
      */
     auto strings_table = std::vector<uint8_t>{};
+    auto var_offsets   = std::map<std::string, size_t>{};
     auto fn_table      = std::vector<uint8_t>{};
     auto fn_offsets    = std::map<std::string, size_t>{};
+    for (auto const& each : nodes) {
+        if (dynamic_cast<ast::Label_def*>(each.get()) == nullptr) {
+            continue;
+        }
+
+        auto& ct = static_cast<ast::Label_def&>(*each);
+        if (ct.type == "string") {
+            auto s = std::string{};
+            for (auto i = size_t{0}; i < ct.value.size(); ++i) {
+                auto& each = ct.value.at(i);
+
+                using enum viua::libs::lexer::TOKEN;
+                if (each.token == LITERAL_STRING) {
+                    auto tmp = each.text;
+                    tmp = tmp.substr(1, tmp.size() - 2);
+                    tmp = viua::support::string::unescape(tmp);
+                    s += tmp;
+                } else if (each.token == RA_PTR_DEREF) {
+                    auto& next = ct.value.at(++i);
+                    if (next.token != LITERAL_INTEGER) {
+                        using viua::libs::errors::compile_time::Error;
+                        using viua::libs::errors::compile_time::Cause;
+
+                        auto const e = Error{each, Cause::Invalid_operand, "cannot multiply string constant by non-integer"}.add(next).add(ct.value.at(i - 2)).aside("right-hand side must be an positive integer");
+                        display_error_and_exit(source_path, source_text, e);
+                    }
+
+                    auto x = ston<size_t>(next.text);
+                    auto o = std::ostringstream{};
+                    for (auto i = size_t{0}; i < x; ++i) {
+                        o << s;
+                    }
+                    s = o.str();
+                }
+            }
+
+            var_offsets[ct.name.text] = save_string(strings_table, s);
+        }
+    }
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
             continue;
@@ -2128,10 +2295,44 @@ auto main(int argc, char* argv[]) -> int
                 insn.operands.pop_back();
                 cooked.push_back(std::move(insn));
             } else if (insn.opcode == "string" or insn.opcode == "g.string") {
-                auto s = insn.operands.back().ingredients.front().text;
-                s      = s.substr(1, s.size() - 2);
-                s      = viua::support::string::unescape(s);
-                auto const saved_at = save_string(strings_table, s);
+                auto const lx = insn.operands.back().ingredients.front();
+                auto saved_at = size_t{0};
+                if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
+                    auto s = lx.text;
+                    s      = s.substr(1, s.size() - 2);
+                    s      = viua::support::string::unescape(s);
+                    saved_at = save_string(strings_table, s);
+                } else if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
+                    try {
+                        saved_at = var_offsets.at(lx.text);
+                    } catch (std::out_of_range const&) {
+                        using viua::libs::errors::compile_time::Error;
+                        using viua::libs::errors::compile_time::Cause;
+
+                        auto e = Error{lx, Cause::Unknown_label, lx.text};
+
+                        using viua::support::string::levenshtein_filter;
+                        auto misspell_candidates = levenshtein_filter(lx.text, var_offsets);
+                        if (not misspell_candidates.empty()) {
+                            using viua::support::string::levenshtein_best;
+                            auto best_candidate = levenshtein_best(
+                                lx.text, misspell_candidates, (lx.text.size() / 2));
+                            if (best_candidate.second != lx.text) {
+                                did_you_mean(e, best_candidate.second);
+                            }
+                        }
+
+                        display_error_in_function(source_path, e, fn.name.text);
+                        display_error_and_exit(source_path, source_text, e);
+                    }
+                } else {
+                    using viua::libs::errors::compile_time::Error;
+                    using viua::libs::errors::compile_time::Cause;
+
+                    auto const e = Error{lx, Cause::Invalid_operand}.aside("expected string literal, or a label");
+                    display_error_in_function(source_path, e, fn.name.text);
+                    display_error_and_exit(source_path, source_text, e);
+                }
 
                 auto synth        = ast::Instruction{};
                 synth.opcode      = insn.opcode;
