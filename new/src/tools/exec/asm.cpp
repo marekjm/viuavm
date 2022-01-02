@@ -2201,7 +2201,7 @@ auto main(int argc, char* argv[]) -> int
         std::vector<std::pair<std::string, std::pair<size_t, size_t>>>{};
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
-            return 0;
+            continue;
         }
 
         auto& fn = static_cast<ast::Fn_def&>(*each);
