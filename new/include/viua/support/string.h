@@ -20,6 +20,7 @@
 #ifndef VIUA_SUPPORT_STRING_H
 #define VIUA_SUPPORT_STRING_H
 
+#include <map>
 #include <set>
 #include <string>
 #include <string_view>
@@ -42,6 +43,18 @@ auto levenshtein_filter(std::string const,
                         std::set<std::string> const&,
                         LevenshteinDistance const = LevenshteinDistance{
                             0xffffffffffffffff}) -> std::set<DistancePair>;
+template<typename T>
+auto levenshtein_filter(std::string const needle,
+                        std::map<std::string, T> const& haystack,
+                        LevenshteinDistance const dist = LevenshteinDistance{
+                            0xffffffffffffffff}) -> std::set<DistancePair>
+{
+    auto candidates = std::set<std::string>{};
+    for (auto const& each : haystack) {
+        candidates.insert(each.first);
+    }
+    return levenshtein_filter(needle, candidates, dist);
+}
 auto levenshtein_best(std::string const,
                       std::set<DistancePair> const&,
                       LevenshteinDistance const) -> DistancePair;
