@@ -1566,28 +1566,44 @@ namespace {
 auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
     -> std::string_view
 {
-    // std::cerr
-    //     << "want line of " << loc.line
-    //     << " (from offset +" << loc.offset
-    //     << ")\n";
+    /*
+     * We want to get a view of a single line out of a view of the entire source
+     * code. This task can be achieved by finding the newlines before and after
+     * the offset at which out location is located, and cutting the portion of
+     * the string inside these two bounds.
+     */
     {
+        /*
+         * The ending newline is easy - just find the next occurence after the
+         * location we are interested in. If no can be found then we have
+         * nothing to do because the line we want to view is the last line of
+         * the source code.
+         */
         auto line_end = size_t{0};
         line_end      = sv.find('\n', loc.offset);
-        // std::cerr << "  ends at " << line_end << "\n";
 
         if (line_end != std::string::npos) {
             sv.remove_suffix(sv.size() - line_end);
         }
     }
     {
+        /*
+         * The starting newline is tricky. We need to find it, but if we do not
+         * then it means that the line we want to view is the very fist line of
+         * the source code...
+         */
         auto line_begin = size_t{0};
         line_begin      = sv.rfind('\n', (loc.offset ? (loc.offset - 1) : 0));
-        if (line_begin == std::string::npos) {
-            line_begin = 0;
-        }
-        // std::cerr << "  begins at " << line_begin << "\n";
 
-        sv.remove_prefix(line_begin + 1);
+        /*
+         * ...and we have to treat it a little bit different. For any other line
+         * we increase the beginning offset by 1 (to skip the actual newline
+         * character), and for the first one we substitute the npos for 0 (to
+         * start from the beginning).
+         */
+        line_begin = (line_begin == std::string::npos) ? 0 : (line_begin + 1);
+
+        sv.remove_prefix(line_begin);
     }
 
     return sv;
