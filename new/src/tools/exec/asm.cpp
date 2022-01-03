@@ -2493,12 +2493,38 @@ auto main(int argc, char* argv[]) -> int
     auto args = std::vector<std::string_view>{};
     std::copy(argv + 1, argv + argc, std::back_inserter(args));
 
-    auto output_path = std::filesystem::path{"a.out"};
+    auto output_path     = std::filesystem::path{"a.out"};
+    auto verbosity_level = 0;
+    auto show_version    = false;
+
     for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
         auto const& each = args.at(i);
-        if (each == "-o") {
+        if (each == "--") {
+            // explicit separator of options and operands
+            ++i;
+            break;
+        } else if (each == "-o") {
             output_path = args.at(++i);
+        } else if (each == "-v") {
+            ++verbosity_level;
+        } else if (each == "--version") {
+            show_version = true;
+        } else if (each.front() == '-') {
+            // unknown option
+        } else {
+            // input files start here
+            ++i;
+            break;
         }
+    }
+
+    if (show_version) {
+        if (verbosity_level) {
+            std::cout << "Viua VM assembler ";
+        }
+        std::cout << (verbosity_level ? VIUAVM_VERSION_FULL : VIUAVM_VERSION)
+                  << "\n";
+        return 0;
     }
 
     /*

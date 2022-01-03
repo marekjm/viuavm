@@ -10,6 +10,10 @@ CORE_LIB_DIR=$(CORE_DIR)/lib
 CORE_MAN_DIR=$(CORE_DIR)/man
 
 
+VIUAVM_VERSION=$(shell sh ./scripts/make_version.sh)
+VIUAVM_VERSION_FULL=$(shell sh ./scripts/make_version.sh full)
+
+
 ################################################################################
 # Compilation flags
 CXX=g++
@@ -31,6 +35,8 @@ CXXFLAGS_INCLUDE=\
 CXXFLAGS=\
 		 -std=$(CXXSTD) \
 		 -O$(OPTIMISE) \
+		 -DVIUAVM_VERSION='"$(VIUAVM_VERSION)"' \
+		 -DVIUAVM_VERSION_FULL='"$(VIUAVM_VERSION_FULL)"' \
 		 $(CXXFLAGS_OPTIMISATION) \
 		 $(CXXFLAGS_WARNING) \
 		 $(CXXFLAGS_INCLUDE)
