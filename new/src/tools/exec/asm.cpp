@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <filesystem>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -1665,79 +1666,6 @@ auto view_line_after(std::string_view sv, viua::libs::lexer::Location loc)
     return sv;
 }
 
-auto display_error_and_exit [[noreturn]] (std::string_view source_path,
-                                          std::string_view source_text,
-                                          viua::libs::lexer::Lexeme const& e)
--> void
-{
-    using viua::support::tty::ATTR_RESET;
-    using viua::support::tty::COLOR_FG_ORANGE_RED_1;
-    using viua::support::tty::COLOR_FG_RED;
-    using viua::support::tty::COLOR_FG_RED_1;
-    using viua::support::tty::COLOR_FG_WHITE;
-    using viua::support::tty::send_escape_seq;
-    constexpr auto esc = send_escape_seq;
-
-    auto const SEPARATOR         = std::string{" |  "};
-    constexpr auto LINE_NO_WIDTH = size_t{5};
-
-    auto source_line    = std::ostringstream{};
-    auto highlight_line = std::ostringstream{};
-
-    std::cerr << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR << "\n";
-
-    {
-        auto const location = e.location;
-
-        auto line = view_line_of(source_text, location);
-
-        source_line << esc(2, COLOR_FG_RED) << std::setw(LINE_NO_WIDTH)
-                    << (location.line + 1) << esc(2, ATTR_RESET) << SEPARATOR;
-        highlight_line << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR;
-
-        source_line << std::string_view{line.data(), location.character};
-        highlight_line << std::string(location.character, ' ');
-        line.remove_prefix(location.character);
-
-        /*
-         * This if is required because of TERMINATOR tokens in unexpected
-         * places. In case a TERMINATOR token is the cause of the error it
-         * will not appear in line. If we attempted to shift line's head, it
-         * would be removing a prefix from an empty std::string_view which
-         * is undefined behaviour.
-         *
-         * I think the "bad TERMINATOR" is the only situation when this is
-         * important.
-         *
-         * When it happens, we just don't print the terminator (which is a
-         * newline), because a newline character will be added anyway.
-         */
-        if (not line.empty()) {
-            source_line << esc(2, COLOR_FG_RED_1) << e.text
-                        << esc(2, ATTR_RESET);
-            line.remove_prefix(e.text.size());
-        }
-        highlight_line << esc(2, COLOR_FG_RED) << '^';
-        highlight_line << esc(2, COLOR_FG_ORANGE_RED_1)
-                       << std::string((e.text.size() - 1), '~');
-
-        source_line << line;
-    }
-
-    std::cerr << source_line.str() << "\n";
-    std::cerr << highlight_line.str() << "\n";
-
-    std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
-              << ':' << esc(2, COLOR_FG_WHITE) << (e.location.line + 1)
-              << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
-              << (e.location.character + 1) << esc(2, ATTR_RESET) << ": "
-              << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
-              << "unexpected token: " << viua::libs::lexer::to_string(e.token)
-              << "\n";
-
-    exit(1);
-}
-
 auto cook_spans(
     std::vector<viua::libs::errors::compile_time::Error::span_type> raw)
     -> std::vector<std::tuple<bool, size_t, size_t>>
@@ -1773,7 +1701,7 @@ auto cook_spans(
     return cooked;
 }
 auto display_error_and_exit
-    [[noreturn]] (std::string_view source_path,
+    [[noreturn]] (std::filesystem::path source_path,
                   std::string_view source_text,
                   viua::libs::errors::compile_time::Error const& e) -> void
 {
@@ -1932,7 +1860,8 @@ auto display_error_and_exit
             std::cerr << each << "\n";
         } else {
             auto const prefix_length =
-                source_path.size() + std::to_string(e.line() + 1).size()
+                source_path.string().size()
+                + std::to_string(e.line() + 1).size()
                 + std::to_string(e.character() + 1).size() + 6  // for ": note"
                 + 2  // for ":" after source path and line number
                 ;
@@ -1951,7 +1880,7 @@ auto display_error_and_exit
     exit(1);
 }
 
-auto display_error_in_function(std::string_view source_path,
+auto display_error_in_function(std::filesystem::path const source_path,
                                viua::libs::errors::compile_time::Error const& e,
                                std::string_view const fn_name) -> void
 {
@@ -1974,98 +1903,15 @@ auto display_error_in_function(std::string_view source_path,
 }
 }  // namespace
 
-auto main(int argc, char* argv[]) -> int
+namespace stage {
+using Lexemes   = std::vector<viua::libs::lexer::Lexeme>;
+using AST_nodes = std::vector<std::unique_ptr<ast::Node>>;
+
+auto lexical_analysis(std::filesystem::path const source_path,
+                      std::string_view const source_text) -> Lexemes
 {
-    if (argc == 1) {
-        return 1;
-    }
-
-    auto args = std::vector<std::string_view>{};
-    std::copy(argv + 1, argv + argc, std::back_inserter(args));
-
-    auto output_path = std::string{"a.out"};
-    for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
-        auto const& each = args.at(i);
-        if (each == "-o") {
-            output_path = args.at(++i);
-        }
-    }
-
-    /*
-     * If invoked *with* some arguments, find the path to the source file and
-     * assemble it - converting assembly source code into binary. Produced
-     * binary may be:
-     *
-     *  - executable (default): an ELF executable, suitable to be run by Viua VM
-     *    kernel
-     *  - linkable (with -c flag): an ELF relocatable object file, which should
-     *    be linked with other object files to produce a final executable or
-     *    shared object
-     */
-    auto const source_path = args.back();
-    auto source_text       = std::string{};
-    {
-        auto const source_fd = open(source_path.data(), O_RDONLY);
-        if (source_fd == -1) {
-            using viua::support::tty::ATTR_RESET;
-            using viua::support::tty::COLOR_FG_RED;
-            using viua::support::tty::COLOR_FG_WHITE;
-            using viua::support::tty::send_escape_seq;
-            constexpr auto esc = send_escape_seq;
-
-            auto const error_message = strerrordesc_np(errno);
-            std::cerr << esc(2, COLOR_FG_WHITE) << source_path
-                      << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                      << "error" << esc(2, ATTR_RESET) << ": " << error_message
-                      << "\n";
-            return 1;
-        }
-
-        struct stat source_stat {
-        };
-        if (fstat(source_fd, &source_stat) == -1) {
-            using viua::support::tty::ATTR_RESET;
-            using viua::support::tty::COLOR_FG_RED;
-            using viua::support::tty::COLOR_FG_WHITE;
-            using viua::support::tty::send_escape_seq;
-            constexpr auto esc = send_escape_seq;
-
-            auto const error_message = strerrordesc_np(errno);
-            std::cerr << esc(2, COLOR_FG_WHITE) << source_path
-                      << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                      << "error" << esc(2, ATTR_RESET) << ": " << error_message
-                      << "\n";
-            return 1;
-        }
-        if (source_stat.st_size == 0) {
-            using viua::support::tty::ATTR_RESET;
-            using viua::support::tty::COLOR_FG_RED;
-            using viua::support::tty::COLOR_FG_WHITE;
-            using viua::support::tty::send_escape_seq;
-            constexpr auto esc = send_escape_seq;
-
-            std::cerr << esc(2, COLOR_FG_WHITE) << source_path
-                      << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                      << "error" << esc(2, ATTR_RESET)
-                      << ": empty source file\n";
-            return 1;
-        }
-
-        source_text.resize(source_stat.st_size);
-        read(source_fd, source_text.data(), source_text.size());
-        close(source_fd);
-    }
-
-    /*
-     * Lexical analysis (lexing).
-     *
-     * Split the loaded source code into a stream of lexemes for easier
-     * processing later. The first point at which errors are detected eg, if
-     * illegal characters are used, strings are unclosed, etc.
-     */
-    auto lexemes = std::vector<viua::libs::lexer::Lexeme>{};
     try {
-        lexemes = viua::libs::lexer::lex(source_text);
+        return viua::libs::lexer::lex(source_text);
     } catch (viua::libs::lexer::Location const& location) {
         using viua::support::tty::ATTR_RESET;
         using viua::support::tty::COLOR_FG_ORANGE_RED_1;
@@ -2139,111 +1985,31 @@ auto main(int argc, char* argv[]) -> int
                   << esc(2, COLOR_FG_WHITE) << e.text << esc(2, ATTR_RESET)
                   << viua::support::string::CORNER_QUOTE_UR << "\n";
 
-        return 1;
+        exit(1);
     } catch (viua::libs::errors::compile_time::Error const& e) {
         display_error_and_exit(source_path, source_text, e);
     }
+}
 
-    if constexpr (DEBUG_LEX) {
-        std::cerr << lexemes.size() << " raw lexeme(s)\n";
-        for (auto const& each : lexemes) {
-            std::cerr << "  " << viua::libs::lexer::to_string(each.token) << ' '
-                      << each.location.line << ':' << each.location.character
-                      << '-' << (each.location.character + each.text.size() - 1)
-                      << " +" << each.location.offset;
-
-            using viua::libs::lexer::TOKEN;
-            auto const printable = (each.token == TOKEN::LITERAL_STRING)
-                                   or (each.token == TOKEN::LITERAL_INTEGER)
-                                   or (each.token == TOKEN::LITERAL_FLOAT)
-                                   or (each.token == TOKEN::LITERAL_ATOM)
-                                   or (each.token == TOKEN::OPCODE);
-            if (printable) {
-                std::cerr << " " << each.text;
-            }
-
-            std::cerr << "\n";
-        }
-    }
-
-    lexemes = ast::remove_noise(std::move(lexemes));
-
-    if constexpr (DEBUG_LEX) {
-        std::cerr << lexemes.size() << " cooked lexeme(s)\n";
-        if constexpr (false) {
-            for (auto const& each : lexemes) {
-                std::cerr << "  " << viua::libs::lexer::to_string(each.token)
-                          << ' ' << each.location.line << ':'
-                          << each.location.character << '-'
-                          << (each.location.character + each.text.size() - 1)
-                          << " +" << each.location.offset;
-
-                using viua::libs::lexer::TOKEN;
-                auto const printable = (each.token == TOKEN::LITERAL_STRING)
-                                       or (each.token == TOKEN::LITERAL_INTEGER)
-                                       or (each.token == TOKEN::LITERAL_FLOAT)
-                                       or (each.token == TOKEN::LITERAL_ATOM)
-                                       or (each.token == TOKEN::OPCODE);
-                if (printable) {
-                    std::cerr << " " << each.text;
-                }
-
-                std::cerr << "\n";
-            }
-        }
-    }
-
-    /*
-     * Syntactical analysis (parsing).
-     *
-     * Convert raw stream of lexemes into an abstract syntax tree structure that
-     * groups lexemes representing a single entity (eg, a register access
-     * specification) into a single object, and represents the relationships
-     * between such objects.
-     */
-    auto nodes = std::vector<std::unique_ptr<ast::Node>>{};
+auto syntactical_analysis(std::filesystem::path const source_path,
+                          std::string_view const source_text,
+                          Lexemes const& lexemes) -> AST_nodes
+{
     try {
-        nodes = parse(lexemes);
+        return parse(lexemes);
     } catch (viua::libs::lexer::Lexeme const& e) {
         display_error_and_exit(source_path, source_text, e);
     } catch (viua::libs::errors::compile_time::Error const& e) {
         display_error_and_exit(source_path, source_text, e);
     }
+}
 
-    /*
-     * Calculate function spans in source code for error reporting. This way an
-     * error offset can be matched to a function without the error having to
-     * carry the function name.
-     */
-    auto fn_spans =
-        std::vector<std::pair<std::string, std::pair<size_t, size_t>>>{};
-    for (auto const& each : nodes) {
-        if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
-            continue;
-        }
-
-        auto& fn = static_cast<ast::Fn_def&>(*each);
-        fn_spans.emplace_back(
-            fn.name.text,
-            std::pair<size_t, size_t>{fn.start.location.offset,
-                                      fn.end.location.offset});
-    }
-
-    /*
-     * String table preparation.
-     *
-     * Replace string, atom, float, and double literals in operands with offsets
-     * into the string table. We want all instructions to fit into 64 bits, so
-     * having variable-size operands is not an option.
-     *
-     * Don't move the strings table preparation after the pseudoinstruction
-     * expansion stage. li pseudoinstructions are emitted during strings table
-     * preparation so they need to be expanded.
-     */
-    auto strings_table = std::vector<uint8_t>{};
-    auto var_offsets   = std::map<std::string, size_t>{};
-    auto fn_table      = std::vector<uint8_t>{};
-    auto fn_offsets    = std::map<std::string, size_t>{};
+auto load_value_labels(std::filesystem::path const source_path,
+                       std::string_view const source_text,
+                       AST_nodes const& nodes,
+                       std::vector<uint8_t>& strings_table,
+                       std::map<std::string, size_t>& var_offsets) -> void
+{
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Label_def*>(each.get()) == nullptr) {
             continue;
@@ -2290,6 +2056,12 @@ auto main(int argc, char* argv[]) -> int
             var_offsets[ct.name.text] = save_string(strings_table, s);
         }
     }
+}
+
+auto load_function_labels(AST_nodes const& nodes,
+                          std::vector<uint8_t>& fn_table,
+                          std::map<std::string, size_t>& fn_offsets) -> void
+{
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
             continue;
@@ -2298,6 +2070,21 @@ auto main(int argc, char* argv[]) -> int
         auto& fn = static_cast<ast::Fn_def&>(*each);
         fn_offsets.emplace(fn.name.text,
                            save_fn_address(fn_table, fn.name.text));
+    }
+}
+
+auto cook_long_immediates(std::filesystem::path const source_path,
+                          std::string_view const source_text,
+                          AST_nodes const& nodes,
+                          std::vector<uint8_t>& strings_table,
+                          std::map<std::string, size_t>& var_offsets) -> void
+{
+    for (auto const& each : nodes) {
+        if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
+            continue;
+        }
+
+        auto& fn = static_cast<ast::Fn_def&>(*each);
 
         auto cooked = std::vector<ast::Instruction>{};
         for (auto& insn : fn.instructions) {
@@ -2439,13 +2226,13 @@ auto main(int argc, char* argv[]) -> int
         }
         fn.instructions = std::move(cooked);
     }
+}
 
-    /*
-     * Pseudoinstruction- and macro-expansion.
-     *
-     * Replace pseudoinstructions (eg, li) with sequences of real instructions
-     * that will have the same effect. Ditto for macros.
-     */
+auto cook_pseudoinstructions(std::filesystem::path const source_path,
+                             std::string_view const source_text,
+                             AST_nodes& nodes,
+                             std::map<std::string, size_t>& fn_offsets) -> void
+{
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
             continue;
@@ -2454,7 +2241,7 @@ auto main(int argc, char* argv[]) -> int
         auto& fn                 = static_cast<ast::Fn_def&>(*each);
         auto const raw_ops_count = fn.instructions.size();
         try {
-            fn.instructions = expand_pseudoinstructions(
+            fn.instructions = ::expand_pseudoinstructions(
                 std::move(fn.instructions), fn_offsets);
         } catch (viua::libs::errors::compile_time::Error const& e) {
             display_error_in_function(source_path, e, fn.name.text);
@@ -2473,15 +2260,12 @@ auto main(int argc, char* argv[]) -> int
             }
         }
     }
+}
 
-    /*
-     * Detect entry point function.
-     *
-     * We're not handling relocatable files (shared libs, etc) yet so it makes
-     * sense to enforce entry function presence in all cases. Once the
-     * relocatables and separate compilation is supported again, this should be
-     * hidden behind a flag.
-     */
+auto find_entry_point(std::filesystem::path const source_path,
+                      std::string_view const source_text,
+                      AST_nodes const& nodes) -> viua::libs::lexer::Lexeme
+{
     auto entry_point_fn = std::optional<viua::libs::lexer::Lexeme>{};
     for (auto const& each : nodes) {
         if (each->has_attr("entry_point")) {
@@ -2517,20 +2301,43 @@ auto main(int argc, char* argv[]) -> int
                   << esc(2, ATTR_RESET) << ": "
                   << " the entry function should have the [[entry_point]] "
                      "attribute\n";
-        return 1;
+        exit(1);
+    }
+    return *entry_point_fn;
+}
+
+using Text         = std::vector<viua::arch::instruction_type>;
+using Fn_addresses = std::map<std::string, uint64_t>;
+auto emit_bytecode(std::filesystem::path const source_path,
+                   std::string_view const source_text,
+                   AST_nodes const& nodes,
+                   std::vector<uint8_t>& fn_table,
+                   std::map<std::string, size_t> const& fn_offsets)
+    -> std::pair<Text, Fn_addresses>
+{
+    /*
+     * Calculate function spans in source code for error reporting. This way an
+     * error offset can be matched to a function without the error having to
+     * carry the function name.
+     */
+    auto fn_spans =
+        std::vector<std::pair<std::string, std::pair<size_t, size_t>>>{};
+    for (auto const& each : nodes) {
+        if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
+            continue;
+        }
+
+        auto& fn = static_cast<ast::Fn_def&>(*each);
+        fn_spans.emplace_back(
+            fn.name.text,
+            std::pair<size_t, size_t>{fn.start.location.offset,
+                                      fn.end.location.offset});
     }
 
-    /*
-     * Bytecode emission.
-     *
-     * This stage is also responsible for preparing the function table. It is a
-     * table mapping function names to the offsets inside the .text section, at
-     * which their entry points reside.
-     */
     auto text         = std::vector<viua::arch::instruction_type>{};
     auto fn_addresses = std::map<std::string, uint64_t>{};
     try {
-        fn_addresses = emit_bytecode(nodes, text, fn_table, fn_offsets);
+        fn_addresses = ::emit_bytecode(nodes, text, fn_table, fn_offsets);
     } catch (viua::libs::errors::compile_time::Error const& e) {
         auto fn_name = std::optional<std::string>{};
 
@@ -2548,127 +2355,344 @@ auto main(int argc, char* argv[]) -> int
         display_error_and_exit(source_path, source_text, e);
     }
 
+    return {text, fn_addresses};
+}
+
+auto emit_elf(std::filesystem::path const output_path,
+              std::filesystem::path const source_path,
+              Text const& text,
+              std::vector<uint8_t> const& strings_table,
+              std::optional<viua::libs::lexer::Lexeme> const entry_point_fn,
+              std::vector<uint8_t> const& fn_table,
+              Fn_addresses& fn_addresses) -> void
+{
+    auto const a_out = open(output_path.c_str(),
+                            O_CREAT | O_TRUNC | O_WRONLY,
+                            S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+    if (a_out == -1) {
+        close(a_out);
+        exit(1);
+    }
+
+    constexpr auto VIUA_MAGIC [[maybe_unused]] = "\x7fVIUA\x00\x00\x00";
+    auto const VIUAVM_INTERP                   = std::string{"viua-vm"};
+
+    {
+        constexpr auto NO_OF_ELF_PHDR_USED = 5;
+
+        auto const text_size =
+            (text.size() * sizeof(std::decay_t<decltype(text)>::value_type));
+        auto const text_offset =
+            (sizeof(Elf64_Ehdr) + (NO_OF_ELF_PHDR_USED * sizeof(Elf64_Phdr))
+             + (VIUAVM_INTERP.size() + 1));
+        auto const strings_offset = (text_offset + text_size);
+        auto const fn_offset      = (strings_offset + strings_table.size());
+
+        if constexpr (DEBUG_ELF) {
+            using viua::support::tty::ATTR_RESET;
+            using viua::support::tty::COLOR_FG_WHITE;
+            using viua::support::tty::send_escape_seq;
+            constexpr auto esc = send_escape_seq;
+
+            auto const location = entry_point_fn.value().location;
+
+            std::cerr << esc(2, COLOR_FG_WHITE) << source_path
+                      << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
+                      << (location.line + 1) << esc(2, ATTR_RESET) << ':'
+                      << esc(2, COLOR_FG_WHITE) << (location.character + 1)
+                      << esc(2, ATTR_RESET)
+                      << ": text segment size: " << esc(2, COLOR_FG_WHITE)
+                      << text_size << esc(2, ATTR_RESET) << " byte(s)"
+                      << "\n";
+        }
+
+        // see elf(5)
+        Elf64_Ehdr elf_header{};
+        elf_header.e_ident[EI_MAG0]       = '\x7f';
+        elf_header.e_ident[EI_MAG1]       = 'E';
+        elf_header.e_ident[EI_MAG2]       = 'L';
+        elf_header.e_ident[EI_MAG3]       = 'F';
+        elf_header.e_ident[EI_CLASS]      = ELFCLASS64;
+        elf_header.e_ident[EI_DATA]       = ELFDATA2LSB;
+        elf_header.e_ident[EI_VERSION]    = EV_CURRENT;
+        elf_header.e_ident[EI_OSABI]      = ELFOSABI_STANDALONE;
+        elf_header.e_ident[EI_ABIVERSION] = 0;
+        elf_header.e_type                 = ET_EXEC;
+        elf_header.e_machine              = ET_NONE;
+        elf_header.e_version              = elf_header.e_ident[EI_VERSION];
+        elf_header.e_entry =
+            text_offset + fn_addresses[entry_point_fn.value().text];
+        elf_header.e_phoff     = sizeof(elf_header);
+        elf_header.e_phentsize = sizeof(Elf64_Phdr);
+        elf_header.e_phnum     = NO_OF_ELF_PHDR_USED;
+        elf_header.e_shoff     = 0;  // FIXME section header table
+        elf_header.e_flags     = 0;  // processor-specific flags, should be 0
+        elf_header.e_ehsize    = sizeof(elf_header);
+        write(a_out, &elf_header, sizeof(elf_header));
+
+        Elf64_Phdr magic_for_binfmt_misc{};
+        magic_for_binfmt_misc.p_type   = PT_NULL;
+        magic_for_binfmt_misc.p_offset = 0;
+        memcpy(&magic_for_binfmt_misc.p_offset, VIUA_MAGIC, 8);
+        write(a_out, &magic_for_binfmt_misc, sizeof(magic_for_binfmt_misc));
+
+        Elf64_Phdr interpreter{};
+        interpreter.p_type = PT_INTERP;
+        interpreter.p_offset =
+            (sizeof(elf_header) + NO_OF_ELF_PHDR_USED * sizeof(Elf64_Phdr));
+        interpreter.p_filesz = VIUAVM_INTERP.size() + 1;
+        interpreter.p_flags  = PF_R;
+        write(a_out, &interpreter, sizeof(interpreter));
+
+        Elf64_Phdr text_segment{};
+        text_segment.p_type   = PT_LOAD;
+        text_segment.p_offset = text_offset;
+        text_segment.p_filesz = text_size;
+        text_segment.p_memsz  = text_size;
+        text_segment.p_flags  = PF_R | PF_X;
+        text_segment.p_align  = sizeof(viua::arch::instruction_type);
+        write(a_out, &text_segment, sizeof(text_segment));
+
+        Elf64_Phdr strings_segment{};
+        strings_segment.p_type   = PT_LOAD;
+        strings_segment.p_offset = strings_offset;
+        strings_segment.p_filesz = strings_table.size();
+        strings_segment.p_memsz  = strings_table.size();
+        strings_segment.p_flags  = PF_R;
+        strings_segment.p_align  = sizeof(viua::arch::instruction_type);
+        write(a_out, &strings_segment, sizeof(strings_segment));
+
+        Elf64_Phdr fn_segment{};
+        fn_segment.p_type   = PT_LOAD;
+        fn_segment.p_offset = fn_offset;
+        fn_segment.p_filesz = fn_table.size();
+        fn_segment.p_memsz  = fn_table.size();
+        fn_segment.p_flags  = PF_R;
+        fn_segment.p_align  = sizeof(viua::arch::instruction_type);
+        write(a_out, &fn_segment, sizeof(fn_segment));
+
+        write(a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);
+
+        write(a_out, text.data(), text_size);
+
+        write(a_out, strings_table.data(), strings_table.size());
+
+        write(a_out, fn_table.data(), fn_table.size());
+    }
+
+    close(a_out);
+}
+}  // namespace stage
+
+auto main(int argc, char* argv[]) -> int
+{
+    if (argc == 1) {
+        return 1;
+    }
+
+    auto args = std::vector<std::string_view>{};
+    std::copy(argv + 1, argv + argc, std::back_inserter(args));
+
+    auto output_path = std::filesystem::path{"a.out"};
+    for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
+        auto const& each = args.at(i);
+        if (each == "-o") {
+            output_path = args.at(++i);
+        }
+    }
+
+    /*
+     * If invoked *with* some arguments, find the path to the source file and
+     * assemble it - converting assembly source code into binary. Produced
+     * binary may be:
+     *
+     *  - executable (default): an ELF executable, suitable to be run by Viua VM
+     *    kernel
+     *  - linkable (with -c flag): an ELF relocatable object file, which should
+     *    be linked with other object files to produce a final executable or
+     *    shared object
+     */
+    auto const source_path = std::filesystem::path{args.back()};
+    auto source_text       = std::string{};
+    {
+        auto const source_fd = open(source_path.c_str(), O_RDONLY);
+        if (source_fd == -1) {
+            using viua::support::tty::ATTR_RESET;
+            using viua::support::tty::COLOR_FG_RED;
+            using viua::support::tty::COLOR_FG_WHITE;
+            using viua::support::tty::send_escape_seq;
+            constexpr auto esc = send_escape_seq;
+
+            auto const error_message = strerrordesc_np(errno);
+            std::cerr << esc(2, COLOR_FG_WHITE) << source_path
+                      << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                      << "error" << esc(2, ATTR_RESET) << ": " << error_message
+                      << "\n";
+            return 1;
+        }
+
+        struct stat source_stat {
+        };
+        if (fstat(source_fd, &source_stat) == -1) {
+            using viua::support::tty::ATTR_RESET;
+            using viua::support::tty::COLOR_FG_RED;
+            using viua::support::tty::COLOR_FG_WHITE;
+            using viua::support::tty::send_escape_seq;
+            constexpr auto esc = send_escape_seq;
+
+            auto const error_message = strerrordesc_np(errno);
+            std::cerr << esc(2, COLOR_FG_WHITE) << source_path
+                      << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                      << "error" << esc(2, ATTR_RESET) << ": " << error_message
+                      << "\n";
+            return 1;
+        }
+        if (source_stat.st_size == 0) {
+            using viua::support::tty::ATTR_RESET;
+            using viua::support::tty::COLOR_FG_RED;
+            using viua::support::tty::COLOR_FG_WHITE;
+            using viua::support::tty::send_escape_seq;
+            constexpr auto esc = send_escape_seq;
+
+            std::cerr << esc(2, COLOR_FG_WHITE) << source_path
+                      << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                      << "error" << esc(2, ATTR_RESET)
+                      << ": empty source file\n";
+            return 1;
+        }
+
+        source_text.resize(source_stat.st_size);
+        read(source_fd, source_text.data(), source_text.size());
+        close(source_fd);
+    }
+
+    /*
+     * Lexical analysis (lexing).
+     *
+     * Split the loaded source code into a stream of lexemes for easier
+     * processing later. The first point at which errors are detected eg, if
+     * illegal characters are used, strings are unclosed, etc.
+     */
+    auto lexemes = stage::lexical_analysis(source_path, source_text);
+    if constexpr (DEBUG_LEX) {
+        std::cerr << lexemes.size() << " raw lexeme(s)\n";
+        for (auto const& each : lexemes) {
+            std::cerr << "  " << viua::libs::lexer::to_string(each.token) << ' '
+                      << each.location.line << ':' << each.location.character
+                      << '-' << (each.location.character + each.text.size() - 1)
+                      << " +" << each.location.offset;
+
+            using viua::libs::lexer::TOKEN;
+            auto const printable = (each.token == TOKEN::LITERAL_STRING)
+                                   or (each.token == TOKEN::LITERAL_INTEGER)
+                                   or (each.token == TOKEN::LITERAL_FLOAT)
+                                   or (each.token == TOKEN::LITERAL_ATOM)
+                                   or (each.token == TOKEN::OPCODE);
+            if (printable) {
+                std::cerr << " " << each.text;
+            }
+
+            std::cerr << "\n";
+        }
+    }
+
+    lexemes = ast::remove_noise(std::move(lexemes));
+    if constexpr (DEBUG_LEX) {
+        std::cerr << lexemes.size() << " cooked lexeme(s)\n";
+        if constexpr (false) {
+            for (auto const& each : lexemes) {
+                std::cerr << "  " << viua::libs::lexer::to_string(each.token)
+                          << ' ' << each.location.line << ':'
+                          << each.location.character << '-'
+                          << (each.location.character + each.text.size() - 1)
+                          << " +" << each.location.offset;
+
+                using viua::libs::lexer::TOKEN;
+                auto const printable = (each.token == TOKEN::LITERAL_STRING)
+                                       or (each.token == TOKEN::LITERAL_INTEGER)
+                                       or (each.token == TOKEN::LITERAL_FLOAT)
+                                       or (each.token == TOKEN::LITERAL_ATOM)
+                                       or (each.token == TOKEN::OPCODE);
+                if (printable) {
+                    std::cerr << " " << each.text;
+                }
+
+                std::cerr << "\n";
+            }
+        }
+    }
+
+    /*
+     * Syntactical analysis (parsing).
+     *
+     * Convert raw stream of lexemes into an abstract syntax tree structure that
+     * groups lexemes representing a single entity (eg, a register access
+     * specification) into a single object, and represents the relationships
+     * between such objects.
+     */
+    auto nodes = stage::syntactical_analysis(source_path, source_text, lexemes);
+
+    /*
+     * String table preparation.
+     *
+     * Replace string, atom, float, and double literals in operands with offsets
+     * into the string table. We want all instructions to fit into 64 bits, so
+     * having variable-size operands is not an option.
+     *
+     * Don't move the strings table preparation after the pseudoinstruction
+     * expansion stage. li pseudoinstructions are emitted during strings table
+     * preparation so they need to be expanded.
+     */
+    auto strings_table = std::vector<uint8_t>{};
+    auto var_offsets   = std::map<std::string, size_t>{};
+    auto fn_table      = std::vector<uint8_t>{};
+    auto fn_offsets    = std::map<std::string, size_t>{};
+
+    stage::load_value_labels(
+        source_path, source_text, nodes, strings_table, var_offsets);
+    stage::load_function_labels(nodes, fn_table, fn_offsets);
+    stage::cook_long_immediates(
+        source_path, source_text, nodes, strings_table, var_offsets);
+
+    /*
+     * Pseudoinstruction- and macro-expansion.
+     *
+     * Replace pseudoinstructions (eg, li) with sequences of real instructions
+     * that will have the same effect. Ditto for macros.
+     */
+    stage::cook_pseudoinstructions(source_path, source_text, nodes, fn_offsets);
+
+    /*
+     * Detect entry point function.
+     *
+     * We're not handling relocatable files (shared libs, etc) yet so it makes
+     * sense to enforce entry function presence in all cases. Once the
+     * relocatables and separate compilation is supported again, this should be
+     * hidden behind a flag.
+     */
+    auto entry_point_fn = std::optional<viua::libs::lexer::Lexeme>{};
+    entry_point_fn = stage::find_entry_point(source_path, source_text, nodes);
+
+    /*
+     * Bytecode emission.
+     *
+     * This stage is also responsible for preparing the function table. It is a
+     * table mapping function names to the offsets inside the .text section, at
+     * which their entry points reside.
+     */
+    auto [text, fn_addresses] = stage::emit_bytecode(
+        source_path, source_text, nodes, fn_table, fn_offsets);
+
     /*
      * ELF emission.
      */
-    {
-        auto const a_out =
-            open(output_path.c_str(),
-                 O_CREAT | O_TRUNC | O_WRONLY,
-                 S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
-        if (a_out == -1) {
-            close(a_out);
-            exit(1);
-        }
-
-        constexpr auto VIUA_MAGIC [[maybe_unused]] = "\x7fVIUA\x00\x00\x00";
-        auto const VIUAVM_INTERP                   = std::string{"viua-vm"};
-
-        {
-            constexpr auto NO_OF_ELF_PHDR_USED = 5;
-
-            auto const text_size =
-                (text.size() * sizeof(decltype(text)::value_type));
-            auto const text_offset =
-                (sizeof(Elf64_Ehdr) + (NO_OF_ELF_PHDR_USED * sizeof(Elf64_Phdr))
-                 + (VIUAVM_INTERP.size() + 1));
-            auto const strings_offset = (text_offset + text_size);
-            auto const fn_offset      = (strings_offset + strings_table.size());
-
-            if constexpr (DEBUG_ELF) {
-                using viua::support::tty::ATTR_RESET;
-                using viua::support::tty::COLOR_FG_WHITE;
-                using viua::support::tty::send_escape_seq;
-                constexpr auto esc = send_escape_seq;
-
-                auto const location = entry_point_fn.value().location;
-
-                std::cerr << esc(2, COLOR_FG_WHITE) << source_path
-                          << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
-                          << (location.line + 1) << esc(2, ATTR_RESET) << ':'
-                          << esc(2, COLOR_FG_WHITE) << (location.character + 1)
-                          << esc(2, ATTR_RESET)
-                          << ": text segment size: " << esc(2, COLOR_FG_WHITE)
-                          << text_size << esc(2, ATTR_RESET) << " byte(s)"
-                          << "\n";
-            }
-
-            // see elf(5)
-            Elf64_Ehdr elf_header{};
-            elf_header.e_ident[EI_MAG0]       = '\x7f';
-            elf_header.e_ident[EI_MAG1]       = 'E';
-            elf_header.e_ident[EI_MAG2]       = 'L';
-            elf_header.e_ident[EI_MAG3]       = 'F';
-            elf_header.e_ident[EI_CLASS]      = ELFCLASS64;
-            elf_header.e_ident[EI_DATA]       = ELFDATA2LSB;
-            elf_header.e_ident[EI_VERSION]    = EV_CURRENT;
-            elf_header.e_ident[EI_OSABI]      = ELFOSABI_STANDALONE;
-            elf_header.e_ident[EI_ABIVERSION] = 0;
-            elf_header.e_type                 = ET_EXEC;
-            elf_header.e_machine              = ET_NONE;
-            elf_header.e_version              = elf_header.e_ident[EI_VERSION];
-            elf_header.e_entry =
-                text_offset + fn_addresses[entry_point_fn.value().text];
-            elf_header.e_phoff     = sizeof(elf_header);
-            elf_header.e_phentsize = sizeof(Elf64_Phdr);
-            elf_header.e_phnum     = NO_OF_ELF_PHDR_USED;
-            elf_header.e_shoff     = 0;  // FIXME section header table
-            elf_header.e_flags  = 0;  // processor-specific flags, should be 0
-            elf_header.e_ehsize = sizeof(elf_header);
-            write(a_out, &elf_header, sizeof(elf_header));
-
-            Elf64_Phdr magic_for_binfmt_misc{};
-            magic_for_binfmt_misc.p_type   = PT_NULL;
-            magic_for_binfmt_misc.p_offset = 0;
-            memcpy(&magic_for_binfmt_misc.p_offset, VIUA_MAGIC, 8);
-            write(a_out, &magic_for_binfmt_misc, sizeof(magic_for_binfmt_misc));
-
-            Elf64_Phdr interpreter{};
-            interpreter.p_type = PT_INTERP;
-            interpreter.p_offset =
-                (sizeof(elf_header) + NO_OF_ELF_PHDR_USED * sizeof(Elf64_Phdr));
-            interpreter.p_filesz = VIUAVM_INTERP.size() + 1;
-            interpreter.p_flags  = PF_R;
-            write(a_out, &interpreter, sizeof(interpreter));
-
-            Elf64_Phdr text_segment{};
-            text_segment.p_type   = PT_LOAD;
-            text_segment.p_offset = text_offset;
-            text_segment.p_filesz = text_size;
-            text_segment.p_memsz  = text_size;
-            text_segment.p_flags  = PF_R | PF_X;
-            text_segment.p_align  = sizeof(viua::arch::instruction_type);
-            write(a_out, &text_segment, sizeof(text_segment));
-
-            Elf64_Phdr strings_segment{};
-            strings_segment.p_type   = PT_LOAD;
-            strings_segment.p_offset = strings_offset;
-            strings_segment.p_filesz = strings_table.size();
-            strings_segment.p_memsz  = strings_table.size();
-            strings_segment.p_flags  = PF_R;
-            strings_segment.p_align  = sizeof(viua::arch::instruction_type);
-            write(a_out, &strings_segment, sizeof(strings_segment));
-
-            Elf64_Phdr fn_segment{};
-            fn_segment.p_type   = PT_LOAD;
-            fn_segment.p_offset = fn_offset;
-            fn_segment.p_filesz = fn_table.size();
-            fn_segment.p_memsz  = fn_table.size();
-            fn_segment.p_flags  = PF_R;
-            fn_segment.p_align  = sizeof(viua::arch::instruction_type);
-            write(a_out, &fn_segment, sizeof(fn_segment));
-
-            write(a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);
-
-            write(a_out, text.data(), text_size);
-
-            write(a_out, strings_table.data(), strings_table.size());
-
-            write(a_out, fn_table.data(), fn_table.size());
-        }
-
-        close(a_out);
-    }
+    stage::emit_elf(output_path,
+                    source_path,
+                    text,
+                    strings_table,
+                    entry_point_fn,
+                    fn_table,
+                    fn_addresses);
 
     return 0;
 }
