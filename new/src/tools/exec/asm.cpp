@@ -2360,6 +2360,7 @@ auto emit_bytecode(std::filesystem::path const source_path,
 
 auto emit_elf(std::filesystem::path const output_path,
               std::filesystem::path const source_path,
+              bool const as_executable,
               Text const& text,
               std::vector<uint8_t> const& strings_table,
               std::optional<viua::libs::lexer::Lexeme> const entry_point_fn,
@@ -2380,11 +2381,11 @@ auto emit_elf(std::filesystem::path const output_path,
     {
         constexpr auto NO_OF_ELF_PHDR_USED = 5;
 
+        auto const elf_size = sizeof(Elf64_Ehdr) + (NO_OF_ELF_PHDR_USED * sizeof(Elf64_Phdr));
         auto const text_size =
             (text.size() * sizeof(std::decay_t<decltype(text)>::value_type));
         auto const text_offset =
-            (sizeof(Elf64_Ehdr) + (NO_OF_ELF_PHDR_USED * sizeof(Elf64_Phdr))
-             + (VIUAVM_INTERP.size() + 1));
+            (elf_size + (VIUAVM_INTERP.size() + 1));
         auto const strings_offset = (text_offset + text_size);
         auto const fn_offset      = (strings_offset + strings_table.size());
 
@@ -2417,11 +2418,12 @@ auto emit_elf(std::filesystem::path const output_path,
         elf_header.e_ident[EI_VERSION]    = EV_CURRENT;
         elf_header.e_ident[EI_OSABI]      = ELFOSABI_STANDALONE;
         elf_header.e_ident[EI_ABIVERSION] = 0;
-        elf_header.e_type                 = ET_EXEC;
+        elf_header.e_type                 = (as_executable ? ET_EXEC : ET_REL);
         elf_header.e_machine              = ET_NONE;
         elf_header.e_version              = elf_header.e_ident[EI_VERSION];
-        elf_header.e_entry =
-            text_offset + fn_addresses[entry_point_fn.value().text];
+        elf_header.e_entry = (as_executable
+            ? (text_offset + fn_addresses[entry_point_fn.value().text])
+            : 0);
         elf_header.e_phoff     = sizeof(elf_header);
         elf_header.e_phentsize = sizeof(Elf64_Phdr);
         elf_header.e_phnum     = NO_OF_ELF_PHDR_USED;
@@ -2494,6 +2496,7 @@ auto main(int argc, char* argv[]) -> int
     std::copy(argv + 1, argv + argc, std::back_inserter(args));
 
     auto output_path     = std::filesystem::path{"a.out"};
+    auto as_executable   = true;
     auto verbosity_level = 0;
     auto show_version    = false;
 
@@ -2505,6 +2508,8 @@ auto main(int argc, char* argv[]) -> int
             break;
         } else if (each == "-o") {
             output_path = args.at(++i);
+        } else if (each == "-c") {
+            as_executable = false;
         } else if (each == "-v") {
             ++verbosity_level;
         } else if (each == "--version") {
@@ -2714,6 +2719,7 @@ auto main(int argc, char* argv[]) -> int
      */
     stage::emit_elf(output_path,
                     source_path,
+                    as_executable,
                     text,
                     strings_table,
                     entry_point_fn,

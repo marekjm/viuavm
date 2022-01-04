@@ -536,16 +536,6 @@ auto main(int argc, char* argv[]) -> int
         std::cerr << "[vm] loaded "
                   << (text_header.p_filesz / sizeof(decltype(text)::value_type))
                   << " instructions\n";
-        std::cerr << "[vm] .text address at +0x" << std::hex << std::setw(8)
-                  << std::setfill('0') << text_header.p_offset << std::dec
-                  << "\n";
-        std::cerr << "[vm] ELF entry address at +0x" << std::hex << std::setw(8)
-                  << std::setfill('0') << elf_header.e_entry << std::dec
-                  << "\n";
-        std::cerr << "[vm] entry address at [.text]+0x" << std::hex
-                  << std::setw(8) << std::setfill('0')
-                  << (entry_addr * sizeof(viua::arch::instruction_type))
-                  << std::dec << "\n";
         std::cerr
             << "[vm] loaded " << strings_header.p_filesz
             << " byte(s) of .rodata (strings) section from PT_LOAD segment of "
@@ -554,6 +544,21 @@ auto main(int argc, char* argv[]) -> int
             << "[vm] loaded " << fn_header.p_filesz
             << " byte(s) of .rodata (fn table) section from PT_LOAD segment of "
             << executable_path << "\n";
+        std::cerr << "[vm] .text address at +0x" << std::hex << std::setw(8)
+                  << std::setfill('0') << text_header.p_offset << std::dec
+                  << "\n";
+        if (elf_header.e_type == ET_EXEC) {
+            std::cerr << "[vm] ELF entry address at +0x" << std::hex << std::setw(8)
+                      << std::setfill('0') << elf_header.e_entry << std::dec
+                      << "\n";
+            std::cerr << "[vm] entry address at [.text]+0x" << std::hex
+                      << std::setw(8) << std::setfill('0')
+                      << (entry_addr * sizeof(viua::arch::instruction_type))
+                      << std::dec << "\n";
+        } else {
+            std::cerr << "[vm] not an executable, aborting execution\n";
+            return 1;
+        }
     }
 
     auto env            = Env{};
