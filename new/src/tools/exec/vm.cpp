@@ -548,9 +548,9 @@ auto main(int argc, char* argv[]) -> int
                   << std::setfill('0') << text_header.p_offset << std::dec
                   << "\n";
         if (elf_header.e_type == ET_EXEC) {
-            std::cerr << "[vm] ELF entry address at +0x" << std::hex << std::setw(8)
-                      << std::setfill('0') << elf_header.e_entry << std::dec
-                      << "\n";
+            std::cerr << "[vm] ELF entry address at +0x" << std::hex
+                      << std::setw(8) << std::setfill('0') << elf_header.e_entry
+                      << std::dec << "\n";
             std::cerr << "[vm] entry address at [.text]+0x" << std::hex
                       << std::setw(8) << std::setfill('0')
                       << (entry_addr * sizeof(viua::arch::instruction_type))
