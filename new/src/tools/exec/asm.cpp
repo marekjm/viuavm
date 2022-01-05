@@ -2406,6 +2406,7 @@ auto emit_elf(std::filesystem::path const output_path,
             magic_for_binfmt_misc.p_type   = PT_NULL;
             magic_for_binfmt_misc.p_offset = 0;
             memcpy(&magic_for_binfmt_misc.p_offset, VIUA_MAGIC, 8);
+            magic_for_binfmt_misc.p_filesz = 8;
             elf_pheaders.push_back(magic_for_binfmt_misc);
         }
         {
@@ -2467,7 +2468,7 @@ auto emit_elf(std::filesystem::path const output_path,
 
         Elf64_Shdr magic_section{};
         magic_section.sh_name = save_shstr_entry(".viua.magic");
-        magic_section.sh_type = SHT_PROGBITS;
+        magic_section.sh_type = SHT_NOBITS;
         magic_section.sh_offset =
             sizeof(Elf64_Ehdr) + offsetof(Elf64_Phdr, p_offset);
         magic_section.sh_size  = 8;
@@ -2537,6 +2538,9 @@ auto emit_elf(std::filesystem::path const output_path,
             auto offset_accumulator = size_t{0};
             for (auto& each : elf_sheaders) {
                 if (each.sh_type == SHT_NULL) {
+                    continue;
+                }
+                if (each.sh_type == SHT_NOBITS) {
                     continue;
                 }
 
