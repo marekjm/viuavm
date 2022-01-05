@@ -27,6 +27,7 @@
 #include <unistd.h>
 
 #include <algorithm>
+#include <list>
 #include <chrono>
 #include <filesystem>
 #include <iomanip>
@@ -2360,7 +2361,6 @@ auto emit_bytecode(std::filesystem::path const source_path,
 }
 
 auto emit_elf(std::filesystem::path const output_path,
-              std::filesystem::path const source_path,
               bool const as_executable,
               Text const& text,
               std::vector<uint8_t> const& strings_table,
@@ -2380,40 +2380,7 @@ auto emit_elf(std::filesystem::path const output_path,
     auto const VIUAVM_INTERP                   = std::string{"viua-vm"};
 
     {
-        constexpr auto NO_OF_ELF_PHDR_USED = 5;
-        constexpr auto NO_OF_ELF_SHDR_USED = 7;
-
-        auto const elf_size = sizeof(Elf64_Ehdr)
-                              + (NO_OF_ELF_PHDR_USED * sizeof(Elf64_Phdr))
-                              + (NO_OF_ELF_SHDR_USED * sizeof(Elf64_Shdr));
-        auto const phtab_offset = sizeof(Elf64_Ehdr);
-        auto const shtab_offset =
-            sizeof(Elf64_Ehdr) + (NO_OF_ELF_PHDR_USED * sizeof(Elf64_Phdr));
-
-        auto const text_size =
-            (text.size() * sizeof(std::decay_t<decltype(text)>::value_type));
-        auto const text_offset     = (elf_size + (VIUAVM_INTERP.size() + 1));
-        auto const strings_offset  = (text_offset + text_size);
-        auto const fn_offset       = (strings_offset + strings_table.size());
-        auto const shstrtab_offset = (fn_offset + fn_table.size());
-
-        if constexpr (DEBUG_ELF) {
-            using viua::support::tty::ATTR_RESET;
-            using viua::support::tty::COLOR_FG_WHITE;
-            using viua::support::tty::send_escape_seq;
-            constexpr auto esc = send_escape_seq;
-
-            auto const location = entry_point_fn.value().location;
-
-            std::cerr << esc(2, COLOR_FG_WHITE) << source_path
-                      << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
-                      << (location.line + 1) << esc(2, ATTR_RESET) << ':'
-                      << esc(2, COLOR_FG_WHITE) << (location.character + 1)
-                      << esc(2, ATTR_RESET)
-                      << ": text segment size: " << esc(2, COLOR_FG_WHITE)
-                      << text_size << esc(2, ATTR_RESET) << " byte(s)"
-                      << "\n";
-        }
+        auto const text_offset     = (VIUAVM_INTERP.size() + 1);
 
         // see elf(5)
         Elf64_Ehdr elf_header{};
@@ -2429,56 +2396,56 @@ auto emit_elf(std::filesystem::path const output_path,
         elf_header.e_type                 = (as_executable ? ET_EXEC : ET_REL);
         elf_header.e_machine              = ET_NONE;
         elf_header.e_version              = elf_header.e_ident[EI_VERSION];
-        elf_header.e_entry =
-            (as_executable
-                 ? (text_offset + fn_addresses[entry_point_fn.value().text])
-                 : 0);
         elf_header.e_flags  = 0;  // processor-specific flags, should be 0
         elf_header.e_ehsize = sizeof(elf_header);
 
-        elf_header.e_phoff     = phtab_offset;
-        elf_header.e_phentsize = sizeof(Elf64_Phdr);
-        elf_header.e_phnum     = NO_OF_ELF_PHDR_USED;
+        auto elf_pheaders = std::list<Elf64_Phdr>{};
 
-        elf_header.e_shoff     = shtab_offset;
-        elf_header.e_shentsize = sizeof(Elf64_Shdr);
-        elf_header.e_shnum     = NO_OF_ELF_SHDR_USED;
-        elf_header.e_shstrndx  = 1;
-
-        Elf64_Phdr magic_for_binfmt_misc{};
-        magic_for_binfmt_misc.p_type   = PT_NULL;
-        magic_for_binfmt_misc.p_offset = 0;
-        memcpy(&magic_for_binfmt_misc.p_offset, VIUA_MAGIC, 8);
-
-        Elf64_Phdr interpreter{};
-        interpreter.p_type   = PT_INTERP;
-        interpreter.p_offset = elf_size;
-        interpreter.p_filesz = VIUAVM_INTERP.size() + 1;
-        interpreter.p_flags  = PF_R;
-
-        Elf64_Phdr text_segment{};
-        text_segment.p_type   = PT_LOAD;
-        text_segment.p_offset = text_offset;
-        text_segment.p_filesz = text_size;
-        text_segment.p_memsz  = text_size;
-        text_segment.p_flags  = PF_R | PF_X;
-        text_segment.p_align  = sizeof(viua::arch::instruction_type);
-
-        Elf64_Phdr strings_segment{};
-        strings_segment.p_type   = PT_LOAD;
-        strings_segment.p_offset = strings_offset;
-        strings_segment.p_filesz = strings_table.size();
-        strings_segment.p_memsz  = strings_table.size();
-        strings_segment.p_flags  = PF_R;
-        strings_segment.p_align  = sizeof(viua::arch::instruction_type);
-
-        Elf64_Phdr fn_segment{};
-        fn_segment.p_type   = PT_LOAD;
-        fn_segment.p_offset = fn_offset;
-        fn_segment.p_filesz = fn_table.size();
-        fn_segment.p_memsz  = fn_table.size();
-        fn_segment.p_flags  = PF_R;
-        fn_segment.p_align  = sizeof(viua::arch::instruction_type);
+        {
+            Elf64_Phdr magic_for_binfmt_misc{};
+            magic_for_binfmt_misc.p_type   = PT_NULL;
+            magic_for_binfmt_misc.p_offset = 0;
+            memcpy(&magic_for_binfmt_misc.p_offset, VIUA_MAGIC, 8);
+            elf_pheaders.push_back(magic_for_binfmt_misc);
+        }
+        {
+            Elf64_Phdr interpreter{};
+            interpreter.p_type   = PT_INTERP;
+            interpreter.p_offset = 0;
+            interpreter.p_filesz = VIUAVM_INTERP.size() + 1;
+            interpreter.p_flags  = PF_R;
+            elf_pheaders.push_back(interpreter);
+        }
+        {
+            Elf64_Phdr text_segment{};
+            text_segment.p_type   = PT_LOAD;
+            text_segment.p_offset = 0;
+            text_segment.p_filesz = (text.size() * sizeof(std::decay_t<decltype(text)>::value_type));
+            text_segment.p_memsz = text_segment.p_filesz;
+            text_segment.p_flags  = PF_R | PF_X;
+            text_segment.p_align  = sizeof(viua::arch::instruction_type);
+            elf_pheaders.push_back(text_segment);
+        }
+        {
+            Elf64_Phdr strings_segment{};
+            strings_segment.p_type   = PT_LOAD;
+            strings_segment.p_offset = 0;
+            strings_segment.p_filesz = strings_table.size();
+            strings_segment.p_memsz  = strings_segment.p_filesz;
+            strings_segment.p_flags  = PF_R;
+            strings_segment.p_align  = sizeof(viua::arch::instruction_type);
+            elf_pheaders.push_back(strings_segment);
+        }
+        {
+            Elf64_Phdr fn_segment{};
+            fn_segment.p_type   = PT_LOAD;
+            fn_segment.p_offset = 0;
+            fn_segment.p_filesz = fn_table.size();
+            fn_segment.p_memsz  = fn_segment.p_filesz;
+            fn_segment.p_flags  = PF_R;
+            fn_segment.p_align  = sizeof(viua::arch::instruction_type);
+            elf_pheaders.push_back(fn_segment);
+        }
 
         auto shstr            = std::vector<char>{'\0'};
         auto save_shstr_entry = [&shstr](std::string_view const sv) -> size_t {
@@ -2488,16 +2455,15 @@ auto emit_elf(std::filesystem::path const output_path,
             return saved_at;
         };
 
+        auto elf_sheaders = std::list<Elf64_Shdr>{};
+
         /*
          * It is mandated by ELF that the first section header is void, and must
          * be all zeroes. It is reserved and used by ELF extensions.
          */
         Elf64_Shdr void_section{};
-
-        Elf64_Shdr shstr_section{};
-        shstr_section.sh_name   = save_shstr_entry(".shstrtab");
-        shstr_section.sh_type   = SHT_STRTAB;
-        shstr_section.sh_offset = shstrtab_offset;
+        void_section.sh_type = SHT_NULL;
+        elf_sheaders.push_back(void_section);
 
         Elf64_Shdr magic_section{};
         magic_section.sh_name = save_shstr_entry(".viua.magic");
@@ -2506,30 +2472,34 @@ auto emit_elf(std::filesystem::path const output_path,
             sizeof(Elf64_Ehdr) + offsetof(Elf64_Phdr, p_offset);
         magic_section.sh_size  = 8;
         magic_section.sh_flags = 0;
+        elf_sheaders.push_back(magic_section);
 
         Elf64_Shdr interp_section{};
         interp_section.sh_name   = save_shstr_entry(".interp");
         interp_section.sh_type   = SHT_PROGBITS;
-        interp_section.sh_offset = elf_size;
+        interp_section.sh_offset = 0;
         interp_section.sh_size   = VIUAVM_INTERP.size() + 1;
         interp_section.sh_flags  = 0;
+        elf_sheaders.push_back(interp_section);
 
         Elf64_Shdr text_section{};
         text_section.sh_name   = save_shstr_entry(".text");
         text_section.sh_type   = SHT_PROGBITS;
-        text_section.sh_offset = text_offset;
-        text_section.sh_size   = text_size;
+        text_section.sh_offset = 0;
+        text_section.sh_size   = (text.size() * sizeof(std::decay_t<decltype(text)>::value_type));
         text_section.sh_flags  = SHF_ALLOC | SHF_EXECINSTR;
+        elf_sheaders.push_back(text_section);
 
         Elf64_Shdr strings_section{};
         strings_section.sh_name   = save_shstr_entry(".rodata");
         strings_section.sh_type   = SHT_PROGBITS;
-        strings_section.sh_offset = strings_offset;
+        strings_section.sh_offset = 0;
         strings_section.sh_size   = strings_table.size();
         strings_section.sh_flags  = SHF_ALLOC;
+        elf_sheaders.push_back(strings_section);
 
         Elf64_Shdr fn_section{};
-        fn_section.sh_name = save_shstr_entry(".symtab.viua.fns");
+        fn_section.sh_name = save_shstr_entry(".viua.fns");
         /*
          * This could be SHT_SYMTAB, but the SHT_SYMTAB type sections expect a
          * certain format of the symbol table which Viua does not use. So let's
@@ -2537,31 +2507,70 @@ auto emit_elf(std::filesystem::path const output_path,
          * the program.
          */
         fn_section.sh_type   = SHT_PROGBITS;
-        fn_section.sh_offset = fn_offset;
+        fn_section.sh_offset = 0;
         fn_section.sh_size   = fn_table.size();
         fn_section.sh_flags  = SHF_ALLOC;
+        elf_sheaders.push_back(fn_section);
 
-        shstr_section.sh_size = shstr.size();
+        Elf64_Shdr sh{};
+        sh.sh_name   = save_shstr_entry(".shstrtab");
+        sh.sh_type   = SHT_STRTAB;
+        sh.sh_offset = 0;
+        sh.sh_size = shstr.size();
+        elf_sheaders.push_back(sh);
+
+        auto const elf_size = sizeof(Elf64_Ehdr)
+            + (elf_pheaders.size() * sizeof(Elf64_Phdr))
+            + (elf_sheaders.size() * sizeof(Elf64_Shdr));
+        {
+            auto offset_accumulator = size_t{0};
+            for (auto& each : elf_pheaders) {
+                if (each.p_type == PT_NULL) {
+                    continue;
+                }
+
+                each.p_offset = (elf_size + offset_accumulator);
+                offset_accumulator += each.p_filesz;
+            }
+        }
+        {
+            auto offset_accumulator = size_t{0};
+            for (auto& each : elf_sheaders) {
+                if (each.sh_type == SHT_NULL) {
+                    continue;
+                }
+
+                each.sh_offset = (elf_size + offset_accumulator);
+                offset_accumulator += each.sh_size;
+            }
+        }
+
+        elf_header.e_entry =
+            (as_executable
+                 ? (text_offset + fn_addresses[entry_point_fn.value().text] + elf_size)
+                 : 0);
+
+        elf_header.e_phoff     = sizeof(Elf64_Ehdr);;
+        elf_header.e_phentsize = sizeof(Elf64_Phdr);
+        elf_header.e_phnum     = elf_pheaders.size();
+
+        elf_header.e_shoff     = elf_header.e_phoff + (elf_pheaders.size() * sizeof(Elf64_Phdr));
+        elf_header.e_shentsize = sizeof(Elf64_Shdr);
+        elf_header.e_shnum     = elf_sheaders.size();
+        elf_header.e_shstrndx  = elf_sheaders.size() - 1;
 
         write(a_out, &elf_header, sizeof(elf_header));
 
-        write(a_out, &magic_for_binfmt_misc, sizeof(magic_for_binfmt_misc));
-        write(a_out, &interpreter, sizeof(interpreter));
-        write(a_out, &text_segment, sizeof(text_segment));
-        write(a_out, &strings_segment, sizeof(strings_segment));
-        write(a_out, &fn_segment, sizeof(fn_segment));
-
-        write(a_out, &void_section, sizeof(Elf64_Shdr));
-        write(a_out, &shstr_section, sizeof(Elf64_Shdr));
-        write(a_out, &magic_section, sizeof(Elf64_Shdr));
-        write(a_out, &interp_section, sizeof(Elf64_Shdr));
-        write(a_out, &text_section, sizeof(Elf64_Shdr));
-        write(a_out, &strings_section, sizeof(Elf64_Shdr));
-        write(a_out, &fn_section, sizeof(Elf64_Shdr));
+        for (auto const& each : elf_pheaders) {
+            write(a_out, &each, sizeof(std::remove_reference_t<decltype(each)>));
+        }
+        for (auto const& each : elf_sheaders) {
+            write(a_out, &each, sizeof(std::remove_reference_t<decltype(each)>));
+        }
 
         write(a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);
 
-        write(a_out, text.data(), text_size);
+        write(a_out, text.data(), (text.size() * sizeof(std::decay_t<decltype(text)>::value_type)));
         write(a_out, strings_table.data(), strings_table.size());
         write(a_out, fn_table.data(), fn_table.size());
 
@@ -2804,7 +2813,6 @@ auto main(int argc, char* argv[]) -> int
      * ELF emission.
      */
     stage::emit_elf(output_path,
-                    source_path,
                     as_executable,
                     text,
                     strings_table,
