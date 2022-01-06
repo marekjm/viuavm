@@ -2362,11 +2362,10 @@ auto emit_bytecode(std::filesystem::path const source_path,
 
 auto emit_elf(std::filesystem::path const output_path,
               bool const as_executable,
+              std::optional<uint64_t> const entry_point_fn,
               Text const& text,
               std::vector<uint8_t> const& strings_table,
-              std::optional<viua::libs::lexer::Lexeme> const entry_point_fn,
-              std::vector<uint8_t> const& fn_table,
-              Fn_addresses& fn_addresses) -> void
+              std::vector<uint8_t> const& fn_table) -> void
 {
     auto const a_out = open(output_path.c_str(),
                             O_CREAT | O_TRUNC | O_WRONLY,
@@ -2630,9 +2629,9 @@ auto emit_elf(std::filesystem::path const output_path,
         }
 
         elf_header.e_entry =
-            (as_executable
-                 ? (*text_offset + fn_addresses[entry_point_fn.value().text] + elf_size)
-                 : 0);
+            entry_point_fn.has_value()
+                 ? (*text_offset + *entry_point_fn + elf_size)
+                 : 0;
 
         elf_header.e_phoff     = sizeof(Elf64_Ehdr);;
         elf_header.e_phentsize = sizeof(Elf64_Phdr);
@@ -2907,11 +2906,12 @@ auto main(int argc, char* argv[]) -> int
      */
     stage::emit_elf(output_path,
                     as_executable,
+                    (entry_point_fn.has_value()
+                        ? std::optional{fn_addresses[entry_point_fn.value().text]}
+                        : std::nullopt),
                     text,
                     strings_table,
-                    entry_point_fn,
-                    fn_table,
-                    fn_addresses);
+                    fn_table);
 
     return 0;
 }
