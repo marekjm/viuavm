@@ -43,9 +43,16 @@ struct Loaded_elf {
     Elf64_Ehdr header;
     std::vector<std::pair<std::string, Fragment>> fragments;
 
-    auto find_fragment(std::string_view const) const -> std::optional<std::reference_wrapper<Fragment const>>;
+    auto find_fragment(std::string_view const) const
+        -> std::optional<std::reference_wrapper<Fragment const>>;
     auto entry_point() const -> std::optional<size_t>;
-    auto name_function_at(size_t const offset) const -> std::pair<std::string, size_t>;
+
+    static auto fn_at(std::vector<uint8_t> const&, size_t const)
+        -> std::pair<std::string, size_t>;
+    auto name_function_at(size_t const offset) const
+        -> std::pair<std::string, size_t>;
+    auto function_table() const
+        -> std::map<size_t, std::pair<std::string, size_t>>;
 
     static auto load(int const elf_fd) -> Loaded_elf;
 };
@@ -133,22 +140,51 @@ auto Loaded_elf::find_fragment(std::string_view const sv) const -> std::optional
     });
     return (frag == fragments.end()) ? std::nullopt : std::optional{std::ref(frag->second)};
 }
-auto Loaded_elf::name_function_at(size_t const offset) const -> std::pair<std::string, size_t>
+auto Loaded_elf::fn_at(std::vector<uint8_t> const& function_table,
+                       size_t const offset) -> std::pair<std::string, size_t>
 {
-    auto const& functions_table = find_fragment(".viua.fns")->get();
-
     auto sz = uint64_t{};
-    memcpy(&sz, (functions_table.data.data() + offset - sizeof(sz)), sizeof(sz));
+    memcpy(&sz, (function_table.data() + offset - sizeof(sz)), sizeof(sz));
     sz = le64toh(sz);
 
+
     auto name = std::string{
-        reinterpret_cast<char const*>(functions_table.data.data()) + offset, sz};
+        reinterpret_cast<char const*>(function_table.data()) + offset, sz};
+
 
     auto addr = uint64_t{};
-    memcpy(&addr, (functions_table.data.data() + offset + sz), sizeof(addr));
+    memcpy(&addr, (function_table.data() + offset + sz), sizeof(addr));
     addr = le64toh(addr);
 
+    /*
+    std::cout << "Offset:     " << offset << "\n";
+    std::cout << "Label size: " << sz << "\n";
+    std::cout << "Label:      " << name << "\n";
+    std::cout << "Address:    " << addr << "\n";
+    */
+
     return {name, addr};
+}
+auto Loaded_elf::name_function_at(size_t const offset) const
+    -> std::pair<std::string, size_t>
+{
+    auto const& functions_table = find_fragment(".viua.fns")->get();
+    return fn_at(functions_table.data, offset);
+}
+auto Loaded_elf::function_table() const
+    -> std::map<size_t, std::pair<std::string, size_t>>
+{
+    auto const& raw = find_fragment(".viua.fns")->get();
+    auto ft         = std::map<size_t, std::pair<std::string, size_t>>{};
+
+    for (auto i = size_t{sizeof(uint64_t)}; i < raw.data.size();
+         i += (2 * sizeof(uint64_t))) {
+        auto fn = fn_at(raw.data, i);
+        ft[i]   = std::move(fn);
+        i += ft[i].first.size();
+    }
+
+    return ft;
 }
 
 constexpr auto VIUA_MAGIC [[maybe_unused]] = std::string_view{"\x7fVIUA\x00\x00\x00", 8};
@@ -267,17 +303,33 @@ auto main(int argc, char* argv[]) -> int
         }
     }
 
-    std::cout << "\nType:        " << ((elf.header.e_type == ET_EXEC)
-            ? "EXEC (Executable)"
-            : "REL (Relocatable)") << "\n";
+    std::cout << "\nType:        "
+              << ((elf.header.e_type == ET_EXEC) ? "EXEC (Executable)"
+                                                 : "REL (Relocatable)")
+              << "\n";
     std::cout << "Entry point: ";
     if (auto const ep = elf.entry_point(); ep.has_value()) {
-        std::cout << std::setw(16) << std::setfill('0') << std::hex << elf.header.e_entry
-            << "  [.text+0x" << std::hex << *ep << "]";
+        std::cout << std::setw(16) << std::setfill('0') << std::hex
+                  << elf.header.e_entry << "  [.text+0x" << std::hex << *ep
+                  << "]";
         std::cout << std::dec;
         std::cout << "  " << elf.name_function_at(*ep).first << "\n";
     } else {
         std::cout << "not found\n";
+    }
+
+    std::cout << "\nFunction table:\n";
+    std::cout << "  " << std::setw(16) << std::setfill(' ') << "Label offset"
+              << "            " << std::setw(16) << std::setfill(' ')
+              << "Target address"
+              << "  Label"
+              << "\n";
+    for (auto const& [offset, fn] : elf.function_table()) {
+        auto const& [name, addr] = fn;
+
+        std::cout << "  " << std::hex << std::setw(16) << std::setfill('0')
+                  << offset << "  [.text+0x" << std::setw(16)
+                  << std::setfill('0') << addr << "]  " << name << "\n";
     }
 
     return 0;
