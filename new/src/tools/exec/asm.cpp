@@ -27,11 +27,11 @@
 #include <unistd.h>
 
 #include <algorithm>
-#include <list>
 #include <chrono>
 #include <filesystem>
 #include <iomanip>
 #include <iostream>
+#include <list>
 #include <map>
 #include <numeric>
 #include <optional>
@@ -2405,7 +2405,7 @@ auto emit_elf(std::filesystem::path const output_path,
         };
 
         using Header_pair = std::pair<std::optional<Elf64_Phdr>, Elf64_Shdr>;
-        auto elf_headers = std::vector<Header_pair>{};
+        auto elf_headers  = std::vector<Header_pair>{};
 
         {
             /*
@@ -2418,7 +2418,7 @@ auto emit_elf(std::filesystem::path const output_path,
             Elf64_Shdr void_section{};
             void_section.sh_type = SHT_NULL;
 
-            elf_headers.push_back({ std::nullopt, void_section });
+            elf_headers.push_back({std::nullopt, void_section});
         }
         {
             /*
@@ -2434,14 +2434,13 @@ auto emit_elf(std::filesystem::path const output_path,
             seg.p_filesz = 8;
 
             Elf64_Shdr sec{};
-            sec.sh_name = save_shstr_entry(".viua.magic");
-            sec.sh_type = SHT_NOBITS;
-            sec.sh_offset =
-                sizeof(Elf64_Ehdr) + offsetof(Elf64_Phdr, p_offset);
-            sec.sh_size  = 8;
-            sec.sh_flags = 0;
+            sec.sh_name   = save_shstr_entry(".viua.magic");
+            sec.sh_type   = SHT_NOBITS;
+            sec.sh_offset = sizeof(Elf64_Ehdr) + offsetof(Elf64_Phdr, p_offset);
+            sec.sh_size   = 8;
+            sec.sh_flags  = 0;
 
-            elf_headers.push_back({ seg, sec });
+            elf_headers.push_back({seg, sec});
         }
         {
             /*
@@ -2464,7 +2463,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_size   = VIUAVM_INTERP.size() + 1;
             sec.sh_flags  = 0;
 
-            elf_headers.push_back({ seg, sec });
+            elf_headers.push_back({seg, sec});
         }
         {
             /*
@@ -2475,10 +2474,12 @@ auto emit_elf(std::filesystem::path const output_path,
             Elf64_Phdr seg{};
             seg.p_type   = PT_LOAD;
             seg.p_offset = 0;
-            auto const sz = (text.size() * sizeof(std::decay_t<decltype(text)>::value_type));
+            auto const sz =
+                (text.size()
+                 * sizeof(std::decay_t<decltype(text)>::value_type));
             seg.p_filesz = seg.p_memsz = sz;
-            seg.p_flags  = PF_R | PF_X;
-            seg.p_align  = sizeof(viua::arch::instruction_type);
+            seg.p_flags                = PF_R | PF_X;
+            seg.p_align                = sizeof(viua::arch::instruction_type);
 
             Elf64_Shdr sec{};
             sec.sh_name   = save_shstr_entry(".text");
@@ -2487,7 +2488,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_size   = seg.p_filesz;
             sec.sh_flags  = SHF_ALLOC | SHF_EXECINSTR;
 
-            elf_headers.push_back({ seg, sec });
+            elf_headers.push_back({seg, sec});
         }
         {
             /*
@@ -2503,12 +2504,12 @@ auto emit_elf(std::filesystem::path const output_path,
              * table).
              */
             Elf64_Phdr seg{};
-            seg.p_type   = PT_LOAD;
-            seg.p_offset = 0;
+            seg.p_type    = PT_LOAD;
+            seg.p_offset  = 0;
             auto const sz = strings_table.size();
             seg.p_filesz = seg.p_memsz = sz;
-            seg.p_flags  = PF_R;
-            seg.p_align  = sizeof(viua::arch::instruction_type);
+            seg.p_flags                = PF_R;
+            seg.p_align                = sizeof(viua::arch::instruction_type);
 
             Elf64_Shdr sec{};
             sec.sh_name   = save_shstr_entry(".rodata");
@@ -2517,7 +2518,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_size   = seg.p_filesz;
             sec.sh_flags  = SHF_ALLOC;
 
-            elf_headers.push_back({ seg, sec });
+            elf_headers.push_back({seg, sec});
         }
         {
             /*
@@ -2530,24 +2531,27 @@ auto emit_elf(std::filesystem::path const output_path,
              * Inefficient, but flexible.
              */
             Elf64_Phdr seg{};
-            seg.p_type   = PT_LOAD;
-            seg.p_offset = 0;
+            seg.p_type    = PT_LOAD;
+            seg.p_offset  = 0;
             auto const sz = fn_table.size();
             seg.p_filesz = seg.p_memsz = sz;
-            seg.p_flags  = PF_R;
-            seg.p_align  = sizeof(viua::arch::instruction_type);
+            seg.p_flags                = PF_R;
+            seg.p_align                = sizeof(viua::arch::instruction_type);
 
             Elf64_Shdr sec{};
             sec.sh_name = save_shstr_entry(".viua.fns");
             /*
-             * This could be SHT_SYMTAB, but the SHT_SYMTAB type sections expect a certain format of the symbol table which Viua does not use. So let's just use SHT_PROGBITS because interpretation of SHT_PROGBITS is up to the program.
+             * This could be SHT_SYMTAB, but the SHT_SYMTAB type sections expect
+             * a certain format of the symbol table which Viua does not use. So
+             * let's just use SHT_PROGBITS because interpretation of
+             * SHT_PROGBITS is up to the program.
              */
             sec.sh_type   = SHT_PROGBITS;
             sec.sh_offset = 0;
             sec.sh_size   = seg.p_filesz;
             sec.sh_flags  = SHF_ALLOC;
 
-            elf_headers.push_back({ seg, sec });
+            elf_headers.push_back({seg, sec});
         }
         {
             /*
@@ -2563,51 +2567,52 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_name   = save_shstr_entry(".shstrtab");
             sec.sh_type   = SHT_STRTAB;
             sec.sh_offset = 0;
-            sec.sh_size = shstr.size();
+            sec.sh_size   = shstr.size();
 
-            elf_headers.push_back({ std::nullopt, sec });
+            elf_headers.push_back({std::nullopt, sec});
         }
 
-        auto elf_pheaders = std::count_if(elf_headers.begin(), elf_headers.end(), [](auto const& each) -> bool
-        {
-            return each.first.has_value();
-        });
+        auto elf_pheaders = std::count_if(
+            elf_headers.begin(),
+            elf_headers.end(),
+            [](auto const& each) -> bool { return each.first.has_value(); });
         auto elf_sheaders = elf_headers.size();
 
         auto const elf_size = sizeof(Elf64_Ehdr)
-            + (elf_pheaders * sizeof(Elf64_Phdr))
-            + (elf_sheaders * sizeof(Elf64_Shdr));
+                              + (elf_pheaders * sizeof(Elf64_Phdr))
+                              + (elf_sheaders * sizeof(Elf64_Shdr));
         auto text_offset = std::optional<size_t>{};
         {
             auto offset_accumulator = size_t{0};
-            for (auto& [ segment, section ] : elf_headers) {
+            for (auto& [segment, section] : elf_headers) {
                 if (segment.has_value() and (segment->p_type != PT_NULL)) {
                     if (segment->p_type == PT_NULL) {
                         continue;
                     }
 
                     /*
-                     * The thing that Viua VM mandates is that the main function (if
-                     * it exists) MUST be put in the first executable segment. This
-                     * can be elegantly achieved by blindly pushing the address of
-                     * first such segment.
+                     * The thing that Viua VM mandates is that the main function
+                     * (if it exists) MUST be put in the first executable
+                     * segment. This can be elegantly achieved by blindly
+                     * pushing the address of first such segment.
                      *
                      * The following construction using std::optional:
                      *
                      *      x = x.value_or(y)
                      *
-                     * ensures that x will store the first assigned value without
-                     * any checks. Why not use somethin more C-like? For example:
+                     * ensures that x will store the first assigned value
+                     * without any checks. Why not use somethin more C-like? For
+                     * example:
                      *
                      *      x = (x ? x : y)
                      *
                      * looks like it achieves the same without any fancy-shmancy
                      * types. Yeah, it only looks like it does so. If the first
-                     * executable segment would happen to be at offset 0 then the
-                     * C-style code fails, while the C++-style is correct. As an
-                     * aside: this ie, C style being broken an C++ being correct is
-                     * something surprisingly common. Or rather more functional
-                     * style being correct... But I digress.
+                     * executable segment would happen to be at offset 0 then
+                     * the C-style code fails, while the C++-style is correct.
+                     * As an aside: this ie, C style being broken an C++ being
+                     * correct is something surprisingly common. Or rather more
+                     * functional style being correct... But I digress.
                      */
                     if (segment->p_flags == (PF_R | PF_X)) {
                         text_offset = text_offset.value_or(offset_accumulator);
@@ -2628,16 +2633,17 @@ auto emit_elf(std::filesystem::path const output_path,
             }
         }
 
-        elf_header.e_entry =
-            entry_point_fn.has_value()
-                 ? (*text_offset + *entry_point_fn + elf_size)
-                 : 0;
+        elf_header.e_entry = entry_point_fn.has_value()
+                                 ? (*text_offset + *entry_point_fn + elf_size)
+                                 : 0;
 
-        elf_header.e_phoff     = sizeof(Elf64_Ehdr);;
+        elf_header.e_phoff = sizeof(Elf64_Ehdr);
+        ;
         elf_header.e_phentsize = sizeof(Elf64_Phdr);
         elf_header.e_phnum     = elf_pheaders;
 
-        elf_header.e_shoff     = elf_header.e_phoff + (elf_pheaders * sizeof(Elf64_Phdr));
+        elf_header.e_shoff =
+            elf_header.e_phoff + (elf_pheaders * sizeof(Elf64_Phdr));
         elf_header.e_shentsize = sizeof(Elf64_Shdr);
         elf_header.e_shnum     = elf_sheaders;
         elf_header.e_shstrndx  = elf_sheaders - 1;
@@ -2650,19 +2656,25 @@ auto emit_elf(std::filesystem::path const output_path,
          * tricks, but I don't think it's worth it. For-each loops are simple
          * and do not require any special bookkeeping to work correctly.
          */
-        for (auto const& [ segment, _ ] : elf_headers) {
+        for (auto const& [segment, _] : elf_headers) {
             if (not segment) {
                 continue;
             }
-            write(a_out, &*segment, sizeof(std::remove_reference_t<decltype(*segment)>));
+            write(a_out,
+                  &*segment,
+                  sizeof(std::remove_reference_t<decltype(*segment)>));
         }
-        for (auto const& [ _, section ] : elf_headers) {
-            write(a_out, &section, sizeof(std::remove_reference_t<decltype(section)>));
+        for (auto const& [_, section] : elf_headers) {
+            write(a_out,
+                  &section,
+                  sizeof(std::remove_reference_t<decltype(section)>));
         }
 
         write(a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);
 
-        write(a_out, text.data(), (text.size() * sizeof(std::decay_t<decltype(text)>::value_type)));
+        write(a_out,
+              text.data(),
+              (text.size() * sizeof(std::decay_t<decltype(text)>::value_type)));
         write(a_out, strings_table.data(), strings_table.size());
         write(a_out, fn_table.data(), fn_table.size());
 
@@ -2683,9 +2695,9 @@ auto main(int argc, char* argv[]) -> int
     std::copy(argv + 1, argv + argc, std::back_inserter(args));
 
     auto preferred_output_path = std::optional<std::filesystem::path>{};
-    auto as_executable   = true;
-    auto verbosity_level = 0;
-    auto show_version    = false;
+    auto as_executable         = true;
+    auto verbosity_level       = 0;
+    auto show_version          = false;
 
     for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
         auto const& each = args.at(i);
@@ -2784,15 +2796,13 @@ auto main(int argc, char* argv[]) -> int
         close(source_fd);
     }
 
-    auto const output_path = preferred_output_path.value_or(as_executable
-        ? std::filesystem::path{"a.out"}
-        : [source_path]() -> std::filesystem::path
-        {
+    auto const output_path = preferred_output_path.value_or(
+        as_executable ? std::filesystem::path{"a.out"}
+                      : [source_path]() -> std::filesystem::path {
             auto o = source_path;
             o.replace_extension("o");
             return o;
-        }()
-    );
+        }());
 
     /*
      * Lexical analysis (lexing).
@@ -2914,14 +2924,15 @@ auto main(int argc, char* argv[]) -> int
     /*
      * ELF emission.
      */
-    stage::emit_elf(output_path,
-                    as_executable,
-                    (entry_point_fn.has_value()
-                        ? std::optional{fn_addresses[entry_point_fn.value().text]}
-                        : std::nullopt),
-                    text,
-                    strings_table,
-                    fn_table);
+    stage::emit_elf(
+        output_path,
+        as_executable,
+        (entry_point_fn.has_value()
+             ? std::optional{fn_addresses[entry_point_fn.value().text]}
+             : std::nullopt),
+        text,
+        strings_table,
+        fn_table);
 
     return 0;
 }
