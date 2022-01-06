@@ -2682,7 +2682,7 @@ auto main(int argc, char* argv[]) -> int
     auto args = std::vector<std::string_view>{};
     std::copy(argv + 1, argv + argc, std::back_inserter(args));
 
-    auto output_path     = std::filesystem::path{"a.out"};
+    auto preferred_output_path = std::optional<std::filesystem::path>{};
     auto as_executable   = true;
     auto verbosity_level = 0;
     auto show_version    = false;
@@ -2694,7 +2694,7 @@ auto main(int argc, char* argv[]) -> int
             ++i;
             break;
         } else if (each == "-o") {
-            output_path = args.at(++i);
+            preferred_output_path = std::filesystem::path{args.at(++i)};
         } else if (each == "-c") {
             as_executable = false;
         } else if (each == "-v") {
@@ -2783,6 +2783,16 @@ auto main(int argc, char* argv[]) -> int
         read(source_fd, source_text.data(), source_text.size());
         close(source_fd);
     }
+
+    auto const output_path = preferred_output_path.value_or(as_executable
+        ? std::filesystem::path{"a.out"}
+        : [source_path]() -> std::filesystem::path
+        {
+            auto o = source_path;
+            o.replace_extension("o");
+            return o;
+        }()
+    );
 
     /*
      * Lexical analysis (lexing).
