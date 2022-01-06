@@ -477,7 +477,6 @@ auto main(int argc, char* argv[]) -> int
     {
         auto const a_out = open(executable_path.c_str(), O_RDONLY);
         if (a_out == -1) {
-            close(a_out);
             exit(1);
         }
 
