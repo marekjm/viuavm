@@ -2397,55 +2397,6 @@ auto emit_elf(std::filesystem::path const output_path,
         elf_header.e_flags  = 0;  // processor-specific flags, should be 0
         elf_header.e_ehsize = sizeof(elf_header);
 
-        auto elf_pheaders = std::list<Elf64_Phdr>{};
-
-        {
-            Elf64_Phdr magic_for_binfmt_misc{};
-            magic_for_binfmt_misc.p_type   = PT_NULL;
-            magic_for_binfmt_misc.p_offset = 0;
-            memcpy(&magic_for_binfmt_misc.p_offset, VIUA_MAGIC, 8);
-            magic_for_binfmt_misc.p_filesz = 8;
-            elf_pheaders.push_back(magic_for_binfmt_misc);
-        }
-        {
-            Elf64_Phdr interpreter{};
-            interpreter.p_type   = PT_INTERP;
-            interpreter.p_offset = 0;
-            interpreter.p_filesz = VIUAVM_INTERP.size() + 1;
-            interpreter.p_flags  = PF_R;
-            elf_pheaders.push_back(interpreter);
-        }
-        {
-            Elf64_Phdr text_segment{};
-            text_segment.p_type   = PT_LOAD;
-            text_segment.p_offset = 0;
-            text_segment.p_filesz = (text.size() * sizeof(std::decay_t<decltype(text)>::value_type));
-            text_segment.p_memsz = text_segment.p_filesz;
-            text_segment.p_flags  = PF_R | PF_X;
-            text_segment.p_align  = sizeof(viua::arch::instruction_type);
-            elf_pheaders.push_back(text_segment);
-        }
-        {
-            Elf64_Phdr strings_segment{};
-            strings_segment.p_type   = PT_LOAD;
-            strings_segment.p_offset = 0;
-            strings_segment.p_filesz = strings_table.size();
-            strings_segment.p_memsz  = strings_segment.p_filesz;
-            strings_segment.p_flags  = PF_R;
-            strings_segment.p_align  = sizeof(viua::arch::instruction_type);
-            elf_pheaders.push_back(strings_segment);
-        }
-        {
-            Elf64_Phdr fn_segment{};
-            fn_segment.p_type   = PT_LOAD;
-            fn_segment.p_offset = 0;
-            fn_segment.p_filesz = fn_table.size();
-            fn_segment.p_memsz  = fn_segment.p_filesz;
-            fn_segment.p_flags  = PF_R;
-            fn_segment.p_align  = sizeof(viua::arch::instruction_type);
-            elf_pheaders.push_back(fn_segment);
-        }
-
         auto shstr            = std::vector<char>{'\0'};
         auto save_shstr_entry = [&shstr](std::string_view const sv) -> size_t {
             auto const saved_at = shstr.size();
@@ -2454,124 +2405,227 @@ auto emit_elf(std::filesystem::path const output_path,
             return saved_at;
         };
 
-        auto elf_sheaders = std::list<Elf64_Shdr>{};
+        using Header_pair = std::pair<std::optional<Elf64_Phdr>, Elf64_Shdr>;
+        auto elf_headers = std::vector<Header_pair>{};
 
-        /*
-         * It is mandated by ELF that the first section header is void, and must
-         * be all zeroes. It is reserved and used by ELF extensions.
-         */
-        Elf64_Shdr void_section{};
-        void_section.sh_type = SHT_NULL;
-        elf_sheaders.push_back(void_section);
+        {
+            /*
+             * It is mandated by ELF that the first section header is void, and
+             * must be all zeroes. It is reserved and used by ELF extensions.
+             *
+             * We do not extend ELF in any way, so this section is SHT_NULL for
+             * Viua VM.
+             */
+            Elf64_Shdr void_section{};
+            void_section.sh_type = SHT_NULL;
 
-        Elf64_Shdr magic_section{};
-        magic_section.sh_name = save_shstr_entry(".viua.magic");
-        magic_section.sh_type = SHT_NOBITS;
-        magic_section.sh_offset =
-            sizeof(Elf64_Ehdr) + offsetof(Elf64_Phdr, p_offset);
-        magic_section.sh_size  = 8;
-        magic_section.sh_flags = 0;
-        elf_sheaders.push_back(magic_section);
+            elf_headers.push_back({ std::nullopt, void_section });
+        }
+        {
+            /*
+             * The second section (and the first fragment) is the magic number
+             * Viua uses to detect the if the binary *really* is something it
+             * can handle, and on Linux by the binfmt.d(5) to enable running
+             * Viua ELFs automatically.
+             */
+            Elf64_Phdr seg{};
+            seg.p_type   = PT_NULL;
+            seg.p_offset = 0;
+            memcpy(&seg.p_offset, VIUA_MAGIC, 8);
+            seg.p_filesz = 8;
 
-        Elf64_Shdr interp_section{};
-        interp_section.sh_name   = save_shstr_entry(".interp");
-        interp_section.sh_type   = SHT_PROGBITS;
-        interp_section.sh_offset = 0;
-        interp_section.sh_size   = VIUAVM_INTERP.size() + 1;
-        interp_section.sh_flags  = 0;
-        elf_sheaders.push_back(interp_section);
+            Elf64_Shdr sec{};
+            sec.sh_name = save_shstr_entry(".viua.magic");
+            sec.sh_type = SHT_NOBITS;
+            sec.sh_offset =
+                sizeof(Elf64_Ehdr) + offsetof(Elf64_Phdr, p_offset);
+            sec.sh_size  = 8;
+            sec.sh_flags = 0;
 
-        Elf64_Shdr text_section{};
-        text_section.sh_name   = save_shstr_entry(".text");
-        text_section.sh_type   = SHT_PROGBITS;
-        text_section.sh_offset = 0;
-        text_section.sh_size   = (text.size() * sizeof(std::decay_t<decltype(text)>::value_type));
-        text_section.sh_flags  = SHF_ALLOC | SHF_EXECINSTR;
-        elf_sheaders.push_back(text_section);
+            elf_headers.push_back({ seg, sec });
+        }
+        {
+            /*
+             * What follows is the interpreter. This is mostly useful to get
+             * better reporting out of readelf(1) and file(1). It also serves as
+             * a second thing to check for if the file *really* is a Viua
+             * binary.
+             */
 
-        Elf64_Shdr strings_section{};
-        strings_section.sh_name   = save_shstr_entry(".rodata");
-        strings_section.sh_type   = SHT_PROGBITS;
-        strings_section.sh_offset = 0;
-        strings_section.sh_size   = strings_table.size();
-        strings_section.sh_flags  = SHF_ALLOC;
-        elf_sheaders.push_back(strings_section);
+            Elf64_Phdr seg{};
+            seg.p_type   = PT_INTERP;
+            seg.p_offset = 0;
+            seg.p_filesz = VIUAVM_INTERP.size() + 1;
+            seg.p_flags  = PF_R;
 
-        Elf64_Shdr fn_section{};
-        fn_section.sh_name = save_shstr_entry(".viua.fns");
-        /*
-         * This could be SHT_SYMTAB, but the SHT_SYMTAB type sections expect a
-         * certain format of the symbol table which Viua does not use. So let's
-         * just use SHT_PROGBITS because interpretation of SHT_PROGBITS is up to
-         * the program.
-         */
-        fn_section.sh_type   = SHT_PROGBITS;
-        fn_section.sh_offset = 0;
-        fn_section.sh_size   = fn_table.size();
-        fn_section.sh_flags  = SHF_ALLOC;
-        elf_sheaders.push_back(fn_section);
+            Elf64_Shdr sec{};
+            sec.sh_name   = save_shstr_entry(".interp");
+            sec.sh_type   = SHT_PROGBITS;
+            sec.sh_offset = 0;
+            sec.sh_size   = VIUAVM_INTERP.size() + 1;
+            sec.sh_flags  = 0;
 
-        Elf64_Shdr sh{};
-        sh.sh_name   = save_shstr_entry(".shstrtab");
-        sh.sh_type   = SHT_STRTAB;
-        sh.sh_offset = 0;
-        sh.sh_size = shstr.size();
-        elf_sheaders.push_back(sh);
+            elf_headers.push_back({ seg, sec });
+        }
+        {
+            /*
+             * The first segment and section pair that contains something users
+             * of Viua can affect is the .text section ie, the executable
+             * instructions representing user programs.
+             */
+            Elf64_Phdr seg{};
+            seg.p_type   = PT_LOAD;
+            seg.p_offset = 0;
+            auto const sz = (text.size() * sizeof(std::decay_t<decltype(text)>::value_type));
+            seg.p_filesz = seg.p_memsz = sz;
+            seg.p_flags  = PF_R | PF_X;
+            seg.p_align  = sizeof(viua::arch::instruction_type);
+
+            Elf64_Shdr sec{};
+            sec.sh_name   = save_shstr_entry(".text");
+            sec.sh_type   = SHT_PROGBITS;
+            sec.sh_offset = 0;
+            sec.sh_size   = seg.p_filesz;
+            sec.sh_flags  = SHF_ALLOC | SHF_EXECINSTR;
+
+            elf_headers.push_back({ seg, sec });
+        }
+        {
+            /*
+             * Then, the .rodata section containing user data. Only constants
+             * are allowed to be defined as data labels in Viua -- there are no
+             * global variables.
+             *
+             * The "strings table" contains not only strings but also floats,
+             * atoms, and any other piece of data that does not fit into a
+             * single load instruction (with the exception of long integers
+             * which are loaded using a sequence of raw instructions - this
+             * allows loading addresses, which are then used to index strings
+             * table).
+             */
+            Elf64_Phdr seg{};
+            seg.p_type   = PT_LOAD;
+            seg.p_offset = 0;
+            auto const sz = strings_table.size();
+            seg.p_filesz = seg.p_memsz = sz;
+            seg.p_flags  = PF_R;
+            seg.p_align  = sizeof(viua::arch::instruction_type);
+
+            Elf64_Shdr sec{};
+            sec.sh_name   = save_shstr_entry(".rodata");
+            sec.sh_type   = SHT_PROGBITS;
+            sec.sh_offset = 0;
+            sec.sh_size   = seg.p_filesz;
+            sec.sh_flags  = SHF_ALLOC;
+
+            elf_headers.push_back({ seg, sec });
+        }
+        {
+            /*
+             * Last, but not least, comes another LOAD segment. This one is
+             * mapped to a non-standard named section: .viua.fns It contains a
+             * symbol table with function addresses.
+             *
+             * Function calls use this table to determine the address to which
+             * they should transfer control - there are no direct calls.
+             * Inefficient, but flexible.
+             */
+            Elf64_Phdr seg{};
+            seg.p_type   = PT_LOAD;
+            seg.p_offset = 0;
+            auto const sz = fn_table.size();
+            seg.p_filesz = seg.p_memsz = sz;
+            seg.p_flags  = PF_R;
+            seg.p_align  = sizeof(viua::arch::instruction_type);
+
+            Elf64_Shdr sec{};
+            sec.sh_name = save_shstr_entry(".viua.fns");
+            /*
+             * This could be SHT_SYMTAB, but the SHT_SYMTAB type sections expect a certain format of the symbol table which Viua does not use. So let's just use SHT_PROGBITS because interpretation of SHT_PROGBITS is up to the program.
+             */
+            sec.sh_type   = SHT_PROGBITS;
+            sec.sh_offset = 0;
+            sec.sh_size   = seg.p_filesz;
+            sec.sh_flags  = SHF_ALLOC;
+
+            elf_headers.push_back({ seg, sec });
+        }
+        {
+            /*
+             * ACHTUNG! ATTENTION! UWAGA! POZOR! TÄHELEPANU!
+             *
+             * This section contains the strings table representing section
+             * names. If any more sections are added they MUST APPEAR BEFORE
+             * THIS SECTION. Otherwise the strings won't be available because
+             * the size of the section will not be correct and will appear as
+             * <corrupt> in readelf(1) output.
+             */
+            Elf64_Shdr sec{};
+            sec.sh_name   = save_shstr_entry(".shstrtab");
+            sec.sh_type   = SHT_STRTAB;
+            sec.sh_offset = 0;
+            sec.sh_size = shstr.size();
+
+            elf_headers.push_back({ std::nullopt, sec });
+        }
+
+        auto elf_pheaders = std::count_if(elf_headers.begin(), elf_headers.end(), [](auto const& each) -> bool
+        {
+            return each.first.has_value();
+        });
+        auto elf_sheaders = elf_headers.size();
 
         auto const elf_size = sizeof(Elf64_Ehdr)
-            + (elf_pheaders.size() * sizeof(Elf64_Phdr))
-            + (elf_sheaders.size() * sizeof(Elf64_Shdr));
+            + (elf_pheaders * sizeof(Elf64_Phdr))
+            + (elf_sheaders * sizeof(Elf64_Shdr));
         auto text_offset = std::optional<size_t>{};
         {
             auto offset_accumulator = size_t{0};
-            for (auto& each : elf_pheaders) {
-                if (each.p_type == PT_NULL) {
+            for (auto& [ segment, section ] : elf_headers) {
+                if (segment.has_value() and (segment->p_type != PT_NULL)) {
+                    if (segment->p_type == PT_NULL) {
+                        continue;
+                    }
+
+                    /*
+                     * The thing that Viua VM mandates is that the main function (if
+                     * it exists) MUST be put in the first executable segment. This
+                     * can be elegantly achieved by blindly pushing the address of
+                     * first such segment.
+                     *
+                     * The following construction using std::optional:
+                     *
+                     *      x = x.value_or(y)
+                     *
+                     * ensures that x will store the first assigned value without
+                     * any checks. Why not use somethin more C-like? For example:
+                     *
+                     *      x = (x ? x : y)
+                     *
+                     * looks like it achieves the same without any fancy-shmancy
+                     * types. Yeah, it only looks like it does so. If the first
+                     * executable segment would happen to be at offset 0 then the
+                     * C-style code fails, while the C++-style is correct. As an
+                     * aside: this ie, C style being broken an C++ being correct is
+                     * something surprisingly common. Or rather more functional
+                     * style being correct... But I digress.
+                     */
+                    if (segment->p_flags == (PF_R | PF_X)) {
+                        text_offset = text_offset.value_or(offset_accumulator);
+                    }
+
+                    segment->p_offset = (elf_size + offset_accumulator);
+                }
+
+                if (section.sh_type == SHT_NULL) {
+                    continue;
+                }
+                if (section.sh_type == SHT_NOBITS) {
                     continue;
                 }
 
-                /*
-                 * The thing that Viua VM mandates is that the main function (if
-                 * it exists) MUST be put in the first executable segment. This
-                 * can be elegantly achieved by blindly pushing the address of
-                 * first such segment.
-                 *
-                 * The following construction using std::optional:
-                 *
-                 *      x = x.value_or(y)
-                 *
-                 * ensures that x will store the first assigned value without
-                 * any checks. Why not use somethin more C-like? For example:
-                 *
-                 *      x = (x ? x : y)
-                 *
-                 * looks like it achieves the same without any fancy-shmancy
-                 * types. Yeah, it only looks like it does so. If the first
-                 * executable segment would happen to be at offset 0 then the
-                 * C-style code fails, while the C++-style is correct. As an
-                 * aside: this ie, C style being broken an C++ being correct is
-                 * something surprisingly common. Or rather more functional
-                 * style being correct... But I digress.
-                 */
-                if (each.p_flags == (PF_R | PF_X)) {
-                    text_offset = text_offset.value_or(offset_accumulator);
-                }
-
-                each.p_offset = (elf_size + offset_accumulator);
-                offset_accumulator += each.p_filesz;
-            }
-        }
-        {
-            auto offset_accumulator = size_t{0};
-            for (auto& each : elf_sheaders) {
-                if (each.sh_type == SHT_NULL) {
-                    continue;
-                }
-                if (each.sh_type == SHT_NOBITS) {
-                    continue;
-                }
-
-                each.sh_offset = (elf_size + offset_accumulator);
-                offset_accumulator += each.sh_size;
+                section.sh_offset = (elf_size + offset_accumulator);
+                offset_accumulator += section.sh_size;
             }
         }
 
@@ -2582,20 +2636,29 @@ auto emit_elf(std::filesystem::path const output_path,
 
         elf_header.e_phoff     = sizeof(Elf64_Ehdr);;
         elf_header.e_phentsize = sizeof(Elf64_Phdr);
-        elf_header.e_phnum     = elf_pheaders.size();
+        elf_header.e_phnum     = elf_pheaders;
 
-        elf_header.e_shoff     = elf_header.e_phoff + (elf_pheaders.size() * sizeof(Elf64_Phdr));
+        elf_header.e_shoff     = elf_header.e_phoff + (elf_pheaders * sizeof(Elf64_Phdr));
         elf_header.e_shentsize = sizeof(Elf64_Shdr);
-        elf_header.e_shnum     = elf_sheaders.size();
-        elf_header.e_shstrndx  = elf_sheaders.size() - 1;
+        elf_header.e_shnum     = elf_sheaders;
+        elf_header.e_shstrndx  = elf_sheaders - 1;
 
         write(a_out, &elf_header, sizeof(elf_header));
 
-        for (auto const& each : elf_pheaders) {
-            write(a_out, &each, sizeof(std::remove_reference_t<decltype(each)>));
+        /*
+         * Unfortunately, we have to have use two loops here because segment and
+         * section headers cannot be interweaved. We could do some lseek(2)
+         * tricks, but I don't think it's worth it. For-each loops are simple
+         * and do not require any special bookkeeping to work correctly.
+         */
+        for (auto const& [ segment, _ ] : elf_headers) {
+            if (not segment) {
+                continue;
+            }
+            write(a_out, &*segment, sizeof(std::remove_reference_t<decltype(*segment)>));
         }
-        for (auto const& each : elf_sheaders) {
-            write(a_out, &each, sizeof(std::remove_reference_t<decltype(each)>));
+        for (auto const& [ _, section ] : elf_headers) {
+            write(a_out, &section, sizeof(std::remove_reference_t<decltype(section)>));
         }
 
         write(a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);
