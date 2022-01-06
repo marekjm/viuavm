@@ -17,23 +17,23 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <viua/support/tty.h>
+#include <elf.h>
+#include <fcntl.h>
+#include <stdint.h>
+#include <string.h>
+#include <unistd.h>
 
-#include <iostream>
 #include <filesystem>
+#include <iostream>
+#include <map>
 #include <optional>
 #include <vector>
-#include <map>
 
-#include <stdint.h>
-#include <fcntl.h>
-#include <string.h>
-#include <elf.h>
-#include <unistd.h>
+#include <viua/support/tty.h>
 
 
 struct Fragment {
-    size_t index {};
+    size_t index{};
     std::optional<Elf64_Phdr> program_header{};
     Elf64_Shdr section_header{};
     std::vector<uint8_t> data;
@@ -99,10 +99,10 @@ auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
 
     auto sh_index = size_t{0};
     for (auto const& sh : sheaders) {
-        auto const ph = std::find_if(pheaders.begin(), pheaders.end(), [&sh](auto const& each) -> bool
-        {
-            return (each.p_offset == sh.sh_offset);
-        });
+        auto const ph = std::find_if(
+            pheaders.begin(), pheaders.end(), [&sh](auto const& each) -> bool {
+                return (each.p_offset == sh.sh_offset);
+            });
 
         auto fragment = Fragment{};
 
@@ -119,26 +119,30 @@ auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
         }
 
         fragment.index = sh_index++;
-        loaded.fragments.push_back({ section_names.at(fragment.index), std::move(fragment) });
+        loaded.fragments.push_back(
+            {section_names.at(fragment.index), std::move(fragment)});
     }
 
     return loaded;
 }
 auto Loaded_elf::entry_point() const -> std::optional<size_t>
 {
-    if (auto const f = find_fragment(".text"); header.e_entry and f.has_value()) {
+    if (auto const f = find_fragment(".text");
+        header.e_entry and f.has_value()) {
         return (header.e_entry - f->get().program_header->p_offset);
     } else {
         return std::nullopt;
     }
 }
-auto Loaded_elf::find_fragment(std::string_view const sv) const -> std::optional<std::reference_wrapper<Fragment const>>
+auto Loaded_elf::find_fragment(std::string_view const sv) const
+    -> std::optional<std::reference_wrapper<Fragment const>>
 {
-    auto const frag = std::find_if(fragments.begin(), fragments.end(), [sv](auto const& frag) -> bool
-    {
-        return (frag.first == sv);
-    });
-    return (frag == fragments.end()) ? std::nullopt : std::optional{std::ref(frag->second)};
+    auto const frag = std::find_if(
+        fragments.begin(), fragments.end(), [sv](auto const& frag) -> bool {
+            return (frag.first == sv);
+        });
+    return (frag == fragments.end()) ? std::nullopt
+                                     : std::optional{std::ref(frag->second)};
 }
 auto Loaded_elf::fn_at(std::vector<uint8_t> const& function_table,
                        size_t const offset) -> std::pair<std::string, size_t>
@@ -187,7 +191,8 @@ auto Loaded_elf::function_table() const
     return ft;
 }
 
-constexpr auto VIUA_MAGIC [[maybe_unused]] = std::string_view{"\x7fVIUA\x00\x00\x00", 8};
+constexpr auto VIUA_MAGIC
+    [[maybe_unused]] = std::string_view{"\x7fVIUA\x00\x00\x00", 8};
 
 auto main(int argc, char* argv[]) -> int
 {
@@ -209,20 +214,20 @@ auto main(int argc, char* argv[]) -> int
     auto const elf_path = std::filesystem::path{argv[1]};
     if (not std::filesystem::exists(elf_path)) {
         std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                  << ": file does not exist: "
-                  << esc(2, COLOR_FG_WHITE) << elf_path.string() << esc(2, ATTR_RESET)
-                  << "\n";
+                  << ": file does not exist: " << esc(2, COLOR_FG_WHITE)
+                  << elf_path.string() << esc(2, ATTR_RESET) << "\n";
         return 1;
     }
 
     auto const elf_fd = open(elf_path.c_str(), O_RDONLY);
     if (elf_fd == -1) {
         auto const saved_errno = errno;
-        auto const errname = strerrorname_np(saved_errno);
-        auto const errdesc = strerrordesc_np(saved_errno);
+        auto const errname     = strerrorname_np(saved_errno);
+        auto const errdesc     = strerrordesc_np(saved_errno);
 
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.string() << esc(2, ATTR_RESET)
-                  << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET);
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.string()
+                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
+                  << esc(2, ATTR_RESET);
         if (errname) {
             std::cerr << ": " << errname;
         }
@@ -234,9 +239,9 @@ auto main(int argc, char* argv[]) -> int
     std::cout << "Fragments:\n";
 
     auto const index_width = std::to_string(elf.fragments.size()).size();
-    for (auto const& [ name, each ] : elf.fragments) {
-        auto const& sh[[maybe_unused]] = each.section_header;
-        auto const& ph[[maybe_unused]] = each.program_header;
+    for (auto const& [name, each] : elf.fragments) {
+        auto const& sh [[maybe_unused]] = each.section_header;
+        auto const& ph [[maybe_unused]] = each.program_header;
 
         if (sh.sh_type == SHT_NULL) {
             continue;
@@ -246,17 +251,19 @@ auto main(int argc, char* argv[]) -> int
             constexpr auto NAME_WIDTH = 20;
             std::cout << "  [" << std::setw(index_width) << each.index << "] ";
             std::cout << name << std::string((NAME_WIDTH - name.size()), ' ');
-            std::cout << ((sh.sh_type == SHT_NOBITS) ? "NOBITS"
-                        : (sh.sh_type == SHT_PROGBITS) ? "PROGBITS"
-                        : (sh.sh_type == SHT_STRTAB) ? "STRTAB"
-                        : (sh.sh_type == SHT_NULL) ? "NULL"
-                        : "<unexpected section header type>");
+            std::cout << ((sh.sh_type == SHT_NOBITS)     ? "NOBITS"
+                          : (sh.sh_type == SHT_PROGBITS) ? "PROGBITS"
+                          : (sh.sh_type == SHT_STRTAB)   ? "STRTAB"
+                          : (sh.sh_type == SHT_NULL)
+                              ? "NULL"
+                              : "<unexpected section header type>");
             if (ph.has_value()) {
                 std::cout << " in ";
-                std::cout << ((ph->p_type == PT_LOAD) ? "LOAD"
-                            : (ph->p_type == PT_INTERP) ? "INTERP"
-                            : (ph->p_type == PT_NULL) ? "NULL"
-                            : "<unexpected program header type>");
+                std::cout << ((ph->p_type == PT_LOAD)     ? "LOAD"
+                              : (ph->p_type == PT_INTERP) ? "INTERP"
+                              : (ph->p_type == PT_NULL)
+                                  ? "NULL"
+                                  : "<unexpected program header type>");
             }
             std::cout << "\n";
         }
@@ -264,42 +271,47 @@ auto main(int argc, char* argv[]) -> int
         auto const INDENT = std::string((index_width + 5), ' ');
         {
             std::cout << INDENT << "Offset       "
-                << std::setw(sizeof(sh.sh_offset)) << std::setfill('0')
-                << std::hex << sh.sh_offset
-                << std::dec << " (" << sh.sh_offset << " bytes)"
-                << "\n";
+                      << std::setw(sizeof(sh.sh_offset)) << std::setfill('0')
+                      << std::hex << sh.sh_offset << std::dec << " ("
+                      << sh.sh_offset << " bytes)"
+                      << "\n";
 
             std::cout << INDENT << "File size    "
-                << std::setw(sizeof(sh.sh_size)) << std::setfill('0')
-                << std::hex << sh.sh_size
-                << std::dec << " (" << sh.sh_size << " bytes)"
-                << "\n";
+                      << std::setw(sizeof(sh.sh_size)) << std::setfill('0')
+                      << std::hex << sh.sh_size << std::dec << " ("
+                      << sh.sh_size << " bytes)"
+                      << "\n";
 
             if (ph and (ph->p_type == PT_LOAD)) {
                 std::cout << INDENT << "Memory size  "
-                    << std::setw(sizeof(ph->p_memsz)) << std::setfill('0')
-                    << std::hex << ph->p_memsz
-                    << std::dec << " (" << ph->p_memsz << " bytes)"
-                    << "\n";
+                          << std::setw(sizeof(ph->p_memsz)) << std::setfill('0')
+                          << std::hex << ph->p_memsz << std::dec << " ("
+                          << ph->p_memsz << " bytes)"
+                          << "\n";
             }
         }
 
         if (name == ".interp") {
-            std::cout << INDENT << "  [Interpreter: " << each.data.data() << "]\n";
+            std::cout << INDENT << "  [Interpreter: " << each.data.data()
+                      << "]\n";
         }
         if (name == ".viua.magic") {
             std::cout << INDENT << "  [Magic:";
             std::cout << std::hex;
             for (auto const each : each.data) {
                 std::cout << ' ' << std::setw(2) << std::setfill('0')
-                    << static_cast<int>(each);
+                          << static_cast<int>(each);
             }
             std::cout << std::dec;
 
-            std::cout << (((VIUA_MAGIC.size() == each.data.size()) and (memcmp(VIUA_MAGIC.data(), each.data.data(), VIUA_MAGIC.size()) == 0))
-                    ? " (valid)"
-                    : " (invalid)")
-                << "]\n";
+            std::cout << (((VIUA_MAGIC.size() == each.data.size())
+                           and (memcmp(VIUA_MAGIC.data(),
+                                       each.data.data(),
+                                       VIUA_MAGIC.size())
+                                == 0))
+                              ? " (valid)"
+                              : " (invalid)")
+                      << "]\n";
         }
     }
 
