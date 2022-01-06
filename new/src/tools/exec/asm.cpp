@@ -2380,8 +2380,6 @@ auto emit_elf(std::filesystem::path const output_path,
     auto const VIUAVM_INTERP                   = std::string{"viua-vm"};
 
     {
-        auto const text_offset     = (VIUAVM_INTERP.size() + 1);
-
         // see elf(5)
         Elf64_Ehdr elf_header{};
         elf_header.e_ident[EI_MAG0]       = '\x7f';
@@ -2523,11 +2521,39 @@ auto emit_elf(std::filesystem::path const output_path,
         auto const elf_size = sizeof(Elf64_Ehdr)
             + (elf_pheaders.size() * sizeof(Elf64_Phdr))
             + (elf_sheaders.size() * sizeof(Elf64_Shdr));
+        auto text_offset = std::optional<size_t>{};
         {
             auto offset_accumulator = size_t{0};
             for (auto& each : elf_pheaders) {
                 if (each.p_type == PT_NULL) {
                     continue;
+                }
+
+                /*
+                 * The thing that Viua VM mandates is that the main function (if
+                 * it exists) MUST be put in the first executable segment. This
+                 * can be elegantly achieved by blindly pushing the address of
+                 * first such segment.
+                 *
+                 * The following construction using std::optional:
+                 *
+                 *      x = x.value_or(y)
+                 *
+                 * ensures that x will store the first assigned value without
+                 * any checks. Why not use somethin more C-like? For example:
+                 *
+                 *      x = (x ? x : y)
+                 *
+                 * looks like it achieves the same without any fancy-shmancy
+                 * types. Yeah, it only looks like it does so. If the first
+                 * executable segment would happen to be at offset 0 then the
+                 * C-style code fails, while the C++-style is correct. As an
+                 * aside: this ie, C style being broken an C++ being correct is
+                 * something surprisingly common. Or rather more functional
+                 * style being correct... But I digress.
+                 */
+                if (each.p_flags == (PF_R | PF_X)) {
+                    text_offset = text_offset.value_or(offset_accumulator);
                 }
 
                 each.p_offset = (elf_size + offset_accumulator);
@@ -2551,7 +2577,7 @@ auto emit_elf(std::filesystem::path const output_path,
 
         elf_header.e_entry =
             (as_executable
-                 ? (text_offset + fn_addresses[entry_point_fn.value().text] + elf_size)
+                 ? (*text_offset + fn_addresses[entry_point_fn.value().text] + elf_size)
                  : 0);
 
         elf_header.e_phoff     = sizeof(Elf64_Ehdr);;
