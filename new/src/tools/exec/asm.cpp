@@ -2266,7 +2266,9 @@ auto cook_pseudoinstructions(std::filesystem::path const source_path,
 
 auto find_entry_point(std::filesystem::path const source_path,
                       std::string_view const source_text,
-                      AST_nodes const& nodes) -> viua::libs::lexer::Lexeme
+                      bool const as_executable,
+                      AST_nodes const& nodes)
+    -> std::optional<viua::libs::lexer::Lexeme>
 {
     auto entry_point_fn = std::optional<viua::libs::lexer::Lexeme>{};
     for (auto const& each : nodes) {
@@ -2286,7 +2288,7 @@ auto find_entry_point(std::filesystem::path const source_path,
             entry_point_fn = static_cast<ast::Fn_def&>(*each).name;
         }
     }
-    if (not entry_point_fn.has_value()) {
+    if (as_executable and not entry_point_fn.has_value()) {
         using viua::support::tty::ATTR_RESET;
         using viua::support::tty::COLOR_FG_CYAN;
         using viua::support::tty::COLOR_FG_RED;
@@ -2297,15 +2299,15 @@ auto find_entry_point(std::filesystem::path const source_path,
         std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
                   << ": " << esc(2, COLOR_FG_RED) << "error"
                   << esc(2, ATTR_RESET) << ": "
-                  << " no entry point function defined\n";
+                  << "no entry point function defined\n";
         std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
                   << ": " << esc(2, COLOR_FG_CYAN) << "note"
                   << esc(2, ATTR_RESET) << ": "
-                  << " the entry function should have the [[entry_point]] "
+                  << "the entry function should have the [[entry_point]] "
                      "attribute\n";
         exit(1);
     }
-    return *entry_point_fn;
+    return entry_point_fn;
 }
 
 using Text         = std::vector<viua::arch::instruction_type>;
@@ -2908,8 +2910,8 @@ auto main(int argc, char* argv[]) -> int
      * relocatables and separate compilation is supported again, this should be
      * hidden behind a flag.
      */
-    auto entry_point_fn = std::optional<viua::libs::lexer::Lexeme>{};
-    entry_point_fn = stage::find_entry_point(source_path, source_text, nodes);
+    auto const entry_point_fn =
+        stage::find_entry_point(source_path, source_text, as_executable, nodes);
 
     /*
      * Bytecode emission.
