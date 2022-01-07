@@ -17,6 +17,9 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef VIUA_SUPPORT_TTY_H
+#define VIUA_SUPPORT_TTY_H
+
 #include <string_view>
 
 namespace viua::support::tty {
@@ -33,3 +36,5 @@ constexpr auto ATTR_RESET            = std::string_view{"\x1b[0m"};
 
 auto send_escape_seq(int const, std::string_view const) -> std::string_view;
 }  // namespace viua::support::tty
+
+#endif
