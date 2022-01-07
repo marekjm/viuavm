@@ -123,6 +123,7 @@ $(BUILD)/%.o: ./src/%.cpp
 ################################################################################
 # Explicit dependencies
 $(BUILD)/tools/exec/loader: \
+	$(BUILD)/vm/elf.o \
 	$(BUILD)/support/tty.o
 
 $(BUILD)/tools/exec/asm: \
