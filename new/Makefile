@@ -141,8 +141,10 @@ $(BUILD)/tools/exec/asm.o: \
 	./include/viua/support/vector.h
 
 $(BUILD)/tools/exec/vm: \
+	$(BUILD)/support/tty.o \
 	$(BUILD)/support/string.o \
 	$(BUILD)/vm/core.o \
+	$(BUILD)/vm/elf.o \
 	$(BUILD)/vm/ins.o \
 	$(BUILD)/vm/types.o \
 	$(BUILD)/vm/types/traits.o \
