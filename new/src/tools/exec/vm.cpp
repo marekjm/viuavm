@@ -26,8 +26,8 @@
 #include <unistd.h>
 
 #include <chrono>
-#include <functional>
 #include <filesystem>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -40,7 +40,6 @@
 #include <variant>
 #include <vector>
 
-#include <viua/vm/elf.h>
 #include <viua/arch/arch.h>
 #include <viua/arch/ins.h>
 #include <viua/arch/ops.h>
@@ -48,6 +47,7 @@
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
 #include <viua/vm/core.h>
+#include <viua/vm/elf.h>
 #include <viua/vm/ins.h>
 #include <viua/vm/types.h>
 
@@ -502,21 +502,19 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
 
-    using Module = viua::vm::elf::Loaded_elf;
+    using Module           = viua::vm::elf::Loaded_elf;
     auto const main_module = Module::load(elf_fd);
 
-    auto strings  = std::vector<uint8_t>{};
+    auto strings = std::vector<uint8_t>{};
     if (auto const f = main_module.find_fragment(".rodata"); f.has_value()) {
         strings = f->get().data;
     } else {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET)
-                  << ": no strings fragment found\n";
+                  << esc(2, ATTR_RESET) << ": no strings fragment found\n";
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET)
-                  << ": no .rodata section found\n";
+                  << esc(2, ATTR_RESET) << ": no .rodata section found\n";
         return 1;
     }
 
@@ -530,29 +528,29 @@ auto main(int argc, char* argv[]) -> int
                   << ": no function table fragment found\n";
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET)
-                  << ": no .viua.fns section found\n";
+                  << esc(2, ATTR_RESET) << ": no .viua.fns section found\n";
         return 1;
     }
 
-    auto text     = std::vector<viua::arch::instruction_type>{};
+    auto text = std::vector<viua::arch::instruction_type>{};
     if (auto const f = main_module.find_fragment(".text"); f.has_value()) {
         auto const& tf = f->get();
 
         text.reserve(tf.data.size() / sizeof(viua::arch::instruction_type));
-        for (auto i = size_t{0}; i < tf.data.size(); i += sizeof(viua::arch::instruction_type)) {
+        for (auto i = size_t{0}; i < tf.data.size();
+             i += sizeof(viua::arch::instruction_type)) {
             text.emplace_back(viua::arch::instruction_type{});
-            memcpy(&text.back(), &tf.data[i], sizeof(viua::arch::instruction_type));
+            memcpy(&text.back(),
+                   &tf.data[i],
+                   sizeof(viua::arch::instruction_type));
         }
     } else {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET)
-                  << ": no text fragment found\n";
+                  << esc(2, ATTR_RESET) << ": no text fragment found\n";
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET)
-                  << ": no .text section found\n";
+                  << esc(2, ATTR_RESET) << ": no .text section found\n";
         return 1;
     }
 
@@ -562,8 +560,7 @@ auto main(int argc, char* argv[]) -> int
     } else {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET)
-                  << ": no entry point defined\n";
+                  << esc(2, ATTR_RESET) << ": no entry point defined\n";
         return 1;
     }
 

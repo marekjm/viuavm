@@ -20,16 +20,16 @@
 #ifndef VIUA_VM_ELF_H
 #define VIUA_VM_ELF_H
 
-#include <sys/types.h>
 #include <elf.h>
 #include <string.h>
+#include <sys/types.h>
 #include <unistd.h>
 
-#include <map>
-#include <string>
-#include <optional>
-#include <vector>
 #include <functional>
+#include <map>
+#include <optional>
+#include <string>
+#include <vector>
 
 
 namespace viua::vm::elf {
@@ -59,6 +59,6 @@ struct Loaded_elf {
 };
 
 constexpr inline auto VIUA_MAGIC = std::string_view{"\x7fVIUA\x00\x00\x00", 8};
-}
+}  // namespace viua::vm::elf
 
 #endif

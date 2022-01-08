@@ -155,4 +155,4 @@ auto Loaded_elf::function_table() const
 
     return ft;
 }
-}
+}  // namespace viua::vm::elf
