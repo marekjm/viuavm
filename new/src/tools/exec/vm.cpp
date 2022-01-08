@@ -66,23 +66,6 @@ using viua::vm::Env;
 using viua::vm::Stack;
 
 
-auto Env::function_at(size_t const offset) const
-    -> std::pair<std::string, size_t>
-{
-    auto sz = uint64_t{};
-    memcpy(&sz, (functions_table.data() + offset - sizeof(sz)), sizeof(sz));
-    sz = le64toh(sz);
-
-    auto name = std::string{
-        reinterpret_cast<char const*>(functions_table.data()) + offset, sz};
-
-    auto addr = uint64_t{};
-    memcpy(&addr, (functions_table.data() + offset + sz), sizeof(addr));
-    addr = le64toh(addr);
-
-    return {name, addr};
-}
-
 namespace {
 auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
     -> viua::arch::instruction_type const*
@@ -386,27 +369,21 @@ auto run_instruction(Stack& stack, viua::arch::instruction_type const* ip)
     return ip;
 }
 
-auto run(Stack& stack,
-         viua::arch::instruction_type const* ip,
-         std::tuple<std::string_view const,
-                    viua::arch::instruction_type const*,
-                    viua::arch::instruction_type const*> ip_range) -> void
+auto run(Stack& stack, viua::arch::instruction_type const* ip) -> void
 {
-    auto const [module, ip_begin, ip_end] = ip_range;
-
     constexpr auto PREEMPTION_THRESHOLD = size_t{2};
 
-    while ((ip < ip_end) and (ip >= ip_begin)) {
+    while (stack.environment.ip_in_valid_range(ip)) {
         if constexpr (VIUA_TRACE_CYCLES) {
             viua::TRACE_STREAM
-                << "cycle at " << module << "+0x" << std::hex << std::setw(8)
+                << "cycle at " << stack.environment.elf_path.native() << "[.text+0x" << std::hex << std::setw(8)
                 << std::setfill('0')
-                << ((ip - ip_begin) * sizeof(viua::arch::instruction_type))
-                << std::dec << viua::TRACE_STREAM.endl;
+                << ((ip - stack.environment.ip_base) * sizeof(viua::arch::instruction_type))
+                << std::dec << ']' << viua::TRACE_STREAM.endl;
         }
 
-        for (auto i = size_t{0}; i < PREEMPTION_THRESHOLD and ip != ip_end;
-             ++i) {
+        auto const ip_ok = [&stack, &ip]() -> bool { return stack.environment.ip_in_valid_range(ip); };
+        for (auto i = size_t{0}; i < PREEMPTION_THRESHOLD and ip_ok(); ++i) {
             /*
              * This is needed to detect greedy bundles and adjust preemption
              * counter appropriately. If a greedy bundle contains more
@@ -419,18 +396,11 @@ auto run(Stack& stack,
             ip = run_instruction(stack, ip);
 
             /*
-             * Halting instruction returns nullptr because it does not know
-             * where the end of bytecode lies. This is why we have to watch
-             * out for null pointer here.
-             */
-            ip = (ip == nullptr ? ip_end : ip);
-
-            /*
              * If the instruction was a greedy bundle instead of a single
              * one, the preemption counter has to be adjusted. It may be the
              * case that the bundle already hit the preemption threshold.
              */
-            if (greedy and ip != ip_end) {
+            if (greedy and ip_ok()) {
                 i += (ip - bundle_ip) - 1;
             }
         }
@@ -439,7 +409,7 @@ auto run(Stack& stack,
             // std::cerr << "exited\n";
             break;
         }
-        if (ip == ip_end) {
+        if (not ip_ok()) {
             // std::cerr << "halted\n";
             break;
         }
@@ -455,9 +425,9 @@ auto run(Stack& stack,
         }
     }
 
-    if ((ip > ip_end) or (ip < ip_begin)) {
+    if (not stack.environment.ip_in_valid_range(ip)) {
         std::cerr << "[vm] ip " << std::hex << std::setw(8) << std::setfill('0')
-                  << ((ip - ip_begin) * sizeof(viua::arch::instruction_type))
+                  << ((ip - stack.environment.ip_base) * sizeof(viua::arch::instruction_type))
                   << std::dec << " outside of valid range\n";
     }
 }
@@ -541,10 +511,7 @@ auto main(int argc, char* argv[]) -> int
     using Module           = viua::vm::elf::Loaded_elf;
     auto const main_module = Module::load(elf_fd);
 
-    auto strings = std::vector<uint8_t>{};
-    if (auto const f = main_module.find_fragment(".rodata"); f.has_value()) {
-        strings = f->get().data;
-    } else {
+    if (auto const f = main_module.find_fragment(".rodata"); not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
                   << esc(2, ATTR_RESET) << ": no strings fragment found\n";
@@ -553,11 +520,7 @@ auto main(int argc, char* argv[]) -> int
                   << esc(2, ATTR_RESET) << ": no .rodata section found\n";
         return 1;
     }
-
-    auto fn_table = std::vector<uint8_t>{};
-    if (auto const f = main_module.find_fragment(".viua.fns"); f.has_value()) {
-        fn_table = f->get().data;
-    } else {
+    if (auto const f = main_module.find_fragment(".viua.fns"); not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
                   << esc(2, ATTR_RESET)
@@ -567,20 +530,7 @@ auto main(int argc, char* argv[]) -> int
                   << esc(2, ATTR_RESET) << ": no .viua.fns section found\n";
         return 1;
     }
-
-    auto text = std::vector<viua::arch::instruction_type>{};
-    if (auto const f = main_module.find_fragment(".text"); f.has_value()) {
-        auto const& tf = f->get();
-
-        text.reserve(tf.data.size() / sizeof(viua::arch::instruction_type));
-        for (auto i = size_t{0}; i < tf.data.size();
-             i += sizeof(viua::arch::instruction_type)) {
-            text.emplace_back(viua::arch::instruction_type{});
-            memcpy(&text.back(),
-                   &tf.data[i],
-                   sizeof(viua::arch::instruction_type));
-        }
-    } else {
+    if (auto const f = main_module.find_fragment(".text"); not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
                   << esc(2, ATTR_RESET) << ": no text fragment found\n";
@@ -600,16 +550,10 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
 
-    auto env            = Env{};
-    env.strings_table   = std::move(strings);
-    env.functions_table = std::move(fn_table);
-    env.ip_base         = &text[0];
+    auto env = Env{elf_path, main_module};
 
     auto stack = Stack{env};
-    stack.push(256, (text.data() + entry_addr), nullptr);
-
-    auto const ip_begin = &text[0];
-    auto const ip_end   = (ip_begin + text.size());
+    stack.push(256, (env.ip_base + entry_addr), nullptr);
 
     if constexpr (VIUA_TRACE_CYCLES) {
         if (auto trace_fd = getenv("VIUA_VM_TRACE_FD"); trace_fd) {
@@ -631,14 +575,10 @@ auto main(int argc, char* argv[]) -> int
     }
 
     if constexpr (true) {
-        run(stack,
-            stack.back().entry_address,
-            {(elf_path.native() + "[.text]"), ip_begin, ip_end});
+        run(stack, stack.back().entry_address);
     } else {
         try {
-            run(stack,
-                stack.back().entry_address,
-                {(elf_path.native() + "[.text]"), ip_begin, ip_end});
+            run(stack, stack.back().entry_address);
         } catch (viua::vm::abort_execution const& e) {
             std::cerr << "Aborted execution: " << e.what() << "\n";
             return 1;

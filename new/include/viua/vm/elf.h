@@ -31,13 +31,17 @@
 #include <string>
 #include <vector>
 
+#include <viua/arch/arch.h>
+
 
 namespace viua::vm::elf {
 struct Fragment {
+    using data_type = std::vector<uint8_t>;
+
     size_t index{};
     std::optional<Elf64_Phdr> program_header{};
     Elf64_Shdr section_header{};
-    std::vector<uint8_t> data;
+    data_type data;
 };
 
 struct Loaded_elf {
@@ -56,6 +60,7 @@ struct Loaded_elf {
         -> std::map<size_t, std::pair<std::string, size_t>>;
 
     static auto load(int const elf_fd) -> Loaded_elf;
+    static auto make_text_from(Fragment::data_type const&) -> std::vector<viua::arch::instruction_type>;
 };
 
 constexpr inline auto VIUA_MAGIC = std::string_view{"\x7fVIUA\x00\x00\x00", 8};

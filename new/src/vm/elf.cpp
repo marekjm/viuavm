@@ -155,4 +155,18 @@ auto Loaded_elf::function_table() const
 
     return ft;
 }
+
+auto Loaded_elf::make_text_from(Fragment::data_type const& data) -> std::vector<viua::arch::instruction_type>
+{
+    auto text = std::vector<viua::arch::instruction_type>{};
+    text.reserve(data.size() / sizeof(viua::arch::instruction_type));
+    for (auto i = size_t{0}; i < data.size();
+         i += sizeof(viua::arch::instruction_type)) {
+        text.emplace_back(viua::arch::instruction_type{});
+        memcpy(&text.back(),
+               &data[i],
+               sizeof(viua::arch::instruction_type));
+    }
+    return text;
+}
 }  // namespace viua::vm::elf
