@@ -24,6 +24,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include <chrono>
 #include <filesystem>
@@ -478,6 +480,12 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
 
+    /*
+     * Do not assume that the path given by the user points to a file that
+     * exists. Typos are a thing. And let's check if the file really is a
+     * regular file - trying to execute directories or device files does not
+     * make much sense.
+     */
     auto const elf_path = std::filesystem::path{argv[1]};
     if (not std::filesystem::exists(elf_path)) {
         std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
@@ -485,7 +493,35 @@ auto main(int argc, char* argv[]) -> int
                   << elf_path.native() << esc(2, ATTR_RESET) << "\n";
         return 1;
     }
+    {
+        struct stat statbuf {};
+        if (stat(elf_path.c_str(), &statbuf) == -1) {
+            auto const saved_errno = errno;
+            auto const errname     = strerrorname_np(saved_errno);
+            auto const errdesc     = strerrordesc_np(saved_errno);
 
+            std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                      << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
+                      << esc(2, ATTR_RESET);
+            if (errname) {
+                std::cerr << ": " << errname;
+            }
+            std::cerr << ": " << (errdesc ? errdesc : "unknown error") << "\n";
+            return 1;
+        }
+        if ((statbuf.st_mode & S_IFMT) != S_IFREG) {
+            std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                      << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
+                      << esc(2, ATTR_RESET);
+            std::cerr << ": not a regular file\n";
+            return 1;
+        }
+    }
+
+    /*
+     * Even if the path exists and is a regular file we should check if it was
+     * opened correctly.
+     */
     auto const elf_fd = open(elf_path.c_str(), O_RDONLY);
     if (elf_fd == -1) {
         auto const saved_errno = errno;
