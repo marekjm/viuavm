@@ -228,9 +228,9 @@ auto main(int argc, char* argv[]) -> int
             case R:
                 std::cout << viua::arch::ops::R::decode(ip).to_string();
                 break;
-            /* default: */
-            /*     std::cout << "; " << std::string(16, '^') << " invalid instruction"; */
-            /*     break; */
+            default:
+                std::cout << "; " << std::string(16, '^') << " invalid instruction";
+                break;
             }
             std::cout << "\n";
         }
