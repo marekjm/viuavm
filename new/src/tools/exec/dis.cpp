@@ -32,6 +32,69 @@
 #include <viua/vm/elf.h>
 
 
+namespace {
+auto ins_to_string(viua::arch::instruction_type const ip) -> std::string
+{
+    auto const opcode = static_cast<viua::arch::opcode_type>(
+        ip & viua::arch::ops::OPCODE_MASK);
+    auto const format = static_cast<viua::arch::ops::FORMAT>(
+        opcode & viua::arch::ops::FORMAT_MASK);
+
+    switch (format) {
+        using enum viua::arch::ops::FORMAT;
+    case N:
+        return viua::arch::ops::to_string(opcode);
+    case T:
+        return viua::arch::ops::T::decode(ip).to_string();
+    case D:
+        return viua::arch::ops::D::decode(ip).to_string();
+    case S:
+        return viua::arch::ops::S::decode(ip).to_string();
+    case F:
+        return viua::arch::ops::F::decode(ip).to_string();
+    case E:
+        return viua::arch::ops::E::decode(ip).to_string();
+    case R:
+        return viua::arch::ops::R::decode(ip).to_string();
+    default:
+        return ("; " + std::string(16, '^') + " invalid instruction");
+    }
+}
+}
+
+using Cooked_text = std::vector<std::tuple<
+    std::optional<viua::arch::opcode_type>,
+    std::optional<viua::arch::instruction_type>,
+    std::string
+>>;
+
+namespace cook {
+auto addi_to_li(Cooked_text& text) -> void
+{
+    auto tmp = Cooked_text{};
+
+    for (auto& [ op, ip, s ] : text) {
+        auto const opcode = static_cast<viua::arch::ops::OPCODE>(*op);
+        using enum viua::arch::ops::OPCODE;
+        if ((opcode == ADDI) or (opcode == ADDIU)) {
+            auto const ins = viua::arch::ops::R::decode(*ip);
+            if (ins.in.is_void()) {
+                tmp.push_back({
+                    std::nullopt,
+                    std::nullopt,
+                    ("li " + ins.out.to_string() + ", " + std::to_string(ins.immediate) + ((opcode == ADDIU) ? "u" : ""))
+                });
+                continue;
+            }
+        }
+
+        tmp.push_back({ op, ip, std::move(s) });
+    }
+
+    text = std::move(tmp);
+}
+}
+
 auto main(int argc, char* argv[]) -> int
 {
     using viua::support::tty::ATTR_RESET;
@@ -192,47 +255,23 @@ auto main(int argc, char* argv[]) -> int
             << ((ef.first == name) ? "[[entry_point]] " : "")
             << name << "\n";
 
+        auto cooked_text = Cooked_text{};
         for (auto i = (addr / sizeof(viua::arch::instruction_type)); i <= size; ++i) {
             auto const ip = text.at(i);
-
-            std::cout << "    ; ";
-            std::cout << std::setw(16) << std::setfill('0') << std::hex
-                << ip << "\n";
-
             auto const opcode = static_cast<viua::arch::opcode_type>(
                 ip & viua::arch::ops::OPCODE_MASK);
-            auto const format = static_cast<viua::arch::ops::FORMAT>(
-                opcode & viua::arch::ops::FORMAT_MASK);
+            cooked_text.push_back({ opcode, ip, ins_to_string(ip) });
+        }
 
-            std::cout << "    ";
-            switch (format) {
-                using enum viua::arch::ops::FORMAT;
-            case N:
-                std::cout << viua::arch::ops::to_string(opcode);
-                break;
-            case T:
-                std::cout << viua::arch::ops::T::decode(ip).to_string();
-                break;
-            case D:
-                std::cout << viua::arch::ops::D::decode(ip).to_string();
-                break;
-            case S:
-                std::cout << viua::arch::ops::S::decode(ip).to_string();
-                break;
-            case F:
-                std::cout << viua::arch::ops::F::decode(ip).to_string();
-                break;
-            case E:
-                std::cout << viua::arch::ops::E::decode(ip).to_string();
-                break;
-            case R:
-                std::cout << viua::arch::ops::R::decode(ip).to_string();
-                break;
-            default:
-                std::cout << "; " << std::string(16, '^') << " invalid instruction";
-                break;
+        cook::addi_to_li(cooked_text);
+
+        for (auto const& [ op, ip, s ] : cooked_text) {
+            if (ip.has_value()) {
+                std::cout << "    ; ";
+                std::cout << std::setw(16) << std::setfill('0') << std::hex
+                    << *ip << "\n";
             }
-            std::cout << "\n";
+            std::cout << "    " << s << "\n";
         }
 
         std::cout << ".end\n\n";
