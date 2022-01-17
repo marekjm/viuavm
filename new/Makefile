@@ -46,7 +46,7 @@ CXXLIBS=\
 ################################################################################
 # High-level targets
 all: \
-	$(BUILD)/tools/exec/loader \
+	$(BUILD)/tools/exec/readelf \
 	$(BUILD)/tools/exec/dis \
 	$(BUILD)/tools/exec/asm \
 	$(BUILD)/tools/exec/vm
@@ -121,7 +121,7 @@ $(BUILD)/%.o: ./src/%.cpp
 
 ################################################################################
 # Explicit dependencies
-$(BUILD)/tools/exec/loader: \
+$(BUILD)/tools/exec/readelf: \
 	$(BUILD)/vm/elf.o \
 	$(BUILD)/support/tty.o
 

@@ -6,6 +6,17 @@ of the code as reasonably possible in parallel, taking advantage of manycore
 processors. The ISA presented to users exposes an execution model based on the
 Actor Model.
 
+## Tools
+
+A set of tools is provided for programmers to interact and use the VM. These
+are:
+
+- `vm`: the actual VM implementation used to run executable ELF files containing
+  Viua bytecode
+- `asm` and `dis`: assembler and disassembler
+- `readelf`: a `readelf(1)` specific to Viua ELFs (the usual one is still useful
+  as Viua ELFs are valid ELF files)
+
 --------------------------------------------------------------------------------
 
 ## Transparent execution
