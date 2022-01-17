@@ -2042,12 +2042,21 @@ auto emit_elf(std::filesystem::path const output_path,
 
 auto main(int argc, char* argv[]) -> int
 {
-    if (argc == 1) {
+    using viua::support::tty::ATTR_RESET;
+    using viua::support::tty::COLOR_FG_CYAN;
+    using viua::support::tty::COLOR_FG_ORANGE_RED_1;
+    using viua::support::tty::COLOR_FG_RED;
+    using viua::support::tty::COLOR_FG_RED_1;
+    using viua::support::tty::COLOR_FG_WHITE;
+    using viua::support::tty::send_escape_seq;
+    constexpr auto esc = send_escape_seq;
+
+    auto const args = std::vector<std::string>{(argv + 1), (argv + argc)};
+    if (args.empty()) {
+        std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+                  << ": no file to assemble\n";
         return 1;
     }
-
-    auto args = std::vector<std::string_view>{};
-    std::copy(argv + 1, argv + argc, std::back_inserter(args));
 
     auto preferred_output_path = std::optional<std::filesystem::path>{};
     auto as_executable         = true;
@@ -2060,11 +2069,19 @@ auto main(int argc, char* argv[]) -> int
             // explicit separator of options and operands
             ++i;
             break;
-        } else if (each == "-o") {
+        }
+        /*
+         * Tool-specific options.
+         */
+        else if (each == "-o") {
             preferred_output_path = std::filesystem::path{args.at(++i)};
         } else if (each == "-c") {
             as_executable = false;
-        } else if (each == "-v" or each == "--verbose") {
+        }
+        /*
+         * Common options.
+         */
+        else if (each == "-v" or each == "--verbose") {
             ++verbosity_level;
         } else if (each == "--version") {
             show_version = true;
@@ -2079,7 +2096,7 @@ auto main(int argc, char* argv[]) -> int
 
     if (show_version) {
         if (verbosity_level) {
-            std::cout << "Viua VM assembler ";
+            std::cout << "Viua VM ";
         }
         std::cout << (verbosity_level ? VIUAVM_VERSION_FULL : VIUAVM_VERSION)
                   << "\n";

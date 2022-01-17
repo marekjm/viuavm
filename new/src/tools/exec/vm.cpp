@@ -448,10 +448,44 @@ auto main(int argc, char* argv[]) -> int
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    if (argc == 1) {
+    auto const args = std::vector<std::string>{(argv + 1), (argv + argc)};
+    if (args.empty()) {
         std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
                   << ": no executable to run\n";
         return 1;
+    }
+
+    auto verbosity_level = 0;
+    auto show_version    = false;
+
+    for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
+        auto const& each = args.at(i);
+        if (each == "--") {
+            // explicit separator of options and operands
+            break;
+        }
+        /*
+         * Common options.
+         */
+        else if (each == "-v" or each == "--verbose") {
+            ++verbosity_level;
+        } else if (each == "--version") {
+            show_version = true;
+        } else if (each.front() == '-') {
+            // unknown option
+        } else {
+            // input files start here
+            break;
+        }
+    }
+
+    if (show_version) {
+        if (verbosity_level) {
+            std::cout << "Viua VM ";
+        }
+        std::cout << (verbosity_level ? VIUAVM_VERSION_FULL : VIUAVM_VERSION)
+                  << "\n";
+        return 0;
     }
 
     /*
@@ -460,7 +494,7 @@ auto main(int argc, char* argv[]) -> int
      * regular file - trying to execute directories or device files does not
      * make much sense.
      */
-    auto const elf_path = std::filesystem::path{argv[1]};
+    auto const elf_path = std::filesystem::path{args.back()};
     if (not std::filesystem::exists(elf_path)) {
         std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
                   << ": file does not exist: " << esc(2, COLOR_FG_WHITE)

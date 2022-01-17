@@ -25,6 +25,7 @@
 #include <sys/types.h>
 
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 
 #include <viua/arch/ops.h>
@@ -195,18 +196,54 @@ auto main(int argc, char* argv[]) -> int
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    if (argc == 1) {
+    auto const args = std::vector<std::string>{(argv + 1), (argv + argc)};
+    if (args.empty()) {
         std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
                   << ": no file to disassemble\n";
         return 1;
     }
 
-    auto const args  = std::vector<std::string>{(argv + 1), (argv + argc)};
-    auto demangle_li = true;
-    for (auto const& each : args) {
-        if (each == "--no-demangle-li") {
-            demangle_li = false;
+    auto preferred_output_path = std::optional<std::filesystem::path>{};
+    auto demangle_li           = true;
+    auto verbosity_level       = 0;
+    auto show_version          = false;
+
+    for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
+        auto const& each = args.at(i);
+        if (each == "--") {
+            // explicit separator of options and operands
+            break;
         }
+        /*
+         * Tool-specific options.
+         */
+        else if (each == "--no-demangle-li") {
+            demangle_li = false;
+        } else if (each == "-o") {
+            preferred_output_path = std::filesystem::path{args.at(++i)};
+        }
+        /*
+         * Common options.
+         */
+        else if (each == "-v" or each == "--verbose") {
+            ++verbosity_level;
+        } else if (each == "--version") {
+            show_version = true;
+        } else if (each.front() == '-') {
+            // unknown option
+        } else {
+            // input files start here
+            break;
+        }
+    }
+
+    if (show_version) {
+        if (verbosity_level) {
+            std::cout << "Viua VM ";
+        }
+        std::cout << (verbosity_level ? VIUAVM_VERSION_FULL : VIUAVM_VERSION)
+                  << "\n";
+        return 0;
     }
 
     /*
@@ -339,6 +376,12 @@ auto main(int argc, char* argv[]) -> int
             / sizeof(viua::arch::instruction_type);
     }
 
+    auto to_file = std::ofstream{};
+    if (preferred_output_path.has_value()) {
+        to_file.open(*preferred_output_path);
+    }
+    auto& out = (preferred_output_path.has_value() ? to_file : std::cout);
+
     auto ef = main_module.name_function_at(entry_addr);
     for (auto const& [name, addr, size] : ordered_fns) {
         /*
@@ -346,19 +389,17 @@ auto main(int argc, char* argv[]) -> int
          * would be useful if you wanted to map the disassembled span to bytes
          * inside the bytecode segment.
          */
-        std::cout << "; [.text+0x" << std::setw(16) << std::setfill('0') << addr
-                  << "] to "
-                  << "[.text+0x" << std::setw(16) << std::setfill('0')
-                  << (addr + (size * sizeof(viua::arch::instruction_type)))
-                  << "] (" << size << " instruction" << ((size > 1) ? "s" : "")
-                  << ")\n";
+        out << "; [.text+0x" << std::setw(16) << std::setfill('0') << addr
+            << "] to "
+            << "[.text+0x" << std::setw(16) << std::setfill('0')
+            << (addr + (size * sizeof(viua::arch::instruction_type))) << "] ("
+            << size << " instruction" << ((size > 1) ? "s" : "") << ")\n";
 
         /*
          * Then, the name. Marking the entry point is necessary to correctly
          * recreate the behaviour of the program.
          */
-        std::cout
-            << ".function: " << ((ef.first == name) ? "[[entry_point]] " : "")
+        out << ".function: " << ((ef.first == name) ? "[[entry_point]] " : "")
             << name << "\n";
 
         auto cooked_text  = Cooked_text{};
@@ -377,14 +418,14 @@ auto main(int argc, char* argv[]) -> int
 
         for (auto const& [op, ip, s] : cooked_text) {
             if (ip.has_value()) {
-                std::cout << "    ; ";
-                std::cout << std::setw(16) << std::setfill('0') << std::hex
-                          << *ip << "\n";
+                out << "    ; ";
+                out << std::setw(16) << std::setfill('0') << std::hex << *ip
+                    << "\n";
             }
-            std::cout << "    " << s << "\n";
+            out << "    " << s << "\n";
         }
 
-        std::cout << ".end\n\n";
+        out << ".end\n\n";
     }
 
     return 0;
