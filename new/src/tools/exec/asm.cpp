@@ -806,6 +806,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
     auto const base       = parts.second.first.first;
     auto const multiplier = parts.second.first.second;
     auto const is_greedy  = (each.opcode.text.find("g.") == 0);
+    auto const full_form  = each.operands.at(1).has_attr("full");
 
     auto const is_unsigned = (raw_value.text.back() == 'u');
 
@@ -814,7 +815,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
      * of the highest 36 bits are set. Otherwise, the lui is just
      * overhead.
      */
-    if (parts.first) {
+    if (parts.first or full_form) {
         using namespace std::string_literals;
         auto synth = each;
         synth.opcode.text =
@@ -830,7 +831,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
         cooked.push_back(synth);
     }
 
-    if (multiplier != 0) {
+    if ((multiplier != 0) or full_form) {
         {
             auto synth           = ast::Instruction{};
             synth.opcode         = each.opcode;
@@ -898,9 +899,16 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
                 synth.operands.push_back(src);
             }
             {
+                /*
+                 * The multiplier may be zero if the full form of the expansion
+                 * is requested eg, for an address load. Without this additional
+                 * check the result of the expansion would be incorrect because
+                 * the multiplier would zero the low part of the integer.
+                 */
+                auto const imm_value = (multiplier != 0) ? multiplier : 1;
                 auto immediate = ast::Operand{};
                 immediate.ingredients.push_back(lx.make_synth(
-                    std::to_string(multiplier), TOKEN::LITERAL_INTEGER));
+                    std::to_string(imm_value), TOKEN::LITERAL_INTEGER));
 
                 synth.operands.push_back(immediate);
             }
