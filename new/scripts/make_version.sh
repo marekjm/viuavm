@@ -9,7 +9,7 @@ if [[ $(git ls-files -m | wc -l) -ne 0 ]]; then
     GIT_DIRTY='-dirty'
 fi
 
-FINGERPRINT=$(cat $(find ./include ./src -type f) | sha384sum | cut -d' ' -f1)
+FINGERPRINT=$(cat $(find ./include ./src -type f | sort) | sha384sum | cut -d' ' -f1)
 
 MODE=${1}
 case ${MODE} in
