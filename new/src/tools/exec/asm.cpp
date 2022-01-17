@@ -2719,7 +2719,7 @@ auto main(int argc, char* argv[]) -> int
             preferred_output_path = std::filesystem::path{args.at(++i)};
         } else if (each == "-c") {
             as_executable = false;
-        } else if (each == "-v") {
+        } else if (each == "-v" or each == "--verbose") {
             ++verbosity_level;
         } else if (each == "--version") {
             show_version = true;
