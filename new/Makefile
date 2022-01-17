@@ -126,6 +126,7 @@ $(BUILD)/tools/exec/loader: \
 	$(BUILD)/support/tty.o
 
 $(BUILD)/tools/exec/dis: \
+	$(BUILD)/tools/libs/assembler.o \
 	$(BUILD)/support/tty.o \
 	$(BUILD)/vm/elf.o \
 	$(BUILD)/arch/arch.o \
@@ -137,6 +138,7 @@ $(BUILD)/tools/exec/asm: \
 	$(BUILD)/tools/libs/errors/compile_time.o \
 	$(BUILD)/tools/libs/lexer.o \
 	$(BUILD)/tools/libs/parser.o \
+	$(BUILD)/tools/libs/assembler.o \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
 

@@ -46,6 +46,7 @@
 
 #include <viua/arch/arch.h>
 #include <viua/arch/ops.h>
+#include <viua/libs/assembler.h>
 #include <viua/libs/errors/compile_time.h>
 #include <viua/libs/lexer.h>
 #include <viua/libs/parser.h>
@@ -59,65 +60,6 @@ constexpr auto DEBUG_EXPANSION = false;
 
 
 namespace {
-auto to_loading_parts_unsigned(uint64_t const value)
-    -> std::pair<uint64_t, std::pair<std::pair<uint32_t, uint32_t>, uint32_t>>
-{
-    constexpr auto LOW_24  = uint64_t{0x0000000000ffffff};
-    constexpr auto HIGH_36 = uint64_t{0xfffffffff0000000};
-
-    auto const high_part = ((value & HIGH_36) >> 28);
-    auto const low_part  = static_cast<uint32_t>(value & ~HIGH_36);
-
-    /*
-     * If the low part consists of only 24 bits we can use just two
-     * instructions:
-     *
-     *  1/ lui to load high 36 bits
-     *  2/ addi to add low 24 bits
-     *
-     * This reduces the overhead of loading 64-bit values.
-     */
-    if ((low_part & LOW_24) == low_part) {
-        return {high_part, {{low_part, 0}, 0}};
-    }
-
-    auto const multiplier = 16;
-    auto const remainder  = (low_part % multiplier);
-    auto const base       = (low_part - remainder) / multiplier;
-
-    return {high_part, {{base, multiplier}, remainder}};
-}
-auto li_cost(uint64_t const value) -> size_t
-{
-    /*
-     * Remember to keep this function in sync with what expand_li() function
-     * does. If this function ie, li_cost() returns a bad value, or expand_li()
-     * starts emitting different instructions -- branch calculations will fail.
-     */
-    auto count = size_t{0};
-
-    auto parts = to_loading_parts_unsigned(value);
-    if (parts.first) {
-        ++count;  // lui
-    }
-
-    auto const multiplier = parts.second.first.second;
-    if (multiplier != 0) {
-        ++count;  // g.addiu
-        ++count;  // g.addiu
-        ++count;  // g.mul
-        ++count;  // g.addiu
-        ++count;  // g.add
-        ++count;  // g.add
-        ++count;  // g.delete
-        ++count;  // g.delete
-    } else {
-        ++count;  // addiu
-    }
-
-    return count;
-}
-
 auto save_string(std::vector<uint8_t>& strings, std::string_view const data)
     -> size_t
 {
@@ -207,6 +149,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
         throw Error{raw_value, Cause::Invalid_operand, "expected integer"};
     }
 
+    using viua::libs::assembler::to_loading_parts_unsigned;
     auto parts            = to_loading_parts_unsigned(value);
     auto const base       = parts.second.first.first;
     auto const multiplier = parts.second.first.second;
@@ -758,6 +701,7 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
          * Another choice is to never REDUCE the cost, but insert a bunch of
          * g.noop's as padding. Yeah, that could work, I guess.
          */
+        using viua::libs::assembler::li_cost;
         if (each.opcode == "if" or each.opcode == "g.if") {
             branch_ops_baggage +=
                 li_cost(std::stoull(each.operands.back().to_string()));
