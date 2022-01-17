@@ -60,6 +60,74 @@ auto ins_to_string(viua::arch::instruction_type const ip) -> std::string
         return ("; " + std::string(16, '^') + " invalid instruction");
     }
 }
+
+auto match_opcode(
+        viua::arch::instruction_type const ip
+        , viua::arch::ops::OPCODE const op
+        , viua::arch::opcode_type const flags = 0) -> bool
+{
+    using viua::arch::opcode_type;
+    return (static_cast<opcode_type>(ip) == (static_cast<opcode_type>(op) | flags));
+};
+
+auto to_loading_parts_unsigned(uint64_t const value)
+    -> std::pair<uint64_t, std::pair<std::pair<uint32_t, uint32_t>, uint32_t>>
+{
+    constexpr auto LOW_24  = uint64_t{0x0000000000ffffff};
+    constexpr auto HIGH_36 = uint64_t{0xfffffffff0000000};
+
+    auto const high_part = ((value & HIGH_36) >> 28);
+    auto const low_part  = static_cast<uint32_t>(value & ~HIGH_36);
+
+    /*
+     * If the low part consists of only 24 bits we can use just two
+     * instructions:
+     *
+     *  1/ lui to load high 36 bits
+     *  2/ addi to add low 24 bits
+     *
+     * This reduces the overhead of loading 64-bit values.
+     */
+    if ((low_part & LOW_24) == low_part) {
+        return {high_part, {{low_part, 0}, 0}};
+    }
+
+    auto const multiplier = 16;
+    auto const remainder  = (low_part % multiplier);
+    auto const base       = (low_part - remainder) / multiplier;
+
+    return {high_part, {{base, multiplier}, remainder}};
+}
+auto li_cost(uint64_t const value) -> size_t
+{
+    /*
+     * Remember to keep this function in sync with what expand_li() function
+     * does. If this function ie, li_cost() returns a bad value, or expand_li()
+     * starts emitting different instructions -- branch calculations will fail.
+     */
+    auto count = size_t{0};
+
+    auto parts = to_loading_parts_unsigned(value);
+    if (parts.first) {
+        ++count;  // lui
+    }
+
+    auto const multiplier = parts.second.first.second;
+    if (multiplier != 0) {
+        ++count;  // g.addiu
+        ++count;  // g.addiu
+        ++count;  // g.mul
+        ++count;  // g.addiu
+        ++count;  // g.add
+        ++count;  // g.add
+        ++count;  // g.delete
+        ++count;  // g.delete
+    } else {
+        ++count;  // addiu
+    }
+
+    return count;
+}
 }
 
 using Cooked_text = std::vector<std::tuple<
@@ -69,26 +137,109 @@ using Cooked_text = std::vector<std::tuple<
 >>;
 
 namespace cook {
-auto addi_to_li(Cooked_text& text) -> void
+auto demangle_canonical_li(Cooked_text& text) -> void
 {
     auto tmp = Cooked_text{};
 
-    for (auto& [ op, ip, s ] : text) {
-        auto const opcode = static_cast<viua::arch::ops::OPCODE>(*op);
+    auto const ins_at = [&text](size_t const n) -> viua::arch::instruction_type
+    {
+        return std::get<1>(text.at(n)).value_or(0);
+    };
+    auto const m = [ins_at](size_t const n
+        , viua::arch::ops::OPCODE const op
+        , viua::arch::opcode_type const flags = 0) -> bool
+    {
+        return match_opcode(ins_at(n), op, flags);
+    };
+    auto match_canonical_li = [m](size_t const n, viua::arch::ops::OPCODE const lui) -> bool
+    {
         using enum viua::arch::ops::OPCODE;
-        if ((opcode == ADDI) or (opcode == ADDIU)) {
-            auto const ins = viua::arch::ops::R::decode(*ip);
-            if (ins.in.is_void()) {
-                tmp.push_back({
-                    std::nullopt,
-                    std::nullopt,
-                    ("li " + ins.out.to_string() + ", " + std::to_string(ins.immediate) + ((opcode == ADDIU) ? "u" : ""))
-                });
+        using viua::arch::ops::GREEDY;
+        return  m((n + 0), lui, GREEDY)
+            and m((n + 1), ADDIU, GREEDY)
+            and m((n + 2), ADDIU, GREEDY)
+            and m((n + 3), MUL, GREEDY)
+            and m((n + 4), ADDIU, GREEDY)
+            and m((n + 5), ADD, GREEDY)
+            and m((n + 6), ADD, GREEDY)
+            and m((n + 7), MOVE, GREEDY)
+            and (m((n + 8), MOVE) or m((n + 8), MOVE, GREEDY));
+    };
+
+    using enum viua::arch::ops::OPCODE;
+    for (auto i = size_t{0}; i < text.size(); ++i) {
+        if (match_canonical_li(i, LUI) or match_canonical_li(i, LUIU)) {
+            using viua::arch::ops::E;
+            using viua::arch::ops::R;
+
+            auto const lui = E::decode(ins_at(i));
+            auto const high_part = lui.immediate;
+            auto const base = R::decode(ins_at(i + 1)).immediate;
+            auto const multiplier = R::decode(ins_at(i + 2)).immediate;
+            auto const remainder = R::decode(ins_at(i + 4)).immediate;
+
+            auto const literal = high_part + (base * multiplier) + remainder;
+
+            using viua::arch::ops::GREEDY;
+            auto const needs_annotation = (li_cost(literal) != li_cost(std::numeric_limits<uint64_t>::max()));
+            auto const needs_greedy = m((i + 8), MOVE, GREEDY);
+            auto const needs_unsigned = m(i, LUIU, GREEDY);
+
+            tmp.emplace_back(
+                  std::nullopt
+                , std::nullopt
+                , ((needs_greedy ? "g." : "") + std::string{"li "}
+                    + lui.out.to_string() + ", "
+                    + (needs_annotation ? "[[full]] " : "")
+                    + std::to_string(literal)
+                    + (needs_unsigned ? "u" : "")));
+            i += 8;
+        } else {
+            tmp.push_back(std::move(text.at(i)));
+        }
+    }
+
+    text = std::move(tmp);
+}
+
+auto demangle_addi_to_void(Cooked_text& text) -> void
+{
+    auto tmp = Cooked_text{};
+
+    auto const ins_at = [&text](size_t const n) -> viua::arch::instruction_type
+    {
+        return std::get<1>(text.at(n)).value_or(0);
+    };
+    auto const m = [ins_at](size_t const n
+        , viua::arch::ops::OPCODE const op
+        , viua::arch::opcode_type const flags = 0) -> bool
+    {
+        return match_opcode(ins_at(n), op, flags);
+    };
+
+    using enum viua::arch::ops::OPCODE;
+    for (auto i = size_t{0}; i < text.size(); ++i) {
+        using viua::arch::ops::GREEDY;
+        if (m(i, ADDI) or m(i, ADDIU) or m(i, ADDI, GREEDY) or m(i, ADDIU, GREEDY)) {
+            using viua::arch::ops::R;
+            auto const addi = R::decode(ins_at(i));
+            if (addi.in.is_void()) {
+                auto const needs_greedy = (addi.opcode & GREEDY);
+                auto const needs_unsigned = m(i, LUIU, GREEDY);
+
+                tmp.emplace_back(
+                      std::nullopt
+                    , std::nullopt
+                    , ((needs_greedy ? "g." : "") + std::string{"li "}
+                        + addi.out.to_string() + ", "
+                        + std::to_string(addi.immediate)
+                        + (needs_unsigned ? "u" : "")));
+
                 continue;
             }
         }
 
-        tmp.push_back({ op, ip, std::move(s) });
+        tmp.push_back(std::move(text.at(i)));
     }
 
     text = std::move(tmp);
@@ -112,13 +263,21 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
 
+    auto const args = std::vector<std::string>{(argv + 1), (argv + argc)};
+    auto demangle_li = true;
+    for (auto const& each : args) {
+        if (each == "--no-demangle-li") {
+            demangle_li = false;
+        }
+    }
+
     /*
      * Do not assume that the path given by the user points to a file that
      * exists. Typos are a thing. And let's check if the file really is a
      * regular file - trying to execute directories or device files does not
      * make much sense.
      */
-    auto const elf_path = std::filesystem::path{argv[1]};
+    auto const elf_path = std::filesystem::path{args.back()};
     if (not std::filesystem::exists(elf_path)) {
         std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
                   << ": file does not exist: " << esc(2, COLOR_FG_WHITE)
@@ -256,14 +415,18 @@ auto main(int argc, char* argv[]) -> int
             << name << "\n";
 
         auto cooked_text = Cooked_text{};
-        for (auto i = (addr / sizeof(viua::arch::instruction_type)); i <= size; ++i) {
-            auto const ip = text.at(i);
+        auto const offset = (addr / sizeof(viua::arch::instruction_type));
+        for (auto i = size_t{0}; i < size; ++i) {
+            auto const ip = text.at(offset + i);
             auto const opcode = static_cast<viua::arch::opcode_type>(
                 ip & viua::arch::ops::OPCODE_MASK);
             cooked_text.push_back({ opcode, ip, ins_to_string(ip) });
         }
 
-        cook::addi_to_li(cooked_text);
+        if (demangle_li) {
+            cook::demangle_canonical_li(cooked_text);
+            cook::demangle_addi_to_void(cooked_text);
+        }
 
         for (auto const& [ op, ip, s ] : cooked_text) {
             if (ip.has_value()) {
