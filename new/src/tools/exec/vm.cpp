@@ -23,9 +23,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <chrono>
 #include <filesystem>
@@ -376,13 +376,16 @@ auto run(Stack& stack, viua::arch::instruction_type const* ip) -> void
     while (stack.environment.ip_in_valid_range(ip)) {
         if constexpr (VIUA_TRACE_CYCLES) {
             viua::TRACE_STREAM
-                << "cycle at " << stack.environment.elf_path.native() << "[.text+0x" << std::hex << std::setw(8)
-                << std::setfill('0')
-                << ((ip - stack.environment.ip_base) * sizeof(viua::arch::instruction_type))
+                << "cycle at " << stack.environment.elf_path.native()
+                << "[.text+0x" << std::hex << std::setw(8) << std::setfill('0')
+                << ((ip - stack.environment.ip_base)
+                    * sizeof(viua::arch::instruction_type))
                 << std::dec << ']' << viua::TRACE_STREAM.endl;
         }
 
-        auto const ip_ok = [&stack, &ip]() -> bool { return stack.environment.ip_in_valid_range(ip); };
+        auto const ip_ok = [&stack, &ip]() -> bool {
+            return stack.environment.ip_in_valid_range(ip);
+        };
         for (auto i = size_t{0}; i < PREEMPTION_THRESHOLD and ip_ok(); ++i) {
             /*
              * This is needed to detect greedy bundles and adjust preemption
@@ -427,7 +430,8 @@ auto run(Stack& stack, viua::arch::instruction_type const* ip) -> void
 
     if (not stack.environment.ip_in_valid_range(ip)) {
         std::cerr << "[vm] ip " << std::hex << std::setw(8) << std::setfill('0')
-                  << ((ip - stack.environment.ip_base) * sizeof(viua::arch::instruction_type))
+                  << ((ip - stack.environment.ip_base)
+                      * sizeof(viua::arch::instruction_type))
                   << std::dec << " outside of valid range\n";
     }
 }
@@ -464,7 +468,8 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
     {
-        struct stat statbuf {};
+        struct stat statbuf {
+        };
         if (stat(elf_path.c_str(), &statbuf) == -1) {
             auto const saved_errno = errno;
             auto const errname     = strerrorname_np(saved_errno);
@@ -511,7 +516,8 @@ auto main(int argc, char* argv[]) -> int
     using Module           = viua::vm::elf::Loaded_elf;
     auto const main_module = Module::load(elf_fd);
 
-    if (auto const f = main_module.find_fragment(".rodata"); not f.has_value()) {
+    if (auto const f = main_module.find_fragment(".rodata");
+        not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
                   << esc(2, ATTR_RESET) << ": no strings fragment found\n";
@@ -520,7 +526,8 @@ auto main(int argc, char* argv[]) -> int
                   << esc(2, ATTR_RESET) << ": no .rodata section found\n";
         return 1;
     }
-    if (auto const f = main_module.find_fragment(".viua.fns"); not f.has_value()) {
+    if (auto const f = main_module.find_fragment(".viua.fns");
+        not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
                   << esc(2, ATTR_RESET)

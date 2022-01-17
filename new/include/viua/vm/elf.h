@@ -60,7 +60,8 @@ struct Loaded_elf {
         -> std::map<size_t, std::pair<std::string, size_t>>;
 
     static auto load(int const elf_fd) -> Loaded_elf;
-    static auto make_text_from(Fragment::data_type const&) -> std::vector<viua::arch::instruction_type>;
+    static auto make_text_from(Fragment::data_type const&)
+        -> std::vector<viua::arch::instruction_type>;
 };
 
 constexpr inline auto VIUA_MAGIC = std::string_view{"\x7fVIUA\x00\x00\x00", 8};

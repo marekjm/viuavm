@@ -906,7 +906,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
                  * the multiplier would zero the low part of the integer.
                  */
                 auto const imm_value = (multiplier != 0) ? multiplier : 1;
-                auto immediate = ast::Operand{};
+                auto immediate       = ast::Operand{};
                 immediate.ingredients.push_back(lx.make_synth(
                     std::to_string(imm_value), TOKEN::LITERAL_INTEGER));
 

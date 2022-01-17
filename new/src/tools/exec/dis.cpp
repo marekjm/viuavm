@@ -18,14 +18,14 @@
  */
 
 
-#include <stdint.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <string.h>
 #include <fcntl.h>
+#include <stdint.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
-#include <iostream>
 #include <filesystem>
+#include <iostream>
 
 #include <viua/arch/ops.h>
 #include <viua/support/tty.h>
@@ -35,8 +35,8 @@
 namespace {
 auto ins_to_string(viua::arch::instruction_type const ip) -> std::string
 {
-    auto const opcode = static_cast<viua::arch::opcode_type>(
-        ip & viua::arch::ops::OPCODE_MASK);
+    auto const opcode =
+        static_cast<viua::arch::opcode_type>(ip & viua::arch::ops::OPCODE_MASK);
     auto const format = static_cast<viua::arch::ops::FORMAT>(
         opcode & viua::arch::ops::FORMAT_MASK);
 
@@ -61,13 +61,13 @@ auto ins_to_string(viua::arch::instruction_type const ip) -> std::string
     }
 }
 
-auto match_opcode(
-        viua::arch::instruction_type const ip
-        , viua::arch::ops::OPCODE const op
-        , viua::arch::opcode_type const flags = 0) -> bool
+auto match_opcode(viua::arch::instruction_type const ip,
+                  viua::arch::ops::OPCODE const op,
+                  viua::arch::opcode_type const flags = 0) -> bool
 {
     using viua::arch::opcode_type;
-    return (static_cast<opcode_type>(ip) == (static_cast<opcode_type>(op) | flags));
+    return (static_cast<opcode_type>(ip)
+            == (static_cast<opcode_type>(op) | flags));
 };
 
 auto to_loading_parts_unsigned(uint64_t const value)
@@ -128,42 +128,36 @@ auto li_cost(uint64_t const value) -> size_t
 
     return count;
 }
-}
+}  // namespace
 
-using Cooked_text = std::vector<std::tuple<
-    std::optional<viua::arch::opcode_type>,
-    std::optional<viua::arch::instruction_type>,
-    std::string
->>;
+using Cooked_text =
+    std::vector<std::tuple<std::optional<viua::arch::opcode_type>,
+                           std::optional<viua::arch::instruction_type>,
+                           std::string>>;
 
 namespace cook {
 auto demangle_canonical_li(Cooked_text& text) -> void
 {
     auto tmp = Cooked_text{};
 
-    auto const ins_at = [&text](size_t const n) -> viua::arch::instruction_type
-    {
+    auto const ins_at =
+        [&text](size_t const n) -> viua::arch::instruction_type {
         return std::get<1>(text.at(n)).value_or(0);
     };
-    auto const m = [ins_at](size_t const n
-        , viua::arch::ops::OPCODE const op
-        , viua::arch::opcode_type const flags = 0) -> bool
-    {
+    auto const m = [ins_at](size_t const n,
+                            viua::arch::ops::OPCODE const op,
+                            viua::arch::opcode_type const flags = 0) -> bool {
         return match_opcode(ins_at(n), op, flags);
     };
-    auto match_canonical_li = [m](size_t const n, viua::arch::ops::OPCODE const lui) -> bool
-    {
+    auto match_canonical_li = [m](size_t const n,
+                                  viua::arch::ops::OPCODE const lui) -> bool {
         using enum viua::arch::ops::OPCODE;
         using viua::arch::ops::GREEDY;
-        return  m((n + 0), lui, GREEDY)
-            and m((n + 1), ADDIU, GREEDY)
-            and m((n + 2), ADDIU, GREEDY)
-            and m((n + 3), MUL, GREEDY)
-            and m((n + 4), ADDIU, GREEDY)
-            and m((n + 5), ADD, GREEDY)
-            and m((n + 6), ADD, GREEDY)
-            and m((n + 7), MOVE, GREEDY)
-            and (m((n + 8), MOVE) or m((n + 8), MOVE, GREEDY));
+        return m((n + 0), lui, GREEDY) and m((n + 1), ADDIU, GREEDY)
+               and m((n + 2), ADDIU, GREEDY) and m((n + 3), MUL, GREEDY)
+               and m((n + 4), ADDIU, GREEDY) and m((n + 5), ADD, GREEDY)
+               and m((n + 6), ADD, GREEDY) and m((n + 7), MOVE, GREEDY)
+               and (m((n + 8), MOVE) or m((n + 8), MOVE, GREEDY));
     };
 
     using enum viua::arch::ops::OPCODE;
@@ -172,27 +166,28 @@ auto demangle_canonical_li(Cooked_text& text) -> void
             using viua::arch::ops::E;
             using viua::arch::ops::R;
 
-            auto const lui = E::decode(ins_at(i));
-            auto const high_part = lui.immediate;
-            auto const base = R::decode(ins_at(i + 1)).immediate;
+            auto const lui        = E::decode(ins_at(i));
+            auto const high_part  = lui.immediate;
+            auto const base       = R::decode(ins_at(i + 1)).immediate;
             auto const multiplier = R::decode(ins_at(i + 2)).immediate;
-            auto const remainder = R::decode(ins_at(i + 4)).immediate;
+            auto const remainder  = R::decode(ins_at(i + 4)).immediate;
 
             auto const literal = high_part + (base * multiplier) + remainder;
 
             using viua::arch::ops::GREEDY;
-            auto const needs_annotation = (li_cost(literal) != li_cost(std::numeric_limits<uint64_t>::max()));
-            auto const needs_greedy = m((i + 8), MOVE, GREEDY);
+            auto const needs_annotation =
+                (li_cost(literal)
+                 != li_cost(std::numeric_limits<uint64_t>::max()));
+            auto const needs_greedy   = m((i + 8), MOVE, GREEDY);
             auto const needs_unsigned = m(i, LUIU, GREEDY);
 
             tmp.emplace_back(
-                  std::nullopt
-                , std::nullopt
-                , ((needs_greedy ? "g." : "") + std::string{"li "}
-                    + lui.out.to_string() + ", "
-                    + (needs_annotation ? "[[full]] " : "")
-                    + std::to_string(literal)
-                    + (needs_unsigned ? "u" : "")));
+                std::nullopt,
+                std::nullopt,
+                ((needs_greedy ? "g." : "") + std::string{"li "}
+                 + lui.out.to_string() + ", "
+                 + (needs_annotation ? "[[full]] " : "")
+                 + std::to_string(literal) + (needs_unsigned ? "u" : "")));
             i += 8;
         } else {
             tmp.push_back(std::move(text.at(i)));
@@ -206,34 +201,33 @@ auto demangle_addi_to_void(Cooked_text& text) -> void
 {
     auto tmp = Cooked_text{};
 
-    auto const ins_at = [&text](size_t const n) -> viua::arch::instruction_type
-    {
+    auto const ins_at =
+        [&text](size_t const n) -> viua::arch::instruction_type {
         return std::get<1>(text.at(n)).value_or(0);
     };
-    auto const m = [ins_at](size_t const n
-        , viua::arch::ops::OPCODE const op
-        , viua::arch::opcode_type const flags = 0) -> bool
-    {
+    auto const m = [ins_at](size_t const n,
+                            viua::arch::ops::OPCODE const op,
+                            viua::arch::opcode_type const flags = 0) -> bool {
         return match_opcode(ins_at(n), op, flags);
     };
 
     using enum viua::arch::ops::OPCODE;
     for (auto i = size_t{0}; i < text.size(); ++i) {
         using viua::arch::ops::GREEDY;
-        if (m(i, ADDI) or m(i, ADDIU) or m(i, ADDI, GREEDY) or m(i, ADDIU, GREEDY)) {
+        if (m(i, ADDI) or m(i, ADDIU) or m(i, ADDI, GREEDY)
+            or m(i, ADDIU, GREEDY)) {
             using viua::arch::ops::R;
             auto const addi = R::decode(ins_at(i));
             if (addi.in.is_void()) {
-                auto const needs_greedy = (addi.opcode & GREEDY);
+                auto const needs_greedy   = (addi.opcode & GREEDY);
                 auto const needs_unsigned = m(i, LUIU, GREEDY);
 
-                tmp.emplace_back(
-                      std::nullopt
-                    , std::nullopt
-                    , ((needs_greedy ? "g." : "") + std::string{"li "}
-                        + addi.out.to_string() + ", "
-                        + std::to_string(addi.immediate)
-                        + (needs_unsigned ? "u" : "")));
+                tmp.emplace_back(std::nullopt,
+                                 std::nullopt,
+                                 ((needs_greedy ? "g." : "")
+                                  + std::string{"li "} + addi.out.to_string()
+                                  + ", " + std::to_string(addi.immediate)
+                                  + (needs_unsigned ? "u" : "")));
 
                 continue;
             }
@@ -244,7 +238,7 @@ auto demangle_addi_to_void(Cooked_text& text) -> void
 
     text = std::move(tmp);
 }
-}
+}  // namespace cook
 
 auto main(int argc, char* argv[]) -> int
 {
@@ -263,7 +257,7 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
 
-    auto const args = std::vector<std::string>{(argv + 1), (argv + argc)};
+    auto const args  = std::vector<std::string>{(argv + 1), (argv + argc)};
     auto demangle_li = true;
     for (auto const& each : args) {
         if (each == "--no-demangle-li") {
@@ -285,7 +279,8 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
     {
-        struct stat statbuf {};
+        struct stat statbuf {
+        };
         if (stat(elf_path.c_str(), &statbuf) == -1) {
             auto const saved_errno = errno;
             auto const errname     = strerrorname_np(saved_errno);
@@ -332,7 +327,8 @@ auto main(int argc, char* argv[]) -> int
     using Module           = viua::vm::elf::Loaded_elf;
     auto const main_module = Module::load(elf_fd);
 
-    if (auto const f = main_module.find_fragment(".rodata"); not f.has_value()) {
+    if (auto const f = main_module.find_fragment(".rodata");
+        not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
                   << esc(2, ATTR_RESET) << ": no strings fragment found\n";
@@ -341,7 +337,8 @@ auto main(int argc, char* argv[]) -> int
                   << esc(2, ATTR_RESET) << ": no .rodata section found\n";
         return 1;
     }
-    if (auto const f = main_module.find_fragment(".viua.fns"); not f.has_value()) {
+    if (auto const f = main_module.find_fragment(".viua.fns");
+        not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
                   << esc(2, ATTR_RESET)
@@ -375,33 +372,39 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
 
-    auto const ft = main_module.function_table();
+    auto const ft    = main_module.function_table();
     auto ordered_fns = std::vector<std::tuple<std::string, size_t, size_t>>{};
     {
         for (auto const& each : ft) {
-            ordered_fns.push_back({ each.second.first, each.second.second, 0 });
+            ordered_fns.push_back({each.second.first, each.second.second, 0});
         }
-        std::sort(ordered_fns.begin(), ordered_fns.end(), [](auto const& a, auto const& b)
-        {
-            return (std::get<1>(a) < std::get<1>(b));
-        });
+        std::sort(ordered_fns.begin(),
+                  ordered_fns.end(),
+                  [](auto const& a, auto const& b) {
+                      return (std::get<1>(a) < std::get<1>(b));
+                  });
         for (auto i = size_t{1}; i < ordered_fns.size(); ++i) {
-            auto const& each = ordered_fns.at(i);
-            auto& prev = ordered_fns.at(i - 1);
-            std::get<2>(prev) = (std::get<1>(each) - std::get<1>(prev)) / sizeof(viua::arch::instruction_type);
+            auto const& each  = ordered_fns.at(i);
+            auto& prev        = ordered_fns.at(i - 1);
+            std::get<2>(prev) = (std::get<1>(each) - std::get<1>(prev))
+                                / sizeof(viua::arch::instruction_type);
         }
-        std::get<2>(ordered_fns.back()) = ((text.size() * sizeof(viua::arch::instruction_type)) - std::get<1>(ordered_fns.back())) / sizeof(viua::arch::instruction_type);
+        std::get<2>(ordered_fns.back()) =
+            ((text.size() * sizeof(viua::arch::instruction_type))
+             - std::get<1>(ordered_fns.back()))
+            / sizeof(viua::arch::instruction_type);
     }
 
     auto ef = main_module.name_function_at(entry_addr);
-    for (auto const& [ name, addr, size ] : ordered_fns) {
+    for (auto const& [name, addr, size] : ordered_fns) {
         /*
          * Let's emit a comment containing the span of the function. This is
          * would be useful if you wanted to map the disassembled span to bytes
          * inside the bytecode segment.
          */
-        std::cout << "; [.text+0x" << std::setw(16) << std::setfill('0') << addr << "] to "
-                  << "[.text+0x" <<  std::setw(16) << std::setfill('0')
+        std::cout << "; [.text+0x" << std::setw(16) << std::setfill('0') << addr
+                  << "] to "
+                  << "[.text+0x" << std::setw(16) << std::setfill('0')
                   << (addr + (size * sizeof(viua::arch::instruction_type)))
                   << "] (" << size << " instruction" << ((size > 1) ? "s" : "")
                   << ")\n";
@@ -410,17 +413,17 @@ auto main(int argc, char* argv[]) -> int
          * Then, the name. Marking the entry point is necessary to correctly
          * recreate the behaviour of the program.
          */
-        std::cout << ".function: "
-            << ((ef.first == name) ? "[[entry_point]] " : "")
+        std::cout
+            << ".function: " << ((ef.first == name) ? "[[entry_point]] " : "")
             << name << "\n";
 
-        auto cooked_text = Cooked_text{};
+        auto cooked_text  = Cooked_text{};
         auto const offset = (addr / sizeof(viua::arch::instruction_type));
         for (auto i = size_t{0}; i < size; ++i) {
-            auto const ip = text.at(offset + i);
+            auto const ip     = text.at(offset + i);
             auto const opcode = static_cast<viua::arch::opcode_type>(
                 ip & viua::arch::ops::OPCODE_MASK);
-            cooked_text.push_back({ opcode, ip, ins_to_string(ip) });
+            cooked_text.push_back({opcode, ip, ins_to_string(ip)});
         }
 
         if (demangle_li) {
@@ -428,11 +431,11 @@ auto main(int argc, char* argv[]) -> int
             cook::demangle_addi_to_void(cooked_text);
         }
 
-        for (auto const& [ op, ip, s ] : cooked_text) {
+        for (auto const& [op, ip, s] : cooked_text) {
             if (ip.has_value()) {
                 std::cout << "    ; ";
                 std::cout << std::setw(16) << std::setfill('0') << std::hex
-                    << *ip << "\n";
+                          << *ip << "\n";
             }
             std::cout << "    " << s << "\n";
         }

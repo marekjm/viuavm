@@ -26,10 +26,10 @@
 
 #include <atomic>
 #include <exception>
+#include <filesystem>
 #include <memory>
 #include <optional>
 #include <string>
-#include <filesystem>
 #include <string_view>
 #include <type_traits>
 #include <unordered_map>
@@ -38,15 +38,15 @@
 #include <vector>
 
 #include <viua/arch/arch.h>
-#include <viua/vm/types.h>
 #include <viua/vm/elf.h>
+#include <viua/vm/types.h>
 
 
 namespace viua::vm {
 struct Env {
     using strtab_type = std::vector<uint8_t>;
-    using fntab_type = std::vector<uint8_t>;
-    using text_type = std::vector<viua::arch::instruction_type>;
+    using fntab_type  = std::vector<uint8_t>;
+    using text_type   = std::vector<viua::arch::instruction_type>;
 
     std::filesystem::path const elf_path;
     viua::vm::elf::Loaded_elf const elf;
@@ -58,15 +58,16 @@ struct Env {
     text_type::value_type const* ip_base;
 
     inline Env(std::filesystem::path const ep, viua::vm::elf::Loaded_elf le)
-        : elf_path{std::move(ep)}
-        , elf{std::move(le)}
-        , strings_table{elf.find_fragment(".rodata")->get().data}
-        , functions_table{elf.find_fragment(".viua.fns")->get().data}
-        , text{elf.make_text_from(elf.find_fragment(".text")->get().data)}
-        , ip_base{text.data()}
+            : elf_path{std::move(ep)}
+            , elf{std::move(le)}
+            , strings_table{elf.find_fragment(".rodata")->get().data}
+            , functions_table{elf.find_fragment(".viua.fns")->get().data}
+            , text{elf.make_text_from(elf.find_fragment(".text")->get().data)}
+            , ip_base{text.data()}
     {}
 
-    inline auto function_at(size_t const off) const -> std::pair<std::string, size_t>
+    inline auto function_at(size_t const off) const
+        -> std::pair<std::string, size_t>
     {
         return elf.fn_at(functions_table, off);
     }
