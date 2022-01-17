@@ -177,7 +177,7 @@ auto demangle_canonical_li(Cooked_text& text) -> void
             using viua::arch::ops::GREEDY;
             auto const needs_annotation =
                 (li_cost(literal)
-                 != li_cost(std::numeric_limits<uint64_t>::max()));
+                 != li_cost(std::numeric_limits<viua::arch::register_type>::max()));
             auto const needs_greedy   = m((i + 8), MOVE, GREEDY);
             auto const needs_unsigned = m(i, LUIU, GREEDY);
 
