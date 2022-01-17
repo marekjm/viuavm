@@ -48,7 +48,7 @@ using opcode_type = uint16_t;
 using instruction_type = uint64_t;
 
 constexpr auto REGISTER_WIDTH = size_t{64};
-using register_type = uint64_t;
+using register_type           = uint64_t;
 
 enum class REGISTER_SET {
     /*

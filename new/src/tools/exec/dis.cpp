@@ -28,9 +28,9 @@
 #include <iostream>
 
 #include <viua/arch/ops.h>
+#include <viua/libs/assembler.h>
 #include <viua/support/tty.h>
 #include <viua/vm/elf.h>
-#include <viua/libs/assembler.h>
 
 
 namespace {
@@ -120,7 +120,8 @@ auto demangle_canonical_li(Cooked_text& text) -> void
             using viua::libs::assembler::li_cost;
             auto const needs_annotation =
                 (li_cost(literal)
-                 != li_cost(std::numeric_limits<viua::arch::register_type>::max()));
+                 != li_cost(
+                     std::numeric_limits<viua::arch::register_type>::max()));
             auto const needs_greedy   = m((i + 8), MOVE, GREEDY);
             auto const needs_unsigned = m(i, LUIU, GREEDY);
 
