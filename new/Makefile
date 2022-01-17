@@ -142,12 +142,6 @@ $(BUILD)/tools/exec/asm: \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
 
-$(BUILD)/tools/exec/asm.o: \
-	./include/viua/libs/errors/compile_time.h \
-	./include/viua/libs/lexer.h \
-	./include/viua/support/tty.h \
-	./include/viua/support/vector.h
-
 $(BUILD)/tools/exec/vm: \
 	$(BUILD)/support/tty.o \
 	$(BUILD)/support/string.o \
@@ -158,20 +152,3 @@ $(BUILD)/tools/exec/vm: \
 	$(BUILD)/vm/types/traits.o \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
-
-$(BUILD)/tools/exec/vm: \
-	./include/viua/vm/core.h
-
-$(BUILD)/vm/ins.o: \
-	./include/viua/vm/ins.h \
-	./include/viua/vm/core.h
-
-$(BUILD)/arch/ops.o: \
-	./include/viua/arch/arch.h \
-	./include/viua/arch/ops.h
-
-$(BUILD)/tools/libs/lexer.o: \
-	./include/viua/libs/lexer.h
-
-$(BUILD)/tools/libs/errors/compile_time.o: \
-	./include/viua/libs/errors/compile_time.h
