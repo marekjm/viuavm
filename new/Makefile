@@ -136,6 +136,7 @@ $(BUILD)/tools/exec/asm: \
 	$(BUILD)/support/tty.o \
 	$(BUILD)/tools/libs/errors/compile_time.o \
 	$(BUILD)/tools/libs/lexer.o \
+	$(BUILD)/tools/libs/parser.o \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
 
