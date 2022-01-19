@@ -360,14 +360,41 @@ auto run_instruction(viua::vm::Stack& stack, viua::arch::instruction_type const*
     do {
         instruction = *ip;
         ip          = execute(stack, ip);
+        ++stack.core->perf_counters.total_ops_executed;
     } while ((ip != nullptr) and (instruction & viua::arch::ops::GREEDY));
 
     return ip;
 }
 
+auto format_time(std::chrono::microseconds const us) -> std::string
+{
+    auto out = std::ostringstream{};
+    out << std::fixed << std::setprecision(2);
+    if (us.count() > 1e6) {
+        out << (us.count() / 1.0e6) << "s";
+    } else if (us.count() > 1e3) {
+        out << (us.count() / 1.0e3) << "ms";
+    } else {
+        out << us.count() << "us";
+    }
+    return out.str();
+}
+auto format_hz(uint64_t const hz) -> std::string
+{
+    auto out = std::ostringstream{};
+    if (hz > 1e3) {
+        out << std::fixed << std::setprecision(2);
+        out << (hz / 1.0e3) << " kHz";
+    } else {
+        out << hz << " Hz";
+    }
+    return out.str();
+}
 auto run(viua::vm::Stack& stack, viua::arch::instruction_type const* ip) -> void
 {
     constexpr auto PREEMPTION_THRESHOLD = size_t{2};
+
+    stack.core->perf_counters.start();
 
     while (stack.module.ip_in_valid_range(ip)) {
         if constexpr (VIUA_TRACE_CYCLES) {
@@ -422,6 +449,19 @@ auto run(viua::vm::Stack& stack, viua::arch::instruction_type const* ip) -> void
             using namespace std::literals;
             std::this_thread::sleep_for(160ms);
         }
+    }
+
+    stack.core->perf_counters.stop();
+    {
+        auto const total_ops = stack.core->perf_counters.total_ops_executed;
+        auto const total_us =
+            std::chrono::duration_cast<std::chrono::microseconds>(
+                stack.core->perf_counters.duration());
+        auto const approx_hz = (1e6 / total_us.count()) * total_ops;
+        viua::TRACE_STREAM << "[vm:perf] executed ops " << total_ops
+            << ", run time " << format_time(total_us)
+            << viua::TRACE_STREAM.endl;
+        viua::TRACE_STREAM << "[vm:perf] approximate frequency " << format_hz(approx_hz) << viua::TRACE_STREAM.endl;
     }
 
     if (not stack.module.ip_in_valid_range(ip)) {

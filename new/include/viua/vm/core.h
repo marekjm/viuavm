@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include <atomic>
+#include <chrono>
 #include <exception>
 #include <filesystem>
 #include <memory>
@@ -329,8 +330,33 @@ struct IO_scheduler {
         -> IO_request::id_type;
 };
 
+struct Performance_counters {
+    using counter_type = uint64_t;
+    counter_type total_ops_executed{0};
+    counter_type total_us_elapsed{0};
+
+    using time_point_type = std::chrono::time_point<std::chrono::steady_clock>;
+    time_point_type bang{};
+    time_point_type death{};
+
+    inline auto start() -> void
+    {
+        bang = std::chrono::steady_clock::now();
+    }
+    inline auto stop() -> void
+    {
+        death = std::chrono::steady_clock::now();
+    }
+    inline auto duration() const -> auto
+    {
+        return (death - bang);
+    }
+};
+
 struct Core {
     IO_scheduler io;
+
+    Performance_counters perf_counters;
 };
 
 struct Stack {
