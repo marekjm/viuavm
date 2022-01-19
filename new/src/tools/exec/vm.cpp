@@ -587,9 +587,10 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
 
+    auto core = viua::vm::Core{};
     auto mod = viua::vm::Module{elf_path, main_module};
 
-    auto stack = viua::vm::Stack{mod};
+    auto stack = viua::vm::Stack{&core, mod};
     stack.push(256, (mod.ip_base + entry_addr), nullptr);
 
     if constexpr (VIUA_TRACE_CYCLES) {

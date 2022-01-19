@@ -1380,7 +1380,7 @@ auto execute(IO_SUBMIT const op, Stack& stack, ip_type const ip) -> void
                                  .boxed_of<viua::vm::types::String>()
                                  ->get()
                                  .content);
-        auto const rd = stack.io.schedule(
+        auto const rd = stack.core->io.schedule(
             port.get<int64_t>(), IORING_OP_READ, std::move(buf));
         dst = rd;
         break;
@@ -1394,7 +1394,7 @@ auto execute(IO_SUBMIT const op, Stack& stack, ip_type const ip) -> void
                                  .boxed_of<viua::vm::types::String>()
                                  ->get()
                                  .content);
-        auto const rd = stack.io.schedule(
+        auto const rd = stack.core->io.schedule(
             port.get<int64_t>(), IORING_OP_WRITE, std::move(buf));
         dst = rd;
         break;
@@ -1407,16 +1407,16 @@ auto execute(IO_WAIT const op, Stack& stack, ip_type const ip) -> void
     auto req = get_value(stack, op.instruction.lhs, ip);
 
     auto const want_id = req.get<uint64_t>();
-    if (not stack.io.requests.contains(want_id)) {
+    if (not stack.core->io.requests.contains(want_id)) {
         io_uring_cqe* cqe{};
         do {
-            io_uring_wait_cqe(&stack.io.ring, &cqe);
+            io_uring_wait_cqe(&stack.core->io.ring, &cqe);
 
             if (cqe->res == -1) {
-                stack.io.requests[cqe->user_data]->status =
+                stack.core->io.requests[cqe->user_data]->status =
                     IO_request::Status::Error;
             } else {
-                auto& rd  = *stack.io.requests[cqe->user_data];
+                auto& rd  = *stack.core->io.requests[cqe->user_data];
                 rd.status = IO_request::Status::Success;
 
                 if (rd.opcode == IORING_OP_READ) {
@@ -1426,13 +1426,13 @@ auto execute(IO_WAIT const op, Stack& stack, ip_type const ip) -> void
                 }
             }
 
-            io_uring_cqe_seen(&stack.io.ring, cqe);
+            io_uring_cqe_seen(&stack.core->io.ring, cqe);
         } while (cqe->user_data != want_id);
     }
 
     dst = std::make_unique<types::String>(
-        std::move(stack.io.requests[want_id]->buffer));
-    stack.io.requests.erase(want_id);
+        std::move(stack.core->io.requests[want_id]->buffer));
+    stack.core->io.requests.erase(want_id);
 }
 auto execute(IO_SHUTDOWN const, Stack&, ip_type const) -> void
 {}

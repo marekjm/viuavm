@@ -329,16 +329,21 @@ struct IO_scheduler {
         -> IO_request::id_type;
 };
 
+struct Core {
+    IO_scheduler io;
+};
+
 struct Stack {
     using addr_type = viua::arch::instruction_type const*;
 
-    IO_scheduler io;
-
+    Core* core;
     Module const& module;
     std::vector<Frame> frames;
     std::vector<Value> args;
 
-    explicit inline Stack(Module const& mod) : module{mod}
+    inline Stack(Core* c, Module const& m)
+        : core{c}
+        , module{m}
     {}
 
     Stack(Stack const&) = delete;
