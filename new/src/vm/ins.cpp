@@ -812,18 +812,18 @@ auto execute(ATOM const op, Stack& stack, ip_type const) -> void
     auto& registers = stack.frames.back().registers;
     auto& target    = registers.at(op.instruction.out.index);
 
-    auto const& env        = stack.environment;
+    auto const& mod        = stack.module;
     auto const data_offset = target.value.get<uint64_t>();
-    auto const data_size   = [env, data_offset]() -> uint64_t {
+    auto const data_size   = [mod, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
-        memcpy(&tmp, &env.strings_table[size_offset], sizeof(uint64_t));
+        memcpy(&tmp, &mod.strings_table[size_offset], sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto s     = std::make_unique<viua::vm::types::Atom>();
     s->content = std::string{
-        reinterpret_cast<char const*>(&env.strings_table[0] + data_offset),
+        reinterpret_cast<char const*>(&mod.strings_table[0] + data_offset),
         data_size};
 
     target.value = std::move(s);
@@ -833,18 +833,18 @@ auto execute(STRING const op, Stack& stack, ip_type const) -> void
     auto& registers = stack.frames.back().registers;
     auto& target    = registers.at(op.instruction.out.index);
 
-    auto const& env        = stack.environment;
+    auto const& mod        = stack.module;
     auto const data_offset = target.value.get<uint64_t>();
-    auto const data_size   = [env, data_offset]() -> uint64_t {
+    auto const data_size   = [mod, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
-        memcpy(&tmp, &env.strings_table[size_offset], sizeof(uint64_t));
+        memcpy(&tmp, &mod.strings_table[size_offset], sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto s     = std::make_unique<viua::vm::types::String>();
     s->content = std::string{
-        reinterpret_cast<char const*>(&env.strings_table[0] + data_offset),
+        reinterpret_cast<char const*>(&mod.strings_table[0] + data_offset),
         data_size};
 
     target.value = std::move(s);
@@ -885,7 +885,7 @@ auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
         }
 
         std::tie(fn_name, fn_addr) =
-            stack.environment.function_at(fn_offset.value.get<uint64_t>());
+            stack.module.function_at(fn_offset.value.get<uint64_t>());
     }
 
     if (fn_addr % sizeof(viua::arch::instruction_type)) {
@@ -893,7 +893,7 @@ auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
     }
 
     auto const fr_return = (ip + 1);
-    auto const fr_entry  = (stack.environment.ip_base
+    auto const fr_entry  = (stack.module.ip_base
                            + (fn_addr / sizeof(viua::arch::instruction_type)));
 
     stack.frames.emplace_back(
@@ -946,14 +946,14 @@ auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
         memcpy(&tmp,
-               &stack.environment.strings_table[size_offset],
+               &stack.module.strings_table[size_offset],
                sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto tmp = uint32_t{};
     memcpy(
-        &tmp, (&stack.environment.strings_table[0] + data_offset), data_size);
+        &tmp, (&stack.module.strings_table[0] + data_offset), data_size);
     tmp = le32toh(tmp);
 
     auto v = float{};
@@ -972,14 +972,14 @@ auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
         memcpy(&tmp,
-               &stack.environment.strings_table[size_offset],
+               &stack.module.strings_table[size_offset],
                sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto tmp = uint64_t{};
     memcpy(
-        &tmp, (&stack.environment.strings_table[0] + data_offset), data_size);
+        &tmp, (&stack.module.strings_table[0] + data_offset), data_size);
     tmp = le64toh(tmp);
 
     auto v = double{};

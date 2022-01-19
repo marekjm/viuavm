@@ -43,7 +43,7 @@
 
 
 namespace viua::vm {
-struct Env {
+struct Module {
     using strtab_type = std::vector<uint8_t>;
     using fntab_type  = std::vector<uint8_t>;
     using text_type   = std::vector<viua::arch::instruction_type>;
@@ -57,7 +57,7 @@ struct Env {
     text_type const text;
     text_type::value_type const* ip_base;
 
-    inline Env(std::filesystem::path const ep, viua::vm::elf::Loaded_elf le)
+    inline Module(std::filesystem::path const ep, viua::vm::elf::Loaded_elf le)
             : elf_path{std::move(ep)}
             , elf{std::move(le)}
             , strings_table{elf.find_fragment(".rodata")->get().data}
@@ -334,11 +334,11 @@ struct Stack {
 
     IO_scheduler io;
 
-    Env const& environment;
+    Module const& module;
     std::vector<Frame> frames;
     std::vector<Value> args;
 
-    explicit inline Stack(Env const& env) : environment{env}
+    explicit inline Stack(Module const& mod) : module{mod}
     {}
 
     Stack(Stack const&) = delete;

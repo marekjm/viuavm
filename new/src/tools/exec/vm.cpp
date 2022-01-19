@@ -62,12 +62,8 @@ auto TRACE_STREAM = viua::support::fdstream{2};
 }
 
 
-using viua::vm::Env;
-using viua::vm::Stack;
-
-
 namespace {
-auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
+auto execute(viua::vm::Stack& stack, viua::arch::instruction_type const* const ip)
     -> viua::arch::instruction_type const*
 {
     auto const raw = *ip;
@@ -357,7 +353,7 @@ auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
     return (ip + 1);
 }
 
-auto run_instruction(Stack& stack, viua::arch::instruction_type const* ip)
+auto run_instruction(viua::vm::Stack& stack, viua::arch::instruction_type const* ip)
     -> viua::arch::instruction_type const*
 {
     auto instruction = viua::arch::instruction_type{};
@@ -369,22 +365,22 @@ auto run_instruction(Stack& stack, viua::arch::instruction_type const* ip)
     return ip;
 }
 
-auto run(Stack& stack, viua::arch::instruction_type const* ip) -> void
+auto run(viua::vm::Stack& stack, viua::arch::instruction_type const* ip) -> void
 {
     constexpr auto PREEMPTION_THRESHOLD = size_t{2};
 
-    while (stack.environment.ip_in_valid_range(ip)) {
+    while (stack.module.ip_in_valid_range(ip)) {
         if constexpr (VIUA_TRACE_CYCLES) {
             viua::TRACE_STREAM
-                << "cycle at " << stack.environment.elf_path.native()
+                << "cycle at " << stack.module.elf_path.native()
                 << "[.text+0x" << std::hex << std::setw(8) << std::setfill('0')
-                << ((ip - stack.environment.ip_base)
+                << ((ip - stack.module.ip_base)
                     * sizeof(viua::arch::instruction_type))
                 << std::dec << ']' << viua::TRACE_STREAM.endl;
         }
 
         auto const ip_ok = [&stack, &ip]() -> bool {
-            return stack.environment.ip_in_valid_range(ip);
+            return stack.module.ip_in_valid_range(ip);
         };
         for (auto i = size_t{0}; i < PREEMPTION_THRESHOLD and ip_ok(); ++i) {
             /*
@@ -428,9 +424,9 @@ auto run(Stack& stack, viua::arch::instruction_type const* ip) -> void
         }
     }
 
-    if (not stack.environment.ip_in_valid_range(ip)) {
+    if (not stack.module.ip_in_valid_range(ip)) {
         std::cerr << "[vm] ip " << std::hex << std::setw(8) << std::setfill('0')
-                  << ((ip - stack.environment.ip_base)
+                  << ((ip - stack.module.ip_base)
                       * sizeof(viua::arch::instruction_type))
                   << std::dec << " outside of valid range\n";
     }
@@ -591,10 +587,10 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
 
-    auto env = Env{elf_path, main_module};
+    auto mod = viua::vm::Module{elf_path, main_module};
 
-    auto stack = Stack{env};
-    stack.push(256, (env.ip_base + entry_addr), nullptr);
+    auto stack = viua::vm::Stack{mod};
+    stack.push(256, (mod.ip_base + entry_addr), nullptr);
 
     if constexpr (VIUA_TRACE_CYCLES) {
         if (auto trace_fd = getenv("VIUA_VM_TRACE_FD"); trace_fd) {
