@@ -18,6 +18,7 @@
  */
 
 
+#include <ctype.h>
 #include <fcntl.h>
 #include <stdint.h>
 #include <string.h>
@@ -353,6 +354,54 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
 
+    auto to_file = std::ofstream{};
+    if (preferred_output_path.has_value()) {
+        to_file.open(*preferred_output_path);
+    }
+    auto& out = (preferred_output_path.has_value() ? to_file : std::cout);
+
+    if (auto const f = main_module.find_fragment(".rodata"); f.has_value()) {
+        auto const& strtab = f->get();
+
+        for (auto off = size_t{8}; off < strtab.data.size();
+             off += sizeof(uint64_t)) {
+            auto const data_size = [&strtab, off]() -> uint64_t {
+                auto const size_offset = (off - sizeof(uint64_t));
+                auto tmp               = uint64_t{};
+                memcpy(&tmp, &strtab.data[size_offset], sizeof(uint64_t));
+                return le64toh(tmp);
+            }();
+            auto const sv = std::string_view{
+                reinterpret_cast<char const*>(&strtab.data[off]), data_size};
+            auto const is_string = std::all_of(sv.begin(), sv.end(), ::isprint);
+
+            out << "; [.rodata+0x" << std::hex << std::setw(16)
+                << std::setfill('0') << off << "] to"
+                << " [.rodata+0x" << std::hex << std::setw(16)
+                << std::setfill('0') << (off + data_size) << "] (" << std::dec
+                << data_size << " byte" << (data_size == 1 ? "" : "s") << ")\n";
+            out << ".label: _strat_" << off << "\n";
+
+            out << ".value: ";
+            if (is_string) {
+                out << "string \"" << sv << "\"";
+            } else {
+                out << "bytes 0x";
+                for (auto const each : sv) {
+                    out << std::setw(2) << std::setfill('0') << std::hex
+                        << static_cast<int>(each);
+                }
+            }
+            out << "\n";
+
+            off += sv.size();
+        }
+
+        if (not strtab.data.empty()) {
+            out << "\n\n";
+        }
+    }
+
     auto const ft    = main_module.function_table();
     auto ordered_fns = std::vector<std::tuple<std::string, size_t, size_t>>{};
     {
@@ -375,12 +424,6 @@ auto main(int argc, char* argv[]) -> int
              - std::get<1>(ordered_fns.back()))
             / sizeof(viua::arch::instruction_type);
     }
-
-    auto to_file = std::ofstream{};
-    if (preferred_output_path.has_value()) {
-        to_file.open(*preferred_output_path);
-    }
-    auto& out = (preferred_output_path.has_value() ? to_file : std::cout);
 
     auto ef = main_module.name_function_at(entry_addr);
     for (auto const& [name, addr, size] : ordered_fns) {
