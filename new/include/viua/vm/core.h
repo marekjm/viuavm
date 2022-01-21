@@ -367,9 +367,7 @@ struct Stack {
     std::vector<Frame> frames;
     std::vector<Value> args;
 
-    inline Stack(Core* c, Module const& m)
-        : core{c}
-        , module{m}
+    inline Stack(Core* c, Module const& m) : core{c}, module{m}
     {}
 
     Stack(Stack const&) = delete;

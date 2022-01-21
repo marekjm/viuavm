@@ -63,7 +63,8 @@ auto TRACE_STREAM = viua::support::fdstream{2};
 
 
 namespace {
-auto execute(viua::vm::Stack& stack, viua::arch::instruction_type const* const ip)
+auto execute(viua::vm::Stack& stack,
+             viua::arch::instruction_type const* const ip)
     -> viua::arch::instruction_type const*
 {
     auto const raw = *ip;
@@ -353,7 +354,8 @@ auto execute(viua::vm::Stack& stack, viua::arch::instruction_type const* const i
     return (ip + 1);
 }
 
-auto run_instruction(viua::vm::Stack& stack, viua::arch::instruction_type const* ip)
+auto run_instruction(viua::vm::Stack& stack,
+                     viua::arch::instruction_type const* ip)
     -> viua::arch::instruction_type const*
 {
     auto instruction = viua::arch::instruction_type{};
@@ -398,12 +400,12 @@ auto run(viua::vm::Stack& stack, viua::arch::instruction_type const* ip) -> void
 
     while (stack.module.ip_in_valid_range(ip)) {
         if constexpr (VIUA_TRACE_CYCLES) {
-            viua::TRACE_STREAM
-                << "cycle at " << stack.module.elf_path.native()
-                << "[.text+0x" << std::hex << std::setw(8) << std::setfill('0')
-                << ((ip - stack.module.ip_base)
-                    * sizeof(viua::arch::instruction_type))
-                << std::dec << ']' << viua::TRACE_STREAM.endl;
+            viua::TRACE_STREAM << "cycle at " << stack.module.elf_path.native()
+                               << "[.text+0x" << std::hex << std::setw(8)
+                               << std::setfill('0')
+                               << ((ip - stack.module.ip_base)
+                                   * sizeof(viua::arch::instruction_type))
+                               << std::dec << ']' << viua::TRACE_STREAM.endl;
         }
 
         auto const ip_ok = [&stack, &ip]() -> bool {
@@ -459,9 +461,10 @@ auto run(viua::vm::Stack& stack, viua::arch::instruction_type const* ip) -> void
                 stack.core->perf_counters.duration());
         auto const approx_hz = (1e6 / total_us.count()) * total_ops;
         viua::TRACE_STREAM << "[vm:perf] executed ops " << total_ops
-            << ", run time " << format_time(total_us)
-            << viua::TRACE_STREAM.endl;
-        viua::TRACE_STREAM << "[vm:perf] approximate frequency " << format_hz(approx_hz) << viua::TRACE_STREAM.endl;
+                           << ", run time " << format_time(total_us)
+                           << viua::TRACE_STREAM.endl;
+        viua::TRACE_STREAM << "[vm:perf] approximate frequency "
+                           << format_hz(approx_hz) << viua::TRACE_STREAM.endl;
     }
 
     if (not stack.module.ip_in_valid_range(ip)) {
@@ -628,7 +631,7 @@ auto main(int argc, char* argv[]) -> int
     }
 
     auto core = viua::vm::Core{};
-    auto mod = viua::vm::Module{elf_path, main_module};
+    auto mod  = viua::vm::Module{elf_path, main_module};
 
     auto stack = viua::vm::Stack{&core, mod};
     stack.push(256, (mod.ip_base + entry_addr), nullptr);
