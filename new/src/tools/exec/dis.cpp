@@ -163,6 +163,7 @@ auto demangle_addi_to_void(Cooked_text& text) -> void
         if (m(i, ADDI) or m(i, ADDIU) or m(i, ADDI, GREEDY)
             or m(i, ADDIU, GREEDY)) {
             using viua::arch::ops::R;
+            using viua::arch::ops::S;
             auto const addi = R::decode(ins_at(i));
             if (addi.in.is_void()) {
                 auto const needs_greedy   = (addi.opcode & GREEDY);
@@ -174,6 +175,16 @@ auto demangle_addi_to_void(Cooked_text& text) -> void
                                   + std::string{"li "} + addi.out.to_string()
                                   + ", " + std::to_string(addi.immediate)
                                   + (needs_unsigned ? "u" : "")));
+
+                if (m(i + 1, STRING) and S::decode(ins_at(i)).out == addi.out) {
+                    auto ins = text.at(i);
+                    tmp.emplace_back(
+                        std::get<0>(ins),
+                        std::get<1>(ins),
+                        ("string " + addi.out.to_string() + ", _strat_"
+                         + std::to_string(addi.immediate)));
+                    ++i;
+                }
 
                 continue;
             }
