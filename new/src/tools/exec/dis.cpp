@@ -143,6 +143,32 @@ auto demangle_canonical_li(Cooked_text& text) -> void
     text = std::move(tmp);
 }
 
+auto demangle_strtab_load(Cooked_text& text, Cooked_text& tmp, size_t& i, viua::arch::Register_access const out, uint64_t const immediate) -> void
+{
+    auto const ins_at =
+        [&text](size_t const n) -> viua::arch::instruction_type {
+        return std::get<1>(text.at(n)).value_or(0);
+    };
+    auto const m = [ins_at](size_t const n,
+                            viua::arch::ops::OPCODE const op,
+                            viua::arch::opcode_type const flags = 0) -> bool {
+        return match_opcode(ins_at(n), op, flags);
+    };
+
+    using enum viua::arch::ops::OPCODE;
+    using viua::arch::ops::S;
+    if (m(i + 1, STRING) and S::decode(ins_at(i)).out == out) {
+        auto ins = text.at(i);
+        tmp.pop_back();
+        tmp.emplace_back(
+            std::get<0>(ins),
+            std::get<1>(ins),
+            ("string " + out.to_string() + ", _strat_"
+             + std::to_string(immediate)));
+        ++i;
+    }
+}
+
 auto demangle_addi_to_void(Cooked_text& text) -> void
 {
     auto tmp = Cooked_text{};
@@ -176,15 +202,7 @@ auto demangle_addi_to_void(Cooked_text& text) -> void
                                   + ", " + std::to_string(addi.immediate)
                                   + (needs_unsigned ? "u" : "")));
 
-                if (m(i + 1, STRING) and S::decode(ins_at(i)).out == addi.out) {
-                    auto ins = text.at(i);
-                    tmp.emplace_back(
-                        std::get<0>(ins),
-                        std::get<1>(ins),
-                        ("string " + addi.out.to_string() + ", _strat_"
-                         + std::to_string(addi.immediate)));
-                    ++i;
-                }
+                demangle_strtab_load(text, tmp, i, addi.out, addi.immediate);
 
                 continue;
             }
