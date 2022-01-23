@@ -1409,6 +1409,9 @@ auto load_value_labels(std::filesystem::path const source_path,
             }
 
             var_offsets[ct.name.text] = save_string(strings_table, s);
+        } else if (ct.type == "atom") {
+            auto const s = ct.value.front().text;
+            var_offsets[ct.name.text] = save_string(strings_table, s);
         }
     }
 }

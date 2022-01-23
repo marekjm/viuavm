@@ -486,6 +486,7 @@ auto parse_constant_definition(
              * Only strings allowed. Other types may be added later.
              */
             "string",
+            "atom",
         };
         if (not known_types.contains(value_type.text)) {
             using viua::support::string::levenshtein_filter;
