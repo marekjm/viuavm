@@ -45,11 +45,16 @@ CXXLIBS=\
 
 ################################################################################
 # High-level targets
-all: \
+all: dist
+
+dist: \
 	$(BUILD)/tools/exec/readelf \
 	$(BUILD)/tools/exec/dis \
 	$(BUILD)/tools/exec/asm \
 	$(BUILD)/tools/exec/vm
+
+test: dist
+	@python3 ./tests/suite.py
 
 clean:
 	find $(BUILD) -type f -delete
