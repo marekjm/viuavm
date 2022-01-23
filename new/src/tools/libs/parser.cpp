@@ -398,7 +398,9 @@ auto parse_function_definition(
                     consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
                 operand.ingredients.push_back(value);
             } else {
-                throw lexemes.front();
+                using viua::libs::errors::compile_time::Cause;
+                using viua::libs::errors::compile_time::Error;
+                throw Error{lexemes.front(), Cause::Unexpected_token};
             }
 
             instruction.operands.push_back(std::move(operand));

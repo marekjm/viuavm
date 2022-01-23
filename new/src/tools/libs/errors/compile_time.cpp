@@ -31,6 +31,8 @@ auto to_string(Cause const ce) -> std::string_view
         return "unknown error";
     case Cause::None:
         return "";
+    case Cause::Unexpected_token:
+        return "unexpected token";
     case Cause::Unknown_opcode:
         return "unknown opcode";
     case Cause::Invalid_register_access:

@@ -40,6 +40,8 @@ enum class Cause {
      */
     None,
 
+    Unexpected_token,
+
     Unknown_opcode,
     Invalid_register_access,
     Too_few_operands,
