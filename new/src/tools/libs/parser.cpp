@@ -381,6 +381,20 @@ auto parse_function_definition(
                     operand.ingredients.push_back(
                         consume_token_of(TOKEN::LITERAL_ATOM, lexemes));
                 }
+            } else if (look_ahead(TOKEN::AT, lexemes)) {
+                auto const access = consume_token_of(TOKEN::AT, lexemes);
+                auto atom = viua::libs::lexer::Lexeme{};
+                try {
+                    atom = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
+                } catch (viua::libs::lexer::Lexeme const& e) {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+                    throw Error{e, Cause::Unexpected_token}
+                        .add(access)
+                        .aside("label name must be an atom");
+                }
+                operand.ingredients.push_back(access);
+                operand.ingredients.push_back(atom);
             } else if (lexemes.front() == TOKEN::LITERAL_INTEGER) {
                 auto const value =
                     consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);

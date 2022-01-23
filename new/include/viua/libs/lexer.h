@@ -50,6 +50,7 @@ enum class TOKEN {
     COMMA,
     DOT,
     EQ,
+    AT,
     TERMINATOR,
     ATTR_LIST_OPEN,
     ATTR_LIST_CLOSE,

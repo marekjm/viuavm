@@ -104,7 +104,7 @@ auto demangle_strtab_load(Cooked_text& text,
         tmp.pop_back();
         tmp.emplace_back(std::get<0>(ins),
                          std::get<1>(ins),
-                         ("string " + out.to_string() + ", _strat_"
+                         ("string " + out.to_string() + ", @_strat_"
                           + std::to_string(immediate)));
         ++i;
     }

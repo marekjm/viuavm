@@ -1446,18 +1446,56 @@ auto cook_long_immediates(std::filesystem::path const source_path,
             if (insn.opcode == "atom" or insn.opcode == "g.atom") {
                 auto const lx = insn.operands.back().ingredients.front();
                 auto s        = lx.text;
+                auto saved_at = size_t{0};
                 if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
                     s = s.substr(1, s.size() - 2);
                     s = viua::support::string::unescape(s);
+                    saved_at = save_string(strings_table, s);
                 } else if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
-                    // do nothing
+                    auto s   = lx.text;
+                    saved_at = save_string(strings_table, s);
+                } else if (lx.token == viua::libs::lexer::TOKEN::AT) {
+                    auto const label = insn.operands.back().ingredients.back();
+                    try {
+                        saved_at = var_offsets.at(label.text);
+                    } catch (std::out_of_range const&) {
+                        using viua::libs::errors::compile_time::Cause;
+                        using viua::libs::errors::compile_time::Error;
+
+                        auto e = Error{label, Cause::Unknown_label, label.text};
+                        e.add(lx);
+
+                        using viua::support::string::levenshtein_filter;
+                        auto misspell_candidates =
+                            levenshtein_filter(label.text, var_offsets);
+                        if (not misspell_candidates.empty()) {
+                            using viua::support::string::levenshtein_best;
+                            auto best_candidate =
+                                levenshtein_best(label.text,
+                                                 misspell_candidates,
+                                                 (label.text.size() / 2));
+                            if (best_candidate.second != label.text) {
+                                did_you_mean(e, best_candidate.second);
+                            }
+                        }
+
+                        display_error_in_function(source_path, e, fn.name.text);
+                        display_error_and_exit(source_path, source_text, e);
+                    }
                 } else {
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
-                    throw Error{
-                        lx, Cause::Invalid_operand, "expected atom or string"};
+
+                    auto e = Error{lx, Cause::Invalid_operand}.aside(
+                        "expected string literal, atom literal, or a label reference");
+
+                    if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
+                        did_you_mean(e, '@' + lx.text);
+                    }
+
+                    display_error_in_function(source_path, e, fn.name.text);
+                    display_error_and_exit(source_path, source_text, e);
                 }
-                auto const saved_at = save_string(strings_table, s);
 
                 auto synth           = ast::Instruction{};
                 synth.opcode         = insn.opcode;
@@ -1481,25 +1519,27 @@ auto cook_long_immediates(std::filesystem::path const source_path,
                     s        = s.substr(1, s.size() - 2);
                     s        = viua::support::string::unescape(s);
                     saved_at = save_string(strings_table, s);
-                } else if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
+                } else if (lx.token == viua::libs::lexer::TOKEN::AT) {
+                    auto const label = insn.operands.back().ingredients.back();
                     try {
-                        saved_at = var_offsets.at(lx.text);
+                        saved_at = var_offsets.at(label.text);
                     } catch (std::out_of_range const&) {
                         using viua::libs::errors::compile_time::Cause;
                         using viua::libs::errors::compile_time::Error;
 
-                        auto e = Error{lx, Cause::Unknown_label, lx.text};
+                        auto e = Error{label, Cause::Unknown_label, label.text};
+                        e.add(lx);
 
                         using viua::support::string::levenshtein_filter;
                         auto misspell_candidates =
-                            levenshtein_filter(lx.text, var_offsets);
+                            levenshtein_filter(label.text, var_offsets);
                         if (not misspell_candidates.empty()) {
                             using viua::support::string::levenshtein_best;
                             auto best_candidate =
-                                levenshtein_best(lx.text,
+                                levenshtein_best(label.text,
                                                  misspell_candidates,
-                                                 (lx.text.size() / 2));
-                            if (best_candidate.second != lx.text) {
+                                                 (label.text.size() / 2));
+                            if (best_candidate.second != label.text) {
                                 did_you_mean(e, best_candidate.second);
                             }
                         }
@@ -1511,8 +1551,13 @@ auto cook_long_immediates(std::filesystem::path const source_path,
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
 
-                    auto const e = Error{lx, Cause::Invalid_operand}.aside(
-                        "expected string literal, or a label");
+                    auto e = Error{lx, Cause::Invalid_operand}.aside(
+                        "expected string literal, or a label reference");
+
+                    if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
+                        did_you_mean(e, '@' + lx.text);
+                    }
+
                     display_error_in_function(source_path, e, fn.name.text);
                     display_error_and_exit(source_path, source_text, e);
                 }

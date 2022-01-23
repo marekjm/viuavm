@@ -76,6 +76,8 @@ auto to_string(TOKEN const token) -> std::string
         return "DOT";
     case TOKEN::EQ:
         return "EQ";
+    case TOKEN::AT:
+        return "AT";
     case TOKEN::TERMINATOR:
         return "TERMINATOR";
     case TOKEN::ATTR_LIST_OPEN:
@@ -142,6 +144,7 @@ const auto OPCODE = std::regex{"^(?:g.)?[a-z][a-z0-9_]*(?:.[stw])?\\b"};
 const auto COMMA           = std::regex{"^,"};
 const auto DOT             = std::regex{"^\\."};
 const auto EQ              = std::regex{"^="};
+const auto AT              = std::regex{"^@"};
 const auto ATTR_LIST_OPEN  = std::regex{"^\\[\\["};
 const auto ATTR_LIST_CLOSE = std::regex{"^\\]\\]"};
 
@@ -366,6 +369,9 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
             continue;
         }
         if (try_match(EQ, TOKEN::EQ)) {
+            continue;
+        }
+        if (try_match(AT, TOKEN::AT)) {
             continue;
         }
 
