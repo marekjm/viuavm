@@ -1197,7 +1197,7 @@ auto display_error_and_exit
     std::cerr << std::string(ERROR_MARKER.size(), ' ')
               << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR_SOURCE << "\n";
 
-    std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+    std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native() << esc(2, ATTR_RESET)
               << ':' << esc(2, COLOR_FG_WHITE) << (e.line() + 1)
               << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
               << (e.character() + 1) << esc(2, ATTR_RESET) << ": "
@@ -1205,7 +1205,7 @@ auto display_error_and_exit
               << e.str() << "\n";
 
     for (auto const& each : e.notes()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native() << esc(2, ATTR_RESET)
                   << ':' << esc(2, COLOR_FG_WHITE) << (e.line() + 1)
                   << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
                   << (e.character() + 1) << esc(2, ATTR_RESET) << ": "
@@ -1248,7 +1248,7 @@ auto display_error_in_function(std::filesystem::path const source_path,
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+    std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native() << esc(2, ATTR_RESET)
               << ':' << esc(2, COLOR_FG_WHITE) << (e.line() + 1)
               << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
               << (e.character() + 1) << esc(2, ATTR_RESET) << ": "
@@ -1329,7 +1329,7 @@ auto lexical_analysis(std::filesystem::path const source_path,
         std::cerr << source_line.str() << "\n";
         std::cerr << highlight_line.str() << "\n";
 
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native() << esc(2, ATTR_RESET)
                   << ':' << esc(2, COLOR_FG_WHITE) << (location.line + 1)
                   << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
                   << (location.character + 1) << esc(2, ATTR_RESET) << ": "
@@ -1649,11 +1649,11 @@ auto find_entry_point(std::filesystem::path const source_path,
         using viua::support::tty::send_escape_seq;
         constexpr auto esc = send_escape_seq;
 
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native() << esc(2, ATTR_RESET)
                   << ": " << esc(2, COLOR_FG_RED) << "error"
                   << esc(2, ATTR_RESET) << ": "
                   << "no entry point function defined\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native() << esc(2, ATTR_RESET)
                   << ": " << esc(2, COLOR_FG_CYAN) << "note"
                   << esc(2, ATTR_RESET) << ": "
                   << "the entry function should have the [[entry_point]] "
@@ -2126,7 +2126,7 @@ auto main(int argc, char* argv[]) -> int
             constexpr auto esc = send_escape_seq;
 
             auto const error_message = strerrordesc_np(errno);
-            std::cerr << esc(2, COLOR_FG_WHITE) << source_path
+            std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
                       << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
                       << "error" << esc(2, ATTR_RESET) << ": " << error_message
                       << "\n";
@@ -2143,7 +2143,7 @@ auto main(int argc, char* argv[]) -> int
             constexpr auto esc = send_escape_seq;
 
             auto const error_message = strerrordesc_np(errno);
-            std::cerr << esc(2, COLOR_FG_WHITE) << source_path
+            std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
                       << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
                       << "error" << esc(2, ATTR_RESET) << ": " << error_message
                       << "\n";
@@ -2156,7 +2156,7 @@ auto main(int argc, char* argv[]) -> int
             using viua::support::tty::send_escape_seq;
             constexpr auto esc = send_escape_seq;
 
-            std::cerr << esc(2, COLOR_FG_WHITE) << source_path
+            std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
                       << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
                       << "error" << esc(2, ATTR_RESET)
                       << ": empty source file\n";
