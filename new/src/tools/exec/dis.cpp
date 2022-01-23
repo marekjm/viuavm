@@ -108,6 +108,15 @@ auto demangle_strtab_load(Cooked_text& text,
                           + std::to_string(immediate)));
         ++i;
     }
+    if (m(i + 1, ATOM) and S::decode(ins_at(i)).out == out) {
+        auto ins = text.at(i);
+        tmp.pop_back();
+        tmp.emplace_back(std::get<0>(ins),
+                         std::get<1>(ins),
+                         ("atom " + out.to_string() + ", @_strat_"
+                          + std::to_string(immediate)));
+        ++i;
+    }
     if (m(i + 1, FLOAT) and S::decode(ins_at(i)).out == out) {
         auto ins = text.at(i);
         tmp.pop_back();
