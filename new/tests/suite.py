@@ -39,6 +39,8 @@ SKIP_DISASSEMBLER_TESTS = True
 
 EBREAK_LINE_BOXED = re.compile(r'\[(\d+)\.([lap])\] (\*?[a-zA-Z_][a-zA-Z_0-9]*) = (.*)')
 EBREAK_LINE_PRIMITIVE = re.compile(r'\[(\d+)\.([lap])\] (is|iu|fl|db) (.*)')
+PERF_OPS_AND_RUNTIME = re.compile(r'\[vm:perf\] executed ops (\d+), run time (.+)')
+PERF_APPROX_FREQ = re.compile(r'\[vm:perf\] approximate frequency (.+ [kMG]?Hz)')
 
 class uint(int):
     def typename(self):
@@ -215,7 +217,22 @@ def run_and_capture(interpreter, executable, args = ()):
 
         i += 1
 
-    return (result, (ebreaks[-1] if ebreaks else None),)
+    perf = {
+        'ops': 0,
+        'run_time': None,
+        'freq': None,
+    }
+
+    for each in lines[::-1]:
+        if m := PERF_OPS_AND_RUNTIME.match(each):
+            perf['ops'] = int(m.group(1))
+            perf['run_time'] = m.group(2)
+        elif m := PERF_APPROX_FREQ.match(each):
+            perf['freq'] = m.group(1)
+        else:
+            break
+
+    return (result, (ebreaks[-1] if ebreaks else None), perf,)
 
 
 CHECK_KINDS = (
@@ -239,7 +256,7 @@ def test_case(case_name, test_program, errors):
     try:
         check_kind = detect_check_kind(test_program)
     except No_check_file_for:
-        return (False, 'no check file', None,)
+        return (False, 'no check file', None, None,)
 
     test_executable = (os.path.splitext(test_program)[0] + '.bin')
 
@@ -253,15 +270,15 @@ def test_case(case_name, test_program, errors):
         test_program,
     ), stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
     if asm_return != 0:
-        return (False, 'failed to assemble', count_runtime(),)
+        return (False, 'failed to assemble', count_runtime(), None,)
 
-    result, ebreak = run_and_capture(
+    result, ebreak, perf = run_and_capture(
         INTERPRETER,
         test_executable,
     )
 
     if result != 0:
-        return (False, 'crashed', count_runtime(),)
+        return (False, 'crashed', count_runtime(), None,)
 
     if check_kind == 'ebreak':
         ebreak_dump = (os.path.splitext(test_program)[0] + '.ebreak')
@@ -273,9 +290,9 @@ def test_case(case_name, test_program, errors):
         for line in ebreak_dump:
             if not load_ebreak_line(want_ebreak, line):
                 errors.write(f'    invalid-want ebreak line: {line}')
-                return (False, None, count_runtime(),)
+                return (False, None, count_runtime(), None,)
         if not ebreak_dump:
-            return (False, 'empty ebreak file', count_runtime(),)
+            return (False, 'empty ebreak file', count_runtime(), None,)
 
         for r, content in want_ebreak['registers'].items():
             for index, cell in content.items():
@@ -286,7 +303,7 @@ def test_case(case_name, test_program, errors):
                         (len(leader) * ' '),
                         *cell
                     ))
-                    return (False, None, count_runtime(),)
+                    return (False, None, count_runtime(), None,)
 
                 got = ebreak['registers'][r][index]
                 got_type, got_value = got
@@ -309,7 +326,7 @@ def test_case(case_name, test_program, errors):
                         (len(leader) * ' '),
                         colorise('red', (max(len(want_type), len(got_type)) * '^')),
                     ))
-                    return False
+                    return (False, 'unexpected type', count_runtime(), None,)
 
                 if want_value != got_value:
                     leader = f'    register {index}.{r}'
@@ -323,10 +340,10 @@ def test_case(case_name, test_program, errors):
                         want_type.ljust(max(len(want_type), len(got_type))),
                         colorise('green', want_value),
                     ))
-                    return False
+                    return (False, 'unexpected value', count_runtime(), None,)
 
     if SKIP_DISASSEMBLER_TESTS:
-        return (True, None, count_runtime(),)
+        return (True, None, count_runtime(), perf,)
 
     test_disassembled_program = test_program + DIS_EXTENSION
     dis_return = subprocess.call(args = (
@@ -336,7 +353,7 @@ def test_case(case_name, test_program, errors):
         test_executable,
     ), stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
     if dis_return != 0:
-        return (False, 'failed to disassemble', count_runtime(),)
+        return (False, 'failed to disassemble', count_runtime(), None,)
 
     asm_return = subprocess.call(args = (
         ASSEMBLER,
@@ -345,15 +362,15 @@ def test_case(case_name, test_program, errors):
         test_disassembled_program,
     ), stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
     if asm_return != 0:
-        return (False, 'failed to reassemble', count_runtime(),)
+        return (False, 'failed to reassemble', count_runtime(), None,)
 
-    result, ebreak = run_and_capture(
+    result, ebreak, _ = run_and_capture(
         INTERPRETER,
         test_executable,
     )
 
     if result != 0:
-        return (False, 'crashed after reassembly', count_runtime(),)
+        return (False, 'crashed after reassembly', count_runtime(), None,)
 
     if check_kind == 'ebreak':
         ebreak_dump = (os.path.splitext(test_program)[0] + '.ebreak')
@@ -365,9 +382,9 @@ def test_case(case_name, test_program, errors):
         for line in ebreak_dump:
             if not load_ebreak_line(want_ebreak, line):
                 errors.write(f'    invalid-want ebreak line: {line}')
-                return (False, None, count_runtime(),)
+                return (False, None, count_runtime(), None,)
         if not ebreak_dump:
-            return (False, 'empty ebreak file', count_runtime(),)
+            return (False, 'empty ebreak file', count_runtime(), None,)
 
         for r, content in want_ebreak['registers'].items():
             for index, cell in content.items():
@@ -401,7 +418,7 @@ def test_case(case_name, test_program, errors):
                         (len(leader) * ' '),
                         colorise('red', (max(len(want_type), len(got_type)) * '^')),
                     ))
-                    return (False, 'unexpected type', count_runtime(),)
+                    return (False, 'unexpected type', count_runtime(), None,)
 
                 if want_value != got_value:
                     leader = f'    register {index}.{r}'
@@ -415,9 +432,9 @@ def test_case(case_name, test_program, errors):
                         want_type.ljust(max(len(want_type), len(got_type))),
                         colorise('green', want_value),
                     ))
-                    return (False, 'unexpected value', count_runtime(),)
+                    return (False, 'unexpected value', count_runtime(), None,)
 
-    return (True, None, count_runtime(),)
+    return (True, None, count_runtime(), perf)
 
 
 def main(args):
@@ -452,14 +469,14 @@ def main(args):
 
         result, symptom, run_time = (False, None, None,)
         if type(result := rc()) is tuple:
-            result, symptom, run_time = result
+            result, symptom, run_time, perf = result
             if run_time:
                 run_times.append(run_time)
 
         if result:
             success_cases += 1
 
-        print('  case {}. of {}: [{}] {}'.format(
+        print('  case {}. of {}: [{}] {}  {}'.format(
             colorise('white', str(case_no).rjust(pad_case_no)),
             colorise('white', case_name.ljust(pad_case_name)),
             colorise(
@@ -468,6 +485,11 @@ def main(args):
             ) + ((' => ' + colorise('light_red', symptom)) if symptom else ''),
             (colorise(CASE_RUNTIME_COLOUR, format_run_time(run_time))
                 if run_time else ''),
+            (('perf: {} ops in {} at {}'.format(
+                colorise(CASE_RUNTIME_COLOUR, '{:3}'.format(perf['ops'])),
+                colorise(CASE_RUNTIME_COLOUR, perf['run_time'].rjust(6)),
+                colorise(CASE_RUNTIME_COLOUR, perf['freq'].rjust(10)),
+            )) if result else ''),
         ))
 
         error_stream.seek(0)
