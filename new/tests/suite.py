@@ -19,14 +19,32 @@ def colorise(color, s):
 
 # CASE_RUNTIME_COLOUR = 'light_gray'
 CASE_RUNTIME_COLOUR = 'grey_42'
+AVG_COLOUR = 'chartreuse_2a'
+MED_COLOUR = 'chartreuse_3b'
+MIN_COLOUR = 'dark_slate_gray_2'
+MAX_COLOUR = 'red_1'
+
+def format_run_time_us(run_time):
+    if run_time < 1e3:
+        return f'{run_time:.2f}us'
+    if run_time < 1e6:
+        ms = (run_time / 1e3)
+        return f'{ms:.2f}ms'
+    return '{:.4}s'.format(run_time / 1e6)
 
 def format_run_time(run_time):
     if not run_time.seconds:
-        ms = (run_time.microseconds / 1e3)
-        return '{:6.2f}ms'.format(ms)
+        return format_run_time_us(run_time.microseconds)
 
-    secs = run_time.seconds + (run_time.microseconds / 1e6)
-    return '{:8.4f}s'.format(secs)
+    us = (run_time.seconds * 1e6) + run_time.microseconds
+    return format_run_time_us(us)
+
+def format_freq(hz):
+    unit = 'Hz'
+    if 1e3 <= hz < 1e6:
+        unit = 'kHz'
+        hz = (hz / 1e3)
+    return '{:.2f} {}'.format(hz, unit)
 
 ENCODING = 'utf-8'
 INTERPRETER = './build/tools/exec/vm'
@@ -461,6 +479,7 @@ def main(args):
     pad_case_name = max(map(lambda _: len(_[0]), cases))
 
     run_times = []
+    perf_stats = []
 
     for case_no, (case_name, test_program,) in enumerate(cases, start = 1):
         error_stream = io.StringIO()
@@ -472,6 +491,25 @@ def main(args):
             result, symptom, run_time, perf = result
             if run_time:
                 run_times.append(run_time)
+            if perf:
+                def make_vm_time(s):
+                    if s.endswith('us'):
+                        return int(s[:-2])
+                    elif s.endswith('ms'):
+                        return int(float(s[:-2]) * 1000)
+                    else:
+                        raise
+                vm_time = make_vm_time(perf['run_time'])
+
+                def make_hz(s):
+                    n, hz = s.split()
+                    return int(float(n) * {
+                        'kHz': 1e3,
+                        'MHz': 1e6,
+                    }[hz])
+                freq = make_hz(perf['freq'])
+
+                perf_stats.append((perf['ops'], vm_time, freq,))
 
         if result:
             success_cases += 1
@@ -507,19 +545,51 @@ def main(args):
     ))
 
     total_run_time = sum(run_times[1:], start=run_times[0])
-    print('total run time was {} ({} ~ {} per case)'.format(
-        format_run_time(total_run_time),
-        format_run_time(min(run_times)).strip(),
-        format_run_time(max(run_times)).strip(),
+    print('\ntotal run time was {} ({} ~ {} per case)'.format(
+        colorise('white', format_run_time(total_run_time)),
+        colorise(MIN_COLOUR, format_run_time(min(run_times)).strip()),
+        colorise(MAX_COLOUR, format_run_time(max(run_times)).strip()),
     ))
     run_times = sorted(run_times)
     middle = (len(run_times) // 2)
     print('median run time was {}'.format(
-        format_run_time((
+        colorise(MED_COLOUR, format_run_time((
             run_times[middle]
             if (len(run_times) % 2) else
-            ((run_times[middle] + run_times[middle]) / 2)
-        )).strip(),
+            ((run_times[middle] + run_times[middle + 1]) / 2)
+        )).strip()),
+    ))
+
+    perf_ops = sorted(map(lambda x: x[0], perf_stats))
+    perf_time = sorted(map(lambda x: x[1], perf_stats))
+    perf_freq = sorted(map(lambda x: x[2], perf_stats))
+    avg = lambda seq: (sum(seq) / len(seq))
+    med = lambda seq: (lambda m: (
+            seq[m] if (len(seq) % 2) else (seq[m] + seq[m])
+        ))(len(seq) // 2)
+    print('\nperf counter     {}    / {}     ({} ~ {}):'.format(
+        colorise(AVG_COLOUR, 'average'),
+        colorise(MED_COLOUR, 'median'),
+        colorise(MIN_COLOUR, 'min'),
+        colorise(MAX_COLOUR, 'max'),
+    ))
+    print('  ops executed:  {}     / {}     ({} ~ {})'.format(
+        colorise(AVG_COLOUR, '{:.2f}'.format(avg(perf_ops)).rjust(6)),
+        colorise(MED_COLOUR, '{:.2f}'.format(med(perf_ops)).rjust(6)),
+        colorise('white', min(perf_ops)),
+        colorise('white', max(perf_ops)),
+    ))
+    print('  VM run time:   {}   / {}   ({} ~ {})'.format(
+        colorise(AVG_COLOUR, format_run_time_us(avg(perf_time)).rjust(8)),
+        colorise(MED_COLOUR, format_run_time_us(med(perf_time)).rjust(8)),
+        colorise('white', format_run_time_us(min(perf_time))),
+        colorise('white', format_run_time_us(max(perf_time))),
+    ))
+    print('  VM CPU freq:   {} / {} ({} ~ {})'.format(
+        colorise(AVG_COLOUR, format_freq(avg(perf_freq))),
+        colorise(MED_COLOUR, format_freq(med(perf_freq))),
+        colorise(MIN_COLOUR, format_freq(min(perf_freq))),
+        colorise(MAX_COLOUR, format_freq(max(perf_freq))),
     ))
 
 
