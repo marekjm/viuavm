@@ -255,7 +255,7 @@ auto demangle_addi_to_void(Cooked_text& text,
             auto const addi = R::decode(ins_at(i));
             if (addi.in.is_void()) {
                 auto const needs_greedy   = (addi.opcode & GREEDY);
-                auto const needs_unsigned = m(i, LUIU, GREEDY);
+                auto const needs_unsigned = (m(i, ADDIU, GREEDY) or m(i, ADDIU));
 
                 tmp.emplace_back(std::nullopt,
                                  std::nullopt,
