@@ -155,10 +155,13 @@ auto demangle_strtab_load(Cooked_text& text,
         auto x = double{};
         memcpy(&x, sv.data(), sizeof(x));
 
+        auto ss = std::ostringstream{};
+        ss << std::setprecision(std::numeric_limits<double>::digits10) << x;
+
         tmp.emplace_back(
             std::get<0>(ins),
             std::get<1>(ins),
-            ("double " + out.to_string() + ", " + std::to_string(x)));
+            ("double " + out.to_string() + ", " + ss.str()));
         ++i;
     }
 }
