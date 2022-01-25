@@ -382,7 +382,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
 
             expand_delete(cooked, synth);
         }
-    } else {
+    } else if (base or (value == 0)) {
         using namespace std::string_literals;
         auto synth           = ast::Instruction{};
         synth.opcode         = each.opcode;

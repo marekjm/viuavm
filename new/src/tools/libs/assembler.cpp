@@ -73,7 +73,7 @@ auto li_cost(uint64_t const value) -> size_t
         ++count;  // g.add
         ++count;  // g.delete
         ++count;  // g.delete
-    } else {
+    } else if (parts.second.first.first or (value == 0)) {
         ++count;  // addiu
     }
 

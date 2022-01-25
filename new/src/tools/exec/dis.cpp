@@ -562,6 +562,8 @@ auto main(int argc, char* argv[]) -> int
                 out << "    ; ";
                 out << std::setw(16) << std::setfill('0') << std::hex << *ip
                     << "\n";
+            } else {
+                out << "\n";
             }
             out << "    " << s << "\n";
         }
