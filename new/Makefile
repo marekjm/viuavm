@@ -51,7 +51,8 @@ dist: \
 	$(BUILD)/tools/exec/readelf \
 	$(BUILD)/tools/exec/dis \
 	$(BUILD)/tools/exec/asm \
-	$(BUILD)/tools/exec/vm
+	$(BUILD)/tools/exec/vm \
+	$(BUILD)/tools/exec/viua
 
 test: dist
 	@python3 ./tests/suite.py
@@ -63,8 +64,8 @@ clean:
 
 install: all
 	mkdir -p $(PREFIX)/lib/viua/{core,site}/{bin,lib,share,man}
-	@cp -v $(BUILD_EXEC_DIR)/asm $(CORE_BIN_DIR)/viua-asm
-	@cp -v $(BUILD_EXEC_DIR)/vm $(CORE_BIN_DIR)/viua-vm
+	@cp -v $(BUILD_EXEC_DIR)/{asm,dis,readelf,vm} $(CORE_BIN_DIR)/
+	@cp -v $(BUILD_EXEC_DIR)/viua $(PREFIX)/bin/
 
 install-binfmt:
 	mkdir -p $(PREFIX)/lib/binfmt.d
@@ -118,6 +119,9 @@ watch-tests:
 # Template rules
 $(BUILD)/%: $(BUILD)/%.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
+
+$(BUILD)/%: ./src/%.sh
+	@cp -v $^ $@
 
 $(BUILD)/%.o: ./src/%.cpp
 	@mkdir -p $(shell dirname $@)
