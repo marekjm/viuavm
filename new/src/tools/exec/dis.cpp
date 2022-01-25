@@ -196,7 +196,7 @@ auto demangle_canonical_li(Cooked_text& text,
             using viua::arch::ops::R;
 
             auto const lui        = E::decode(ins_at(i));
-            auto const high_part  = lui.immediate;
+            auto const high_part  = (lui.immediate << 28);
             auto const base       = R::decode(ins_at(i + 1)).immediate;
             auto const multiplier = R::decode(ins_at(i + 2)).immediate;
             auto const remainder  = R::decode(ins_at(i + 4)).immediate;
