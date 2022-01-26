@@ -334,8 +334,6 @@ auto demangle_addiu(Cooked_text& text) -> void
     for (auto i = size_t{0}; i < text.size(); ++i) {
         using viua::arch::ops::GREEDY;
         if (m(i, ADDIU) or m(i, ADDIU, GREEDY)) {
-            std::cerr << "got a match for demangle_addiu of "
-                      << text.at(i).str() << "\n";
             using viua::arch::ops::R;
             using viua::arch::ops::S;
             auto const addi         = R::decode(ins_at(i));
@@ -370,7 +368,7 @@ auto demangle_branches(Cooked_text& raw) -> std::map<size_t, size_t>
         return match_opcode(ins_at(n), op, flags);
     };
 
-    auto cooked = Cooked_text{};
+    auto cooked              = Cooked_text{};
     auto physical_to_logical = std::map<size_t, size_t>{};
     {
         auto drift = size_t{0};
@@ -378,13 +376,10 @@ auto demangle_branches(Cooked_text& raw) -> std::map<size_t, size_t>
             using enum viua::arch::ops::OPCODE;
 
             if (m(i, IF)) {
-                std::cerr << "found if! increasing drift to " << ++drift
-                          << "\n";
+                ++drift;
             }
 
             physical_to_logical[raw.at(i).index.physical] = (i - drift);
-            std::cerr << "mapped physical " << raw.at(i).index.physical
-                      << " to " << (i - drift) << "\n";
         }
     }
 
@@ -394,8 +389,6 @@ auto demangle_branches(Cooked_text& raw) -> std::map<size_t, size_t>
         if (s.starts_with("g.li") and m(i + 1, IF)) {
             auto const phys_index    = std::stoull(s.substr(s.rfind(' ')));
             auto const logical_index = physical_to_logical.at(phys_index);
-            std::cerr << "phys_index " << phys_index << " maps to logical "
-                      << logical_index << "\n";
 
             auto branch                = std::move(raw.at(++i));
             branch.index.physical      = raw.at(i - 1).index.physical;
