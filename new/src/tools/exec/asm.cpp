@@ -1197,20 +1197,20 @@ auto display_error_and_exit
     std::cerr << std::string(ERROR_MARKER.size(), ' ')
               << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR_SOURCE << "\n";
 
-    std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native() << esc(2, ATTR_RESET)
-              << ':' << esc(2, COLOR_FG_WHITE) << (e.line() + 1)
+    std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
               << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
-              << (e.character() + 1) << esc(2, ATTR_RESET) << ": "
-              << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
-              << e.str() << "\n";
+              << (e.line() + 1) << esc(2, ATTR_RESET) << ':'
+              << esc(2, COLOR_FG_WHITE) << (e.character() + 1)
+              << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED) << "error"
+              << esc(2, ATTR_RESET) << ": " << e.str() << "\n";
 
     for (auto const& each : e.notes()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native() << esc(2, ATTR_RESET)
-                  << ':' << esc(2, COLOR_FG_WHITE) << (e.line() + 1)
+        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
                   << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
-                  << (e.character() + 1) << esc(2, ATTR_RESET) << ": "
-                  << esc(2, COLOR_FG_CYAN) << "note" << esc(2, ATTR_RESET)
-                  << ": ";
+                  << (e.line() + 1) << esc(2, ATTR_RESET) << ':'
+                  << esc(2, COLOR_FG_WHITE) << (e.character() + 1)
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
+                  << "note" << esc(2, ATTR_RESET) << ": ";
         if (each.find('\n') == std::string::npos) {
             std::cerr << each << "\n";
         } else {
@@ -1248,13 +1248,13 @@ auto display_error_in_function(std::filesystem::path const source_path,
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native() << esc(2, ATTR_RESET)
-              << ':' << esc(2, COLOR_FG_WHITE) << (e.line() + 1)
-              << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
-              << (e.character() + 1) << esc(2, ATTR_RESET) << ": "
-              << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-              << ": in function " << esc(2, COLOR_FG_WHITE) << fn_name
-              << esc(2, ATTR_RESET) << ":\n";
+    std::cerr
+        << esc(2, COLOR_FG_WHITE) << source_path.native() << esc(2, ATTR_RESET)
+        << ':' << esc(2, COLOR_FG_WHITE) << (e.line() + 1) << esc(2, ATTR_RESET)
+        << ':' << esc(2, COLOR_FG_WHITE) << (e.character() + 1)
+        << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED) << "error"
+        << esc(2, ATTR_RESET) << ": in function " << esc(2, COLOR_FG_WHITE)
+        << fn_name << esc(2, ATTR_RESET) << ":\n";
 }
 }  // namespace
 
@@ -1329,12 +1329,12 @@ auto lexical_analysis(std::filesystem::path const source_path,
         std::cerr << source_line.str() << "\n";
         std::cerr << highlight_line.str() << "\n";
 
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native() << esc(2, ATTR_RESET)
-                  << ':' << esc(2, COLOR_FG_WHITE) << (location.line + 1)
+        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
                   << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
-                  << (location.character + 1) << esc(2, ATTR_RESET) << ": "
-                  << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                  << ": "
+                  << (location.line + 1) << esc(2, ATTR_RESET) << ':'
+                  << esc(2, COLOR_FG_WHITE) << (location.character + 1)
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET) << ": "
                   << "no token match at character "
                   << viua::support::string::CORNER_QUOTE_LL
                   << esc(2, COLOR_FG_WHITE) << e.text << esc(2, ATTR_RESET)
@@ -1410,7 +1410,7 @@ auto load_value_labels(std::filesystem::path const source_path,
 
             var_offsets[ct.name.text] = save_string(strings_table, s);
         } else if (ct.type == "atom") {
-            auto const s = ct.value.front().text;
+            auto const s              = ct.value.front().text;
             var_offsets[ct.name.text] = save_string(strings_table, s);
         }
     }
@@ -1451,8 +1451,8 @@ auto cook_long_immediates(std::filesystem::path const source_path,
                 auto s        = lx.text;
                 auto saved_at = size_t{0};
                 if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
-                    s = s.substr(1, s.size() - 2);
-                    s = viua::support::string::unescape(s);
+                    s        = s.substr(1, s.size() - 2);
+                    s        = viua::support::string::unescape(s);
                     saved_at = save_string(strings_table, s);
                 } else if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
                     auto s   = lx.text;
@@ -1490,7 +1490,8 @@ auto cook_long_immediates(std::filesystem::path const source_path,
                     using viua::libs::errors::compile_time::Error;
 
                     auto e = Error{lx, Cause::Invalid_operand}.aside(
-                        "expected string literal, atom literal, or a label reference");
+                        "expected string literal, atom literal, or a label "
+                        "reference");
 
                     if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
                         did_you_mean(e, '@' + lx.text);
@@ -1697,13 +1698,13 @@ auto find_entry_point(std::filesystem::path const source_path,
         using viua::support::tty::send_escape_seq;
         constexpr auto esc = send_escape_seq;
 
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native() << esc(2, ATTR_RESET)
-                  << ": " << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET) << ": "
+        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET) << ": "
                   << "no entry point function defined\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native() << esc(2, ATTR_RESET)
-                  << ": " << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": "
+        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
+                  << "note" << esc(2, ATTR_RESET) << ": "
                   << "the entry function should have the [[entry_point]] "
                      "attribute\n";
         exit(1);

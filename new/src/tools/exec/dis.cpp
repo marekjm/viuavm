@@ -257,8 +257,9 @@ auto demangle_addi_to_void(Cooked_text& text,
             using viua::arch::ops::S;
             auto const addi = R::decode(ins_at(i));
             if (addi.in.is_void()) {
-                auto const needs_greedy   = (addi.opcode & GREEDY);
-                auto const needs_unsigned = (m(i, ADDIU, GREEDY) or m(i, ADDIU));
+                auto const needs_greedy = (addi.opcode & GREEDY);
+                auto const needs_unsigned =
+                    (m(i, ADDIU, GREEDY) or m(i, ADDIU));
 
                 tmp.emplace_back(std::nullopt,
                                  std::nullopt,
@@ -301,14 +302,14 @@ auto demangle_addiu(Cooked_text& text) -> void
             std::cerr << "got a match for demangle_addiu of " << std::get<2>(text.at(i)) << "\n";
             using viua::arch::ops::R;
             using viua::arch::ops::S;
-            auto const addi = R::decode(ins_at(i));
-            auto const needs_greedy   = (addi.opcode & GREEDY);
+            auto const addi         = R::decode(ins_at(i));
+            auto const needs_greedy = (addi.opcode & GREEDY);
 
             tmp.emplace_back(std::nullopt,
                              std::nullopt,
-                             ((needs_greedy ? "g." : "")
-                              + std::string{"addi "} + addi.out.to_string()
-                              + ", " + std::to_string(addi.immediate) + 'u'));
+                             ((needs_greedy ? "g." : "") + std::string{"addi "}
+                              + addi.out.to_string() + ", "
+                              + std::to_string(addi.immediate) + 'u'));
             continue;
         }
 
