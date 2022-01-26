@@ -115,6 +115,7 @@ using Cooked_text = std::vector<Cooked_op>;
 namespace cook {
 auto demangle_strtab_load(Cooked_text& raw,
                           viua::vm::elf::Fragment const& rodata,
+                          viua::vm::elf::Fragment const& fntab,
                           Cooked_text& cooked,
                           size_t& i,
                           viua::arch::Register_access const out,
@@ -138,6 +139,7 @@ auto demangle_strtab_load(Cooked_text& raw,
     };
 
     using enum viua::arch::ops::OPCODE;
+    using viua::arch::ops::D;
     using viua::arch::ops::S;
     if (m(i + 1, STRING) and S::decode(ins_at(i + 1)).out == out) {
         auto ins = raw.at(i + 1);
@@ -196,11 +198,28 @@ auto demangle_strtab_load(Cooked_text& raw,
         ++i;
         return;
     }
+    if (m(i + 1, CALL) and D::decode(ins_at(i + 1)).in == out) {
+        auto ins = raw.at(i + 1);
+
+        auto const off       = immediate;
+        auto const data_size = read_size(fntab.data, off);
+        auto const name      = std::string{
+            reinterpret_cast<char const*>(&fntab.data[off]), data_size};
+
+        auto tt = ins.with_text(
+            "call " + D::decode(ins_at(i + 1)).out.to_string() + ", " + name);
+        tt.index = cooked.back().index;
+        cooked.pop_back();
+        tt.index.physical_span = tt.index.physical_span.value() + 1;
+        cooked.emplace_back(tt);
+        ++i;
+        return;
+    }
 }
 
 auto demangle_canonical_li(Cooked_text& text,
-                           viua::vm::elf::Fragment const& rodata
-                           [[maybe_unused]]) -> void
+                           viua::vm::elf::Fragment const& rodata,
+                           viua::vm::elf::Fragment const& fntab) -> void
 {
     auto tmp = Cooked_text{};
 
@@ -259,7 +278,7 @@ auto demangle_canonical_li(Cooked_text& text,
                  + (needs_annotation ? "[[full]] " : "")
                  + std::to_string(literal) + (needs_unsigned ? "u" : "")));
 
-            demangle_strtab_load(text, rodata, tmp, i, lui.out, literal);
+            demangle_strtab_load(text, rodata, fntab, tmp, i, lui.out, literal);
         } else {
             tmp.push_back(std::move(text.at(i)));
         }
@@ -269,7 +288,8 @@ auto demangle_canonical_li(Cooked_text& text,
 }
 
 auto demangle_addi_to_void(Cooked_text& text,
-                           viua::vm::elf::Fragment const& rodata) -> void
+                           viua::vm::elf::Fragment const& rodata,
+                           viua::vm::elf::Fragment const& fntab) -> void
 {
     auto tmp = Cooked_text{};
 
@@ -307,7 +327,7 @@ auto demangle_addi_to_void(Cooked_text& text,
                                   + (needs_unsigned ? "u" : "")));
 
                 demangle_strtab_load(
-                    text, rodata, tmp, i, addi.out, addi.immediate);
+                    text, rodata, fntab, tmp, i, addi.out, addi.immediate);
 
                 continue;
             }
@@ -690,8 +710,11 @@ auto main(int argc, char* argv[]) -> int
         }
 
         if (demangle_li) {
-            cook::demangle_canonical_li(cooked_text, rodata->get());
-            cook::demangle_addi_to_void(cooked_text, rodata->get());
+            auto const fntab = main_module.find_fragment(".viua.fns");
+            cook::demangle_canonical_li(
+                cooked_text, rodata->get(), fntab->get());
+            cook::demangle_addi_to_void(
+                cooked_text, rodata->get(), fntab->get());
         }
         cook::demangle_addiu(cooked_text);
 
