@@ -128,6 +128,14 @@ auto demangle_strtab_load(Cooked_text& raw,
         return match_opcode(ins_at(n), op, flags);
     };
 
+    auto const read_size = [](std::vector<uint8_t> const& data,
+                              size_t const off) -> uint64_t {
+        auto const size_offset = (off - sizeof(uint64_t));
+        auto cooked            = uint64_t{};
+        memcpy(&cooked, &data[size_offset], sizeof(uint64_t));
+        return le64toh(cooked);
+    };
+
     using enum viua::arch::ops::OPCODE;
     using viua::arch::ops::S;
     if (m(i + 1, STRING) and S::decode(ins_at(i + 1)).out == out) {
@@ -155,13 +163,8 @@ auto demangle_strtab_load(Cooked_text& raw,
         cooked.pop_back();
 
         auto const off       = immediate;
-        auto const data_size = [&rodata, off]() -> uint64_t {
-            auto const size_offset = (off - sizeof(uint64_t));
-            auto cooked            = uint64_t{};
-            memcpy(&cooked, &rodata.data[size_offset], sizeof(uint64_t));
-            return le64toh(cooked);
-        }();
-        auto const sv = std::string_view{
+        auto const data_size = read_size(rodata.data, off);
+        auto const sv        = std::string_view{
             reinterpret_cast<char const*>(&rodata.data[off]), data_size};
         auto x = float{};
         memcpy(&x, sv.data(), sizeof(x));
@@ -175,13 +178,8 @@ auto demangle_strtab_load(Cooked_text& raw,
         cooked.pop_back();
 
         auto const off       = immediate;
-        auto const data_size = [&rodata, off]() -> uint64_t {
-            auto const size_offset = (off - sizeof(uint64_t));
-            auto cooked            = uint64_t{};
-            memcpy(&cooked, &rodata.data[size_offset], sizeof(uint64_t));
-            return le64toh(cooked);
-        }();
-        auto const sv = std::string_view{
+        auto const data_size = read_size(rodata.data, off);
+        auto const sv        = std::string_view{
             reinterpret_cast<char const*>(&rodata.data[off]), data_size};
         auto x = double{};
         memcpy(&x, sv.data(), sizeof(x));
