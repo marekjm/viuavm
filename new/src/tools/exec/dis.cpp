@@ -348,7 +348,7 @@ auto demangle_addiu(Cooked_text& text) -> void
                 std::nullopt,
                 std::nullopt,
                 ((needs_greedy ? "g." : "") + std::string{"addi "}
-                 + addi.out.to_string() + ", "
+                 + addi.out.to_string() + ", " + addi.in.to_string() + ", "
                  + std::to_string(addi.immediate) + 'u'));
             continue;
         }
