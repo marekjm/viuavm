@@ -29,7 +29,7 @@ def format_run_time_us(run_time):
         return f'{run_time:.2f}us'
     if run_time < 1e6:
         ms = (run_time / 1e3)
-        return f'{ms:.2f}ms'
+        return f'{ms:6.2f}ms'
     return '{:.4}s'.format(run_time / 1e6)
 
 def format_run_time(run_time):
@@ -53,7 +53,7 @@ DISASSEMBLER = './build/tools/exec/dis'
 
 DIS_EXTENSION = '~'
 
-SKIP_DISASSEMBLER_TESTS = True
+SKIP_DISASSEMBLER_TESTS = False
 
 EBREAK_LINE_BOXED = re.compile(r'\[(\d+)\.([lap])\] (\*?[a-zA-Z_][a-zA-Z_0-9]*) = (.*)')
 EBREAK_LINE_PRIMITIVE = re.compile(r'\[(\d+)\.([lap])\] (is|iu|fl|db) (.*)')
@@ -436,7 +436,7 @@ def test_case(case_name, test_program, errors):
                         (len(leader) * ' '),
                         colorise('red', (max(len(want_type), len(got_type)) * '^')),
                     ))
-                    return (False, 'unexpected type', count_runtime(), None,)
+                    return (False, 'unexpected type (after reassembly)', count_runtime(), None,)
 
                 if want_value != got_value:
                     leader = f'    register {index}.{r}'
@@ -450,7 +450,7 @@ def test_case(case_name, test_program, errors):
                         want_type.ljust(max(len(want_type), len(got_type))),
                         colorise('green', want_value),
                     ))
-                    return (False, 'unexpected value', count_runtime(), None,)
+                    return (False, 'unexpected value (after reassembly)', count_runtime(), None,)
 
     return (True, None, count_runtime(), perf)
 
