@@ -3,6 +3,7 @@
 *.module
 *.bin
 *.out
+*.elf
 
 *.pdf
 

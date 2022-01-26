@@ -276,7 +276,7 @@ def test_case(case_name, test_program, errors):
     except No_check_file_for:
         return (False, 'no check file', None, None,)
 
-    test_executable = (os.path.splitext(test_program)[0] + '.bin')
+    test_executable = (os.path.splitext(test_program)[0] + '.elf')
 
     start_timepoint = datetime.datetime.now()
     count_runtime = lambda: (datetime.datetime.now() - start_timepoint)
