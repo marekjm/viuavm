@@ -31,6 +31,7 @@
 
 #include <viua/arch/ops.h>
 #include <viua/libs/assembler.h>
+#include <viua/support/string.h>
 #include <viua/support/tty.h>
 #include <viua/vm/elf.h>
 
@@ -602,7 +603,10 @@ auto main(int argc, char* argv[]) -> int
             }();
             auto const sv = std::string_view{
                 reinterpret_cast<char const*>(&strtab.data[off]), data_size};
-            auto const is_string = std::all_of(sv.begin(), sv.end(), ::isprint);
+            auto const is_string =
+                std::all_of(sv.begin(), sv.end(), [](char const c) -> bool {
+                    return (::isprint(c) or ::isspace(c));
+                });
 
             if (not is_string) {
                 /*
@@ -622,7 +626,8 @@ auto main(int argc, char* argv[]) -> int
                 << data_size << " byte" << (data_size == 1 ? "" : "s") << ")\n";
             out << ".label: _strat_" << off << "\n";
 
-            out << ".value: string \"" << sv << "\"\n\n";
+            out << ".value: string " << viua::support::string::quoted(sv)
+                << "\n\n";
 
             off += sv.size();
         }

@@ -140,6 +140,7 @@ $(BUILD)/tools/exec/readelf: \
 $(BUILD)/tools/exec/dis: \
 	$(BUILD)/tools/libs/assembler.o \
 	$(BUILD)/support/tty.o \
+	$(BUILD)/support/string.o \
 	$(BUILD)/vm/elf.o \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
