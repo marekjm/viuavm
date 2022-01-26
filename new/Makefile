@@ -76,7 +76,10 @@ install-binfmt:
 	cat ./binfmt.d/viua-exec.conf > /proc/sys/fs/binfmt_misc/register
 
 format:
-	(find ./include -type f ; find ./src -type f) | xargs --max-args 1 --max-procs 0 --verbose clang-format -i
+	(\
+		find ./include -type f -name '*.h' ;\
+		find ./src -type f -name '*.cpp'\
+	) | xargs --max-args 1 --max-procs 0 --verbose clang-format -i
 
 
 ################################################################################
