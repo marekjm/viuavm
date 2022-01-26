@@ -74,22 +74,53 @@ auto match_opcode(viua::arch::instruction_type const ip,
 };
 }  // namespace
 
-using Cooked_text =
-    std::vector<std::tuple<std::optional<viua::arch::opcode_type>,
-                           std::optional<viua::arch::instruction_type>,
-                           std::string>>;
+struct Cooked_op {
+    struct index_type {
+        size_t physical{};  // in actual bytecode
+        std::optional<size_t> physical_span;
+
+        index_type(size_t const n) : physical{n}
+        {}
+    };
+    index_type index;
+
+    using op_type = std::optional<viua::arch::opcode_type>;
+    op_type opcode;
+
+    using in_type = std::optional<viua::arch::instruction_type>;
+    in_type instruction;
+
+    std::string textual_repr;
+
+    inline auto str() const -> std::string
+    {
+        return textual_repr;
+    }
+
+    inline auto with_text(std::string&& s) -> Cooked_op
+    {
+        return Cooked_op{index, opcode, instruction, std::move(s)};
+    }
+
+    inline Cooked_op(index_type const i, op_type o, in_type n, std::string s)
+            : index{i}, opcode{o}, instruction{n}, textual_repr{std::move(s)}
+    {}
+    inline Cooked_op(size_t const i, op_type o, in_type n, std::string s)
+            : index{i}, opcode{o}, instruction{n}, textual_repr{std::move(s)}
+    {}
+};
+using Cooked_text = std::vector<Cooked_op>;
 
 namespace cook {
-auto demangle_strtab_load(Cooked_text& text,
+auto demangle_strtab_load(Cooked_text& raw,
                           viua::vm::elf::Fragment const& rodata,
-                          Cooked_text& tmp,
+                          Cooked_text& cooked,
                           size_t& i,
                           viua::arch::Register_access const out,
                           uint64_t const immediate) -> void
 {
-    auto const ins_at =
-        [&text](size_t const n) -> viua::arch::instruction_type {
-        return std::get<1>(text.at(n)).value_or(0);
+    auto const ins_at = [&raw](size_t const n) -> viua::arch::instruction_type {
+        return raw.at(n).instruction.value_or(0);
     };
     auto const m = [ins_at](size_t const n,
                             viua::arch::ops::OPCODE const op,
@@ -99,56 +130,48 @@ auto demangle_strtab_load(Cooked_text& text,
 
     using enum viua::arch::ops::OPCODE;
     using viua::arch::ops::S;
-    if (m(i + 1, STRING) and S::decode(ins_at(i)).out == out) {
-        auto ins = text.at(i);
-        tmp.pop_back();
-        tmp.emplace_back(std::get<0>(ins),
-                         std::get<1>(ins),
-                         ("string " + out.to_string() + ", @_strat_"
-                          + std::to_string(immediate)));
+    if (m(i + 1, STRING) and S::decode(ins_at(i + 1)).out == out) {
+        auto ins = raw.at(i + 1);
+        cooked.emplace_back(ins.with_text(("string " + out.to_string() + ", @_strat_"
+                                 + std::to_string(immediate))));
         ++i;
     }
-    if (m(i + 1, ATOM) and S::decode(ins_at(i)).out == out) {
-        auto ins = text.at(i);
-        tmp.pop_back();
-        tmp.emplace_back(std::get<0>(ins),
-                         std::get<1>(ins),
-                         ("atom " + out.to_string() + ", @_strat_"
-                          + std::to_string(immediate)));
+    if (m(i + 1, ATOM) and S::decode(ins_at(i + 1)).out == out) {
+        auto ins = raw.at(i + 1);
+        cooked.emplace_back(ins.with_text(("atom " + out.to_string() + ", @_strat_"
+                                 + std::to_string(immediate))));
         ++i;
     }
-    if (m(i + 1, FLOAT) and S::decode(ins_at(i)).out == out) {
-        auto ins = text.at(i);
-        tmp.pop_back();
+    if (m(i + 1, FLOAT) and S::decode(ins_at(i + 1)).out == out) {
+        auto ins = raw.at(i + 1);
+        cooked.pop_back();
 
         auto const off       = immediate;
         auto const data_size = [&rodata, off]() -> uint64_t {
             auto const size_offset = (off - sizeof(uint64_t));
-            auto tmp               = uint64_t{};
-            memcpy(&tmp, &rodata.data[size_offset], sizeof(uint64_t));
-            return le64toh(tmp);
+            auto cooked            = uint64_t{};
+            memcpy(&cooked, &rodata.data[size_offset], sizeof(uint64_t));
+            return le64toh(cooked);
         }();
         auto const sv = std::string_view{
             reinterpret_cast<char const*>(&rodata.data[off]), data_size};
         auto x = float{};
         memcpy(&x, sv.data(), sizeof(x));
 
-        tmp.emplace_back(
-            std::get<0>(ins),
-            std::get<1>(ins),
-            ("float " + out.to_string() + ", " + std::to_string(x)));
+        cooked.emplace_back(ins.with_text(
+            ("float " + out.to_string() + ", " + std::to_string(x))));
         ++i;
     }
-    if (m(i + 1, DOUBLE) and S::decode(ins_at(i)).out == out) {
-        auto ins = text.at(i);
-        tmp.pop_back();
+    if (m(i + 1, DOUBLE) and S::decode(ins_at(i + 1)).out == out) {
+        auto ins = raw.at(i + 1);
+        cooked.pop_back();
 
         auto const off       = immediate;
         auto const data_size = [&rodata, off]() -> uint64_t {
             auto const size_offset = (off - sizeof(uint64_t));
-            auto tmp               = uint64_t{};
-            memcpy(&tmp, &rodata.data[size_offset], sizeof(uint64_t));
-            return le64toh(tmp);
+            auto cooked            = uint64_t{};
+            memcpy(&cooked, &rodata.data[size_offset], sizeof(uint64_t));
+            return le64toh(cooked);
         }();
         auto const sv = std::string_view{
             reinterpret_cast<char const*>(&rodata.data[off]), data_size};
@@ -158,10 +181,8 @@ auto demangle_strtab_load(Cooked_text& text,
         auto ss = std::ostringstream{};
         ss << std::setprecision(std::numeric_limits<double>::digits10) << x;
 
-        tmp.emplace_back(
-            std::get<0>(ins),
-            std::get<1>(ins),
-            ("double " + out.to_string() + ", " + ss.str()));
+        cooked.emplace_back(
+            ins.with_text(("double " + out.to_string() + ", " + ss.str())));
         ++i;
     }
 }
@@ -174,7 +195,7 @@ auto demangle_canonical_li(Cooked_text& text,
 
     auto const ins_at =
         [&text](size_t const n) -> viua::arch::instruction_type {
-        return std::get<1>(text.at(n)).value_or(0);
+        return text.at(n).instruction.value_or(0);
     };
     auto const m = [ins_at](size_t const n,
                             viua::arch::ops::OPCODE const op,
@@ -216,6 +237,7 @@ auto demangle_canonical_li(Cooked_text& text,
             auto const needs_unsigned = m(i, LUIU, GREEDY);
 
             tmp.emplace_back(
+                text.at(i).index,
                 std::nullopt,
                 std::nullopt,
                 ((needs_greedy ? "g." : "") + std::string{"li "}
@@ -240,7 +262,7 @@ auto demangle_addi_to_void(Cooked_text& text,
 
     auto const ins_at =
         [&text](size_t const n) -> viua::arch::instruction_type {
-        return std::get<1>(text.at(n)).value_or(0);
+        return text.at(n).instruction.value_or(0);
     };
     auto const m = [ins_at](size_t const n,
                             viua::arch::ops::OPCODE const op,
@@ -261,7 +283,8 @@ auto demangle_addi_to_void(Cooked_text& text,
                 auto const needs_unsigned =
                     (m(i, ADDIU, GREEDY) or m(i, ADDIU));
 
-                tmp.emplace_back(std::nullopt,
+                tmp.emplace_back(text.at(i).index,
+                                 std::nullopt,
                                  std::nullopt,
                                  ((needs_greedy ? "g." : "")
                                   + std::string{"li "} + addi.out.to_string()
@@ -287,7 +310,7 @@ auto demangle_addiu(Cooked_text& text) -> void
 
     auto const ins_at =
         [&text](size_t const n) -> viua::arch::instruction_type {
-        return std::get<1>(text.at(n)).value_or(0);
+        return text.at(n).instruction.value_or(0);
     };
     auto const m = [ins_at](size_t const n,
                             viua::arch::ops::OPCODE const op,
@@ -299,13 +322,15 @@ auto demangle_addiu(Cooked_text& text) -> void
     for (auto i = size_t{0}; i < text.size(); ++i) {
         using viua::arch::ops::GREEDY;
         if (m(i, ADDIU) or m(i, ADDIU, GREEDY)) {
-            std::cerr << "got a match for demangle_addiu of " << std::get<2>(text.at(i)) << "\n";
+            std::cerr << "got a match for demangle_addiu of "
+                      << text.at(i).str() << "\n";
             using viua::arch::ops::R;
             using viua::arch::ops::S;
             auto const addi         = R::decode(ins_at(i));
             auto const needs_greedy = (addi.opcode & GREEDY);
 
-            tmp.emplace_back(std::nullopt,
+            tmp.emplace_back(text.at(i).index,
+                             std::nullopt,
                              std::nullopt,
                              ((needs_greedy ? "g." : "") + std::string{"addi "}
                               + addi.out.to_string() + ", "
@@ -588,7 +613,7 @@ auto main(int argc, char* argv[]) -> int
             auto const ip     = text.at(offset + i);
             auto const opcode = static_cast<viua::arch::opcode_type>(
                 ip & viua::arch::ops::OPCODE_MASK);
-            cooked_text.push_back({opcode, ip, ins_to_string(ip)});
+            cooked_text.emplace_back(i, opcode, ip, ins_to_string(ip));
         }
 
         if (demangle_li) {
@@ -597,14 +622,18 @@ auto main(int argc, char* argv[]) -> int
         }
         cook::demangle_addiu(cooked_text);
 
-        for (auto const& [op, ip, s] : cooked_text) {
+        out << "    ; <binary>           <logical>\n";
+        for (auto i = size_t{}; i < cooked_text.size(); ++i) {
+            auto const& [index, op, ip, s] = cooked_text.at(i);
+            out << "    ; ";
             if (ip.has_value()) {
-                out << "    ; ";
-                out << std::setw(16) << std::setfill('0') << std::hex << *ip
-                    << "\n";
+                out << std::setw(16) << std::setfill('0') << std::hex << *ip;
             } else {
-                out << "\n";
+                out << std::string(16, ' ');
             }
+            out << "  " << std::dec << std::setw(2) << std::setfill(' ') << i;
+            out << "\n";
+
             out << "    " << s << "\n";
         }
 
