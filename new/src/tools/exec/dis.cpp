@@ -529,13 +529,13 @@ auto main(int argc, char* argv[]) -> int
                 << data_size << " byte" << (data_size == 1 ? "" : "s") << ")\n";
             out << ".label: _strat_" << off << "\n";
 
-            out << ".value: string \"" << sv << "\"\n";
+            out << ".value: string \"" << sv << "\"\n\n";
 
             off += sv.size();
         }
 
         if (dumped) {
-            out << "\n\n";
+            out << "\n";
         }
     }
 
