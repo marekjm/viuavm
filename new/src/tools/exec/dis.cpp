@@ -279,6 +279,44 @@ auto demangle_addi_to_void(Cooked_text& text,
 
     text = std::move(tmp);
 }
+
+auto demangle_addiu(Cooked_text& text) -> void
+{
+    auto tmp = Cooked_text{};
+
+    auto const ins_at =
+        [&text](size_t const n) -> viua::arch::instruction_type {
+        return std::get<1>(text.at(n)).value_or(0);
+    };
+    auto const m = [ins_at](size_t const n,
+                            viua::arch::ops::OPCODE const op,
+                            viua::arch::opcode_type const flags = 0) -> bool {
+        return match_opcode(ins_at(n), op, flags);
+    };
+
+    using enum viua::arch::ops::OPCODE;
+    for (auto i = size_t{0}; i < text.size(); ++i) {
+        using viua::arch::ops::GREEDY;
+        if (m(i, ADDIU) or m(i, ADDIU, GREEDY)) {
+            std::cerr << "got a match for demangle_addiu of " << std::get<2>(text.at(i)) << "\n";
+            using viua::arch::ops::R;
+            using viua::arch::ops::S;
+            auto const addi = R::decode(ins_at(i));
+            auto const needs_greedy   = (addi.opcode & GREEDY);
+
+            tmp.emplace_back(std::nullopt,
+                             std::nullopt,
+                             ((needs_greedy ? "g." : "")
+                              + std::string{"addi "} + addi.out.to_string()
+                              + ", " + std::to_string(addi.immediate) + 'u'));
+            continue;
+        }
+
+        tmp.push_back(std::move(text.at(i)));
+    }
+
+    text = std::move(tmp);
+}
 }  // namespace cook
 
 auto main(int argc, char* argv[]) -> int
@@ -556,6 +594,7 @@ auto main(int argc, char* argv[]) -> int
             cook::demangle_canonical_li(cooked_text, rodata->get());
             cook::demangle_addi_to_void(cooked_text, rodata->get());
         }
+        cook::demangle_addiu(cooked_text);
 
         for (auto const& [op, ip, s] : cooked_text) {
             if (ip.has_value()) {
