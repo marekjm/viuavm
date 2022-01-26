@@ -358,6 +358,64 @@ auto demangle_addiu(Cooked_text& text) -> void
 
     text = std::move(tmp);
 }
+
+auto demangle_branches(Cooked_text& raw) -> std::map<size_t, size_t>
+{
+    auto const ins_at = [&raw](size_t const n) -> viua::arch::instruction_type {
+        return raw.at(n).instruction.value_or(0);
+    };
+    auto const m = [ins_at](size_t const n,
+                            viua::arch::ops::OPCODE const op,
+                            viua::arch::opcode_type const flags = 0) -> bool {
+        return match_opcode(ins_at(n), op, flags);
+    };
+
+    auto cooked = Cooked_text{};
+    auto physical_to_logical = std::map<size_t, size_t>{};
+    {
+        auto drift = size_t{0};
+        for (auto i = size_t{0}; i < raw.size(); ++i) {
+            using enum viua::arch::ops::OPCODE;
+
+            if (m(i, IF)) {
+                std::cerr << "found if! increasing drift to " << ++drift
+                          << "\n";
+            }
+
+            physical_to_logical[raw.at(i).index.physical] = (i - drift);
+            std::cerr << "mapped physical " << raw.at(i).index.physical
+                      << " to " << (i - drift) << "\n";
+        }
+    }
+
+    for (auto i = size_t{0}; i < raw.size(); ++i) {
+        using enum viua::arch::ops::OPCODE;
+        auto const s = raw.at(i).str();
+        if (s.starts_with("g.li") and m(i + 1, IF)) {
+            auto const phys_index    = std::stoull(s.substr(s.rfind(' ')));
+            auto const logical_index = physical_to_logical.at(phys_index);
+            std::cerr << "phys_index " << phys_index << " maps to logical "
+                      << logical_index << "\n";
+
+            auto branch                = std::move(raw.at(++i));
+            branch.index.physical      = raw.at(i - 1).index.physical;
+            branch.index.physical_span = branch.index.physical;
+            branch.textual_repr =
+                branch.textual_repr.substr(0, branch.textual_repr.rfind(' '))
+                + ' ' + std::to_string(logical_index);
+
+            cooked.push_back(branch);
+
+            continue;
+        }
+
+        cooked.push_back(std::move(raw.at(i)));
+    }
+
+    raw = std::move(cooked);
+
+    return physical_to_logical;
+}
 }  // namespace cook
 
 auto main(int argc, char* argv[]) -> int
@@ -637,11 +695,7 @@ auto main(int argc, char* argv[]) -> int
         }
         cook::demangle_addiu(cooked_text);
 
-        auto physical_to_logical = std::map<size_t, size_t>{};
-        for (auto i = size_t{}; i < cooked_text.size(); ++i) {
-            auto const& each                         = cooked_text.at(i);
-            physical_to_logical[each.index.physical] = i;
-        }
+        auto const physical_to_logical = cook::demangle_branches(cooked_text);
 
         out << "    ; <binary>           <logical>:<physical>\n";
         for (auto i = size_t{}; i < cooked_text.size(); ++i) {
