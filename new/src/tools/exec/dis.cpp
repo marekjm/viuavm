@@ -147,6 +147,7 @@ auto demangle_strtab_load(Cooked_text& raw,
         tt.index.physical_span = tt.index.physical_span.value() + 1;
         cooked.emplace_back(tt);
         ++i;
+        return;
     }
     if (m(i + 1, ATOM) and S::decode(ins_at(i + 1)).out == out) {
         auto ins = raw.at(i + 1);
@@ -157,6 +158,7 @@ auto demangle_strtab_load(Cooked_text& raw,
         tt.index.physical_span = tt.index.physical_span.value() + 1;
         cooked.emplace_back(tt);
         ++i;
+        return;
     }
     if (m(i + 1, FLOAT) and S::decode(ins_at(i + 1)).out == out) {
         auto ins = raw.at(i + 1);
@@ -172,6 +174,7 @@ auto demangle_strtab_load(Cooked_text& raw,
         cooked.emplace_back(ins.with_text(
             ("float " + out.to_string() + ", " + std::to_string(x))));
         ++i;
+        return;
     }
     if (m(i + 1, DOUBLE) and S::decode(ins_at(i + 1)).out == out) {
         auto ins = raw.at(i + 1);
@@ -190,6 +193,7 @@ auto demangle_strtab_load(Cooked_text& raw,
         cooked.emplace_back(
             ins.with_text(("double " + out.to_string() + ", " + ss.str())));
         ++i;
+        return;
     }
 }
 
