@@ -132,14 +132,22 @@ auto demangle_strtab_load(Cooked_text& raw,
     using viua::arch::ops::S;
     if (m(i + 1, STRING) and S::decode(ins_at(i + 1)).out == out) {
         auto ins = raw.at(i + 1);
-        cooked.emplace_back(ins.with_text(("string " + out.to_string() + ", @_strat_"
-                                 + std::to_string(immediate))));
+        auto tt  = ins.with_text(("string " + out.to_string() + ", @_strat_"
+                                 + std::to_string(immediate)));
+        tt.index = cooked.back().index;
+        cooked.pop_back();
+        tt.index.physical_span = tt.index.physical_span.value() + 1;
+        cooked.emplace_back(tt);
         ++i;
     }
     if (m(i + 1, ATOM) and S::decode(ins_at(i + 1)).out == out) {
         auto ins = raw.at(i + 1);
-        cooked.emplace_back(ins.with_text(("atom " + out.to_string() + ", @_strat_"
-                                 + std::to_string(immediate))));
+        auto tt  = ins.with_text(("atom " + out.to_string() + ", @_strat_"
+                                 + std::to_string(immediate)));
+        tt.index = cooked.back().index;
+        cooked.pop_back();
+        tt.index.physical_span = tt.index.physical_span.value() + 1;
+        cooked.emplace_back(tt);
         ++i;
     }
     if (m(i + 1, FLOAT) and S::decode(ins_at(i + 1)).out == out) {
@@ -236,15 +244,17 @@ auto demangle_canonical_li(Cooked_text& text,
             auto const needs_greedy   = m((i + 8), MOVE, GREEDY);
             auto const needs_unsigned = m(i, LUIU, GREEDY);
 
+            auto idx = text.at(i).index;
+            i += 8;
+            idx.physical_span = i;
             tmp.emplace_back(
-                text.at(i).index,
+                idx,
                 std::nullopt,
                 std::nullopt,
                 ((needs_greedy ? "g." : "") + std::string{"li "}
                  + lui.out.to_string() + ", "
                  + (needs_annotation ? "[[full]] " : "")
                  + std::to_string(literal) + (needs_unsigned ? "u" : "")));
-            i += 8;
 
             demangle_strtab_load(text, rodata, tmp, i, lui.out, literal);
         } else {
@@ -283,7 +293,9 @@ auto demangle_addi_to_void(Cooked_text& text,
                 auto const needs_unsigned =
                     (m(i, ADDIU, GREEDY) or m(i, ADDIU));
 
-                tmp.emplace_back(text.at(i).index,
+                auto idx          = text.at(i).index;
+                idx.physical_span = idx.physical;
+                tmp.emplace_back(idx,
                                  std::nullopt,
                                  std::nullopt,
                                  ((needs_greedy ? "g." : "")
@@ -329,12 +341,15 @@ auto demangle_addiu(Cooked_text& text) -> void
             auto const addi         = R::decode(ins_at(i));
             auto const needs_greedy = (addi.opcode & GREEDY);
 
-            tmp.emplace_back(text.at(i).index,
-                             std::nullopt,
-                             std::nullopt,
-                             ((needs_greedy ? "g." : "") + std::string{"addi "}
-                              + addi.out.to_string() + ", "
-                              + std::to_string(addi.immediate) + 'u'));
+            auto idx          = text.at(i).index;
+            idx.physical_span = idx.physical;
+            tmp.emplace_back(
+                idx,
+                std::nullopt,
+                std::nullopt,
+                ((needs_greedy ? "g." : "") + std::string{"addi "}
+                 + addi.out.to_string() + ", "
+                 + std::to_string(addi.immediate) + 'u'));
             continue;
         }
 
@@ -622,7 +637,13 @@ auto main(int argc, char* argv[]) -> int
         }
         cook::demangle_addiu(cooked_text);
 
-        out << "    ; <binary>           <logical>\n";
+        auto physical_to_logical = std::map<size_t, size_t>{};
+        for (auto i = size_t{}; i < cooked_text.size(); ++i) {
+            auto const& each                         = cooked_text.at(i);
+            physical_to_logical[each.index.physical] = i;
+        }
+
+        out << "    ; <binary>           <logical>:<physical>\n";
         for (auto i = size_t{}; i < cooked_text.size(); ++i) {
             auto const& [index, op, ip, s] = cooked_text.at(i);
             out << "    ; ";
@@ -631,7 +652,11 @@ auto main(int argc, char* argv[]) -> int
             } else {
                 out << std::string(16, ' ');
             }
-            out << "  " << std::dec << std::setw(2) << std::setfill(' ') << i;
+            out << "  " << std::dec << std::setw(2) << std::setfill(' ') << i
+                << ":" << index.physical;
+            if (index.physical_span.has_value()) {
+                out << "-" << *index.physical_span;
+            }
             out << "\n";
 
             out << "    " << s << "\n";
