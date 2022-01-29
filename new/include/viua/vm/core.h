@@ -69,8 +69,8 @@ struct Module {
     inline Module(Module const&) = delete;
     inline Module(Module&& m) : Module{std::move(m.elf_path), std::move(m.elf)}
     {}
-    auto operator= (Module const&) -> Module& = delete;
-    auto operator= (Module&&) -> Module& = delete;
+    auto operator=(Module const&) -> Module& = delete;
+    auto operator=(Module&&) -> Module& = delete;
 
     inline auto function_at(size_t const off) const
         -> std::pair<std::string, size_t>
@@ -373,12 +373,13 @@ struct Stack {
 
     Process& proc;
 
-    addr_type ip { nullptr };
+    addr_type ip{nullptr};
 
     std::vector<Frame> frames;
     std::vector<Value> args;
 
-    explicit inline Stack(Process& p) : proc{p} {}
+    explicit inline Stack(Process& p) : proc{p}
+    {}
 
     Stack(Stack const&) = delete;
     Stack(Stack&&)      = default;
@@ -402,19 +403,19 @@ struct Stack {
 };
 
 struct Process {
-    Core* core {};
+    Core* core{};
     Module const& module;
 
     using stack_type = Stack;
     stack_type stack;
 
     explicit inline Process(Core* c, Module const& m)
-        : core{c}
-        , module{m}
-        , stack{*this}
+            : core{c}, module{m}, stack{*this}
     {}
 
-    inline auto push_frame(size_t const locals, stack_type::addr_type const entry_ip, stack_type::addr_type const return_ip) -> void
+    inline auto push_frame(size_t const locals,
+                           stack_type::addr_type const entry_ip,
+                           stack_type::addr_type const return_ip) -> void
     {
         stack.push(locals, entry_ip, return_ip);
         stack.ip = entry_ip;

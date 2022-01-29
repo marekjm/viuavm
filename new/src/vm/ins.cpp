@@ -945,13 +945,15 @@ auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
     auto const data_size   = [&stack, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
-        memcpy(
-            &tmp, &stack.proc.module.strings_table[size_offset], sizeof(uint64_t));
+        memcpy(&tmp,
+               &stack.proc.module.strings_table[size_offset],
+               sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto tmp = uint32_t{};
-    memcpy(&tmp, (&stack.proc.module.strings_table[0] + data_offset), data_size);
+    memcpy(
+        &tmp, (&stack.proc.module.strings_table[0] + data_offset), data_size);
     tmp = le32toh(tmp);
 
     auto v = float{};
@@ -969,13 +971,15 @@ auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
     auto const data_size   = [&stack, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
-        memcpy(
-            &tmp, &stack.proc.module.strings_table[size_offset], sizeof(uint64_t));
+        memcpy(&tmp,
+               &stack.proc.module.strings_table[size_offset],
+               sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto tmp = uint64_t{};
-    memcpy(&tmp, (&stack.proc.module.strings_table[0] + data_offset), data_size);
+    memcpy(
+        &tmp, (&stack.proc.module.strings_table[0] + data_offset), data_size);
     tmp = le64toh(tmp);
 
     auto v = double{};

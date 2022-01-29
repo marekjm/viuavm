@@ -360,7 +360,7 @@ auto run_instruction(viua::vm::Stack& stack)
     auto instruction = viua::arch::instruction_type{};
     do {
         instruction = *stack.ip;
-        stack.ip          = execute(stack, stack.ip);
+        stack.ip    = execute(stack, stack.ip);
         ++stack.proc.core->perf_counters.total_ops_executed;
     } while ((stack.ip != nullptr) and (instruction & viua::arch::ops::GREEDY));
 
