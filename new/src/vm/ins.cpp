@@ -812,7 +812,7 @@ auto execute(ATOM const op, Stack& stack, ip_type const) -> void
     auto& registers = stack.frames.back().registers;
     auto& target    = registers.at(op.instruction.out.index);
 
-    auto const& mod        = stack.module;
+    auto const& mod        = stack.proc.module;
     auto const data_offset = target.value.get<uint64_t>();
     auto const data_size   = [mod, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
@@ -833,7 +833,7 @@ auto execute(STRING const op, Stack& stack, ip_type const) -> void
     auto& registers = stack.frames.back().registers;
     auto& target    = registers.at(op.instruction.out.index);
 
-    auto const& mod        = stack.module;
+    auto const& mod        = stack.proc.module;
     auto const data_offset = target.value.get<uint64_t>();
     auto const data_size   = [mod, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
@@ -885,7 +885,7 @@ auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
         }
 
         std::tie(fn_name, fn_addr) =
-            stack.module.function_at(fn_offset.value.get<uint64_t>());
+            stack.proc.module.function_at(fn_offset.value.get<uint64_t>());
     }
 
     if (fn_addr % sizeof(viua::arch::instruction_type)) {
@@ -893,7 +893,7 @@ auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
     }
 
     auto const fr_return = (ip + 1);
-    auto const fr_entry  = (stack.module.ip_base
+    auto const fr_entry  = (stack.proc.module.ip_base
                            + (fn_addr / sizeof(viua::arch::instruction_type)));
 
     stack.frames.emplace_back(
@@ -946,12 +946,12 @@ auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
         memcpy(
-            &tmp, &stack.module.strings_table[size_offset], sizeof(uint64_t));
+            &tmp, &stack.proc.module.strings_table[size_offset], sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto tmp = uint32_t{};
-    memcpy(&tmp, (&stack.module.strings_table[0] + data_offset), data_size);
+    memcpy(&tmp, (&stack.proc.module.strings_table[0] + data_offset), data_size);
     tmp = le32toh(tmp);
 
     auto v = float{};
@@ -970,12 +970,12 @@ auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
         memcpy(
-            &tmp, &stack.module.strings_table[size_offset], sizeof(uint64_t));
+            &tmp, &stack.proc.module.strings_table[size_offset], sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto tmp = uint64_t{};
-    memcpy(&tmp, (&stack.module.strings_table[0] + data_offset), data_size);
+    memcpy(&tmp, (&stack.proc.module.strings_table[0] + data_offset), data_size);
     tmp = le64toh(tmp);
 
     auto v = double{};
@@ -1376,7 +1376,7 @@ auto execute(IO_SUBMIT const op, Stack& stack, ip_type const ip) -> void
                                  .boxed_of<viua::vm::types::String>()
                                  ->get()
                                  .content);
-        auto const rd = stack.core->io.schedule(
+        auto const rd = stack.proc.core->io.schedule(
             port.get<int64_t>(), IORING_OP_READ, std::move(buf));
         dst = rd;
         break;
@@ -1390,7 +1390,7 @@ auto execute(IO_SUBMIT const op, Stack& stack, ip_type const ip) -> void
                                  .boxed_of<viua::vm::types::String>()
                                  ->get()
                                  .content);
-        auto const rd = stack.core->io.schedule(
+        auto const rd = stack.proc.core->io.schedule(
             port.get<int64_t>(), IORING_OP_WRITE, std::move(buf));
         dst = rd;
         break;
@@ -1403,16 +1403,16 @@ auto execute(IO_WAIT const op, Stack& stack, ip_type const ip) -> void
     auto req = get_value(stack, op.instruction.lhs, ip);
 
     auto const want_id = req.get<uint64_t>();
-    if (not stack.core->io.requests.contains(want_id)) {
+    if (not stack.proc.core->io.requests.contains(want_id)) {
         io_uring_cqe* cqe{};
         do {
-            io_uring_wait_cqe(&stack.core->io.ring, &cqe);
+            io_uring_wait_cqe(&stack.proc.core->io.ring, &cqe);
 
             if (cqe->res == -1) {
-                stack.core->io.requests[cqe->user_data]->status =
+                stack.proc.core->io.requests[cqe->user_data]->status =
                     IO_request::Status::Error;
             } else {
-                auto& rd  = *stack.core->io.requests[cqe->user_data];
+                auto& rd  = *stack.proc.core->io.requests[cqe->user_data];
                 rd.status = IO_request::Status::Success;
 
                 if (rd.opcode == IORING_OP_READ) {
@@ -1422,13 +1422,13 @@ auto execute(IO_WAIT const op, Stack& stack, ip_type const ip) -> void
                 }
             }
 
-            io_uring_cqe_seen(&stack.core->io.ring, cqe);
+            io_uring_cqe_seen(&stack.proc.core->io.ring, cqe);
         } while (cqe->user_data != want_id);
     }
 
     dst = std::make_unique<types::String>(
-        std::move(stack.core->io.requests[want_id]->buffer));
-    stack.core->io.requests.erase(want_id);
+        std::move(stack.proc.core->io.requests[want_id]->buffer));
+    stack.proc.core->io.requests.erase(want_id);
 }
 auto execute(IO_SHUTDOWN const, Stack&, ip_type const) -> void
 {}

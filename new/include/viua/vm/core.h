@@ -359,16 +359,19 @@ struct Core {
     Performance_counters perf_counters;
 };
 
+class Process;
+
 struct Stack {
     using addr_type = viua::arch::instruction_type const*;
 
-    Core* core;
-    Module const& module;
+    Process& proc;
+
+    addr_type ip { nullptr };
+
     std::vector<Frame> frames;
     std::vector<Value> args;
 
-    inline Stack(Core* c, Module const& m) : core{c}, module{m}
-    {}
+    explicit inline Stack(Process& p) : proc{p} {}
 
     Stack(Stack const&) = delete;
     Stack(Stack&&)      = default;
@@ -388,6 +391,26 @@ struct Stack {
     inline auto back() const -> decltype(frames)::const_reference
     {
         return frames.back();
+    }
+};
+
+struct Process {
+    Core* core {};
+    Module const& module;
+
+    using stack_type = Stack;
+    stack_type stack;
+
+    explicit inline Process(Core* c, Module const& m)
+        : core{c}
+        , module{m}
+        , stack{*this}
+    {}
+
+    inline auto push_frame(size_t const locals, stack_type::addr_type const entry_ip, stack_type::addr_type const return_ip) -> void
+    {
+        stack.push(locals, entry_ip, return_ip);
+        stack.ip = entry_ip;
     }
 };
 
