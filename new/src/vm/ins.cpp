@@ -814,7 +814,7 @@ auto execute(ATOM const op, Stack& stack, ip_type const) -> void
 
     auto const& mod        = stack.proc.module;
     auto const data_offset = target.value.get<uint64_t>();
-    auto const data_size   = [mod, data_offset]() -> uint64_t {
+    auto const data_size   = [&mod, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
         memcpy(&tmp, &mod.strings_table[size_offset], sizeof(uint64_t));
@@ -835,7 +835,7 @@ auto execute(STRING const op, Stack& stack, ip_type const) -> void
 
     auto const& mod        = stack.proc.module;
     auto const data_offset = target.value.get<uint64_t>();
-    auto const data_size   = [mod, data_offset]() -> uint64_t {
+    auto const data_size   = [&mod, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
         memcpy(&tmp, &mod.strings_table[size_offset], sizeof(uint64_t));

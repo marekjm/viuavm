@@ -630,7 +630,9 @@ auto main(int argc, char* argv[]) -> int
     }
 
     auto core = viua::vm::Core{};
-    auto mod  = viua::vm::Module{elf_path, main_module};
+
+    core.modules.emplace("", viua::vm::Module{elf_path, main_module});
+    auto const& mod = core.modules.at("");
 
     auto proc = viua::vm::Process{&core, mod};
     proc.push_frame(256, (mod.ip_base + entry_addr), nullptr);

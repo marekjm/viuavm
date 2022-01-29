@@ -66,6 +66,11 @@ struct Module {
             , text{elf.make_text_from(elf.find_fragment(".text")->get().data)}
             , ip_base{text.data()}
     {}
+    inline Module(Module const&) = delete;
+    inline Module(Module&& m) : Module{std::move(m.elf_path), std::move(m.elf)}
+    {}
+    auto operator= (Module const&) -> Module& = delete;
+    auto operator= (Module&&) -> Module& = delete;
 
     inline auto function_at(size_t const off) const
         -> std::pair<std::string, size_t>
@@ -354,6 +359,8 @@ struct Performance_counters {
 };
 
 struct Core {
+    std::map<std::string, Module> modules;
+
     IO_scheduler io;
 
     Performance_counters perf_counters;
