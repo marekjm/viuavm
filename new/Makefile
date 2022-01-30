@@ -163,5 +163,6 @@ $(BUILD)/tools/exec/vm: \
 	$(BUILD)/vm/ins.o \
 	$(BUILD)/vm/types.o \
 	$(BUILD)/vm/types/traits.o \
+	$(BUILD)/runtime/pid.o \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o

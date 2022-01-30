@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 
 #include <viua/vm/core.h>
 
@@ -44,5 +45,18 @@ auto IO_scheduler::schedule(int const fd,
     requests[req_id] = std::move(req);
 
     return req_id;
+}
+
+auto Core::spawn(std::string mod_name, uint64_t const entry) -> pid_type
+{
+    auto const& mod = modules.at(mod_name);
+
+    auto const pid = pids.emit();
+    auto proc      = std::make_unique<Process>(pid, this, mod);
+    proc->push_frame(256, (mod.ip_base + entry), nullptr);
+
+    procs.emplace(pid, std::move(proc));
+
+    return pid;
 }
 }  // namespace viua::vm

@@ -39,6 +39,7 @@
 #include <vector>
 
 #include <viua/arch/arch.h>
+#include <viua/runtime/pid.h>
 #include <viua/vm/elf.h>
 #include <viua/vm/types.h>
 
@@ -358,15 +359,21 @@ struct Performance_counters {
     }
 };
 
+class Process;
+
 struct Core {
     std::map<std::string, Module> modules;
 
     IO_scheduler io;
 
     Performance_counters perf_counters;
-};
 
-class Process;
+    using pid_type = viua::runtime::PID;
+    viua::runtime::Pid_emitter pids;
+    std::map<pid_type, std::unique_ptr<Process>> procs{};
+
+    auto spawn(std::string, uint64_t const) -> pid_type;
+};
 
 struct Stack {
     using addr_type = viua::arch::instruction_type const*;
@@ -403,14 +410,17 @@ struct Stack {
 };
 
 struct Process {
+    using pid_type = viua::runtime::PID;
+    pid_type const pid;
+
     Core* core{};
     Module const& module;
 
     using stack_type = Stack;
     stack_type stack;
 
-    explicit inline Process(Core* c, Module const& m)
-            : core{c}, module{m}, stack{*this}
+    explicit inline Process(pid_type const p, Core* c, Module const& m)
+            : pid{p}, core{c}, module{m}, stack{*this}
     {}
 
     inline auto push_frame(size_t const locals,

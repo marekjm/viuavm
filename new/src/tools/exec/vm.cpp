@@ -283,7 +283,9 @@ auto execute(viua::vm::Stack& stack,
             return nullptr;
         case OPCODE_N::EBREAK:
             execute(EBREAK{viua::arch::ops::N::decode(raw)}, stack, ip);
-            viua::TRACE_STREAM << "    #ebreak" << viua::TRACE_STREAM.endl;
+            viua::TRACE_STREAM << "    #ebreak in process "
+                               << stack.proc.pid.to_string()
+                               << viua::TRACE_STREAM.endl;
             break;
         }
         break;
@@ -630,12 +632,8 @@ auto main(int argc, char* argv[]) -> int
     }
 
     auto core = viua::vm::Core{};
-
     core.modules.emplace("", viua::vm::Module{elf_path, main_module});
-    auto const& mod = core.modules.at("");
-
-    auto proc = viua::vm::Process{&core, mod};
-    proc.push_frame(256, (mod.ip_base + entry_addr), nullptr);
+    auto const main_pid = core.spawn("", entry_addr);
 
     if constexpr (VIUA_TRACE_CYCLES) {
         if (auto trace_fd = getenv("VIUA_VM_TRACE_FD"); trace_fd) {
@@ -657,7 +655,7 @@ auto main(int argc, char* argv[]) -> int
     }
 
     try {
-        run(proc);
+        run(*core.procs.at(main_pid));
     } catch (viua::vm::abort_execution const& e) {
         std::cerr << "Aborted execution: " << e.what() << "\n";
         if constexpr (true) {
