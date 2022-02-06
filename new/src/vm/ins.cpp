@@ -886,6 +886,8 @@ auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
 
         std::tie(fn_name, fn_addr) =
             stack.proc.module.function_at(fn_offset.value.get<uint64_t>());
+
+        get_proxy(stack, op.instruction.in, ip).overwrite().make_void();
     }
 
     if (fn_addr % sizeof(viua::arch::instruction_type)) {
