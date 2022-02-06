@@ -477,6 +477,17 @@ def main(args):
         ('s' if len(cases) != 1 else ''),
     ))
 
+    # Set a known PID seed. This makes test checks much easier to write, as the
+    # PID values can be statically determined. Without setting VIUA_VM_PID_SEED
+    # the PIDs would be semi-random ie, would start from a randomly generated
+    # address in the fe80::/10 subnet.
+    #
+    # Why fe80::42? Because the fe80::/10 subnet denotes a link-local IPv6
+    # address (which is a suitable choice for process IDs, as we don't want them
+    # to be globally valid addresses), and 42 is the answer to the question of
+    # life, universe, and everything.
+    os.environ['VIUA_VM_PID_SEED'] = os.environ.get('VIUA_VM_PID_SEED', 'fe80::42')
+
     success_cases = 0
     pad_case_no = len(str(len(cases) + 1))
     pad_case_name = max(map(lambda _: len(_[0]), cases))
