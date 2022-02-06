@@ -283,9 +283,6 @@ auto execute(viua::vm::Stack& stack,
             return nullptr;
         case OPCODE_N::EBREAK:
             execute(EBREAK{viua::arch::ops::N::decode(raw)}, stack, ip);
-            viua::TRACE_STREAM << "    #ebreak in process "
-                               << stack.proc.pid.to_string()
-                               << viua::TRACE_STREAM.endl;
             break;
         }
         break;

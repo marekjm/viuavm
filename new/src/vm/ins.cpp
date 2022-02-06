@@ -1460,7 +1460,7 @@ auto dump_registers(std::vector<Value> const& registers,
             continue;
         }
 
-        TRACE_STREAM << "  " << std::setw(7) << std::setfill(' ')
+        TRACE_STREAM << "      " << std::setw(7) << std::setfill(' ')
                      << ('[' + std::to_string(i) + '.' + suffix.data() + ']')
                      << ' ';
 
@@ -1521,8 +1521,48 @@ auto dump_registers(std::vector<Value> const& registers,
 }  // namespace
 auto execute(EBREAK const, Stack& stack, ip_type const) -> void
 {
+    viua::TRACE_STREAM << "begin ebreak in process "
+                       << stack.proc.pid.to_string()
+                       << viua::TRACE_STREAM.endl;
+
+    viua::TRACE_STREAM << "  backtrace:" << viua::TRACE_STREAM.endl;
+    for (auto i = size_t{0}; i < stack.frames.size(); ++i) {
+        auto const& each = stack.frames.at(i);
+
+        viua::TRACE_STREAM << "    #" << i << "  " << stack.proc.module.elf_path.native()
+                           << "[.text+0x" << std::hex << std::setw(8)
+                           << std::setfill('0')
+                           << ((each.entry_address - stack.proc.module.ip_base)
+                               * sizeof(viua::arch::instruction_type))
+                           << std::dec
+                           << ']';
+        viua::TRACE_STREAM << " return to ";
+        if (each.return_address) {
+            viua::TRACE_STREAM << stack.proc.module.elf_path.native()
+                               << "[.text+0x" << std::hex << std::setw(8)
+                               << std::setfill('0')
+                               << ((each.return_address - stack.proc.module.ip_base)
+                                   * sizeof(viua::arch::instruction_type))
+                               << std::dec << ']';
+        } else {
+            viua::TRACE_STREAM << "null";
+        }
+        viua::TRACE_STREAM << viua::TRACE_STREAM.endl;
+    }
+
+    viua::TRACE_STREAM << "  register contents:" << viua::TRACE_STREAM.endl;
+    for (auto i = size_t{0}; i < stack.frames.size(); ++i) {
+        auto const& each = stack.frames.at(i);
+
+        viua::TRACE_STREAM << "    of #" << i << viua::TRACE_STREAM.endl;
+
+        dump_registers(each.parameters, "p");
+        dump_registers(each.registers, "l");
+    }
     dump_registers(stack.args, "a");
-    dump_registers(stack.frames.back().parameters, "p");
-    dump_registers(stack.frames.back().registers, "l");
+
+    viua::TRACE_STREAM << "end ebreak in process "
+                       << stack.proc.pid.to_string()
+                       << viua::TRACE_STREAM.endl;
 }
 }  // namespace viua::vm::ins

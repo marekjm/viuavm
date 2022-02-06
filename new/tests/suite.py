@@ -53,7 +53,7 @@ DISASSEMBLER = './build/tools/exec/dis'
 
 DIS_EXTENSION = '~'
 
-SKIP_DISASSEMBLER_TESTS = False
+SKIP_DISASSEMBLER_TESTS = True
 
 EBREAK_LINE_BOXED = re.compile(r'\[(\d+)\.([lap])\] (\*?[a-zA-Z_][a-zA-Z_0-9]*) = (.*)')
 EBREAK_LINE_PRIMITIVE = re.compile(r'\[(\d+)\.([lap])\] (is|iu|fl|db) (.*)')
@@ -173,22 +173,96 @@ def make_ebreak():
         },
     }
 
-def load_ebreak_line(ebreak, line):
-    mb = EBREAK_LINE_BOXED.match(line)
-    mp = EBREAK_LINE_PRIMITIVE.match(line)
-    if not (mb or mp):
-        return False
+EBREAK_BEGIN = re.compile(r'^begin ebreak in process \[([a-f0-9:]+)\]')
+EBREAK_END = re.compile(r'^end ebreak in process \[([a-f0-9:]+)\]')
+EBREAK_BACKTRACE_ENTRY = re.compile(
+       r'^#\d+  (.*?[\.text\+0x[a-f0-9]{8}\]) '
+    r'return to (.*?\[\.text\+0x[a-f0-9]{8}\]|null)')
+EBREAK_CONTENTS_OF = re.compile(r'^of #([0-9]+|last)')
 
-    m = (mb or mp)
+EBREAK_LINE_BOXED = re.compile(r'\[(\d+)\.([lap])\] (\*?[a-zA-Z_][a-zA-Z_0-9]*) = (.*)')
+EBREAK_LINE_PRIMITIVE = re.compile(r'\[(\d+)\.([lap])\] (is|iu|fl|db) (.*)')
 
-    index = m.group(1)
-    regset = m.group(2)
-    type_of = m.group(3)
-    value_of = m.group(4)
 
-    ebreak['registers'][regset][int(index)] = (type_of, value_of,)
+class Missing_frame_content_open(Exception):
+    pass
+def consume_register_contents(ebreak_lines):
+    contents = {}
 
-    return True
+    if not (ebreak_lines and EBREAK_CONTENTS_OF.match(ebreak_lines[0])):
+        raise Missing_frame_content_open()
+
+    while ebreak_lines and (frame := EBREAK_CONTENTS_OF.match(ebreak_lines[0])):
+        frame = frame.group(1)
+        frame = (-1 if frame == 'last' else int(frame))
+        ebreak_lines.pop(0)
+
+        registers = {
+            'l': {},
+            'a': {},
+            'p': {},
+        }
+
+        while ebreak_lines:
+            b = EBREAK_LINE_BOXED.match(ebreak_lines[0])
+            p = EBREAK_LINE_PRIMITIVE.match(ebreak_lines[0])
+
+            if (m := (b or p)):
+                index = int(m.group(1))
+                register_set = m.group(2)
+                object_type = m.group(3)
+                object_value = m.group(4)
+                registers[register_set][index] = (object_type, object_value,)
+
+                ebreak_lines.pop(0)
+                continue
+
+            break
+
+        contents[frame] = registers
+
+    return contents
+
+def consume_ebreak_lines(ebreak_lines):
+    ebreak = {
+        'pid': None,
+        'backtrace': [],
+    }
+
+    if (pid := EBREAK_BEGIN.match(ebreak_lines[0])):
+        ebreak['pid'] = pid.group(1)
+        ebreak_lines.pop(0)
+    else:
+        raise Exception('missing ebreak begin')
+
+    if ebreak_lines[0] == 'backtrace:':
+        ebreak_lines.pop(0)
+
+        while (be := EBREAK_BACKTRACE_ENTRY.match(ebreak_lines[0])):
+            ret = be.group(2)
+            ebreak['backtrace'].append({
+                'fn': be.group(1),
+                'return': (None if ret == 'null' else ret),
+            })
+            ebreak_lines.pop(0)
+    else:
+        raise Exception('invalid ebreak snapshot (expected backtrace)')
+
+    if ebreak_lines[0] == 'register contents:':
+        ebreak_lines.pop(0)
+
+        for frame, registers in consume_register_contents(ebreak_lines).items():
+            ebreak['backtrace'][frame]['registers'] = registers
+    else:
+        raise Exception('invalid ebreak snapshot (expected register contents)')
+
+
+    if (pid := EBREAK_END.match(ebreak_lines[0])):
+        ebreak_lines.pop(0)
+    else:
+        raise Exception('missing ebreak end')
+
+    return ebreak
 
 def run_and_capture(interpreter, executable, args = ()):
     (read_fd, write_fd,) = os.pipe()
@@ -220,18 +294,16 @@ def run_and_capture(interpreter, executable, args = ()):
     ebreaks = []
     i = 0
     while i < len(lines):
-        line = lines[i]
-        if line == 'ebreak':
-            i += 1
-
-            ebreak = make_ebreak()
-
-            while True:
-                if not load_ebreak_line(ebreak, lines[i]):
-                    break
+        if EBREAK_BEGIN.match(lines[i]):
+            ebreak_lines = []
+            while i < len(lines):
+                ebreak_lines.append(lines[i])
                 i += 1
 
-            ebreaks.append(ebreak)
+                if EBREAK_END.match(lines[i - 1]):
+                    break
+
+            ebreaks.append(consume_ebreak_lines(ebreak_lines))
 
         i += 1
 
@@ -301,67 +373,73 @@ def test_case(case_name, test_program, errors):
     if check_kind == 'ebreak':
         ebreak_dump = (os.path.splitext(test_program)[0] + '.ebreak')
         with open(ebreak_dump, 'r') as ifstream:
-            ebreak_dump = ifstream.readlines()
+            ebreak_dump = ifstream.read().splitlines()
 
-        want_ebreak = make_ebreak()
-
-        for line in ebreak_dump:
-            if not load_ebreak_line(want_ebreak, line):
-                errors.write(f'    invalid-want ebreak line: {line}')
-                return (False, None, count_runtime(), None,)
         if not ebreak_dump:
             return (False, 'empty ebreak file', count_runtime(), None,)
 
+        try:
+            want_ebreak = consume_register_contents(ebreak_dump[:])
+        except Missing_frame_content_open:
+            ebreak_dump.insert(0, 'of #last')
+            want_ebreak = consume_register_contents(ebreak_dump[:])
+
+        if not want_ebreak:
+            return (False, 'invalid ebreak file', count_runtime(), None,)
+
         if ebreak is None:
-            return (False, 'no ebreak dump', count_runtime(), None,)
+            return (False, 'program did not emit ebreak', count_runtime(), None,)
 
-        for r, content in want_ebreak['registers'].items():
-            for index, cell in content.items():
-                if index not in ebreak['registers'][r]:
-                    leader = f'    register {index}.{r}'
-                    errors.write(f'{leader} is void\n')
-                    errors.write('{} expected {} = {}\n'.format(
-                        (len(leader) * ' '),
-                        *cell
-                    ))
-                    return (False, None, count_runtime(), None,)
+        for frame_index, frame_data in want_ebreak.items():
+            for r, registers in frame_data.items():
+                for index, cell in registers.items():
+                    ebreak_frame = ebreak['backtrace'][frame_index]
 
-                got = ebreak['registers'][r][index]
-                got_type, got_value = got
+                    if index not in ebreak_frame['registers'][r]:
+                        leader = f'    register {index}.{r}'
+                        errors.write(f'{leader} is void\n')
+                        errors.write('{} expected {} = {}\n'.format(
+                            (len(leader) * ' '),
+                            *cell
+                        ))
+                        return (False, None, count_runtime(), None,)
 
-                want_type, want_value = cell
+                    got = ebreak_frame['registers'][r][index]
+                    got_type, got_value = got
 
-                if want_type != got_type:
-                    leader = f'    register {index}.{r}'
-                    errors.write('{} contains {} = {}\n'.format(
-                        leader,
-                        colorise('red', got_type.ljust(max(len(want_type), len(got_type)))),
-                        got_value,
-                    ))
-                    errors.write('{} expected {} = {}\n'.format(
-                        (len(leader) * ' '),
-                        colorise('green', want_type.ljust(max(len(want_type), len(got_type)))),
-                        want_value,
-                    ))
-                    errors.write('{}          {}\n'.format(
-                        (len(leader) * ' '),
-                        colorise('red', (max(len(want_type), len(got_type)) * '^')),
-                    ))
-                    return (False, 'unexpected type', count_runtime(), None,)
+                    want_type, want_value = cell
 
-                if want_value != got_value:
-                    leader = f'    register {index}.{r}'
-                    errors.write('{} contains {} = {}\n'.format(
-                        leader,
-                        got_type.ljust(max(len(want_type), len(got_type))),
-                        colorise('red', got_value),
-                    ))
-                    errors.write('{} expected {} = {}\n'.format(
-                        (len(leader) * ' '),
-                        want_type.ljust(max(len(want_type), len(got_type))),
-                        colorise('green', want_value),
-                    ))
-                    return (False, 'unexpected value', count_runtime(), None,)
+                    if want_type != got_type:
+                        leader = f'    register {index}.{r}'
+                        errors.write('{} contains {} = {}\n'.format(
+                            leader,
+                            colorise('red', got_type.ljust(max(len(want_type), len(got_type)))),
+                            got_value,
+                        ))
+                        errors.write('{} expected {} = {}\n'.format(
+                            (len(leader) * ' '),
+                            colorise('green', want_type.ljust(max(len(want_type), len(got_type)))),
+                            want_value,
+                        ))
+                        errors.write('{}          {}\n'.format(
+                            (len(leader) * ' '),
+                            colorise('red', (max(len(want_type), len(got_type)) * '^')),
+                        ))
+                        return (False, 'unexpected type', count_runtime(), None,)
+
+                    if want_value != got_value:
+                        leader = f'    register {index}.{r}'
+                        errors.write('{} contains {} = {}\n'.format(
+                            leader,
+                            got_type.ljust(max(len(want_type), len(got_type))),
+                            colorise('red', got_value),
+                        ))
+                        errors.write('{} expected {} = {}\n'.format(
+                            (len(leader) * ' '),
+                            want_type.ljust(max(len(want_type), len(got_type))),
+                            colorise('green', want_value),
+                        ))
+                        return (False, 'unexpected value', count_runtime(), None,)
 
     if SKIP_DISASSEMBLER_TESTS:
         return (True, None, count_runtime(), perf,)
@@ -459,8 +537,7 @@ def test_case(case_name, test_program, errors):
 
 
 def main(args):
-    CASES_DIR = os.environ.get('VIUAVM_TEST_CASES_DIR', './tests/asm')
-
+    CASES_DIR = os.environ.get('VIUA_VM_TEST_CASES_DIR', './tests/asm')
     raw_cases = glob.glob(f'{CASES_DIR}/*.asm')
     cases = [
         (
