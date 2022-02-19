@@ -405,7 +405,9 @@ auto run(viua::vm::Process& proc) -> bool
                            << std::setfill('0')
                            << ((proc.stack.ip - proc.module.ip_base)
                                * sizeof(viua::arch::instruction_type))
-                           << std::dec << ']' << viua::TRACE_STREAM.endl;
+                           << std::dec << "] in process "
+                           << proc.pid.to_string()
+                           << viua::TRACE_STREAM.endl;
     }
 
     constexpr auto PREEMPTION_THRESHOLD = size_t{2};
@@ -432,7 +434,7 @@ auto run(viua::vm::Process& proc) -> bool
     }
 
     if (proc.stack.frames.empty()) {
-        // std::cerr << "exited\n";
+        std::cerr << "[vm:sched:proc] process " << proc.pid.to_string() << " has empty stack\n";
         return false;
     }
     if (not ip_ok()) {
@@ -462,13 +464,24 @@ auto run(viua::vm::Core& core) -> void
     while (not core.run_queue.empty()) {
         auto const pid = core.run_queue.front();
         core.run_queue.pop();
+        viua::TRACE_STREAM << "[vm:sched:proc] process " << pid.to_string()
+            << " popped from run queue" << viua::TRACE_STREAM.endl;
 
         auto& proc = core.procs.at(pid);
+
+        viua::TRACE_STREAM << "[vm:sched:proc] process " << proc->pid.to_string()
+            << " obtained"
+            << viua::TRACE_STREAM.endl;
 
         auto const state = run(*proc);
 
         if (state) {
+            viua::TRACE_STREAM << "[vm:sched:proc] process " << pid.to_string()
+                << " pushed to run queue" << viua::TRACE_STREAM.endl;
             core.run_queue.push(pid);
+        } else {
+            viua::TRACE_STREAM << "[vm:sched:proc] process " << pid.to_string()
+                << " exited" << viua::TRACE_STREAM.endl;
         }
     }
 
