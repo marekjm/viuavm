@@ -37,6 +37,7 @@
 #include <utility>
 #include <variant>
 #include <vector>
+#include <queue>
 
 #include <viua/arch/arch.h>
 #include <viua/runtime/pid.h>
@@ -371,6 +372,7 @@ struct Core {
     using pid_type = viua::runtime::PID;
     viua::runtime::Pid_emitter pids;
     std::map<pid_type, std::unique_ptr<Process>> procs{};
+    std::queue<pid_type> run_queue;
 
     auto spawn(std::string, uint64_t const) -> pid_type;
 };

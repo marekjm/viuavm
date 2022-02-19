@@ -393,86 +393,97 @@ auto format_hz(uint64_t const hz) -> std::string
     }
     return out.str();
 }
-auto run(viua::vm::Process& proc) -> void
+auto run(viua::vm::Process& proc) -> bool
 {
-    constexpr auto PREEMPTION_THRESHOLD = size_t{2};
-
-    proc.core->perf_counters.start();
-
     auto const ip_ok = [&proc]() -> bool {
         return proc.module.ip_in_valid_range(proc.stack.ip);
     };
-    while (ip_ok()) {
-        if constexpr (VIUA_TRACE_CYCLES) {
-            viua::TRACE_STREAM << "cycle at " << proc.module.elf_path.native()
-                               << "[.text+0x" << std::hex << std::setw(8)
-                               << std::setfill('0')
-                               << ((proc.stack.ip - proc.module.ip_base)
-                                   * sizeof(viua::arch::instruction_type))
-                               << std::dec << ']' << viua::TRACE_STREAM.endl;
-        }
 
-        for (auto i = size_t{0}; i < PREEMPTION_THRESHOLD and ip_ok(); ++i) {
-            /*
-             * This is needed to detect greedy bundles and adjust preemption
-             * counter appropriately. If a greedy bundle contains more
-             * instructions than the preemption threshold allows the process
-             * will be suspended immediately.
-             */
-            auto const greedy    = (*proc.stack.ip & viua::arch::ops::GREEDY);
-            auto const bundle_ip = proc.stack.ip;
+    if constexpr (VIUA_TRACE_CYCLES) {
+        viua::TRACE_STREAM << "cycle at " << proc.module.elf_path.native()
+                           << "[.text+0x" << std::hex << std::setw(8)
+                           << std::setfill('0')
+                           << ((proc.stack.ip - proc.module.ip_base)
+                               * sizeof(viua::arch::instruction_type))
+                           << std::dec << ']' << viua::TRACE_STREAM.endl;
+    }
 
-            proc.stack.ip = run_instruction(proc.stack);
+    constexpr auto PREEMPTION_THRESHOLD = size_t{2};
+    for (auto i = size_t{0}; i < PREEMPTION_THRESHOLD and ip_ok(); ++i) {
+        /*
+         * This is needed to detect greedy bundles and adjust preemption
+         * counter appropriately. If a greedy bundle contains more
+         * instructions than the preemption threshold allows the process
+         * will be suspended immediately.
+         */
+        auto const greedy    = (*proc.stack.ip & viua::arch::ops::GREEDY);
+        auto const bundle_ip = proc.stack.ip;
 
-            /*
-             * If the instruction was a greedy bundle instead of a single
-             * one, the preemption counter has to be adjusted. It may be the
-             * case that the bundle already hit the preemption threshold.
-             */
-            if (greedy and ip_ok()) {
-                i += (proc.stack.ip - bundle_ip) - 1;
-            }
-        }
+        proc.stack.ip = run_instruction(proc.stack);
 
-        if (proc.stack.frames.empty()) {
-            // std::cerr << "exited\n";
-            break;
-        }
-        if (not ip_ok()) {
-            // std::cerr << "halted\n";
-            break;
-        }
-
-        if constexpr (VIUA_SLOW_CYCLES) {
-            /*
-             * FIXME Limit the amount of instructions executed per second
-             * for debugging purposes. Once everything works as it should,
-             * remove this code.
-             */
-            using namespace std::literals;
-            std::this_thread::sleep_for(160ms);
+        /*
+         * If the instruction was a greedy bundle instead of a single
+         * one, the preemption counter has to be adjusted. It may be the
+         * case that the bundle already hit the preemption threshold.
+         */
+        if (greedy and ip_ok()) {
+            i += (proc.stack.ip - bundle_ip) - 1;
         }
     }
 
-    proc.core->perf_counters.stop();
+    if (proc.stack.frames.empty()) {
+        // std::cerr << "exited\n";
+        return false;
+    }
+    if (not ip_ok()) {
+        std::cerr << "[vm] ip " << std::hex << std::setw(8) << std::setfill('0')
+                  << ((proc.stack.ip - proc.module.ip_base)
+                      * sizeof(viua::arch::instruction_type))
+                  << std::dec << " outside of valid range\n";
+        return false;
+    }
+
+    if constexpr (VIUA_SLOW_CYCLES) {
+        /*
+         * FIXME Limit the amount of instructions executed per second
+         * for debugging purposes. Once everything works as it should,
+         * remove this code.
+         */
+        using namespace std::literals;
+        std::this_thread::sleep_for(160ms);
+    }
+
+    return true;
+}
+auto run(viua::vm::Core& core) -> void
+{
+    core.perf_counters.start();
+
+    while (not core.run_queue.empty()) {
+        auto const pid = core.run_queue.front();
+        core.run_queue.pop();
+
+        auto& proc = core.procs.at(pid);
+
+        auto const state = run(*proc);
+
+        if (state) {
+            core.run_queue.push(pid);
+        }
+    }
+
+    core.perf_counters.stop();
     {
-        auto const total_ops = proc.core->perf_counters.total_ops_executed;
+        auto const total_ops = core.perf_counters.total_ops_executed;
         auto const total_us =
             std::chrono::duration_cast<std::chrono::microseconds>(
-                proc.core->perf_counters.duration());
+                core.perf_counters.duration());
         auto const approx_hz = (1e6 / total_us.count()) * total_ops;
         viua::TRACE_STREAM << "[vm:perf] executed ops " << total_ops
                            << ", run time " << format_time(total_us)
                            << viua::TRACE_STREAM.endl;
         viua::TRACE_STREAM << "[vm:perf] approximate frequency "
                            << format_hz(approx_hz) << viua::TRACE_STREAM.endl;
-    }
-
-    if (not ip_ok()) {
-        std::cerr << "[vm] ip " << std::hex << std::setw(8) << std::setfill('0')
-                  << ((proc.stack.ip - proc.module.ip_base)
-                      * sizeof(viua::arch::instruction_type))
-                  << std::dec << " outside of valid range\n";
     }
 }
 }  // namespace
@@ -633,7 +644,7 @@ auto main(int argc, char* argv[]) -> int
 
     auto core = viua::vm::Core{};
     core.modules.emplace("", viua::vm::Module{elf_path, main_module});
-    auto const main_pid = core.spawn("", entry_addr);
+    auto const main_pid[[maybe_unused]] = core.spawn("", entry_addr);
 
     if constexpr (VIUA_TRACE_CYCLES) {
         if (auto trace_fd = getenv("VIUA_VM_TRACE_FD"); trace_fd) {
@@ -655,7 +666,7 @@ auto main(int argc, char* argv[]) -> int
     }
 
     try {
-        run(*core.procs.at(main_pid));
+        run(core);
     } catch (viua::vm::abort_execution const& e) {
         std::cerr << "Aborted execution: " << e.what() << "\n";
         if constexpr (true) {

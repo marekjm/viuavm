@@ -56,6 +56,7 @@ auto Core::spawn(std::string mod_name, uint64_t const entry) -> pid_type
     proc->push_frame(256, (mod.ip_base + entry), nullptr);
 
     procs.emplace(pid, std::move(proc));
+    run_queue.push(pid);
 
     return pid;
 }
