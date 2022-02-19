@@ -1447,10 +1447,34 @@ auto execute(IO_CTL const, Stack&, ip_type const) -> void
 auto execute(IO_PEEK const, Stack&, ip_type const) -> void
 {}
 
-auto execute(ACTOR const, Stack& stack, ip_type const) -> void
+auto execute(ACTOR const op, Stack& stack, ip_type const ip) -> void
 {
-    auto const p = stack.proc.core->spawn("", 0x28);
-    viua::TRACE_STREAM << "spawning new actor, with PID " + p.to_string() << viua::TRACE_STREAM.endl;
+    auto fn_name = std::string{};
+    auto fn_addr = size_t{};
+    {
+        auto const fn_index   = op.instruction.in.index;
+        auto const& fn_offset = stack.frames.back().registers.at(fn_index);
+        if (fn_offset.is_void()) {
+            throw abort_execution{ip, "fn offset cannot be void"};
+        }
+        if (fn_offset.is_boxed()) {
+            // FIXME only unboxed integers allowed for now
+            throw abort_execution{ip, "fn offset cannot be boxed"};
+        }
+
+        std::tie(fn_name, fn_addr) =
+            stack.proc.module.function_at(fn_offset.value.get<uint64_t>());
+
+        get_proxy(stack, op.instruction.in, ip).overwrite().make_void();
+    }
+
+    if (fn_addr % sizeof(viua::arch::instruction_type)) {
+        throw abort_execution{ip, "invalid IP after call"};
+    }
+
+    auto const fr_entry  = (fn_addr / sizeof(viua::arch::instruction_type));
+
+    stack.proc.core->spawn("", fr_entry);
 }
 }  // namespace viua::vm::ins
 

@@ -464,20 +464,12 @@ auto run(viua::vm::Core& core) -> void
     while (not core.run_queue.empty()) {
         auto const pid = core.run_queue.front();
         core.run_queue.pop();
-        viua::TRACE_STREAM << "[vm:sched:proc] process " << pid.to_string()
-            << " popped from run queue" << viua::TRACE_STREAM.endl;
 
         auto& proc = core.procs.at(pid);
-
-        viua::TRACE_STREAM << "[vm:sched:proc] process " << proc->pid.to_string()
-            << " obtained"
-            << viua::TRACE_STREAM.endl;
 
         auto const state = run(*proc);
 
         if (state) {
-            viua::TRACE_STREAM << "[vm:sched:proc] process " << pid.to_string()
-                << " pushed to run queue" << viua::TRACE_STREAM.endl;
             core.run_queue.push(pid);
         } else {
             viua::TRACE_STREAM << "[vm:sched:proc] process " << pid.to_string()
