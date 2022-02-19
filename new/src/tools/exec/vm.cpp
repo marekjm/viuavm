@@ -401,7 +401,7 @@ auto run(viua::vm::Process& proc) -> bool
 
     if constexpr (VIUA_TRACE_CYCLES) {
         viua::TRACE_STREAM << "cycle at " << proc.module.elf_path.native()
-                           << "[.text+0x" << std::hex << std::setw(8)
+                           << "[.text+0x" << std::hex << std::setw(16)
                            << std::setfill('0')
                            << ((proc.stack.ip - proc.module.ip_base)
                                * sizeof(viua::arch::instruction_type))
