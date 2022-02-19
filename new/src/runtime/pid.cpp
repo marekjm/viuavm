@@ -19,6 +19,7 @@
 
 #include <viua/runtime/pid.h>
 
+#include <algorithm>
 #include <array>
 #include <random>
 #include <string>
@@ -41,16 +42,14 @@ auto PID::operator<=>(PID const& other) const -> std::strong_ordering
      * and that's it. The less-than relation is implemented only so that
      * PID values may be used as keys in std::map<>.
      */
-    auto const lhs = reinterpret_cast<char const*>(value.s6_addr);
-    auto const rhs = reinterpret_cast<char const*>(other.value.s6_addr);
-    switch (strncmp(lhs, rhs, sizeof(value.s6_addr))) {
-        case 1:
-            return std::strong_ordering::greater;
-        case -1:
-            return std::strong_ordering::less;
-        default:
-            return std::strong_ordering::equal;
+    auto const lhs = reinterpret_cast<unsigned char const*>(value.s6_addr);
+    auto const rhs = reinterpret_cast<unsigned char const*>(other.value.s6_addr);
+    for (auto i = size_t{0}; i < sizeof(decltype(value)::s6_addr); ++i) {
+        if (auto cmp = (lhs[i] <=> rhs[i]); cmp != 0) {
+            return cmp;
+        }
     }
+    return std::strong_ordering::equal;
 }
 
 auto PID::get() const -> pid_type

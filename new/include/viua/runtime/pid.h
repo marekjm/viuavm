@@ -36,8 +36,6 @@ struct PID {
   private:
     pid_type const value;
 
-    auto cmp(PID const&) const -> int;
-
   public:
     auto operator<=>(PID const&) const -> std::strong_ordering;
 
