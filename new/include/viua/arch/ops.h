@@ -255,6 +255,8 @@ enum class OPCODE : opcode_type {
 
     IO_PEEK = (FORMAT_D | 0x000b),
 
+    ACTOR = (FORMAT_D | 0x000c),
+
     FRAME  = (FORMAT_S | 0x0001),
     RETURN = (FORMAT_S | 0x0002),
     ATOM   = (FORMAT_S | 0x0003),
@@ -326,6 +328,7 @@ enum class OPCODE_D : opcode_type {
     Make_entry(REF),
     Make_entry(IF),
     Make_entry(IO_PEEK),
+    Make_entry(ACTOR),
 };
 enum class OPCODE_S : opcode_type {
     Make_entry(FRAME),

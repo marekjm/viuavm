@@ -31,6 +31,10 @@
 #include <viua/vm/ins.h>
 
 
+namespace viua {
+extern viua::support::fdstream TRACE_STREAM;
+}
+
 namespace viua::vm::ins {
 using namespace viua::arch::ins;
 using viua::vm::Stack;
@@ -1442,11 +1446,13 @@ auto execute(IO_CTL const, Stack&, ip_type const) -> void
 {}
 auto execute(IO_PEEK const, Stack&, ip_type const) -> void
 {}
-}  // namespace viua::vm::ins
 
-namespace viua {
-extern viua::support::fdstream TRACE_STREAM;
+auto execute(ACTOR const, Stack& stack, ip_type const) -> void
+{
+    auto const p = stack.proc.core->spawn("", 0x28);
+    viua::TRACE_STREAM << "spawning new actor, with PID " + p.to_string() << viua::TRACE_STREAM.endl;
 }
+}  // namespace viua::vm::ins
 
 namespace viua::vm::ins {
 using namespace viua::arch::ins;

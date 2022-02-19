@@ -341,6 +341,9 @@ auto execute(viua::vm::Stack& stack,
         case OPCODE_D::IO_PEEK:
             execute(IO_PEEK{instruction}, stack, ip);
             break;
+        case OPCODE_D::ACTOR:
+            execute(ACTOR{instruction}, stack, ip);
+            break;
         }
         break;
     }

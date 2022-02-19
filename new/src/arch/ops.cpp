@@ -372,6 +372,8 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "io_ctl";
     case OPCODE::IO_PEEK:
         return greedy + "io_peek";
+    case OPCODE::ACTOR:
+        return greedy + "actor";
     }
 
     return "<unknown>";
@@ -506,6 +508,8 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::IO_CTL));
     } else if (sv == "io_peek") {
         return (op | static_cast<opcode_type>(OPCODE::IO_PEEK));
+    } else if (sv == "actor") {
+        return (op | static_cast<opcode_type>(OPCODE::ACTOR));
     } else {
         throw std::invalid_argument{"viua::arch::ops::parse_opcode: "
                                     + std::string{raw}};

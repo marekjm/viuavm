@@ -244,6 +244,9 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "g.io_peek",
     "io_peek",
 
+    "actor",
+    "g.actor",
+
     /*
      * Pseudoinstructions listed below.
      */

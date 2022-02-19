@@ -109,6 +109,8 @@ Work_instruction(IO_WAIT);
 Work_instruction(IO_SHUTDOWN);
 Work_instruction(IO_CTL);
 Work_instruction(IO_PEEK);
+
+Work_instruction(ACTOR);
 }  // namespace viua::vm::ins
 
 #endif

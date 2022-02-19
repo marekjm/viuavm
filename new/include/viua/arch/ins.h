@@ -447,6 +447,13 @@ struct IO_PEEK : Instruction {
     IO_PEEK(viua::arch::ops::D i) : instruction{i}
     {}
 };
+
+struct ACTOR : Instruction {
+    viua::arch::ops::D instruction;
+
+    ACTOR(viua::arch::ops::D i) : instruction{i}
+    {}
+};
 }  // namespace viua::arch::ins
 
 #endif
