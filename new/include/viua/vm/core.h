@@ -371,8 +371,20 @@ struct Core {
 
     using pid_type = viua::runtime::PID;
     viua::runtime::Pid_emitter pids;
-    std::map<pid_type, std::unique_ptr<Process>> procs{};
-    std::queue<pid_type> run_queue;
+
+    std::queue<std::unique_ptr<Process>> run_queue;
+    std::map<pid_type, std::unique_ptr<Process>> suspended;
+
+    inline auto pop_ready() -> auto
+    {
+        auto proc = std::move(run_queue.front());
+        run_queue.pop();
+        return proc;
+    }
+    inline auto push_ready(std::unique_ptr<Process> proc) -> void
+    {
+        run_queue.push(std::move(proc));
+    }
 
     auto spawn(std::string, uint64_t const) -> pid_type;
 };

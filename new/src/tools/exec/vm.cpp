@@ -462,17 +462,14 @@ auto run(viua::vm::Core& core) -> void
     core.perf_counters.start();
 
     while (not core.run_queue.empty()) {
-        auto const pid = core.run_queue.front();
-        core.run_queue.pop();
-
-        auto& proc = core.procs.at(pid);
+        auto proc = core.pop_ready();
 
         auto const state = run(*proc);
 
         if (state) {
-            core.run_queue.push(pid);
+            core.push_ready(std::move(proc));
         } else {
-            viua::TRACE_STREAM << "[vm:sched:proc] process " << pid.to_string()
+            viua::TRACE_STREAM << "[vm:sched:proc] process " << proc->pid.to_string()
                 << " exited" << viua::TRACE_STREAM.endl;
         }
     }
