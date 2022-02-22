@@ -1474,7 +1474,9 @@ auto execute(ACTOR const op, Stack& stack, ip_type const ip) -> void
 
     auto const fr_entry  = (fn_addr / sizeof(viua::arch::instruction_type));
 
-    stack.proc.core->spawn("", fr_entry);
+    auto const pid = stack.proc.core->spawn("", fr_entry);
+    auto dst = get_slot(op.instruction.out, stack, ip);
+    dst.value()->value = std::make_unique<viua::vm::types::PID>(pid);
 }
 }  // namespace viua::vm::ins
 

@@ -285,4 +285,28 @@ auto Buffer::size() const -> size_type
 {
     return values.size();
 }
+
+auto PID::type_name() const -> std::string
+{
+    return "pid";
+}
+auto PID::to_string() const -> std::string
+{
+    return pid.to_string();
+}
+auto PID::operator()(traits::Cmp const&, Cell_view const& v) const -> std::strong_ordering
+{
+    if (not v.holds<Value>()) {
+        throw std::runtime_error{"cannot compare unboxed value to PID"};
+    }
+
+    auto const a = v.boxed_of<PID>();
+    if (not a) {
+        throw std::runtime_error{"cannot compare "
+                                 + v.boxed_of<Value>().value().get().type_name()
+                                 + " value to PID"};
+    }
+
+    return (a.value().get().pid <=> pid);
+}
 }  // namespace viua::vm::types

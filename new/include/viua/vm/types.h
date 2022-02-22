@@ -27,6 +27,7 @@
 
 #include <viua/vm/types/traits.h>
 #include <viua/vm/types/value.h>
+#include <viua/runtime/pid.h>
 
 
 /*
@@ -176,5 +177,26 @@ struct Buffer
     auto to_string() const -> std::string override;
 };
 }  // namespace viua::vm::types
+
+/*
+ * The following types are opaque and represent the primitives used in Viua VM's
+ * implementation of concurrency based on actors.
+ */
+namespace viua::vm::types {
+struct PID
+        : Value
+        , traits::To_string
+        , traits::Cmp {
+    using pid_type = viua::runtime::PID;
+    pid_type pid;
+
+    inline explicit PID(pid_type p): pid{p} {}
+
+    auto type_name() const -> std::string override;
+    auto to_string() const -> std::string override;
+    auto operator()(traits::Cmp const&, Cell_view const&) const
+        -> std::strong_ordering override;
+};
+}
 
 #endif
