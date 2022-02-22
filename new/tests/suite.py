@@ -173,23 +173,130 @@ def make_ebreak():
         },
     }
 
-EBREAK_BEGIN = re.compile(r'^begin ebreak in process \[([a-f0-9:]+)\]')
-EBREAK_END = re.compile(r'^end ebreak in process \[([a-f0-9:]+)\]')
+EBREAK_BEGIN = re.compile(r'^begin ebreak in process (\[[a-f0-9:]+\])')
+EBREAK_END = re.compile(r'^end ebreak in process (\[[a-f0-9:]+\])')
 EBREAK_BACKTRACE_ENTRY = re.compile(
        r'^#\d+  (.*?[\.text\+0x[a-f0-9]{8}\]) '
     r'return to (.*?\[\.text\+0x[a-f0-9]{8}\]|null)')
-EBREAK_CONTENTS_OF = re.compile(r'^of #([0-9]+|last)')
+EBREAK_CONTENTS_OF = re.compile(r'^of #(\d+|last)')
+EBREAK_SELECT = re.compile(r'^ebreak (-?\d+) in proc(?:ess)? (\[[a-f0-9:]+\])')
 
 EBREAK_LINE_BOXED = re.compile(r'\[(\d+)\.([lap])\] (\*?[a-zA-Z_][a-zA-Z_0-9]*) = (.*)')
 EBREAK_LINE_PRIMITIVE = re.compile(r'\[(\d+)\.([lap])\] (is|iu|fl|db) (.*)')
 
 
+class Missing_value(Exception):
+    @staticmethod
+    def to_string():
+        return 'missing value'
+
+class Unexpected_type(Exception):
+    @staticmethod
+    def to_string():
+        return 'unexpected type'
+
+class Unexpected_value(Exception):
+    @staticmethod
+    def to_string():
+        return 'unexpected value'
+
+class Bad_ebreak_script(Exception):
+    pass
+
+def walk_ebreak_test(errors, want_ebreak, live_ebreak):
+    pid = '[{}]'.format(os.environ['VIUA_VM_PID_SEED'])
+    frame = -1
+    ebreak_index = 0
+
+    for i, line in enumerate(want_ebreak):
+        if select := EBREAK_SELECT.match(line):
+            if (ebreak_index := select.group(1)) == 'last':
+                ebreak_index = -1
+            ebreak_index = int(ebreak_index)
+
+            pid = select.group(2)
+
+            if len(live_ebreak[pid]) <= ebreak_index:
+                raise Bad_ebreak_script(i + 1)
+
+            frame -1
+
+            continue
+
+        if frame_no := EBREAK_CONTENTS_OF.match(line):
+            if (frame := frame_no.group(1)) == 'last':
+                frame = -1
+            frame = int(frame)
+            continue
+
+        b = EBREAK_LINE_BOXED.match(line)
+        p = EBREAK_LINE_PRIMITIVE.match(line)
+        if not (b or p):
+            continue # FIXME suspicious - maybe an error?
+
+        m = (b or p)
+        index = int(m.group(1))
+        register_set = m.group(2)
+        want_type = m.group(3)
+        want_value = m.group(4)
+
+        ebreak = live_ebreak[pid][ebreak_index]['backtrace']
+        live_frame = ebreak[frame]
+
+        if index not in live_frame['registers'][register_set]:
+            leader = f'    register {index}.{register_set}'
+            errors.write(f'{leader} is void\n')
+            errors.write('{} expected {} = {}\n'.format(
+                (len(leader) * ' '),
+                want_type,
+                want_value,
+            ))
+            raise Missing_value()
+
+        live_cell = live_frame['registers'][register_set][index]
+        live_type, live_value = live_cell
+
+        if want_type != live_type:
+            leader = f'    register {index}.{register_set}'
+            errors.write('{} contains {} = {}\n'.format(
+                leader,
+                colorise('red', live_type.ljust(max(len(want_type), len(live_type)))),
+                live_value,
+            ))
+            errors.write('{} expected {} = {}\n'.format(
+                (len(leader) * ' '),
+                colorise('green', want_type.ljust(max(len(want_type), len(live_type)))),
+                want_value,
+            ))
+            errors.write('{}          {}\n'.format(
+                (len(leader) * ' '),
+                colorise('red', (max(len(want_type), len(live_type)) * '^')),
+            ))
+            raise Unexpected_type()
+
+        if want_value != live_value:
+            leader = f'    register {index}.{register_set}'
+            errors.write('{} contains {} = {}\n'.format(
+                leader,
+                live_type.ljust(max(len(want_type), len(live_type))),
+                colorise('red', live_value),
+            ))
+            errors.write('{} expected {} = {}\n'.format(
+                (len(leader) * ' '),
+                want_type.ljust(max(len(want_type), len(live_type))),
+                colorise('green', want_value),
+            ))
+            raise Unexpected_value()
+
+
 class Missing_frame_content_open(Exception):
+    pass
+class Invalid_ebreak_line(Exception):
     pass
 def consume_register_contents(ebreak_lines):
     contents = {}
 
-    if not (ebreak_lines and EBREAK_CONTENTS_OF.match(ebreak_lines[0])):
+    if ebreak_lines and not EBREAK_CONTENTS_OF.match(ebreak_lines[0]):
         raise Missing_frame_content_open()
 
     while ebreak_lines and (frame := EBREAK_CONTENTS_OF.match(ebreak_lines[0])):
@@ -223,7 +330,7 @@ def consume_register_contents(ebreak_lines):
 
     return contents
 
-def consume_ebreak_lines(ebreak_lines):
+def consume_live_ebreak_lines(ebreak_lines):
     ebreak = {
         'pid': None,
         'backtrace': [],
@@ -303,7 +410,7 @@ def run_and_capture(interpreter, executable, args = ()):
                 if EBREAK_END.match(lines[i - 1]):
                     break
 
-            ebreaks.append(consume_ebreak_lines(ebreak_lines))
+            ebreaks.append(consume_live_ebreak_lines(ebreak_lines))
 
         i += 1
 
@@ -322,7 +429,19 @@ def run_and_capture(interpreter, executable, args = ()):
         else:
             break
 
-    return (result, (ebreaks[-1] if ebreaks else None), perf,)
+    if ebreaks:
+        es = {}
+        for each in ebreaks:
+            pid = each['pid']
+            if pid not in es:
+                es[pid] = []
+
+            del each['pid']
+            es[pid].append(each)
+
+        ebreaks = es
+
+    return (result, (ebreaks if ebreaks else None), perf,)
 
 
 CHECK_KINDS = (
@@ -378,68 +497,16 @@ def test_case(case_name, test_program, errors):
         if not ebreak_dump:
             return (False, 'empty ebreak file', count_runtime(), None,)
 
-        try:
-            want_ebreak = consume_register_contents(ebreak_dump[:])
-        except Missing_frame_content_open:
-            ebreak_dump.insert(0, 'of #last')
-            want_ebreak = consume_register_contents(ebreak_dump[:])
-
-        if not want_ebreak:
-            return (False, 'invalid ebreak file', count_runtime(), None,)
-
         if ebreak is None:
             return (False, 'program did not emit ebreak', count_runtime(), None,)
 
-        for frame_index, frame_data in want_ebreak.items():
-            for r, registers in frame_data.items():
-                for index, cell in registers.items():
-                    ebreak_frame = ebreak['backtrace'][frame_index]
 
-                    if index not in ebreak_frame['registers'][r]:
-                        leader = f'    register {index}.{r}'
-                        errors.write(f'{leader} is void\n')
-                        errors.write('{} expected {} = {}\n'.format(
-                            (len(leader) * ' '),
-                            *cell
-                        ))
-                        return (False, None, count_runtime(), None,)
-
-                    got = ebreak_frame['registers'][r][index]
-                    got_type, got_value = got
-
-                    want_type, want_value = cell
-
-                    if want_type != got_type:
-                        leader = f'    register {index}.{r}'
-                        errors.write('{} contains {} = {}\n'.format(
-                            leader,
-                            colorise('red', got_type.ljust(max(len(want_type), len(got_type)))),
-                            got_value,
-                        ))
-                        errors.write('{} expected {} = {}\n'.format(
-                            (len(leader) * ' '),
-                            colorise('green', want_type.ljust(max(len(want_type), len(got_type)))),
-                            want_value,
-                        ))
-                        errors.write('{}          {}\n'.format(
-                            (len(leader) * ' '),
-                            colorise('red', (max(len(want_type), len(got_type)) * '^')),
-                        ))
-                        return (False, 'unexpected type', count_runtime(), None,)
-
-                    if want_value != got_value:
-                        leader = f'    register {index}.{r}'
-                        errors.write('{} contains {} = {}\n'.format(
-                            leader,
-                            got_type.ljust(max(len(want_type), len(got_type))),
-                            colorise('red', got_value),
-                        ))
-                        errors.write('{} expected {} = {}\n'.format(
-                            (len(leader) * ' '),
-                            want_type.ljust(max(len(want_type), len(got_type))),
-                            colorise('green', want_value),
-                        ))
-                        return (False, 'unexpected value', count_runtime(), None,)
+        try:
+            walk_ebreak_test(errors, ebreak_dump, ebreak)
+        except (Missing_value, Unexpected_type, Unexpected_value,) as e:
+            return (False, e.to_string(), count_runtime(), None,)
+        except Bad_ebreak_script as e:
+            return (False, f'bad ebreak script, error on line {e.args[0]}', count_runtime(), None,)
 
     if SKIP_DISASSEMBLER_TESTS:
         return (True, None, count_runtime(), perf,)
