@@ -1478,6 +1478,14 @@ auto execute(ACTOR const op, Stack& stack, ip_type const ip) -> void
     auto dst = get_slot(op.instruction.out, stack, ip);
     dst.value()->value = std::make_unique<viua::vm::types::PID>(pid);
 }
+auto execute(SELF const op, Stack& stack, ip_type const) -> void
+{
+    auto& registers = stack.back().registers;
+    auto& target    = registers.at(op.instruction.out.index);
+
+    auto s       = std::make_unique<viua::vm::types::PID>(stack.proc.pid);
+    target.value = std::move(s);
+}
 }  // namespace viua::vm::ins
 
 namespace viua::vm::ins {

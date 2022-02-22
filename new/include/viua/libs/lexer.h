@@ -246,6 +246,8 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
 
     "actor",
     "g.actor",
+    "self",
+    "g.self",
 
     /*
      * Pseudoinstructions listed below.

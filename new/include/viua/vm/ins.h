@@ -111,6 +111,7 @@ Work_instruction(IO_CTL);
 Work_instruction(IO_PEEK);
 
 Work_instruction(ACTOR);
+Work_instruction(SELF);
 }  // namespace viua::vm::ins
 
 #endif

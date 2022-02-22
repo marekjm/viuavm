@@ -266,6 +266,8 @@ enum class OPCODE : opcode_type {
     STRUCT = (FORMAT_S | 0x0007),
     BUFFER = (FORMAT_S | 0x0008),
 
+    SELF = (FORMAT_S | 0x0009),
+
     LUI  = (FORMAT_E | 0x0001),
     LUIU = (FORMAT_E | 0x0001 | UNSIGNED),
 
@@ -339,6 +341,7 @@ enum class OPCODE_S : opcode_type {
     Make_entry(DOUBLE),
     Make_entry(STRUCT),
     Make_entry(BUFFER),
+    Make_entry(SELF),
 };
 enum class OPCODE_E : opcode_type {
     Make_entry(LUI),

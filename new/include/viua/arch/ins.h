@@ -454,6 +454,12 @@ struct ACTOR : Instruction {
     ACTOR(viua::arch::ops::D i) : instruction{i}
     {}
 };
+struct SELF : Instruction {
+    viua::arch::ops::S instruction;
+
+    SELF(viua::arch::ops::S i) : instruction{i}
+    {}
+};
 }  // namespace viua::arch::ins
 
 #endif

@@ -209,6 +209,9 @@ auto execute(viua::vm::Stack& stack,
         case OPCODE_S::BUFFER:
             execute(BUFFER{instruction}, stack, ip);
             break;
+        case OPCODE_S::SELF:
+            execute(SELF{instruction}, stack, ip);
+            break;
         }
         break;
     }
