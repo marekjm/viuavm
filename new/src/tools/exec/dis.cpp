@@ -215,6 +215,23 @@ auto demangle_strtab_load(Cooked_text& raw,
         ++i;
         return;
     }
+    if (m(i + 1, ACTOR) and D::decode(ins_at(i + 1)).in == out) {
+        auto ins = raw.at(i + 1);
+
+        auto const off       = immediate;
+        auto const data_size = read_size(fntab.data, off);
+        auto const name      = std::string{
+            reinterpret_cast<char const*>(&fntab.data[off]), data_size};
+
+        auto tt = ins.with_text(
+            "actor " + D::decode(ins_at(i + 1)).out.to_string() + ", " + name);
+        tt.index = cooked.back().index;
+        cooked.pop_back();
+        tt.index.physical_span = tt.index.physical_span.value() + 1;
+        cooked.emplace_back(tt);
+        ++i;
+        return;
+    }
 }
 
 auto demangle_canonical_li(Cooked_text& text,
