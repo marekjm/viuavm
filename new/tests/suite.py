@@ -53,7 +53,7 @@ DISASSEMBLER = './build/tools/exec/dis'
 
 DIS_EXTENSION = '~'
 
-SKIP_DISASSEMBLER_TESTS = True
+SKIP_DISASSEMBLER_TESTS = False
 
 EBREAK_LINE_BOXED = re.compile(r'\[(\d+)\.([lap])\] (\*?[a-zA-Z_][a-zA-Z_0-9]*) = (.*)')
 EBREAK_LINE_PRIMITIVE = re.compile(r'\[(\d+)\.([lap])\] (is|iu|fl|db) (.*)')
@@ -541,64 +541,20 @@ def test_case(case_name, test_program, errors):
     if check_kind == 'ebreak':
         ebreak_dump = (os.path.splitext(test_program)[0] + '.ebreak')
         with open(ebreak_dump, 'r') as ifstream:
-            ebreak_dump = ifstream.readlines()
+            ebreak_dump = ifstream.read().splitlines()
 
-        want_ebreak = make_ebreak()
-
-        for line in ebreak_dump:
-            if not load_ebreak_line(want_ebreak, line):
-                errors.write(f'    invalid-want ebreak line: {line}')
-                return (False, None, count_runtime(), None,)
         if not ebreak_dump:
             return (False, 'empty ebreak file', count_runtime(), None,)
 
-        for r, content in want_ebreak['registers'].items():
-            for index, cell in content.items():
-                if index not in ebreak['registers'][r]:
-                    leader = f'    register {index}.{r}'
-                    errors.write(f'{leader} is void\n')
-                    errors.write('{} expected {} = {}\n'.format(
-                        (len(leader) * ' '),
-                        *cell
-                    ))
-                    return (False, None, count_runtime(),)
+        if ebreak is None:
+            return (False, 'program did not emit ebreak', count_runtime(), None,)
 
-                got = ebreak['registers'][r][index]
-                got_type, got_value = got
-
-                want_type, want_value = cell
-
-                if want_type != got_type:
-                    leader = f'    register {index}.{r}'
-                    errors.write('{} contains {} = {}\n'.format(
-                        leader,
-                        colorise('red', got_type.ljust(max(len(want_type), len(got_type)))),
-                        got_value,
-                    ))
-                    errors.write('{} expected {} = {}\n'.format(
-                        (len(leader) * ' '),
-                        colorise('green', want_type.ljust(max(len(want_type), len(got_type)))),
-                        want_value,
-                    ))
-                    errors.write('{}          {}\n'.format(
-                        (len(leader) * ' '),
-                        colorise('red', (max(len(want_type), len(got_type)) * '^')),
-                    ))
-                    return (False, 'unexpected type (after reassembly)', count_runtime(), None,)
-
-                if want_value != got_value:
-                    leader = f'    register {index}.{r}'
-                    errors.write('{} contains {} = {}\n'.format(
-                        leader,
-                        got_type.ljust(max(len(want_type), len(got_type))),
-                        colorise('red', got_value),
-                    ))
-                    errors.write('{} expected {} = {}\n'.format(
-                        (len(leader) * ' '),
-                        want_type.ljust(max(len(want_type), len(got_type))),
-                        colorise('green', want_value),
-                    ))
-                    return (False, 'unexpected value (after reassembly)', count_runtime(), None,)
+        try:
+            walk_ebreak_test(errors, ebreak_dump, ebreak)
+        except (Missing_value, Unexpected_type, Unexpected_value,) as e:
+            return (False, e.to_string(), count_runtime(), None,)
+        except Bad_ebreak_script as e:
+            return (False, f'bad ebreak script, error on line {e.args[0]}', count_runtime(), None,)
 
     return (True, None, count_runtime(), perf)
 
