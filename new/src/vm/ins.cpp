@@ -286,47 +286,106 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
                                              cast_to<int64_t>(rhs));
         if (out.hard()) {
             out = std::move(r);
-        } else {
+        } else if (not out.view().template holds<Signed_integer>()) {
             throw abort_execution{
                 ip,
-                ("cannot store i64 through a reference to " + type_name(out))};
+                ("cannot mutate i64 through a reference to " + type_name(out))};
+        } else {
+            auto b = out.view().template boxed_of<Signed_integer>();
+            b.value().get().value = std::move(r);
         }
     } else if (lhs.template holds<uint64_t>()) {
-        out = typename Op::functor_type{}(lhs.template get<uint64_t>(),
+        auto r = typename Op::functor_type{}(lhs.template get<uint64_t>(),
                                           cast_to<uint64_t>(rhs));
+        if (out.hard()) {
+            out = std::move(r);
+        } else if (not out.view().template holds<Unsigned_integer>()) {
+            throw abort_execution{
+                ip,
+                ("cannot mutate u64 through a reference to " + type_name(out))};
+        } else {
+            auto b = out.view().template boxed_of<Unsigned_integer>();
+            b.value().get().value = std::move(r);
+        }
     } else if (lhs.template holds<float>()) {
-        out = typename Op::functor_type{}(lhs.template get<float>(),
+        auto r = typename Op::functor_type{}(lhs.template get<float>(),
                                           cast_to<float>(rhs));
+        if (out.hard()) {
+            out = std::move(r);
+        } else if (not out.view().template holds<Float_single>()) {
+            throw abort_execution{
+                ip,
+                ("cannot mutate fl through a reference to " + type_name(out))};
+        } else {
+            auto b = out.view().template boxed_of<Float_single>();
+            b.value().get().value = std::move(r);
+        }
     } else if (lhs.template holds<double>()) {
-        out = typename Op::functor_type{}(lhs.template get<double>(),
+        auto r = typename Op::functor_type{}(lhs.template get<double>(),
                                           cast_to<double>(rhs));
+        if (out.hard()) {
+            out = std::move(r);
+        } else if (not out.view().template holds<Float_double>()) {
+            throw abort_execution{
+                ip,
+                ("cannot mutate db through a reference to " + type_name(out))};
+        } else {
+            auto b = out.view().template boxed_of<Float_double>();
+            b.value().get().value = std::move(r);
+        }
     } else if (lhs.template holds<Signed_integer>()) {
         auto r = typename Op::functor_type{}(cast_to<int64_t>(lhs),
                                              cast_to<int64_t>(rhs));
-
         if (out.hard()) {
             out = std::move(r);
         } else if (not out.view().template holds<Signed_integer>()) {
             throw abort_execution{
                 ip,
-                ("cannot store i64 through a reference to " + type_name(out))};
+                ("cannot mutate i64 through a reference to " + type_name(out))};
         } else {
             auto b = out.view().template boxed_of<Signed_integer>();
             b.value().get().value = std::move(r);
         }
     } else if (lhs.template holds<Unsigned_integer>()) {
-        out = typename Op::functor_type{}(cast_to<uint64_t>(lhs),
+        auto r = typename Op::functor_type{}(cast_to<uint64_t>(lhs),
                                           cast_to<uint64_t>(rhs));
+        if (out.hard()) {
+            out = std::move(r);
+        } else if (not out.view().template holds<Unsigned_integer>()) {
+            throw abort_execution{
+                ip,
+                ("cannot mutate u64 through a reference to " + type_name(out))};
+        } else {
+            auto b = out.view().template boxed_of<Unsigned_integer>();
+            b.value().get().value = std::move(r);
+        }
     } else if (lhs.template holds<Float_single>()) {
-        out = typename Op::functor_type{}(cast_to<float>(lhs),
+        auto r = typename Op::functor_type{}(cast_to<float>(lhs),
                                           cast_to<float>(rhs));
+        if (out.hard()) {
+            out = std::move(r);
+        } else if (not out.view().template holds<Float_single>()) {
+            throw abort_execution{
+                ip,
+                ("cannot mutate fl through a reference to " + type_name(out))};
+        } else {
+            auto b = out.view().template boxed_of<Float_single>();
+            b.value().get().value = std::move(r);
+        }
     } else if (lhs.template holds<Float_double>()) {
-        out = typename Op::functor_type{}(cast_to<double>(lhs),
+        auto r = typename Op::functor_type{}(cast_to<double>(lhs),
                                           cast_to<double>(rhs));
-    } /* else if (lhs.template has_trait<Trait>()) {
-        out.value = lhs.boxed_value().template as_trait<Trait>(rhs.content);
-    } */
-    else {
+        if (out.hard()) {
+            out = std::move(r);
+        } else if (not out.view().template holds<Float_double>()) {
+            throw abort_execution{
+                ip,
+                ("cannot mutate db through a reference to " + type_name(out))};
+        } else {
+            auto b = out.view().template boxed_of<Float_double>();
+            b.value().get().value = std::move(r);
+        }
+    } else {
         throw abort_execution{
             ip, "unsupported operand types for arithmetic operation"};
     }
@@ -338,18 +397,114 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
     auto lhs = get_value(stack, op.instruction.lhs, ip);
     auto rhs = get_value(stack, op.instruction.rhs, ip);
 
+    using viua::vm::types::Float_double;
+    using viua::vm::types::Float_single;
+    using viua::vm::types::Signed_integer;
+    using viua::vm::types::Unsigned_integer;
     if (lhs.template holds<int64_t>()) {
-        out = typename Op::functor_type{}(lhs.template get<int64_t>(),
-                                          cast_to<int64_t>(rhs));
+        auto r = typename Op::functor_type{}(lhs.template get<int64_t>(),
+                                             cast_to<int64_t>(rhs));
+        if (out.hard()) {
+            out = std::move(r);
+        } else if (not out.view().template holds<Signed_integer>()) {
+            throw abort_execution{
+                ip,
+                ("cannot mutate i64 through a reference to " + type_name(out))};
+        } else {
+            auto b = out.view().template boxed_of<Signed_integer>();
+            b.value().get().value = std::move(r);
+        }
     } else if (lhs.template holds<uint64_t>()) {
-        out = typename Op::functor_type{}(lhs.template get<uint64_t>(),
+        auto r = typename Op::functor_type{}(lhs.template get<uint64_t>(),
                                           cast_to<uint64_t>(rhs));
+        if (out.hard()) {
+            out = std::move(r);
+        } else if (not out.view().template holds<Unsigned_integer>()) {
+            throw abort_execution{
+                ip,
+                ("cannot mutate u64 through a reference to " + type_name(out))};
+        } else {
+            auto b = out.view().template boxed_of<Unsigned_integer>();
+            b.value().get().value = std::move(r);
+        }
     } else if (lhs.template holds<float>()) {
-        out = typename Op::functor_type{}(lhs.template get<float>(),
+        auto r = typename Op::functor_type{}(lhs.template get<float>(),
                                           cast_to<float>(rhs));
+        if (out.hard()) {
+            out = std::move(r);
+        } else if (not out.view().template holds<Float_single>()) {
+            throw abort_execution{
+                ip,
+                ("cannot mutate fl through a reference to " + type_name(out))};
+        } else {
+            auto b = out.view().template boxed_of<Float_single>();
+            b.value().get().value = std::move(r);
+        }
     } else if (lhs.template holds<double>()) {
-        out = typename Op::functor_type{}(lhs.template get<double>(),
+        auto r = typename Op::functor_type{}(lhs.template get<double>(),
                                           cast_to<double>(rhs));
+        if (out.hard()) {
+            out = std::move(r);
+        } else if (not out.view().template holds<Float_double>()) {
+            throw abort_execution{
+                ip,
+                ("cannot mutate db through a reference to " + type_name(out))};
+        } else {
+            auto b = out.view().template boxed_of<Float_double>();
+            b.value().get().value = std::move(r);
+        }
+    } else if (lhs.template holds<Signed_integer>()) {
+        auto r = typename Op::functor_type{}(cast_to<int64_t>(lhs),
+                                             cast_to<int64_t>(rhs));
+        if (out.hard()) {
+            out = std::move(r);
+        } else if (not out.view().template holds<Signed_integer>()) {
+            throw abort_execution{
+                ip,
+                ("cannot mutate i64 through a reference to " + type_name(out))};
+        } else {
+            auto b = out.view().template boxed_of<Signed_integer>();
+            b.value().get().value = std::move(r);
+        }
+    } else if (lhs.template holds<Unsigned_integer>()) {
+        auto r = typename Op::functor_type{}(cast_to<uint64_t>(lhs),
+                                          cast_to<uint64_t>(rhs));
+        if (out.hard()) {
+            out = std::move(r);
+        } else if (not out.view().template holds<Unsigned_integer>()) {
+            throw abort_execution{
+                ip,
+                ("cannot mutate u64 through a reference to " + type_name(out))};
+        } else {
+            auto b = out.view().template boxed_of<Unsigned_integer>();
+            b.value().get().value = std::move(r);
+        }
+    } else if (lhs.template holds<Float_single>()) {
+        auto r = typename Op::functor_type{}(cast_to<float>(lhs),
+                                          cast_to<float>(rhs));
+        if (out.hard()) {
+            out = std::move(r);
+        } else if (not out.view().template holds<Float_single>()) {
+            throw abort_execution{
+                ip,
+                ("cannot mutate fl through a reference to " + type_name(out))};
+        } else {
+            auto b = out.view().template boxed_of<Float_single>();
+            b.value().get().value = std::move(r);
+        }
+    } else if (lhs.template holds<Float_double>()) {
+        auto r = typename Op::functor_type{}(cast_to<double>(lhs),
+                                          cast_to<double>(rhs));
+        if (out.hard()) {
+            out = std::move(r);
+        } else if (not out.view().template holds<Float_double>()) {
+            throw abort_execution{
+                ip,
+                ("cannot mutate db through a reference to " + type_name(out))};
+        } else {
+            auto b = out.view().template boxed_of<Float_double>();
+            b.value().get().value = std::move(r);
+        }
     } else {
         throw abort_execution{
             ip, "unsupported operand types for arithmetic operation"};
