@@ -270,6 +270,24 @@ template<typename T> auto cast_to(viua::vm::types::Cell_view value) -> T
     throw std::bad_cast{};
 }
 
+template<typename Boxed, typename T>
+auto store_impl(ip_type const ip, Proxy& out, T value, std::string_view const tn) -> void
+{
+    if (out.hard()) {
+        out = std::move(value);
+        return;
+    }
+
+    if (not out.view().template holds<Boxed>()) {
+        throw abort_execution{
+            ip,
+            (std::string{"cannot mutate "} + tn.data() + " through a reference to " + type_name(out))};
+    }
+
+    auto b = out.view().template boxed_of<Boxed>();
+    b.value().get().value = std::move(value);
+}
+
 using viua::vm::types::Cell_view;
 template<typename Op, typename Lhs, typename Boxed_lhs>
 auto execute_arithmetic_op_impl(ip_type const ip, Proxy& out, Cell_view& lhs, Cell_view& rhs, std::string_view const tn) -> void
@@ -413,23 +431,23 @@ auto execute(DIV const op, Stack& stack, ip_type const ip) -> void
 }
 auto execute(MOD const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto& out       = registers.at(op.instruction.out.index);
-    auto& lhs       = registers.at(op.instruction.lhs.index);
-    auto& rhs       = registers.at(op.instruction.rhs.index);
+    auto out = get_proxy(stack, op.instruction.out, ip);
+    auto lhs = get_value(stack, op.instruction.lhs, ip);
+    auto rhs = get_value(stack, op.instruction.rhs, ip);
 
-    if (lhs.is_boxed() or rhs.is_boxed()) {
-        throw abort_execution{
-            nullptr, "boxed values not supported for modulo operations"};
-    }
+    using viua::vm::types::Signed_integer;
+    using viua::vm::types::Unsigned_integer;
 
-    if (lhs.holds<int64_t>()) {
-        out = lhs.value.get<int64_t>() % rhs.cast_to<int64_t>();
-    } else if (lhs.holds<uint64_t>()) {
-        out = lhs.value.get<uint64_t>() % rhs.cast_to<uint64_t>();
+    auto const holds_i64 = (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
+    auto const holds_u64 = (lhs.template holds<uint64_t>() or lhs.template holds<Unsigned_integer>());
+
+    if (holds_i64) {
+        store_impl<Signed_integer>(ip, out, (cast_to<int64_t>(lhs) % cast_to<int64_t>(rhs)), "i64");
+    } else if (holds_u64) {
+        store_impl<Unsigned_integer>(ip, out, (cast_to<uint64_t>(lhs) % cast_to<uint64_t>(rhs)), "u64");
     } else {
-        throw abort_execution{ip,
-                              "unsupported operand types for modulo operation"};
+        throw abort_execution{
+            ip, "unsupported operand types for modulo operation"};
     }
 }
 
