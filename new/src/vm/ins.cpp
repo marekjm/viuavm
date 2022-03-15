@@ -273,34 +273,6 @@ template<typename T> auto cast_to(viua::vm::types::Cell_view value) -> T
 template<typename Boxed, typename T>
 auto store_impl(ip_type const ip, Proxy& out, T value, std::string_view const tn) -> void
 {
-    if (out.hard()) {
-        out = std::move(value);
-        return;
-    }
-
-    if (not out.view().template holds<Boxed>()) {
-        throw abort_execution{
-            ip,
-            (std::string{"cannot mutate "} + tn.data() + " through a reference to " + type_name(out))};
-    }
-
-    auto b = out.view().template boxed_of<Boxed>();
-    b.value().get().value = std::move(value);
-}
-
-using viua::vm::types::Cell_view;
-template<typename Op, typename Lhs, typename Boxed_lhs>
-auto execute_arithmetic_op_impl(ip_type const ip, Proxy& out, Cell_view& lhs, Cell_view& rhs, std::string_view const tn) -> void
-{
-    /*
-     * Instead of casting the lhs operand we could just get it. However, by
-     * always casting we can use the same code for unboxed and boxed variants.
-     * The difference is not visible on the ISA level, but we have to deal with
-     * the hairy details on the implementation level.
-     */
-    auto r = typename Op::functor_type{}(cast_to<Lhs>(lhs),
-                                         cast_to<Lhs>(rhs));
-
     /*
      * This is the simple case. We got an output operand which was specified as
      * a direct register access ie, a "hard" access. This means we can just
@@ -322,7 +294,7 @@ auto execute_arithmetic_op_impl(ip_type const ip, Proxy& out, Cell_view& lhs, Ce
      * any code which contains a use of such dangling references.
      */
     if (out.hard()) {
-        out = std::move(r);
+        out = std::move(value);
         return;
     }
 
@@ -337,7 +309,7 @@ auto execute_arithmetic_op_impl(ip_type const ip, Proxy& out, Cell_view& lhs, Ce
      * reasonable to mutate, for example, a string using an unsigned integer or
      * vice versa.
      */
-    if (not out.view().template holds<Boxed_lhs>()) {
+    if (not out.view().template holds<Boxed>()) {
         throw abort_execution{
             ip,
             (std::string{"cannot mutate "} + tn.data() + " through a reference to " + type_name(out))};
@@ -349,8 +321,22 @@ auto execute_arithmetic_op_impl(ip_type const ip, Proxy& out, Cell_view& lhs, Ce
      * the program wants to mutate a value instead of performing a destructive
      * store.
      */
-    auto b = out.view().template boxed_of<Boxed_lhs>();
-    b.value().get().value = std::move(r);
+    auto b = out.view().template boxed_of<Boxed>();
+    b.value().get().value = std::move(value);
+}
+
+using viua::vm::types::Cell_view;
+template<typename Op, typename Lhs, typename Boxed_lhs>
+auto execute_arithmetic_op_impl(ip_type const ip, Proxy& out, Cell_view& lhs, Cell_view& rhs, std::string_view const tn) -> void
+{
+    /*
+     * Instead of casting the lhs operand we could just get it. However, by
+     * always casting we can use the same code for unboxed and boxed variants.
+     * The difference is not visible on the ISA level, but we have to deal with
+     * the hairy details on the implementation level.
+     */
+    auto r = typename Op::functor_type{}(cast_to<Lhs>(lhs), cast_to<Lhs>(rhs));
+    store_impl<Boxed_lhs>(ip, out, std::move(r), tn);
 }
 template<typename Op, typename Trait>
 auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
