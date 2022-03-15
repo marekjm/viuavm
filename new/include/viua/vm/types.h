@@ -25,9 +25,9 @@
 #include <map>
 #include <vector>
 
+#include <viua/runtime/pid.h>
 #include <viua/vm/types/traits.h>
 #include <viua/vm/types/value.h>
-#include <viua/runtime/pid.h>
 
 
 /*
@@ -190,13 +190,14 @@ struct PID
     using pid_type = viua::runtime::PID;
     pid_type pid;
 
-    inline explicit PID(pid_type p): pid{p} {}
+    inline explicit PID(pid_type p) : pid{p}
+    {}
 
     auto type_name() const -> std::string override;
     auto to_string() const -> std::string override;
     auto operator()(traits::Cmp const&, Cell_view const&) const
         -> std::strong_ordering override;
 };
-}
+}  // namespace viua::vm::types
 
 #endif

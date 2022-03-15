@@ -294,7 +294,8 @@ auto PID::to_string() const -> std::string
 {
     return pid.to_string();
 }
-auto PID::operator()(traits::Cmp const&, Cell_view const& v) const -> std::strong_ordering
+auto PID::operator()(traits::Cmp const&, Cell_view const& v) const
+    -> std::strong_ordering
 {
     if (not v.holds<Value>()) {
         throw std::runtime_error{"cannot compare unboxed value to PID"};

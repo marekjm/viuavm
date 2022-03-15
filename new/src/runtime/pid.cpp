@@ -17,18 +17,18 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <viua/runtime/pid.h>
+#include <arpa/inet.h>
+#include <endian.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <algorithm>
 #include <array>
 #include <random>
-#include <string>
 #include <stdexcept>
+#include <string>
 
-#include <stdlib.h>
-#include <endian.h>
-#include <arpa/inet.h>
-#include <string.h>
+#include <viua/runtime/pid.h>
 
 
 namespace viua::runtime {
@@ -43,7 +43,8 @@ auto PID::operator<=>(PID const& other) const -> std::strong_ordering
      * PID values may be used as keys in std::map<>.
      */
     auto const lhs = reinterpret_cast<unsigned char const*>(value.s6_addr);
-    auto const rhs = reinterpret_cast<unsigned char const*>(other.value.s6_addr);
+    auto const rhs =
+        reinterpret_cast<unsigned char const*>(other.value.s6_addr);
     for (auto i = size_t{0}; i < sizeof(decltype(value)::s6_addr); ++i) {
         if (auto cmp = (lhs[i] <=> rhs[i]); cmp != 0) {
             return cmp;
@@ -59,18 +60,17 @@ auto PID::get() const -> pid_type
 
 auto PID::to_string() const -> std::string
 {
-    std::array<char, INET6_ADDRSTRLEN> buf { '\0' };
+    std::array<char, INET6_ADDRSTRLEN> buf{'\0'};
     inet_ntop(AF_INET6, &value, buf.data(), buf.size());
     return "[" + std::string{buf.data()} + "]";
 }
 
-Pid_emitter::Pid_emitter()
-    : base{{0xfe, 0x80, 0x00}}
-    , counter{0}
+Pid_emitter::Pid_emitter() : base{{0xfe, 0x80, 0x00}}, counter{0}
 {
     if (auto seed = getenv("VIUA_VM_PID_SEED"); seed != nullptr) {
         if (inet_pton(AF_INET6, seed, &base) == 0) {
-            throw std::invalid_argument{"VIUA_VM_PID_SEED must contain an IPv6 address"};
+            throw std::invalid_argument{
+                "VIUA_VM_PID_SEED must contain an IPv6 address"};
         }
 
         memcpy(&counter, base.s6_addr + 8, sizeof(counter));

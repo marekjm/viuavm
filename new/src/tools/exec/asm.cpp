@@ -557,7 +557,8 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
             expand_li(cooked, each);
         } else if (each.opcode == "delete" or each.opcode == "g.delete") {
             expand_delete(cooked, each);
-        } else if (each.opcode == "call" or each.opcode == "actor" or each.opcode == "g.actor") {
+        } else if (each.opcode == "call" or each.opcode == "actor"
+                   or each.opcode == "g.actor") {
             /*
              * Call instructions expansion is simple.
              *

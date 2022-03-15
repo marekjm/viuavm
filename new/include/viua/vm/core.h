@@ -30,6 +30,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <queue>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -37,7 +38,6 @@
 #include <utility>
 #include <variant>
 #include <vector>
-#include <queue>
 
 #include <viua/arch/arch.h>
 #include <viua/runtime/pid.h>

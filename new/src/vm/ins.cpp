@@ -271,7 +271,10 @@ template<typename T> auto cast_to(viua::vm::types::Cell_view value) -> T
 }
 
 template<typename Boxed, typename T>
-auto store_impl(ip_type const ip, Proxy& out, T value, std::string_view const tn) -> void
+auto store_impl(ip_type const ip,
+                Proxy& out,
+                T value,
+                std::string_view const tn) -> void
 {
     /*
      * This is the simple case. We got an output operand which was specified as
@@ -310,9 +313,9 @@ auto store_impl(ip_type const ip, Proxy& out, T value, std::string_view const tn
      * vice versa.
      */
     if (not out.view().template holds<Boxed>()) {
-        throw abort_execution{
-            ip,
-            (std::string{"cannot mutate "} + tn.data() + " through a reference to " + type_name(out))};
+        throw abort_execution{ip,
+                              (std::string{"cannot mutate "} + tn.data()
+                               + " through a reference to " + type_name(out))};
     }
 
     /*
@@ -321,13 +324,17 @@ auto store_impl(ip_type const ip, Proxy& out, T value, std::string_view const tn
      * the program wants to mutate a value instead of performing a destructive
      * store.
      */
-    auto b = out.view().template boxed_of<Boxed>();
+    auto b                = out.view().template boxed_of<Boxed>();
     b.value().get().value = std::move(value);
 }
 
 using viua::vm::types::Cell_view;
 template<typename Op, typename Lhs, typename Boxed_lhs>
-auto execute_arithmetic_op_impl(ip_type const ip, Proxy& out, Cell_view& lhs, Cell_view& rhs, std::string_view const tn) -> void
+auto execute_arithmetic_op_impl(ip_type const ip,
+                                Proxy& out,
+                                Cell_view& lhs,
+                                Cell_view& rhs,
+                                std::string_view const tn) -> void
 {
     /*
      * Instead of casting the lhs operand we could just get it. However, by
@@ -350,19 +357,27 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
     using viua::vm::types::Signed_integer;
     using viua::vm::types::Unsigned_integer;
 
-    auto const holds_i64 = (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
-    auto const holds_u64 = (lhs.template holds<uint64_t>() or lhs.template holds<Unsigned_integer>());
-    auto const holds_f32 = (lhs.template holds<float>() or lhs.template holds<Float_single>());
-    auto const holds_f64 = (lhs.template holds<double>() or lhs.template holds<Float_double>());
+    auto const holds_i64 =
+        (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
+    auto const holds_u64 = (lhs.template holds<uint64_t>()
+                            or lhs.template holds<Unsigned_integer>());
+    auto const holds_f32 =
+        (lhs.template holds<float>() or lhs.template holds<Float_single>());
+    auto const holds_f64 =
+        (lhs.template holds<double>() or lhs.template holds<Float_double>());
 
     if (holds_i64) {
-        execute_arithmetic_op_impl<Op, int64_t, Signed_integer>(ip, out, lhs, rhs, "i64");
+        execute_arithmetic_op_impl<Op, int64_t, Signed_integer>(
+            ip, out, lhs, rhs, "i64");
     } else if (holds_u64) {
-        execute_arithmetic_op_impl<Op, uint64_t, Unsigned_integer>(ip, out, lhs, rhs, "u64");
+        execute_arithmetic_op_impl<Op, uint64_t, Unsigned_integer>(
+            ip, out, lhs, rhs, "u64");
     } else if (holds_f32) {
-        execute_arithmetic_op_impl<Op, float, Float_single>(ip, out, lhs, rhs, "fl");
+        execute_arithmetic_op_impl<Op, float, Float_single>(
+            ip, out, lhs, rhs, "fl");
     } else if (holds_f64) {
-        execute_arithmetic_op_impl<Op, double, Float_double>(ip, out, lhs, rhs, "db");
+        execute_arithmetic_op_impl<Op, double, Float_double>(
+            ip, out, lhs, rhs, "db");
     } else {
         throw abort_execution{
             ip, "unsupported operand types for arithmetic operation"};
@@ -380,19 +395,27 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
     using viua::vm::types::Signed_integer;
     using viua::vm::types::Unsigned_integer;
 
-    auto const holds_i64 = (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
-    auto const holds_u64 = (lhs.template holds<uint64_t>() or lhs.template holds<Unsigned_integer>());
-    auto const holds_f32 = (lhs.template holds<float>() or lhs.template holds<Float_single>());
-    auto const holds_f64 = (lhs.template holds<double>() or lhs.template holds<Float_double>());
+    auto const holds_i64 =
+        (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
+    auto const holds_u64 = (lhs.template holds<uint64_t>()
+                            or lhs.template holds<Unsigned_integer>());
+    auto const holds_f32 =
+        (lhs.template holds<float>() or lhs.template holds<Float_single>());
+    auto const holds_f64 =
+        (lhs.template holds<double>() or lhs.template holds<Float_double>());
 
     if (holds_i64) {
-        execute_arithmetic_op_impl<Op, int64_t, Signed_integer>(ip, out, lhs, rhs, "i64");
+        execute_arithmetic_op_impl<Op, int64_t, Signed_integer>(
+            ip, out, lhs, rhs, "i64");
     } else if (holds_u64) {
-        execute_arithmetic_op_impl<Op, uint64_t, Unsigned_integer>(ip, out, lhs, rhs, "u64");
+        execute_arithmetic_op_impl<Op, uint64_t, Unsigned_integer>(
+            ip, out, lhs, rhs, "u64");
     } else if (holds_f32) {
-        execute_arithmetic_op_impl<Op, float, Float_single>(ip, out, lhs, rhs, "fl");
+        execute_arithmetic_op_impl<Op, float, Float_single>(
+            ip, out, lhs, rhs, "fl");
     } else if (holds_f64) {
-        execute_arithmetic_op_impl<Op, double, Float_double>(ip, out, lhs, rhs, "db");
+        execute_arithmetic_op_impl<Op, double, Float_double>(
+            ip, out, lhs, rhs, "db");
     } else {
         throw abort_execution{
             ip, "unsupported operand types for arithmetic operation"};
@@ -424,16 +447,20 @@ auto execute(MOD const op, Stack& stack, ip_type const ip) -> void
     using viua::vm::types::Signed_integer;
     using viua::vm::types::Unsigned_integer;
 
-    auto const holds_i64 = (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
-    auto const holds_u64 = (lhs.template holds<uint64_t>() or lhs.template holds<Unsigned_integer>());
+    auto const holds_i64 =
+        (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
+    auto const holds_u64 = (lhs.template holds<uint64_t>()
+                            or lhs.template holds<Unsigned_integer>());
 
     if (holds_i64) {
-        store_impl<Signed_integer>(ip, out, (cast_to<int64_t>(lhs) % cast_to<int64_t>(rhs)), "i64");
+        store_impl<Signed_integer>(
+            ip, out, (cast_to<int64_t>(lhs) % cast_to<int64_t>(rhs)), "i64");
     } else if (holds_u64) {
-        store_impl<Unsigned_integer>(ip, out, (cast_to<uint64_t>(lhs) % cast_to<uint64_t>(rhs)), "u64");
+        store_impl<Unsigned_integer>(
+            ip, out, (cast_to<uint64_t>(lhs) % cast_to<uint64_t>(rhs)), "u64");
     } else {
-        throw abort_execution{
-            ip, "unsupported operand types for modulo operation"};
+        throw abort_execution{ip,
+                              "unsupported operand types for modulo operation"};
     }
 }
 
@@ -1515,10 +1542,10 @@ auto execute(ACTOR const op, Stack& stack, ip_type const ip) -> void
         throw abort_execution{ip, "invalid IP after call"};
     }
 
-    auto const fr_entry  = (fn_addr / sizeof(viua::arch::instruction_type));
+    auto const fr_entry = (fn_addr / sizeof(viua::arch::instruction_type));
 
-    auto const pid = stack.proc.core->spawn("", fr_entry);
-    auto dst = get_slot(op.instruction.out, stack, ip);
+    auto const pid     = stack.proc.core->spawn("", fr_entry);
+    auto dst           = get_slot(op.instruction.out, stack, ip);
     dst.value()->value = std::make_unique<viua::vm::types::PID>(pid);
 }
 auto execute(SELF const op, Stack& stack, ip_type const) -> void
@@ -1607,28 +1634,26 @@ auto dump_registers(std::vector<Value> const& registers,
 auto execute(EBREAK const, Stack& stack, ip_type const) -> void
 {
     viua::TRACE_STREAM << "begin ebreak in process "
-                       << stack.proc.pid.to_string()
-                       << viua::TRACE_STREAM.endl;
+                       << stack.proc.pid.to_string() << viua::TRACE_STREAM.endl;
 
     viua::TRACE_STREAM << "  backtrace:" << viua::TRACE_STREAM.endl;
     for (auto i = size_t{0}; i < stack.frames.size(); ++i) {
         auto const& each = stack.frames.at(i);
 
-        viua::TRACE_STREAM << "    #" << i << "  " << stack.proc.module.elf_path.native()
-                           << "[.text+0x" << std::hex << std::setw(8)
-                           << std::setfill('0')
+        viua::TRACE_STREAM << "    #" << i << "  "
+                           << stack.proc.module.elf_path.native() << "[.text+0x"
+                           << std::hex << std::setw(8) << std::setfill('0')
                            << ((each.entry_address - stack.proc.module.ip_base)
                                * sizeof(viua::arch::instruction_type))
-                           << std::dec
-                           << ']';
+                           << std::dec << ']';
         viua::TRACE_STREAM << " return to ";
         if (each.return_address) {
-            viua::TRACE_STREAM << stack.proc.module.elf_path.native()
-                               << "[.text+0x" << std::hex << std::setw(8)
-                               << std::setfill('0')
-                               << ((each.return_address - stack.proc.module.ip_base)
-                                   * sizeof(viua::arch::instruction_type))
-                               << std::dec << ']';
+            viua::TRACE_STREAM
+                << stack.proc.module.elf_path.native() << "[.text+0x"
+                << std::hex << std::setw(8) << std::setfill('0')
+                << ((each.return_address - stack.proc.module.ip_base)
+                    * sizeof(viua::arch::instruction_type))
+                << std::dec << ']';
         } else {
             viua::TRACE_STREAM << "null";
         }
@@ -1646,8 +1671,7 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
     }
     dump_registers(stack.args, "a");
 
-    viua::TRACE_STREAM << "end ebreak in process "
-                       << stack.proc.pid.to_string()
+    viua::TRACE_STREAM << "end ebreak in process " << stack.proc.pid.to_string()
                        << viua::TRACE_STREAM.endl;
 }
 }  // namespace viua::vm::ins

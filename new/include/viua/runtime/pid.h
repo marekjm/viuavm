@@ -20,9 +20,9 @@
 #ifndef VIUA_PID_H
 #define VIUA_PID_H
 
+#include <netinet/in.h>
 #include <stdint.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
 
 #include <string>
 
@@ -46,8 +46,8 @@ struct PID {
 };
 
 class Pid_emitter {
-    in6_addr base {};
-    uint64_t counter {};
+    in6_addr base{};
+    uint64_t counter{};
 
   public:
     Pid_emitter();

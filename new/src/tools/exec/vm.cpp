@@ -409,8 +409,7 @@ auto run(viua::vm::Process& proc) -> bool
                            << ((proc.stack.ip - proc.module.ip_base)
                                * sizeof(viua::arch::instruction_type))
                            << std::dec << "] in process "
-                           << proc.pid.to_string()
-                           << viua::TRACE_STREAM.endl;
+                           << proc.pid.to_string() << viua::TRACE_STREAM.endl;
     }
 
     constexpr auto PREEMPTION_THRESHOLD = size_t{2};
@@ -437,7 +436,8 @@ auto run(viua::vm::Process& proc) -> bool
     }
 
     if (proc.stack.frames.empty()) {
-        std::cerr << "[vm:sched:proc] process " << proc.pid.to_string() << " has empty stack\n";
+        std::cerr << "[vm:sched:proc] process " << proc.pid.to_string()
+                  << " has empty stack\n";
         return false;
     }
     if (not ip_ok()) {
@@ -472,8 +472,9 @@ auto run(viua::vm::Core& core) -> void
         if (state) {
             core.push_ready(std::move(proc));
         } else {
-            viua::TRACE_STREAM << "[vm:sched:proc] process " << proc->pid.to_string()
-                << " exited" << viua::TRACE_STREAM.endl;
+            viua::TRACE_STREAM << "[vm:sched:proc] process "
+                               << proc->pid.to_string() << " exited"
+                               << viua::TRACE_STREAM.endl;
         }
     }
 
@@ -649,7 +650,7 @@ auto main(int argc, char* argv[]) -> int
 
     auto core = viua::vm::Core{};
     core.modules.emplace("", viua::vm::Module{elf_path, main_module});
-    auto const main_pid[[maybe_unused]] = core.spawn("", entry_addr);
+    auto const main_pid [[maybe_unused]] = core.spawn("", entry_addr);
 
     if constexpr (VIUA_TRACE_CYCLES) {
         if (auto trace_fd = getenv("VIUA_VM_TRACE_FD"); trace_fd) {
