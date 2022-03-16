@@ -466,28 +466,34 @@ auto execute(MOD const op, Stack& stack, ip_type const ip) -> void
 
 auto execute(BITSHL const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_slot(op.instruction.out, stack, ip);
+    auto out = get_proxy(stack, op.instruction.out, ip);
     auto lhs = get_value(stack, op.instruction.lhs, ip);
     auto rhs = get_value(stack, op.instruction.rhs, ip);
 
-    *out.value() = (lhs.get<uint64_t>() << rhs.get<uint64_t>());
+    using viua::vm::types::Unsigned_integer;
+    store_impl<Unsigned_integer>(
+        ip, out, (lhs.get<uint64_t>() << rhs.get<uint64_t>()), "u64");
 }
 auto execute(BITSHR const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_slot(op.instruction.out, stack, ip);
+    auto out = get_proxy(stack, op.instruction.out, ip);
     auto lhs = get_value(stack, op.instruction.lhs, ip);
     auto rhs = get_value(stack, op.instruction.rhs, ip);
 
-    *out.value() = (lhs.get<uint64_t>() >> rhs.get<uint64_t>());
+    using viua::vm::types::Unsigned_integer;
+    store_impl<Unsigned_integer>(
+        ip, out, (lhs.get<uint64_t>() >> rhs.get<uint64_t>()), "u64");
 }
 auto execute(BITASHR const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_slot(op.instruction.out, stack, ip);
+    auto out = get_proxy(stack, op.instruction.out, ip);
     auto lhs = get_value(stack, op.instruction.lhs, ip);
     auto rhs = get_value(stack, op.instruction.rhs, ip);
 
+    using viua::vm::types::Unsigned_integer;
     auto const tmp = static_cast<int64_t>(lhs.get<uint64_t>());
-    *out.value()   = static_cast<uint64_t>(tmp >> rhs.get<uint64_t>());
+    store_impl<Unsigned_integer>(
+        ip, out, static_cast<uint64_t>(tmp >> rhs.get<uint64_t>()), "u64");
 }
 auto execute(BITROL const, Stack&, ip_type const) -> void
 {}
@@ -495,35 +501,41 @@ auto execute(BITROR const, Stack&, ip_type const) -> void
 {}
 auto execute(BITAND const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_slot(op.instruction.out, stack, ip);
+    auto out = get_proxy(stack, op.instruction.out, ip);
     auto lhs = get_value(stack, op.instruction.lhs, ip);
     auto rhs = get_value(stack, op.instruction.rhs, ip);
 
-    *out.value() = (lhs.get<uint64_t>() & rhs.get<uint64_t>());
+    using viua::vm::types::Unsigned_integer;
+    store_impl<Unsigned_integer>(
+        ip, out, (lhs.get<uint64_t>() & rhs.get<uint64_t>()), "u64");
 }
 auto execute(BITOR const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_slot(op.instruction.out, stack, ip);
+    auto out = get_proxy(stack, op.instruction.out, ip);
     auto lhs = get_value(stack, op.instruction.lhs, ip);
     auto rhs = get_value(stack, op.instruction.rhs, ip);
 
-    *out.value() = (lhs.get<uint64_t>() | rhs.get<uint64_t>());
+    using viua::vm::types::Unsigned_integer;
+    store_impl<Unsigned_integer>(
+        ip, out, (lhs.get<uint64_t>() | rhs.get<uint64_t>()), "u64");
 }
 auto execute(BITXOR const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_slot(op.instruction.out, stack, ip);
+    auto out = get_proxy(stack, op.instruction.out, ip);
     auto lhs = get_value(stack, op.instruction.lhs, ip);
     auto rhs = get_value(stack, op.instruction.rhs, ip);
 
-    *out.value() = (lhs.get<uint64_t>() ^ rhs.get<uint64_t>());
+    using viua::vm::types::Unsigned_integer;
+    store_impl<Unsigned_integer>(
+        ip, out, (lhs.get<uint64_t>() ^ rhs.get<uint64_t>()), "u64");
 }
-auto execute(BITNOT const op, Stack& stack, ip_type const) -> void
+auto execute(BITNOT const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto& out       = registers.at(op.instruction.out.index);
-    auto& in        = registers.at(op.instruction.in.index);
+    auto out = get_proxy(stack, op.instruction.out, ip);
+    auto in  = get_value(stack, op.instruction.in, ip);
 
-    out.value = ~in.value.get<uint64_t>();
+    using viua::vm::types::Unsigned_integer;
+    store_impl<Unsigned_integer>(ip, out, ~in.get<uint64_t>(), "u64");
 }
 
 auto execute(EQ const op, Stack& stack, ip_type const ip) -> void
