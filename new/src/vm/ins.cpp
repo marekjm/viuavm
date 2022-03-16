@@ -547,41 +547,33 @@ auto execute(EQ const op, Stack& stack, ip_type const ip) -> void
     using viua::vm::types::traits::Eq;
     auto cmp_result = std::partial_ordering::unordered;
 
-    using viua::vm::types::Atom;
     using viua::vm::types::Float_double;
     using viua::vm::types::Float_single;
     using viua::vm::types::Signed_integer;
-    using viua::vm::types::String;
     using viua::vm::types::Unsigned_integer;
-    if (lhs.holds<int64_t>()) {
-        auto const l = lhs.get<int64_t>();
-        auto const r = cast_to<int64_t>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<uint64_t>()) {
-        auto const l = lhs.get<uint64_t>();
-        auto const r = cast_to<uint64_t>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<float>()) {
-        auto const l = lhs.get<float>();
-        auto const r = cast_to<float>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<double>()) {
-        auto const l = lhs.get<double>();
-        auto const r = cast_to<double>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<Signed_integer>()) {
+
+    auto const holds_i64 =
+        (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
+    auto const holds_u64 = (lhs.template holds<uint64_t>()
+                            or lhs.template holds<Unsigned_integer>());
+    auto const holds_f32 =
+        (lhs.template holds<float>() or lhs.template holds<Float_single>());
+    auto const holds_f64 =
+        (lhs.template holds<double>() or lhs.template holds<Float_double>());
+
+    if (holds_i64) {
         auto const l = cast_to<int64_t>(lhs);
         auto const r = cast_to<int64_t>(rhs);
         cmp_result   = (l <=> r);
-    } else if (lhs.holds<Unsigned_integer>()) {
+    } else if (holds_u64) {
         auto const l = cast_to<uint64_t>(lhs);
         auto const r = cast_to<uint64_t>(rhs);
         cmp_result   = (l <=> r);
-    } else if (lhs.holds<Float_single>()) {
+    } else if (holds_f32) {
         auto const l = cast_to<float>(lhs);
         auto const r = cast_to<float>(rhs);
         cmp_result   = (l <=> r);
-    } else if (lhs.holds<Float_double>()) {
+    } else if (holds_f64) {
         auto const l = cast_to<double>(lhs);
         auto const r = cast_to<double>(rhs);
         cmp_result   = (l <=> r);
@@ -610,41 +602,33 @@ auto execute(LT const op, Stack& stack, ip_type const ip) -> void
     using viua::vm::types::traits::Cmp;
     auto cmp_result = std::partial_ordering::unordered;
 
-    using viua::vm::types::Atom;
     using viua::vm::types::Float_double;
     using viua::vm::types::Float_single;
     using viua::vm::types::Signed_integer;
-    using viua::vm::types::String;
     using viua::vm::types::Unsigned_integer;
-    if (lhs.holds<int64_t>()) {
-        auto const l = lhs.get<int64_t>();
-        auto const r = cast_to<int64_t>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<uint64_t>()) {
-        auto const l = lhs.get<uint64_t>();
-        auto const r = cast_to<uint64_t>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<float>()) {
-        auto const l = lhs.get<float>();
-        auto const r = cast_to<float>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<double>()) {
-        auto const l = lhs.get<double>();
-        auto const r = cast_to<double>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<Signed_integer>()) {
+
+    auto const holds_i64 =
+        (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
+    auto const holds_u64 = (lhs.template holds<uint64_t>()
+                            or lhs.template holds<Unsigned_integer>());
+    auto const holds_f32 =
+        (lhs.template holds<float>() or lhs.template holds<Float_single>());
+    auto const holds_f64 =
+        (lhs.template holds<double>() or lhs.template holds<Float_double>());
+
+    if (holds_i64) {
         auto const l = cast_to<int64_t>(lhs);
         auto const r = cast_to<int64_t>(rhs);
         cmp_result   = (l <=> r);
-    } else if (lhs.holds<Unsigned_integer>()) {
+    } else if (holds_u64) {
         auto const l = cast_to<uint64_t>(lhs);
         auto const r = cast_to<uint64_t>(rhs);
         cmp_result   = (l <=> r);
-    } else if (lhs.holds<Float_single>()) {
+    } else if (holds_f32) {
         auto const l = cast_to<float>(lhs);
         auto const r = cast_to<float>(rhs);
         cmp_result   = (l <=> r);
-    } else if (lhs.holds<Float_double>()) {
+    } else if (holds_f64) {
         auto const l = cast_to<double>(lhs);
         auto const r = cast_to<double>(rhs);
         cmp_result   = (l <=> r);
@@ -670,41 +654,33 @@ auto execute(GT const op, Stack& stack, ip_type const ip) -> void
     using viua::vm::types::traits::Cmp;
     auto cmp_result = std::partial_ordering::unordered;
 
-    using viua::vm::types::Atom;
     using viua::vm::types::Float_double;
     using viua::vm::types::Float_single;
     using viua::vm::types::Signed_integer;
-    using viua::vm::types::String;
     using viua::vm::types::Unsigned_integer;
-    if (lhs.holds<int64_t>()) {
-        auto const l = lhs.get<int64_t>();
-        auto const r = cast_to<int64_t>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<uint64_t>()) {
-        auto const l = lhs.get<uint64_t>();
-        auto const r = cast_to<uint64_t>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<float>()) {
-        auto const l = lhs.get<float>();
-        auto const r = cast_to<float>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<double>()) {
-        auto const l = lhs.get<double>();
-        auto const r = cast_to<double>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<Signed_integer>()) {
+
+    auto const holds_i64 =
+        (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
+    auto const holds_u64 = (lhs.template holds<uint64_t>()
+                            or lhs.template holds<Unsigned_integer>());
+    auto const holds_f32 =
+        (lhs.template holds<float>() or lhs.template holds<Float_single>());
+    auto const holds_f64 =
+        (lhs.template holds<double>() or lhs.template holds<Float_double>());
+
+    if (holds_i64) {
         auto const l = cast_to<int64_t>(lhs);
         auto const r = cast_to<int64_t>(rhs);
         cmp_result   = (l <=> r);
-    } else if (lhs.holds<Unsigned_integer>()) {
+    } else if (holds_u64) {
         auto const l = cast_to<uint64_t>(lhs);
         auto const r = cast_to<uint64_t>(rhs);
         cmp_result   = (l <=> r);
-    } else if (lhs.holds<Float_single>()) {
+    } else if (holds_f32) {
         auto const l = cast_to<float>(lhs);
         auto const r = cast_to<float>(rhs);
         cmp_result   = (l <=> r);
-    } else if (lhs.holds<Float_double>()) {
+    } else if (holds_f64) {
         auto const l = cast_to<double>(lhs);
         auto const r = cast_to<double>(rhs);
         cmp_result   = (l <=> r);
@@ -730,41 +706,33 @@ auto execute(CMP const op, Stack& stack, ip_type const ip) -> void
     using viua::vm::types::traits::Cmp;
     auto cmp_result = std::partial_ordering::unordered;
 
-    using viua::vm::types::Atom;
     using viua::vm::types::Float_double;
     using viua::vm::types::Float_single;
     using viua::vm::types::Signed_integer;
-    using viua::vm::types::String;
     using viua::vm::types::Unsigned_integer;
-    if (lhs.holds<int64_t>()) {
-        auto const l = lhs.get<int64_t>();
-        auto const r = cast_to<int64_t>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<uint64_t>()) {
-        auto const l = lhs.get<uint64_t>();
-        auto const r = cast_to<uint64_t>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<float>()) {
-        auto const l = lhs.get<float>();
-        auto const r = cast_to<float>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<double>()) {
-        auto const l = lhs.get<double>();
-        auto const r = cast_to<double>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<Signed_integer>()) {
+
+    auto const holds_i64 =
+        (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
+    auto const holds_u64 = (lhs.template holds<uint64_t>()
+                            or lhs.template holds<Unsigned_integer>());
+    auto const holds_f32 =
+        (lhs.template holds<float>() or lhs.template holds<Float_single>());
+    auto const holds_f64 =
+        (lhs.template holds<double>() or lhs.template holds<Float_double>());
+
+    if (holds_i64) {
         auto const l = cast_to<int64_t>(lhs);
         auto const r = cast_to<int64_t>(rhs);
         cmp_result   = (l <=> r);
-    } else if (lhs.holds<Unsigned_integer>()) {
+    } else if (holds_u64) {
         auto const l = cast_to<uint64_t>(lhs);
         auto const r = cast_to<uint64_t>(rhs);
         cmp_result   = (l <=> r);
-    } else if (lhs.holds<Float_single>()) {
+    } else if (holds_f32) {
         auto const l = cast_to<float>(lhs);
         auto const r = cast_to<float>(rhs);
         cmp_result   = (l <=> r);
-    } else if (lhs.holds<Float_double>()) {
+    } else if (holds_f64) {
         auto const l = cast_to<double>(lhs);
         auto const r = cast_to<double>(rhs);
         cmp_result   = (l <=> r);
