@@ -138,6 +138,11 @@ struct Cell_view {
             return {};
         }
     }
+
+    auto is_boxed() const -> bool
+    {
+        return holds<std::reference_wrapper<boxed_type>>();
+    }
 };
 
 struct Cell {
