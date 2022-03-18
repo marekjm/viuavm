@@ -754,68 +754,92 @@ auto execute(CMP const op, Stack& stack, ip_type const ip) -> void
     auto out = get_proxy(stack, op.instruction.out, ip);
     out      = (cmp_result < 0) ? -1 : (0 < cmp_result) ? 1 : 0;
 }
-auto execute(AND const op, Stack& stack, ip_type const) -> void
+auto execute(AND const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto& out       = registers.at(op.instruction.out.index);
-    auto& lhs       = registers.at(op.instruction.lhs.index);
-    auto& rhs       = registers.at(op.instruction.rhs.index);
+    auto out = get_proxy(stack, op.instruction.out, ip);
+    auto lhs = get_value(stack, op.instruction.lhs, ip);
+    auto rhs = get_value(stack, op.instruction.rhs, ip);
 
     using viua::vm::types::traits::Bool;
-    if (lhs.is_boxed() and not lhs.boxed_value().has_trait<Bool>()) {
+    if (lhs.is_boxed() and not lhs.boxed_of<Bool>().has_value()) {
         throw abort_execution{
-            nullptr, "and: cannot used boxed value without Bool trait"};
+            nullptr, "and: lhs without Bool trait"};
+    }
+    if (rhs.is_boxed() and not rhs.boxed_of<Bool>().has_value()) {
+        throw abort_execution{
+            nullptr, "and: rhs without Bool trait"};
     }
 
-    if (lhs.is_boxed()) {
+    auto const l = (lhs.boxed_of<Bool>().has_value()
+        ? static_cast<bool>(lhs.boxed_of<Bool>().value().get())
+        : cast_to<bool>(lhs));
+    auto const r = (rhs.boxed_of<Bool>().has_value()
+        ? static_cast<bool>(rhs.boxed_of<Bool>().value().get())
+        : cast_to<uint64_t>(rhs));
+
+    using viua::vm::types::Unsigned_integer;
+    store_impl<Unsigned_integer>(ip, out, static_cast<uint64_t>(l and r), "u64");
+
+    /*
+     * This is the old implementation which was moving the operand that
+     * determined the value of the expression into the output register.
+     * I think this still may be desirable behaviour, but maybe the instruction
+     * can be named differently eg, andmove, to send a stronger signal that it
+     * is not a simple logical op.
+     *
+    if (auto l = lhs.boxed_of<Bool>(); l.has_value()) {
+        auto const use_lhs = static_cast<bool>(l.value().get());
         auto const use_lhs = not lhs.boxed_value().as_trait<Bool, bool>(
             [](Bool const& v) -> bool { return static_cast<bool>(v); }, false);
-        out = use_lhs ? std::move(lhs) : std::move(rhs);
     } else {
-        auto const use_lhs = (lhs.value.get<uint64_t>() == 0);
+        auto const use_lhs = (cast_to<uint64_t>(lhs) == 0);
         out                = use_lhs ? std::move(lhs) : std::move(rhs);
     }
+    */
 }
-auto execute(OR const op, Stack& stack, ip_type const) -> void
+auto execute(OR const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto& out       = registers.at(op.instruction.out.index);
-    auto& lhs       = registers.at(op.instruction.lhs.index);
-    auto& rhs       = registers.at(op.instruction.rhs.index);
+    auto out = get_proxy(stack, op.instruction.out, ip);
+    auto lhs = get_value(stack, op.instruction.lhs, ip);
+    auto rhs = get_value(stack, op.instruction.rhs, ip);
 
     using viua::vm::types::traits::Bool;
-    if (lhs.is_boxed() and not lhs.boxed_value().has_trait<Bool>()) {
-        throw abort_execution{nullptr,
-                              "or: cannot used boxed value without Bool trait"};
-    }
-
-    if (lhs.is_boxed()) {
-        auto const use_lhs = lhs.boxed_value().as_trait<Bool, bool>(
-            [](Bool const& v) -> bool { return static_cast<bool>(v); }, false);
-        out = use_lhs ? std::move(lhs) : std::move(rhs);
-    } else {
-        auto const use_lhs = (lhs.value.get<uint64_t>() != 0);
-        out                = use_lhs ? std::move(lhs) : std::move(rhs);
-    }
-}
-auto execute(NOT const op, Stack& stack, ip_type const) -> void
-{
-    auto& registers = stack.frames.back().registers;
-    auto& out       = registers.at(op.instruction.out.index);
-    auto& in        = registers.at(op.instruction.in.index);
-
-    using viua::vm::types::traits::Bool;
-    if (in.is_boxed() and not in.boxed_value().has_trait<Bool>()) {
+    if (lhs.is_boxed() and not lhs.boxed_of<Bool>().has_value()) {
         throw abort_execution{
-            nullptr, "not: cannot used boxed value without Bool trait"};
+            nullptr, "or: lhs without Bool trait"};
+    }
+    if (rhs.is_boxed() and not rhs.boxed_of<Bool>().has_value()) {
+        throw abort_execution{
+            nullptr, "or: rhs without Bool trait"};
     }
 
-    if (in.is_boxed()) {
-        out = in.boxed_value().as_trait<Bool, bool>(
-            [](Bool const& v) -> bool { return static_cast<bool>(v); }, false);
-    } else {
-        out = static_cast<bool>(in.value.get<uint64_t>());
+    auto const l = (lhs.boxed_of<Bool>().has_value()
+        ? static_cast<bool>(lhs.boxed_of<Bool>().value().get())
+        : cast_to<uint64_t>(lhs));
+    auto const r = (rhs.boxed_of<Bool>().has_value()
+        ? static_cast<bool>(rhs.boxed_of<Bool>().value().get())
+        : cast_to<uint64_t>(rhs));
+
+    using viua::vm::types::Unsigned_integer;
+    store_impl<Unsigned_integer>(ip, out, static_cast<uint64_t>(l or r), "u64");
+}
+auto execute(NOT const op, Stack& stack, ip_type const ip) -> void
+{
+    auto out = get_proxy(stack, op.instruction.out, ip);
+    auto in = get_value(stack, op.instruction.in, ip);
+
+    using viua::vm::types::traits::Bool;
+    if (in.is_boxed() and not in.boxed_of<Bool>().has_value()) {
+        throw abort_execution{
+            nullptr, "not: input without Bool trait"};
     }
+
+    auto const i = (in.boxed_of<Bool>().has_value()
+        ? static_cast<bool>(in.boxed_of<Bool>().value().get())
+        : cast_to<uint64_t>(in));
+
+    using viua::vm::types::Unsigned_integer;
+    store_impl<Unsigned_integer>(ip, out, static_cast<uint64_t>(i), "u64");
 }
 
 auto execute(COPY const op, Stack& stack, ip_type const) -> void
