@@ -269,6 +269,10 @@ template<typename T> auto cast_to(viua::vm::types::Cell_view value) -> T
 
     throw std::bad_cast{};
 }
+template<> auto cast_to<bool>(viua::vm::types::Cell_view value) -> bool
+{
+    return static_cast<bool>(cast_to<uint64_t>(value));
+}
 
 template<typename Boxed, typename T>
 auto store_impl(ip_type const ip,
