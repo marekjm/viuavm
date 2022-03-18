@@ -1432,7 +1432,7 @@ auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
     auto tt              = get_proxy(stack, op.instruction.in, ip);
 
     auto take_branch =
-        (condition.holds<void>() or cast_to<uint64_t>(condition));
+        (condition.holds<void>() or cast_to<bool>(condition));
     auto const target =
         take_branch
             ? (stack.back().entry_address + cast_to<uint64_t>(tt.view()))
