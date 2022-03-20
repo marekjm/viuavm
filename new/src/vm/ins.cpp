@@ -905,13 +905,12 @@ auto execute(SWAP const op, Stack& stack, ip_type const) -> void
     std::swap(lhs.value, rhs.value);
 }
 
-auto execute(ATOM const op, Stack& stack, ip_type const) -> void
+auto execute(ATOM const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto& target    = registers.at(op.instruction.out.index);
+    auto target = get_proxy(stack, op.instruction.out, ip);
 
     auto const& mod        = stack.proc.module;
-    auto const data_offset = target.value.get<uint64_t>();
+    auto const data_offset = cast_to<uint64_t>(target.view());
     auto const data_size   = [&mod, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
@@ -924,15 +923,14 @@ auto execute(ATOM const op, Stack& stack, ip_type const) -> void
         reinterpret_cast<char const*>(&mod.strings_table[0] + data_offset),
         data_size};
 
-    target.value = std::move(s);
+    target = std::move(s);
 }
-auto execute(STRING const op, Stack& stack, ip_type const) -> void
+auto execute(STRING const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto& target    = registers.at(op.instruction.out.index);
+    auto target = get_proxy(stack, op.instruction.out, ip);
 
     auto const& mod        = stack.proc.module;
-    auto const data_offset = target.value.get<uint64_t>();
+    auto const data_offset = cast_to<uint64_t>(target.view());
     auto const data_size   = [&mod, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
@@ -945,7 +943,7 @@ auto execute(STRING const op, Stack& stack, ip_type const) -> void
         reinterpret_cast<char const*>(&mod.strings_table[0] + data_offset),
         data_size};
 
-    target.value = std::move(s);
+    target = std::move(s);
 }
 
 auto execute(FRAME const op, Stack& stack, ip_type const ip) -> void
