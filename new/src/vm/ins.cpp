@@ -842,29 +842,45 @@ auto execute(NOT const op, Stack& stack, ip_type const ip) -> void
     store_impl<Unsigned_integer>(ip, out, static_cast<uint64_t>(i), "u64");
 }
 
-auto execute(COPY const op, Stack& stack, ip_type const) -> void
+auto execute(COPY const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto& in        = registers.at(op.instruction.in.index);
-    auto& out       = registers.at(op.instruction.out.index);
+    auto out = get_proxy(stack, op.instruction.out, ip);
+    auto in = get_value(stack, op.instruction.in, ip);
 
     using viua::vm::types::traits::Copy;
-    if (in.is_boxed() and not in.boxed_value().has_trait<Copy>()) {
+    if (in.is_boxed() and not in.boxed_of<Copy>().has_value()) {
         throw abort_execution{nullptr,
-                              "value of type " + in.boxed_value().type_name()
-                                  + " is not copyable"};
+                              "boxed value without Copy trait"};
     }
 
-    if (in.holds<int64_t>()) {
-        out = in.value.get<int64_t>();
-    } else if (in.holds<uint64_t>()) {
-        out = in.value.get<uint64_t>();
-    } else if (in.holds<float>()) {
-        out = in.value.get<float>();
-    } else if (in.holds<double>()) {
-        out = in.value.get<double>();
+    using viua::vm::types::Float_double;
+    using viua::vm::types::Float_single;
+    using viua::vm::types::Signed_integer;
+    using viua::vm::types::Unsigned_integer;
+
+    auto const holds_i64 =
+        (in.template holds<int64_t>() or in.template holds<Signed_integer>());
+    auto const holds_u64 = (in.template holds<uint64_t>()
+                            or in.template holds<Unsigned_integer>());
+    auto const holds_f32 =
+        (in.template holds<float>() or in.template holds<Float_single>());
+    auto const holds_f64 =
+        (in.template holds<double>() or in.template holds<Float_double>());
+
+    if (holds_i64) {
+        store_impl<Signed_integer>(ip, out, cast_to<int64_t>(in), "i64");
+    } else if (holds_u64) {
+        store_impl<Unsigned_integer>(ip, out, cast_to<uint64_t>(in), "u64");
+    } else if (holds_f32) {
+        store_impl<Float_single>(ip, out, cast_to<float>(in), "fl");
+    } else if (holds_f64) {
+        store_impl<Float_double>(ip, out, cast_to<double>(in), "db");
+    } else if (not out.hard()) {
+        throw abort_execution{ip,
+                  "FIXME: storing copies of boxed values through references"};
     } else {
-        out.value = in.boxed_value().as_trait<Copy>().copy();
+        auto const& copier = in.boxed_of<Copy>()->get();
+        out = copier.copy();
     }
 }
 auto execute(MOVE const op, Stack& stack, ip_type const ip) -> void
