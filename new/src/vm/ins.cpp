@@ -952,14 +952,17 @@ auto execute(FRAME const op, Stack& stack, ip_type const ip) -> void
     auto const rs    = op.instruction.out.set;
 
     auto capacity = viua::arch::register_index_type{};
-    if (rs == viua::arch::RS::LOCAL) {
-        capacity = static_cast<viua::arch::register_index_type>(
-            stack.back().registers.at(index).value.get<uint64_t>());
-    } else if (rs == viua::arch::RS::ARGUMENT) {
-        capacity = index;
-    } else {
-        throw abort_execution{
-            ip, "args count must come from local or argument register set"};
+    switch (rs) {
+        case viua::arch::RS::LOCAL:
+            capacity = static_cast<viua::arch::register_index_type>(
+                cast_to<uint64_t>(get_value(stack, op.instruction.out, ip)));
+            break;
+        case viua::arch::RS::ARGUMENT:
+            capacity = index;
+            break;
+        default:
+            throw abort_execution{
+                ip, "args count must come from local or argument register set"};
     }
 
     stack.args = std::vector<Value>(capacity);
