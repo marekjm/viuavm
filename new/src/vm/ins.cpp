@@ -1005,9 +1005,21 @@ auto execute(RETURN const op, Stack& stack, ip_type const ip) -> ip_type
             throw abort_execution{
                 ip, "return value requested from function returning void"};
         }
-        auto const index = op.instruction.out.index;
-        stack.frames.back().registers.at(rt.index) =
-            std::move(fr.registers.at(index));
+
+        auto out = get_proxy(stack, rt, ip);
+        if (not out.hard()) {
+            throw abort_execution{
+                ip, "return operand must be direct register access"};
+        }
+
+        // FIXME detect trying to return a dereference and throw an exception.
+        // The following code is invalid and should be rejected:
+        //
+        //      return *1
+        //
+        // It would be best if the static analysis phase during assembly caught
+        // such errors and refused to produce the ELF output.
+        out = std::move(fr.registers.at(op.instruction.out.index));
     }
 
     return fr.return_address;
