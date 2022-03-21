@@ -2,3 +2,6 @@
 	path = lib/linenoise
 	url = https://github.com/marekjm/linenoise.git
 	branch = devel
+[submodule "new/3rd-party/linenoise"]
+	path = new/3rd-party/linenoise
+	url = https://github.com/yhirose/linenoise
