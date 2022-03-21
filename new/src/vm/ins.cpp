@@ -762,23 +762,22 @@ auto execute(AND const op, Stack& stack, ip_type const ip) -> void
 
     using viua::vm::types::traits::Bool;
     if (lhs.is_boxed() and not lhs.boxed_of<Bool>().has_value()) {
-        throw abort_execution{
-            nullptr, "and: lhs without Bool trait"};
+        throw abort_execution{nullptr, "and: lhs without Bool trait"};
     }
     if (rhs.is_boxed() and not rhs.boxed_of<Bool>().has_value()) {
-        throw abort_execution{
-            nullptr, "and: rhs without Bool trait"};
+        throw abort_execution{nullptr, "and: rhs without Bool trait"};
     }
 
     auto const l = (lhs.boxed_of<Bool>().has_value()
-        ? static_cast<bool>(lhs.boxed_of<Bool>().value().get())
-        : cast_to<bool>(lhs));
+                        ? static_cast<bool>(lhs.boxed_of<Bool>().value().get())
+                        : cast_to<bool>(lhs));
     auto const r = (rhs.boxed_of<Bool>().has_value()
-        ? static_cast<bool>(rhs.boxed_of<Bool>().value().get())
-        : cast_to<uint64_t>(rhs));
+                        ? static_cast<bool>(rhs.boxed_of<Bool>().value().get())
+                        : cast_to<uint64_t>(rhs));
 
     using viua::vm::types::Unsigned_integer;
-    store_impl<Unsigned_integer>(ip, out, static_cast<uint64_t>(l and r), "u64");
+    store_impl<Unsigned_integer>(
+        ip, out, static_cast<uint64_t>(l and r), "u64");
 
     /*
      * This is the old implementation which was moving the operand that
@@ -805,20 +804,18 @@ auto execute(OR const op, Stack& stack, ip_type const ip) -> void
 
     using viua::vm::types::traits::Bool;
     if (lhs.is_boxed() and not lhs.boxed_of<Bool>().has_value()) {
-        throw abort_execution{
-            nullptr, "or: lhs without Bool trait"};
+        throw abort_execution{nullptr, "or: lhs without Bool trait"};
     }
     if (rhs.is_boxed() and not rhs.boxed_of<Bool>().has_value()) {
-        throw abort_execution{
-            nullptr, "or: rhs without Bool trait"};
+        throw abort_execution{nullptr, "or: rhs without Bool trait"};
     }
 
     auto const l = (lhs.boxed_of<Bool>().has_value()
-        ? static_cast<bool>(lhs.boxed_of<Bool>().value().get())
-        : cast_to<uint64_t>(lhs));
+                        ? static_cast<bool>(lhs.boxed_of<Bool>().value().get())
+                        : cast_to<uint64_t>(lhs));
     auto const r = (rhs.boxed_of<Bool>().has_value()
-        ? static_cast<bool>(rhs.boxed_of<Bool>().value().get())
-        : cast_to<uint64_t>(rhs));
+                        ? static_cast<bool>(rhs.boxed_of<Bool>().value().get())
+                        : cast_to<uint64_t>(rhs));
 
     using viua::vm::types::Unsigned_integer;
     store_impl<Unsigned_integer>(ip, out, static_cast<uint64_t>(l or r), "u64");
@@ -826,17 +823,16 @@ auto execute(OR const op, Stack& stack, ip_type const ip) -> void
 auto execute(NOT const op, Stack& stack, ip_type const ip) -> void
 {
     auto out = get_proxy(stack, op.instruction.out, ip);
-    auto in = get_value(stack, op.instruction.in, ip);
+    auto in  = get_value(stack, op.instruction.in, ip);
 
     using viua::vm::types::traits::Bool;
     if (in.is_boxed() and not in.boxed_of<Bool>().has_value()) {
-        throw abort_execution{
-            nullptr, "not: input without Bool trait"};
+        throw abort_execution{nullptr, "not: input without Bool trait"};
     }
 
     auto const i = (in.boxed_of<Bool>().has_value()
-        ? static_cast<bool>(in.boxed_of<Bool>().value().get())
-        : cast_to<uint64_t>(in));
+                        ? static_cast<bool>(in.boxed_of<Bool>().value().get())
+                        : cast_to<uint64_t>(in));
 
     using viua::vm::types::Unsigned_integer;
     store_impl<Unsigned_integer>(ip, out, static_cast<uint64_t>(i), "u64");
@@ -845,12 +841,11 @@ auto execute(NOT const op, Stack& stack, ip_type const ip) -> void
 auto execute(COPY const op, Stack& stack, ip_type const ip) -> void
 {
     auto out = get_proxy(stack, op.instruction.out, ip);
-    auto in = get_value(stack, op.instruction.in, ip);
+    auto in  = get_value(stack, op.instruction.in, ip);
 
     using viua::vm::types::traits::Copy;
     if (in.is_boxed() and not in.boxed_of<Copy>().has_value()) {
-        throw abort_execution{nullptr,
-                              "boxed value without Copy trait"};
+        throw abort_execution{nullptr, "boxed value without Copy trait"};
     }
 
     using viua::vm::types::Float_double;
@@ -876,11 +871,11 @@ auto execute(COPY const op, Stack& stack, ip_type const ip) -> void
     } else if (holds_f64) {
         store_impl<Float_double>(ip, out, cast_to<double>(in), "db");
     } else if (not out.hard()) {
-        throw abort_execution{ip,
-                  "FIXME: storing copies of boxed values through references"};
+        throw abort_execution{
+            ip, "FIXME: storing copies of boxed values through references"};
     } else {
         auto const& copier = in.boxed_of<Copy>()->get();
-        out = copier.copy();
+        out                = copier.copy();
     }
 }
 auto execute(MOVE const op, Stack& stack, ip_type const ip) -> void
@@ -953,16 +948,16 @@ auto execute(FRAME const op, Stack& stack, ip_type const ip) -> void
 
     auto capacity = viua::arch::register_index_type{};
     switch (rs) {
-        case viua::arch::RS::LOCAL:
-            capacity = static_cast<viua::arch::register_index_type>(
-                cast_to<uint64_t>(get_value(stack, op.instruction.out, ip)));
-            break;
-        case viua::arch::RS::ARGUMENT:
-            capacity = index;
-            break;
-        default:
-            throw abort_execution{
-                ip, "args count must come from local or argument register set"};
+    case viua::arch::RS::LOCAL:
+        capacity = static_cast<viua::arch::register_index_type>(
+            cast_to<uint64_t>(get_value(stack, op.instruction.out, ip)));
+        break;
+    case viua::arch::RS::ARGUMENT:
+        capacity = index;
+        break;
+    default:
+        throw abort_execution{
+            ip, "args count must come from local or argument register set"};
     }
 
     stack.args = std::vector<Value>(capacity);
@@ -1450,8 +1445,7 @@ auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
     auto const condition = get_value(stack, op.instruction.out, ip);
     auto tt              = get_proxy(stack, op.instruction.in, ip);
 
-    auto take_branch =
-        (condition.holds<void>() or cast_to<bool>(condition));
+    auto take_branch = (condition.holds<void>() or cast_to<bool>(condition));
     auto const target =
         take_branch
             ? (stack.back().entry_address + cast_to<uint64_t>(tt.view()))
