@@ -112,6 +112,11 @@ Work_instruction(IO_PEEK);
 
 Work_instruction(ACTOR);
 Work_instruction(SELF);
+
+constexpr auto VIUA_TRACE_CYCLES = true;
+auto execute(viua::vm::Stack&,
+             viua::arch::instruction_type const* const)
+    -> viua::arch::instruction_type const*;
 }  // namespace viua::vm::ins
 
 #endif

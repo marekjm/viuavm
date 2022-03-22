@@ -54,7 +54,6 @@
 #include <viua/vm/types.h>
 
 
-constexpr auto VIUA_TRACE_CYCLES = true;
 constexpr auto VIUA_SLOW_CYCLES  = false;
 
 namespace viua {
@@ -63,309 +62,13 @@ auto TRACE_STREAM = viua::support::fdstream{2};
 
 
 namespace {
-auto execute(viua::vm::Stack& stack,
-             viua::arch::instruction_type const* const ip)
-    -> viua::arch::instruction_type const*
-{
-    auto const raw = *ip;
-
-    auto const opcode = static_cast<viua::arch::opcode_type>(
-        raw & viua::arch::ops::OPCODE_MASK);
-    auto const format = static_cast<viua::arch::ops::FORMAT>(
-        opcode & viua::arch::ops::FORMAT_MASK);
-
-
-    switch (format) {
-        using viua::vm::ins::execute;
-        using namespace viua::arch::ins;
-        using enum viua::arch::ops::FORMAT;
-    case T:
-    {
-        auto instruction = viua::arch::ops::T::decode(raw);
-        if constexpr (VIUA_TRACE_CYCLES) {
-            viua::TRACE_STREAM << "    " << instruction.to_string()
-                               << viua::TRACE_STREAM.endl;
-        }
-
-        using viua::arch::ops::OPCODE_T;
-        switch (static_cast<OPCODE_T>(opcode)) {
-        case OPCODE_T::ADD:
-            execute(ADD{instruction}, stack, ip);
-            break;
-        case OPCODE_T::SUB:
-            execute(SUB{instruction}, stack, ip);
-            break;
-        case OPCODE_T::MUL:
-            execute(MUL{instruction}, stack, ip);
-            break;
-        case OPCODE_T::DIV:
-            execute(DIV{instruction}, stack, ip);
-            break;
-        case OPCODE_T::MOD:
-            execute(MOD{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BITSHL:
-            execute(BITSHL{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BITSHR:
-            execute(BITSHR{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BITASHR:
-            execute(BITASHR{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BITROL:
-            execute(BITROL{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BITROR:
-            execute(BITROR{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BITAND:
-            execute(BITAND{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BITOR:
-            execute(BITOR{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BITXOR:
-            execute(BITXOR{instruction}, stack, ip);
-            break;
-        case OPCODE_T::EQ:
-            execute(EQ{instruction}, stack, ip);
-            break;
-        case OPCODE_T::GT:
-            execute(GT{instruction}, stack, ip);
-            break;
-        case OPCODE_T::LT:
-            execute(LT{instruction}, stack, ip);
-            break;
-        case OPCODE_T::CMP:
-            execute(CMP{instruction}, stack, ip);
-            break;
-        case OPCODE_T::AND:
-            execute(AND{instruction}, stack, ip);
-            break;
-        case OPCODE_T::OR:
-            execute(OR{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BUFFER_AT:
-            execute(BUFFER_AT{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BUFFER_POP:
-            execute(BUFFER_POP{instruction}, stack, ip);
-            break;
-        case OPCODE_T::STRUCT_AT:
-            execute(STRUCT_AT{instruction}, stack, ip);
-            break;
-        case OPCODE_T::STRUCT_INSERT:
-            execute(STRUCT_INSERT{instruction}, stack, ip);
-            break;
-        case OPCODE_T::STRUCT_REMOVE:
-            execute(STRUCT_REMOVE{instruction}, stack, ip);
-            break;
-        case OPCODE_T::IO_SUBMIT:
-            execute(IO_SUBMIT{instruction}, stack, ip);
-            break;
-        case OPCODE_T::IO_WAIT:
-            execute(IO_WAIT{instruction}, stack, ip);
-            break;
-        case OPCODE_T::IO_SHUTDOWN:
-            execute(IO_SHUTDOWN{instruction}, stack, ip);
-            break;
-        case OPCODE_T::IO_CTL:
-            execute(IO_CTL{instruction}, stack, ip);
-            break;
-        }
-        break;
-    }
-    case S:
-    {
-        auto instruction = viua::arch::ops::S::decode(raw);
-        if constexpr (VIUA_TRACE_CYCLES) {
-            viua::TRACE_STREAM << "    " << instruction.to_string()
-                               << viua::TRACE_STREAM.endl;
-        }
-
-        using viua::arch::ops::OPCODE_S;
-        switch (static_cast<OPCODE_S>(opcode)) {
-        case OPCODE_S::FRAME:
-            execute(FRAME{instruction}, stack, ip);
-            break;
-        case OPCODE_S::RETURN:
-            return execute(RETURN{instruction}, stack, ip);
-        case OPCODE_S::ATOM:
-            execute(ATOM{instruction}, stack, ip);
-            break;
-        case OPCODE_S::STRING:
-            execute(STRING{instruction}, stack, ip);
-            break;
-        case OPCODE_S::FLOAT:
-            execute(FLOAT{instruction}, stack, ip);
-            break;
-        case OPCODE_S::DOUBLE:
-            execute(DOUBLE{instruction}, stack, ip);
-            break;
-        case OPCODE_S::STRUCT:
-            execute(STRUCT{instruction}, stack, ip);
-            break;
-        case OPCODE_S::BUFFER:
-            execute(BUFFER{instruction}, stack, ip);
-            break;
-        case OPCODE_S::SELF:
-            execute(SELF{instruction}, stack, ip);
-            break;
-        }
-        break;
-    }
-    case E:
-    {
-        auto instruction = viua::arch::ops::E::decode(raw);
-        if constexpr (VIUA_TRACE_CYCLES) {
-            viua::TRACE_STREAM << "    " << instruction.to_string()
-                               << viua::TRACE_STREAM.endl;
-        }
-
-        using viua::arch::ops::OPCODE_E;
-        switch (static_cast<OPCODE_E>(opcode)) {
-        case OPCODE_E::LUI:
-            execute(LUI{instruction}, stack, ip);
-            break;
-        case OPCODE_E::LUIU:
-            execute(LUIU{instruction}, stack, ip);
-            break;
-        }
-        break;
-    }
-    case R:
-    {
-        auto instruction = viua::arch::ops::R::decode(raw);
-        if constexpr (VIUA_TRACE_CYCLES) {
-            viua::TRACE_STREAM << "    " << instruction.to_string()
-                               << viua::TRACE_STREAM.endl;
-        }
-
-        using viua::arch::ops::OPCODE_R;
-        switch (static_cast<OPCODE_R>(opcode)) {
-        case OPCODE_R::ADDI:
-            execute(ADDI{instruction}, stack, ip);
-            break;
-        case OPCODE_R::ADDIU:
-            execute(ADDIU{instruction}, stack, ip);
-            break;
-        case OPCODE_R::SUBI:
-            execute(SUBI{instruction}, stack, ip);
-            break;
-        case OPCODE_R::SUBIU:
-            execute(SUBIU{instruction}, stack, ip);
-            break;
-        case OPCODE_R::MULI:
-            execute(MULI{instruction}, stack, ip);
-            break;
-        case OPCODE_R::MULIU:
-            execute(MULIU{instruction}, stack, ip);
-            break;
-        case OPCODE_R::DIVI:
-            execute(DIVI{instruction}, stack, ip);
-            break;
-        case OPCODE_R::DIVIU:
-            execute(DIVIU{instruction}, stack, ip);
-            break;
-        }
-        break;
-    }
-    case N:
-    {
-        if constexpr (VIUA_TRACE_CYCLES) {
-            viua::TRACE_STREAM << "    " << viua::arch::ops::to_string(opcode)
-                               << viua::TRACE_STREAM.endl;
-        }
-
-        using viua::arch::ops::OPCODE_N;
-        switch (static_cast<OPCODE_N>(opcode)) {
-        case OPCODE_N::NOOP:
-            break;
-        case OPCODE_N::HALT:
-            return nullptr;
-        case OPCODE_N::EBREAK:
-            execute(EBREAK{viua::arch::ops::N::decode(raw)}, stack, ip);
-            break;
-        }
-        break;
-    }
-    case D:
-    {
-        auto instruction = viua::arch::ops::D::decode(raw);
-        if constexpr (VIUA_TRACE_CYCLES) {
-            viua::TRACE_STREAM << "    " << instruction.to_string()
-                               << viua::TRACE_STREAM.endl;
-        }
-
-        using viua::arch::ops::OPCODE_D;
-        switch (static_cast<OPCODE_D>(opcode)) {
-        case OPCODE_D::CALL:
-            /*
-             * Call is a special instruction. It transfers the IP to a
-             * semi-random location, instead of just increasing it to the next
-             * unit.
-             *
-             * This is why we return here, and not use the default behaviour for
-             * most of the other instructions.
-             */
-            return execute(CALL{instruction}, stack, ip);
-        case OPCODE_D::BITNOT:
-            execute(BITNOT{instruction}, stack, ip);
-            break;
-        case OPCODE_D::NOT:
-            execute(NOT{instruction}, stack, ip);
-            break;
-        case OPCODE_D::COPY:
-            execute(COPY{instruction}, stack, ip);
-            break;
-        case OPCODE_D::MOVE:
-            execute(MOVE{instruction}, stack, ip);
-            break;
-        case OPCODE_D::SWAP:
-            execute(SWAP{instruction}, stack, ip);
-            break;
-        case OPCODE_D::BUFFER_PUSH:
-            execute(BUFFER_PUSH{instruction}, stack, ip);
-            break;
-        case OPCODE_D::BUFFER_SIZE:
-            execute(BUFFER_SIZE{instruction}, stack, ip);
-            break;
-        case OPCODE_D::REF:
-            execute(REF{instruction}, stack, ip);
-            break;
-        case OPCODE_D::IF:
-            /*
-             * If is a special instruction. It transfers IP to a semi-random
-             * location instead of just increasing it to the next unit. This is
-             * why the return is used instead of break.
-             */
-            return execute(IF{instruction}, stack, ip);
-        case OPCODE_D::IO_PEEK:
-            execute(IO_PEEK{instruction}, stack, ip);
-            break;
-        case OPCODE_D::ACTOR:
-            execute(ACTOR{instruction}, stack, ip);
-            break;
-        }
-        break;
-    }
-    case F:
-        std::cerr << "unimplemented instruction: "
-                  << viua::arch::ops::to_string(opcode) << "\n";
-        return nullptr;
-    }
-
-    return (ip + 1);
-}
-
 auto run_instruction(viua::vm::Stack& stack)
     -> viua::arch::instruction_type const*
 {
     auto instruction = viua::arch::instruction_type{};
     do {
         instruction = *stack.ip;
-        stack.ip    = execute(stack, stack.ip);
+        stack.ip    = viua::vm::ins::execute(stack, stack.ip);
         ++stack.proc.core->perf_counters.total_ops_executed;
     } while ((stack.ip != nullptr) and (instruction & viua::arch::ops::GREEDY));
 
@@ -402,7 +105,7 @@ auto run(viua::vm::Process& proc) -> bool
         return proc.module.ip_in_valid_range(proc.stack.ip);
     };
 
-    if constexpr (VIUA_TRACE_CYCLES) {
+    if constexpr (viua::vm::ins::VIUA_TRACE_CYCLES) {
         viua::TRACE_STREAM << "cycle at " << proc.module.elf_path.native()
                            << "[.text+0x" << std::hex << std::setw(16)
                            << std::setfill('0')
@@ -652,7 +355,7 @@ auto main(int argc, char* argv[]) -> int
     core.modules.emplace("", viua::vm::Module{elf_path, main_module});
     auto const main_pid [[maybe_unused]] = core.spawn("", entry_addr);
 
-    if constexpr (VIUA_TRACE_CYCLES) {
+    if constexpr (viua::vm::ins::VIUA_TRACE_CYCLES) {
         if (auto trace_fd = getenv("VIUA_VM_TRACE_FD"); trace_fd) {
             try {
                 /*
