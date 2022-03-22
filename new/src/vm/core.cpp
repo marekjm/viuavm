@@ -47,6 +47,14 @@ auto IO_scheduler::schedule(int const fd,
     return req_id;
 }
 
+auto Core::find(pid_type const p) -> std::experimental::observer_ptr<Process>
+{
+    using std::experimental::make_observer;
+    return flock.count(p)
+        ? make_observer<Process>(flock.at(p).get())
+        : nullptr;
+}
+
 auto Core::spawn(std::string mod_name, uint64_t const entry) -> pid_type
 {
     auto const& mod = modules.at(mod_name);

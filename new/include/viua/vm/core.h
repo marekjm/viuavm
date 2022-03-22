@@ -387,6 +387,7 @@ struct Core {
     {
         run_queue.push(std::move(proc));
     }
+    auto find(pid_type const) -> std::experimental::observer_ptr<Process>;
 
     auto spawn(std::string, uint64_t const) -> pid_type;
 };
