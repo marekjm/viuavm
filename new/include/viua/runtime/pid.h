@@ -42,7 +42,7 @@ struct PID {
     auto get() const -> pid_type;
     auto to_string() const -> std::string;
 
-    PID(pid_type const);
+    explicit PID(pid_type const);
 };
 
 class Pid_emitter {

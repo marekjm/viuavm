@@ -89,7 +89,7 @@ auto Pid_emitter::emit() -> PID
 
     memcpy(p.s6_addr + 8, &c, sizeof(c));
 
-    return p;
+    return PID{p};
 }
 
 }  // namespace viua::runtime
