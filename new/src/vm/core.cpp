@@ -55,7 +55,8 @@ auto Core::spawn(std::string mod_name, uint64_t const entry) -> pid_type
     auto proc      = std::make_unique<Process>(pid, this, mod);
     proc->push_frame(256, (mod.ip_base + entry), nullptr);
 
-    run_queue.push(std::move(proc));
+    run_queue.push(std::experimental::make_observer<Process>(proc.get()));
+    flock.insert({ pid, std::move(proc) });
 
     return pid;
 }

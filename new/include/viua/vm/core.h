@@ -27,6 +27,7 @@
 #include <atomic>
 #include <chrono>
 #include <exception>
+#include <experimental/memory>
 #include <filesystem>
 #include <memory>
 #include <optional>
@@ -372,8 +373,9 @@ struct Core {
     using pid_type = viua::runtime::PID;
     viua::runtime::Pid_emitter pids;
 
-    std::queue<std::unique_ptr<Process>> run_queue;
-    std::map<pid_type, std::unique_ptr<Process>> suspended;
+    std::map<pid_type, std::unique_ptr<Process>> flock;
+    std::queue<std::experimental::observer_ptr<Process>> run_queue;
+    std::map<pid_type, std::experimental::observer_ptr<Process>> suspended;
 
     inline auto pop_ready() -> auto
     {
@@ -381,7 +383,7 @@ struct Core {
         run_queue.pop();
         return proc;
     }
-    inline auto push_ready(std::unique_ptr<Process> proc) -> void
+    inline auto push_ready(std::experimental::observer_ptr<Process> proc) -> void
     {
         run_queue.push(std::move(proc));
     }
