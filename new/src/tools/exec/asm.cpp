@@ -163,7 +163,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
      * of the highest 36 bits are set. Otherwise, the lui is just
      * overhead.
      */
-    if (parts.first or full_form) {
+    if (parts.first or full_form or multiplier) {
         using namespace std::string_literals;
         auto synth = each;
         synth.opcode.text =
