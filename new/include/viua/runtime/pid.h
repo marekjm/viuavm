@@ -45,11 +45,10 @@ struct PID {
     explicit PID(pid_type const);
 };
 
-class Pid_emitter {
+struct Pid_emitter {
     in6_addr base{};
     uint64_t counter{};
 
-  public:
     Pid_emitter();
 
     auto emit() -> PID;

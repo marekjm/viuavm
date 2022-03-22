@@ -39,6 +39,13 @@ The above code can be assembler and run using the following commands:
 ]$ ./build/bin/dis readme.elf
 ```
 
+In case of bugs, or when step by step execution is useful, a simple debugger is
+also available:
+
+```
+]$ ./build/bin/repl
+```
+
 ## Tools
 
 A set of tools is provided for programmers to interact and use the VM. These
@@ -49,6 +56,7 @@ are:
 - `asm` and `dis`: assembler and disassembler
 - `readelf`: a `readelf(1)` specific to Viua ELFs (the usual one is still useful
   as Viua ELFs are valid ELF files)
+- `repl`: a primitive debugger
 
 The whole toolchain can be compiled using GCC or Clang. The build is automated
 using GNU Make:

@@ -29,7 +29,8 @@ CXXFLAGS_WARNING=\
 				 -Wfatal-errors
 
 CXXFLAGS_INCLUDE=\
-				 -I./include
+				 -I./include \
+				 -I./3rd-party
 
 CXXFLAGS=\
 		 -std=$(CXXSTD) \
@@ -48,6 +49,7 @@ CXXLIBS=\
 all: dist
 
 dist: \
+	$(BUILD)/tools/exec/repl \
 	$(BUILD)/tools/exec/readelf \
 	$(BUILD)/tools/exec/dis \
 	$(BUILD)/tools/exec/asm \
@@ -166,3 +168,17 @@ $(BUILD)/tools/exec/vm: \
 	$(BUILD)/runtime/pid.o \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
+
+$(BUILD)/tools/exec/repl: \
+	$(BUILD)/arch/arch.o \
+	$(BUILD)/arch/ops.o \
+	$(BUILD)/vm/core.o \
+	$(BUILD)/vm/elf.o \
+	$(BUILD)/vm/ins.o \
+	$(BUILD)/vm/types.o \
+	$(BUILD)/vm/types/traits.o \
+	$(BUILD)/support/string.o \
+	$(BUILD)/support/tty.o \
+	$(BUILD)/runtime/pid.o \
+	3rd-party/linenoise/linenoise.o \
+	3rd-party/linenoise/encodings/utf8.o
