@@ -43,6 +43,7 @@ struct Global_state {
 
     using pid_type = viua::runtime::PID;
     std::unique_ptr<pid_type> selected_pid;
+    std::optional<size_t> selected_frame;
 
     std::string last_input;
 };
@@ -416,6 +417,42 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
             std::cerr << "stack empty\n\r";
         } else {
             viua::vm::ins::print_backtrace(proc->stack);
+        }
+    } else if (*p(0) == "show") {
+        if (p(1).value_or("") == "frame") {
+            if (not REPL_STATE->selected_pid) {
+                std::cerr << esc(2, COLOR_FG_RED) << "error"
+                          << esc(2, ATTR_RESET) << ": no selected actor\n";
+                return true;
+            }
+
+            auto const proc = REPL_STATE->core.find(*REPL_STATE->selected_pid);
+            if (not proc) {
+                std::cerr << esc(2, COLOR_FG_RED) << "error"
+                          << esc(2, ATTR_RESET) << ": actor "
+                          << esc(2, COLOR_FG_WHITE)
+                          << REPL_STATE->selected_pid->to_string()
+                          << esc(2, ATTR_RESET) << " does not exist\n\r";
+                return true;
+            }
+
+            auto const user_frame_index =
+                (p(2).has_value() ? std::stoull(std::string{*p(2)})
+                                  : REPL_STATE->selected_frame.value_or(0));
+            if (user_frame_index >= proc->stack.frames.size()) {
+                std::cerr << esc(2, COLOR_FG_RED) << "error"
+                          << esc(2, ATTR_RESET) << ": frame "
+                          << user_frame_index << " does not exist\n\r";
+                return true;
+            }
+
+            auto const physical_frame_index =
+                proc->stack.frames.size() - user_frame_index - 1;
+            auto const& frame = proc->stack.frames.at(physical_frame_index);
+            viua::vm::ins::print_backtrace(proc->stack, physical_frame_index);
+            viua::vm::ins::dump_registers(frame.parameters, "p");
+            viua::vm::ins::dump_registers(frame.registers, "l");
+            viua::vm::ins::dump_registers(proc->stack.args, "a");
         }
     } else if (*p(0) == "stepi") {
         if (not REPL_STATE->selected_pid) {
