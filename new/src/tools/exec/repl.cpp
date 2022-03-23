@@ -491,6 +491,9 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
 
         try {
             for (auto i = size_t{0}; i < limit; ++i) {
+                if (not proc->module.ip_in_valid_range(proc->stack.ip)) {
+                    throw viua::vm::abort_execution{proc->stack.ip, "ip outside of valid range"};
+                }
                 proc->stack.ip = viua::vm::ins::execute(proc->stack, proc->stack.ip);
             }
         } catch (viua::vm::abort_execution const& e) {
@@ -522,6 +525,9 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
             for (auto i = size_t{0}; i < limit; ++i) {
                 auto instruction = viua::arch::instruction_type{};
                 do {
+                    if (not proc->module.ip_in_valid_range(proc->stack.ip)) {
+                        throw viua::vm::abort_execution{proc->stack.ip, "ip outside of valid range"};
+                    }
                     instruction = *proc->stack.ip;
                     proc->stack.ip    = viua::vm::ins::execute(proc->stack, proc->stack.ip);
                 } while ((proc->stack.ip != nullptr) and (instruction & viua::arch::ops::GREEDY));
