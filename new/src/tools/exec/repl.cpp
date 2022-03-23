@@ -164,9 +164,6 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
                                                 : raw.parent_path());
 
         auto const prefix = "load " + std::string{*p(1)} + ' ';
-        /* runtime_candidates.push_back(prefix + raw.string() + " (raw)"); */
-        /* runtime_candidates.push_back(prefix + parent.string() + " (parent)"); */
-        /* runtime_candidates.push_back(prefix + stem.string() + " (stem)"); */
 
         if (fs::exists(raw) and fs::is_regular_file(raw)) {
             /*

@@ -469,7 +469,6 @@ auto get_proxy(Stack& stack,
     case LOCAL:
         return get_proxy(stack.frames.back().registers, a, ip);
     case ARGUMENT:
-        std::cerr << "getting proxy for argument register\n";
         return get_proxy(stack.args, a, ip);
     case PARAMETER:
         return get_proxy(stack.frames.back().parameters, a, ip);
