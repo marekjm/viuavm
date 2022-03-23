@@ -94,6 +94,10 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
     candidates.push_back("load");
     candidates.push_back("backtrace");
     candidates.push_back("stepi");
+    candidates.push_back("stepi.g");
+    candidates.push_back("show frame");
+    candidates.push_back("up");
+    candidates.push_back("down");
 
     for (auto const& each : candidates) {
         if (not each.starts_with(buf)) {
