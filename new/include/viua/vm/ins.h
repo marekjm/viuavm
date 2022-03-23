@@ -114,9 +114,17 @@ Work_instruction(ACTOR);
 Work_instruction(SELF);
 
 constexpr auto VIUA_TRACE_CYCLES = true;
-auto execute(viua::vm::Stack&,
-             viua::arch::instruction_type const* const)
+auto execute(viua::vm::Stack&, viua::arch::instruction_type const* const)
     -> viua::arch::instruction_type const*;
+
+/*
+ * Utility functions. Used in implementation of EBREAK, but also accessed by the
+ * repl-debugger combo to dump backtraces and register dumps. Reuse makes
+ * keeping the format consistent easier.
+ */
+auto print_backtrace(viua::vm::Stack const&,
+                     std::optional<size_t> const = std::nullopt) -> void;
+auto dump_registers(std::vector<Value> const&, std::string_view const) -> void;
 }  // namespace viua::vm::ins
 
 #endif

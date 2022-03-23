@@ -399,21 +399,24 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
     } else if (*p(0) == "backtrace" or *p(0) == "bt") {
         if (not REPL_STATE->selected_pid) {
             std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                << ": no selected actor\n";
+                      << ": no selected actor\n";
             return true;
         }
 
         auto const proc = REPL_STATE->core.find(*REPL_STATE->selected_pid);
         if (not proc) {
             std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                << ": actor "
-                << esc(2, COLOR_FG_WHITE) << REPL_STATE->selected_pid->to_string()
-                << esc(2, ATTR_RESET) << " does not exist\n\r";
+                      << ": actor " << esc(2, COLOR_FG_WHITE)
+                      << REPL_STATE->selected_pid->to_string()
+                      << esc(2, ATTR_RESET) << " does not exist\n\r";
             return true;
         }
 
-        auto const dummy_ebreak = viua::arch::ins::EBREAK{viua::arch::ops::N{0}};
-        viua::vm::ins::execute(dummy_ebreak, proc->stack, proc->stack.ip);
+        if (proc->stack.frames.empty()) {
+            std::cerr << "stack empty\n\r";
+        } else {
+            viua::vm::ins::print_backtrace(proc->stack);
+        }
     } else if (*p(0) == "stepi") {
         if (not REPL_STATE->selected_pid) {
             std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)

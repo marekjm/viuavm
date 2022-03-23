@@ -1872,13 +1872,7 @@ auto execute(SELF const op, Stack& stack, ip_type const) -> void
     auto s       = std::make_unique<viua::vm::types::PID>(stack.proc.pid);
     target.value = std::move(s);
 }
-}  // namespace viua::vm::ins
 
-namespace viua::vm::ins {
-using namespace viua::arch::ins;
-using viua::vm::Stack;
-using ip_type = viua::arch::instruction_type const*;
-namespace {
 auto dump_registers(std::vector<Value> const& registers,
                     std::string_view const suffix) -> void
 {
@@ -1946,35 +1940,79 @@ auto dump_registers(std::vector<Value> const& registers,
         }
     }
 }
-}  // namespace
+auto print_backtrace_line(
+    Stack const& stack,
+    size_t const frame_index,
+    std::map<Frame::addr_type, std::string> const& fn_entry_to_name) -> void
+{
+    auto const& each = stack.frames.at(frame_index);
+    viua::TRACE_STREAM << "    #" << (stack.frames.size() - frame_index - 1)
+                       << "  ";
+
+    if (fn_entry_to_name.count(each.entry_address)) {
+        viua::TRACE_STREAM << fn_entry_to_name.at(each.entry_address);
+    } else {
+        viua::TRACE_STREAM << "??";
+    }
+    viua::TRACE_STREAM << (each.parameters.empty() ? " ()" : " (...)")
+                       << " at ";
+
+    viua::TRACE_STREAM << stack.proc.module.elf_path.native() << "[.text+0x"
+                       << std::hex << std::setw(8) << std::setfill('0');
+
+    auto ip_offset = size_t{};
+    if (frame_index < (stack.frames.size() - 1)) {
+        ip_offset = (stack.frames.at(frame_index + 1).return_address
+                     - stack.proc.module.ip_base);
+    } else {
+        ip_offset = (stack.ip - stack.proc.module.ip_base);
+    }
+    viua::TRACE_STREAM << (ip_offset * sizeof(viua::arch::instruction_type));
+    viua::TRACE_STREAM << std::dec << ']';
+
+    viua::TRACE_STREAM << " return to ";
+    if (each.return_address) {
+        viua::TRACE_STREAM << stack.proc.module.elf_path.native() << "[.text+0x"
+                           << std::hex << std::setw(8) << std::setfill('0')
+                           << ((each.return_address - stack.proc.module.ip_base)
+                               * sizeof(viua::arch::instruction_type))
+                           << std::dec << ']';
+    } else {
+        viua::TRACE_STREAM << "null";
+    }
+
+    viua::TRACE_STREAM << viua::TRACE_STREAM.endl;
+}
+auto print_backtrace(Stack const& stack, std::optional<size_t> const only_for)
+    -> void
+{
+    auto fn_entry_to_name = std::map<Frame::addr_type, std::string>{};
+    {
+        for (auto const& [fn_off, fn] :
+             stack.proc.module.elf.function_table()) {
+            auto const [fn_name, fn_entry] = fn;
+            auto const entry_addr =
+                (stack.proc.module.ip_base
+                 + (fn_entry / sizeof(viua::arch::instruction_type)));
+            fn_entry_to_name.emplace(entry_addr, fn_name);
+        }
+    }
+
+    if (only_for.has_value()) {
+        print_backtrace_line(stack, *only_for, fn_entry_to_name);
+    } else {
+        for (auto i = size_t{0}; i < stack.frames.size(); ++i) {
+            print_backtrace_line(stack, i, fn_entry_to_name);
+        }
+    }
+}
 auto execute(EBREAK const, Stack& stack, ip_type const) -> void
 {
     viua::TRACE_STREAM << "begin ebreak in process "
                        << stack.proc.pid.to_string() << viua::TRACE_STREAM.endl;
 
     viua::TRACE_STREAM << "  backtrace:" << viua::TRACE_STREAM.endl;
-    for (auto i = size_t{0}; i < stack.frames.size(); ++i) {
-        auto const& each = stack.frames.at(i);
-
-        viua::TRACE_STREAM << "    #" << i << "  "
-                           << stack.proc.module.elf_path.native() << "[.text+0x"
-                           << std::hex << std::setw(8) << std::setfill('0')
-                           << ((each.entry_address - stack.proc.module.ip_base)
-                               * sizeof(viua::arch::instruction_type))
-                           << std::dec << ']';
-        viua::TRACE_STREAM << " return to ";
-        if (each.return_address) {
-            viua::TRACE_STREAM
-                << stack.proc.module.elf_path.native() << "[.text+0x"
-                << std::hex << std::setw(8) << std::setfill('0')
-                << ((each.return_address - stack.proc.module.ip_base)
-                    * sizeof(viua::arch::instruction_type))
-                << std::dec << ']';
-        } else {
-            viua::TRACE_STREAM << "null";
-        }
-        viua::TRACE_STREAM << viua::TRACE_STREAM.endl;
-    }
+    print_backtrace(stack);
 
     viua::TRACE_STREAM << "  register contents:" << viua::TRACE_STREAM.endl;
     for (auto i = size_t{0}; i < stack.frames.size(); ++i) {
