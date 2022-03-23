@@ -22,24 +22,24 @@
 
 #include <experimental/memory>
 #include <filesystem>
-#include <memory>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include <linenoise/encodings/utf8.h>
 #include <linenoise/linenoise.h>
 
-#include <viua/arch/ops.h>
 #include <viua/arch/ins.h>
-#include <viua/vm/core.h>
-#include <viua/vm/ins.h>
+#include <viua/arch/ops.h>
 #include <viua/support/fdstream.h>
 #include <viua/support/tty.h>
+#include <viua/vm/core.h>
+#include <viua/vm/ins.h>
 
 
 struct Global_state {
-    viua::vm::Core core {};
+    viua::vm::Core core{};
 
     using pid_type = viua::runtime::PID;
     std::unique_ptr<pid_type> selected_pid;
@@ -79,7 +79,7 @@ auto split_on_space(std::string_view sv) -> std::vector<std::string_view>
 
     return parts;
 }
-}
+}  // namespace
 
 auto completion(char const* buf, linenoiseCompletions* const lc) -> void
 {
@@ -107,14 +107,13 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
         linenoiseAddCompletion(lc, each.c_str());
     }
 
-    auto const sv = std::string_view{buf};
+    auto const sv    = std::string_view{buf};
     auto const parts = split_on_space(sv);
     if (parts.empty()) {
         return;
     }
 
-    auto const p = [&parts](size_t const n) -> std::optional<std::string_view>
-    {
+    auto const p = [&parts](size_t const n) -> std::optional<std::string_view> {
         return (n < parts.size()) ? std::optional{parts.at(n)} : std::nullopt;
     };
 
@@ -130,13 +129,10 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
         }
     }
 
-    auto const should_complete_files_for_load = (
-        (*p(0) == "load")
-        and p(1).has_value()
-        and (
-            p(2).has_value() or ((not p(2).has_value()) and sv.back() == ' ')
-        )
-    );
+    auto const should_complete_files_for_load =
+        ((*p(0) == "load") and p(1).has_value()
+         and (p(2).has_value()
+              or ((not p(2).has_value()) and sv.back() == ' ')));
     if (should_complete_files_for_load) {
         namespace fs = std::filesystem;
 
@@ -163,9 +159,9 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
          * current directory. Otherwise the completion behaviour is completely
          * broken.
          */
-        auto const parent = (raw.parent_path().string().empty()
-                ? fs::path{"."}
-                : raw.parent_path());
+        auto const parent =
+            (raw.parent_path().string().empty() ? fs::path{"."}
+                                                : raw.parent_path());
 
         auto const prefix = "load " + std::string{*p(1)} + ' ';
         /* runtime_candidates.push_back(prefix + raw.string() + " (raw)"); */
@@ -180,8 +176,7 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
         } else if (fs::exists(raw) and fs::is_directory(raw)) {
             for (auto& p : fs::directory_iterator{raw}) {
                 runtime_candidates.push_back(
-                    prefix
-                    + p.path().native()
+                    prefix + p.path().native()
                     + (fs::is_directory(p.path()) ? "/" : ""));
             }
         } else if (fs::exists(parent) and fs::is_directory(parent)) {
@@ -190,19 +185,19 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
                     continue;
                 }
                 runtime_candidates.push_back(
-                    prefix
-                    + p.path().native()
+                    prefix + p.path().native()
                     + (fs::is_directory(p.path()) ? "/" : ""));
             }
         }
     }
 
     if (*p(0) == "actor" and p(1).has_value() and *p(1) == "new") {
-        auto const stem = p(2).value_or("");
+        auto const stem   = p(2).value_or("");
         auto const prefix = std::string{"actor new "};
-        for (auto const& [ mod_name, mod ] : REPL_STATE->core.modules) {
-            for (auto const& [ fn_off, fn ] : mod.elf.function_table()) {
-                auto const fn_id = (mod_name.empty() ? "" : (mod_name + "::")) + std::get<0>(fn);
+        for (auto const& [mod_name, mod] : REPL_STATE->core.modules) {
+            for (auto const& [fn_off, fn] : mod.elf.function_table()) {
+                auto const fn_id = (mod_name.empty() ? "" : (mod_name + "::"))
+                                   + std::get<0>(fn);
                 if (fn_id.starts_with(stem)) {
                     runtime_candidates.push_back(prefix + fn_id);
                 }
@@ -215,7 +210,8 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
     }
 }
 
-auto hints_impl(char const* buf, int* const color, int* const bold) -> char const*
+auto hints_impl(char const* buf, int* const color, int* const bold)
+    -> char const*
 {
     static_cast<void>(buf);
     static_cast<void>(color);
@@ -380,24 +376,25 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
     } else if (*p(0) == "actor") {
         if (*p(1) == "new" and p(2).has_value()) {
             if (REPL_STATE->core.modules.empty()) {
-                std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                    << ": no modules loaded\n";
+                std::cerr << esc(2, COLOR_FG_RED) << "error"
+                          << esc(2, ATTR_RESET) << ": no modules loaded\n";
                 return true;
             }
 
             auto const fn_id = *p(2);
-            auto const mod_name = std::string{(fn_id.rfind("::") == std::string::npos)
-                ? ""
-                : fn_id.substr(0, fn_id.rfind("::"))};
+            auto const mod_name =
+                std::string{(fn_id.rfind("::") == std::string::npos)
+                                ? ""
+                                : fn_id.substr(0, fn_id.rfind("::"))};
             auto const fn_name = (fn_id.rfind("::") == std::string::npos)
-                ? fn_id
-                : fn_id.substr(fn_id.rfind("::") + 2);
+                                     ? fn_id
+                                     : fn_id.substr(fn_id.rfind("::") + 2);
 
             if (not REPL_STATE->core.modules.count(mod_name)) {
-                std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                    << ": module "
-                    << esc(2, COLOR_FG_WHITE) << mod_name << esc(2, ATTR_RESET)
-                    << " does not exist\n";
+                std::cerr << esc(2, COLOR_FG_RED) << "error"
+                          << esc(2, ATTR_RESET) << ": module "
+                          << esc(2, COLOR_FG_WHITE) << mod_name
+                          << esc(2, ATTR_RESET) << " does not exist\n";
                 return true;
             }
             auto const& mod = REPL_STATE->core.modules.at(mod_name);
@@ -407,9 +404,11 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
                     continue;
                 }
 
-                auto const fn_addr = (std::get<1>(std::get<1>(each)) / sizeof(viua::arch::instruction_type));
-                auto pid = REPL_STATE->core.spawn(mod_name, fn_addr);
-                REPL_STATE->selected_pid = std::make_unique<viua::runtime::PID>(pid);
+                auto const fn_addr = (std::get<1>(std::get<1>(each))
+                                      / sizeof(viua::arch::instruction_type));
+                auto pid           = REPL_STATE->core.spawn(mod_name, fn_addr);
+                REPL_STATE->selected_pid =
+                    std::make_unique<viua::runtime::PID>(pid);
             }
         }
     } else if (*p(0) == "backtrace" or *p(0) == "bt") {
@@ -472,16 +471,16 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
     } else if (*p(0) == "stepi") {
         if (not REPL_STATE->selected_pid) {
             std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                << ": no selected actor\n";
+                      << ": no selected actor\n";
             return true;
         }
 
         auto const proc = REPL_STATE->core.find(*REPL_STATE->selected_pid);
         if (not proc) {
             std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                << ": actor "
-                << esc(2, COLOR_FG_WHITE) << REPL_STATE->selected_pid->to_string()
-                << esc(2, ATTR_RESET) << " does not exist\n\r";
+                      << ": actor " << esc(2, COLOR_FG_WHITE)
+                      << REPL_STATE->selected_pid->to_string()
+                      << esc(2, ATTR_RESET) << " does not exist\n\r";
             return true;
         }
 
@@ -492,28 +491,30 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
         try {
             for (auto i = size_t{0}; i < limit; ++i) {
                 if (not proc->module.ip_in_valid_range(proc->stack.ip)) {
-                    throw viua::vm::abort_execution{proc->stack.ip, "ip outside of valid range"};
+                    throw viua::vm::abort_execution{
+                        proc->stack.ip, "ip outside of valid range"};
                 }
-                proc->stack.ip = viua::vm::ins::execute(proc->stack, proc->stack.ip);
+                proc->stack.ip =
+                    viua::vm::ins::execute(proc->stack, proc->stack.ip);
             }
         } catch (viua::vm::abort_execution const& e) {
             std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                << ": aborted execution: " << e.what() << "\n\r";
+                      << ": aborted execution: " << e.what() << "\n\r";
             return true;
         }
     } else if (*p(0) == "stepi.g") {
         if (not REPL_STATE->selected_pid) {
             std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                << ": no selected actor\n";
+                      << ": no selected actor\n";
             return true;
         }
 
         auto const proc = REPL_STATE->core.find(*REPL_STATE->selected_pid);
         if (not proc) {
             std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                << ": actor "
-                << esc(2, COLOR_FG_WHITE) << REPL_STATE->selected_pid->to_string()
-                << esc(2, ATTR_RESET) << " does not exist\n\r";
+                      << ": actor " << esc(2, COLOR_FG_WHITE)
+                      << REPL_STATE->selected_pid->to_string()
+                      << esc(2, ATTR_RESET) << " does not exist\n\r";
             return true;
         }
 
@@ -526,15 +527,18 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
                 auto instruction = viua::arch::instruction_type{};
                 do {
                     if (not proc->module.ip_in_valid_range(proc->stack.ip)) {
-                        throw viua::vm::abort_execution{proc->stack.ip, "ip outside of valid range"};
+                        throw viua::vm::abort_execution{
+                            proc->stack.ip, "ip outside of valid range"};
                     }
                     instruction = *proc->stack.ip;
-                    proc->stack.ip    = viua::vm::ins::execute(proc->stack, proc->stack.ip);
-                } while ((proc->stack.ip != nullptr) and (instruction & viua::arch::ops::GREEDY));
+                    proc->stack.ip =
+                        viua::vm::ins::execute(proc->stack, proc->stack.ip);
+                } while ((proc->stack.ip != nullptr)
+                         and (instruction & viua::arch::ops::GREEDY));
             }
         } catch (viua::vm::abort_execution const& e) {
             std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                << ": aborted execution: " << e.what() << "\n\r";
+                      << ": aborted execution: " << e.what() << "\n\r";
             return true;
         }
     } else if (*p(0) == "up") {
@@ -609,7 +613,8 @@ auto repl_main() -> void
         auto const line = std::string{raw_line};
         free(raw_line);
 
-        auto const useful_line = std::string_view{line.empty() ? REPL_STATE->last_input : line};
+        auto const useful_line =
+            std::string_view{line.empty() ? REPL_STATE->last_input : line};
         if (auto const parts = split_on_space(useful_line); not parts.empty()) {
             if (not repl_eval(parts)) {
                 break;
@@ -674,8 +679,8 @@ auto main(int argc, char* argv[]) -> int
 
     {
         /*
-         * Enable UTF-8 support. Without this the console may act "funny" when it
-         * encounters multi-byte characters.
+         * Enable UTF-8 support. Without this the console may act "funny" when
+         * it encounters multi-byte characters.
          */
         linenoiseSetEncodingFunctions(linenoiseUtf8PrevCharLen,
                                       linenoiseUtf8NextCharLen,
@@ -688,7 +693,7 @@ auto main(int argc, char* argv[]) -> int
     }
 
     std::cout << esc(1, COLOR_FG_WHITE) << "Viua REPL (debugger) "
-        << esc(1, ATTR_RESET) << VIUAVM_VERSION << "\n";
+              << esc(1, ATTR_RESET) << VIUAVM_VERSION << "\n";
 
     auto state = std::make_unique<Global_state>();
     REPL_STATE = std::experimental::make_observer(state.get());

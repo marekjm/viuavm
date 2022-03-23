@@ -50,9 +50,7 @@ auto IO_scheduler::schedule(int const fd,
 auto Core::find(pid_type const p) -> std::experimental::observer_ptr<Process>
 {
     using std::experimental::make_observer;
-    return flock.count(p)
-        ? make_observer<Process>(flock.at(p).get())
-        : nullptr;
+    return flock.count(p) ? make_observer<Process>(flock.at(p).get()) : nullptr;
 }
 
 auto Core::spawn(std::string mod_name, uint64_t const entry) -> pid_type
@@ -64,7 +62,7 @@ auto Core::spawn(std::string mod_name, uint64_t const entry) -> pid_type
     proc->push_frame(256, (mod.ip_base + entry), nullptr);
 
     run_queue.push(std::experimental::make_observer<Process>(proc.get()));
-    flock.insert({ pid, std::move(proc) });
+    flock.insert({pid, std::move(proc)});
 
     return pid;
 }

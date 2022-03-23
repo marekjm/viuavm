@@ -383,7 +383,8 @@ struct Core {
         run_queue.pop();
         return proc;
     }
-    inline auto push_ready(std::experimental::observer_ptr<Process> proc) -> void
+    inline auto push_ready(std::experimental::observer_ptr<Process> proc)
+        -> void
     {
         run_queue.push(std::move(proc));
     }

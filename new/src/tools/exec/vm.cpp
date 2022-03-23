@@ -54,7 +54,7 @@
 #include <viua/vm/types.h>
 
 
-constexpr auto VIUA_SLOW_CYCLES  = false;
+constexpr auto VIUA_SLOW_CYCLES = false;
 
 namespace viua {
 auto TRACE_STREAM = viua::support::fdstream{2};
