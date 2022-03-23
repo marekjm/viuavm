@@ -494,7 +494,7 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
                 << ": aborted execution: " << e.what() << "\n\r";
             return true;
         }
-    } else if (*p(0) == "step") {
+    } else if (*p(0) == "stepi.g") {
         if (not REPL_STATE->selected_pid) {
             std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
                 << ": no selected actor\n";
