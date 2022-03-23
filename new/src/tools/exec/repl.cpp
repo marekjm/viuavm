@@ -228,7 +228,13 @@ namespace viua {
 auto TRACE_STREAM = viua::support::fdstream{2};
 }
 
-auto repl_eval(std::vector<std::string_view> const parts) -> bool
+/*
+ * This is the symbol users should use when loading a module to be
+ * designated as the main module.
+ */
+constexpr auto MAIN_MODULE_MNEMONIC = "main";
+auto load_module(std::string_view const name, std::filesystem::path elf_path)
+    -> void
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_CYAN;
@@ -239,66 +245,22 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    auto const p = [&parts](size_t const n) -> std::optional<std::string_view>
+    /*
+     * Do not assume that the path given by the user points to a file that
+     * exists. Typos are a thing. And let's check if the file really is a
+     * regular file - trying to execute directories or device files does not
+     * make much sense.
+     */
+    if (not std::filesystem::exists(elf_path)) {
+        std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+                  << ": file does not exist: " << esc(2, COLOR_FG_WHITE)
+                  << elf_path.native() << esc(2, ATTR_RESET) << "\n";
+        return;
+    }
     {
-        return (n < parts.size()) ? std::optional{parts.at(n)} : std::nullopt;
-    };
-
-    if (*p(0) == "quit") {
-        return false;
-    } else if (*p(0) == "repl") {
-        if (*p(1) == "pid-base") {
-            using viua::runtime::PID;
-            std::cout << PID{REPL_STATE->core.pids.base}.to_string() << "\n\r";
-        }
-    } else if (*p(0) == "load") {
-        auto const name = *p(1);
-        auto const elf_path = std::filesystem::path{*p(2)};
-
-        /*
-         * Do not assume that the path given by the user points to a file that
-         * exists. Typos are a thing. And let's check if the file really is a
-         * regular file - trying to execute directories or device files does not
-         * make much sense.
-         */
-        if (not std::filesystem::exists(elf_path)) {
-            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                      << ": file does not exist: " << esc(2, COLOR_FG_WHITE)
-                      << elf_path.native() << esc(2, ATTR_RESET) << "\n";
-            return true;
-        }
-        {
-            struct stat statbuf {
-            };
-            if (stat(elf_path.c_str(), &statbuf) == -1) {
-                auto const saved_errno = errno;
-                auto const errname     = strerrorname_np(saved_errno);
-                auto const errdesc     = strerrordesc_np(saved_errno);
-
-                std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                          << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                          << esc(2, ATTR_RESET);
-                if (errname) {
-                    std::cerr << ": " << errname;
-                }
-                std::cerr << ": " << (errdesc ? errdesc : "unknown error") << "\n";
-                return true;
-            }
-            if ((statbuf.st_mode & S_IFMT) != S_IFREG) {
-                std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                          << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                          << esc(2, ATTR_RESET);
-                std::cerr << ": not a regular file\n";
-                return true;
-            }
-        }
-
-        /*
-         * Even if the path exists and is a regular file we should check if it was
-         * opened correctly.
-         */
-        auto const elf_fd = open(elf_path.c_str(), O_RDONLY);
-        if (elf_fd == -1) {
+        struct stat statbuf {
+        };
+        if (stat(elf_path.c_str(), &statbuf) == -1) {
             auto const saved_errno = errno;
             auto const errname     = strerrorname_np(saved_errno);
             auto const errdesc     = strerrordesc_np(saved_errno);
@@ -310,58 +272,107 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
                 std::cerr << ": " << errname;
             }
             std::cerr << ": " << (errdesc ? errdesc : "unknown error") << "\n";
-            return true;
+            return;
         }
-
-        using Module   = viua::vm::elf::Loaded_elf;
-        auto const mod = Module::load(elf_fd);
-
-        if (auto const f = mod.find_fragment(".rodata");
-            not f.has_value()) {
+        if ((statbuf.st_mode & S_IFMT) != S_IFREG) {
             std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                       << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                      << esc(2, ATTR_RESET) << ": no strings fragment found\n";
-            std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                      << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                      << esc(2, ATTR_RESET) << ": no .rodata section found\n";
-            return true;
+                      << esc(2, ATTR_RESET);
+            std::cerr << ": not a regular file\n";
+            return;
         }
-        if (auto const f = mod.find_fragment(".viua.fns");
-            not f.has_value()) {
-            std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                      << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                      << esc(2, ATTR_RESET)
-                      << ": no function table fragment found\n";
-            std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                      << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                      << esc(2, ATTR_RESET) << ": no .viua.fns section found\n";
-            return true;
-        }
-        if (auto const f = mod.find_fragment(".text"); not f.has_value()) {
-            std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                      << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                      << esc(2, ATTR_RESET) << ": no text fragment found\n";
-            std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                      << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                      << esc(2, ATTR_RESET) << ": no .text section found\n";
-            return true;
-        }
+    }
 
-        if (auto const ep = mod.entry_point(); ep.has_value()) {
-            std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                      << ": "
-                      << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                      << esc(2, ATTR_RESET) << ": an entry point is defined for this module\n";
-        }
+    /*
+     * Even if the path exists and is a regular file we should check if it was
+     * opened correctly.
+     */
+    auto const elf_fd = open(elf_path.c_str(), O_RDONLY);
+    if (elf_fd == -1) {
+        auto const saved_errno = errno;
+        auto const errname     = strerrorname_np(saved_errno);
+        auto const errdesc     = strerrordesc_np(saved_errno);
 
-        /*
-         * This is the symbol users should use when loading a module to be
-         * designated as the main module.
-         */
-        constexpr auto MAIN_MODULE_MNEMONIC = "main";
-        REPL_STATE->core.modules.emplace(
-            ((name == MAIN_MODULE_MNEMONIC) ? "" : name),
-            viua::vm::Module{elf_path, mod});
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
+                  << esc(2, ATTR_RESET);
+        if (errname) {
+            std::cerr << ": " << errname;
+        }
+        std::cerr << ": " << (errdesc ? errdesc : "unknown error") << "\n";
+        return;
+    }
+
+    using Module   = viua::vm::elf::Loaded_elf;
+    auto const mod = Module::load(elf_fd);
+
+    if (auto const f = mod.find_fragment(".rodata"); not f.has_value()) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
+                  << esc(2, ATTR_RESET) << ": no strings fragment found\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
+                  << esc(2, ATTR_RESET) << ": no .rodata section found\n";
+        return;
+    }
+    if (auto const f = mod.find_fragment(".viua.fns"); not f.has_value()) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
+                  << esc(2, ATTR_RESET)
+                  << ": no function table fragment found\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
+                  << esc(2, ATTR_RESET) << ": no .viua.fns section found\n";
+        return;
+    }
+    if (auto const f = mod.find_fragment(".text"); not f.has_value()) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
+                  << esc(2, ATTR_RESET) << ": no text fragment found\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
+                  << esc(2, ATTR_RESET) << ": no .text section found\n";
+        return;
+    }
+
+    if (auto const ep = mod.entry_point(); ep.has_value()) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native() << ": "
+                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
+                  << esc(2, ATTR_RESET)
+                  << ": an entry point is defined for this module\n";
+    }
+
+    REPL_STATE->core.modules.emplace(
+        ((name == MAIN_MODULE_MNEMONIC) ? "" : name),
+        viua::vm::Module{elf_path, mod});
+}
+
+auto repl_eval(std::vector<std::string_view> const parts) -> bool
+{
+    using viua::support::tty::ATTR_RESET;
+    using viua::support::tty::COLOR_FG_CYAN;
+    using viua::support::tty::COLOR_FG_ORANGE_RED_1;
+    using viua::support::tty::COLOR_FG_RED;
+    using viua::support::tty::COLOR_FG_RED_1;
+    using viua::support::tty::COLOR_FG_WHITE;
+    using viua::support::tty::send_escape_seq;
+    constexpr auto esc = send_escape_seq;
+
+    auto const p = [&parts](size_t const n) -> std::optional<std::string_view> {
+        return (n < parts.size()) ? std::optional{parts.at(n)} : std::nullopt;
+    };
+
+    if (*p(0) == "quit") {
+        return false;
+    } else if (*p(0) == "repl") {
+        if (*p(1) == "pid-base") {
+            using viua::runtime::PID;
+            std::cout << PID{REPL_STATE->core.pids.base}.to_string() << "\n\r";
+        }
+    } else if (*p(0) == "load") {
+        auto const name     = *p(1);
+        auto const elf_path = std::filesystem::path{*p(2)};
+        load_module(name, elf_path);
     } else if (*p(0) == "actor") {
         if (*p(1) == "new" and p(2).has_value()) {
             if (REPL_STATE->core.modules.empty()) {
@@ -520,9 +531,6 @@ auto repl_main() -> void
 {
     constexpr auto DEFAULT_PROMPT = "(viua) ";
 
-    auto state = std::make_unique<Global_state>();
-    REPL_STATE = std::experimental::make_observer(state.get());
-
     auto raw_line = static_cast<char*>(nullptr);
     while ((raw_line = linenoise(DEFAULT_PROMPT))) {
         linenoiseHistoryAdd(raw_line);
@@ -550,40 +558,46 @@ auto main(int argc, char* argv[]) -> int
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    auto const args = std::vector<std::string>{(argv + 1), (argv + argc)};
-
+    auto args            = std::vector<std::string>{(argv + 1), (argv + argc)};
     auto verbosity_level = 0;
-    auto show_version = false;
+    {
+        auto show_version = false;
 
-    for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
-        auto const& each = args.at(i);
-        if (each == "--") {
-            // explicit separator of options and operands
-            break;
+        auto i = decltype(args)::size_type{};
+        for (; i < args.size(); ++i) {
+            auto const& each = args.at(i);
+            if (each == "--") {
+                // explicit separator of options and operands
+                ++i;
+                break;
+            }
+
+            /*
+             * Common options.
+             */
+            else if (each == "-v" or each == "--verbose") {
+                ++verbosity_level;
+            } else if (each == "--version") {
+                show_version = true;
+            } else if (each.front() == '-') {
+                // unknown option
+            } else {
+                // input files start here
+                break;
+            }
         }
 
-        /*
-         * Common options.
-         */
-        else if (each == "-v" or each == "--verbose") {
-            ++verbosity_level;
-        } else if (each == "--version") {
-            show_version = true;
-        } else if (each.front() == '-') {
-            // unknown option
-        } else {
-            // input files start here
-            break;
-        }
-    }
+        args = std::vector<std::string>{args.begin() + i, args.end()};
 
-    if (show_version) {
-        if (verbosity_level) {
-            std::cout << "Viua VM ";
+        if (show_version) {
+            if (verbosity_level) {
+                std::cout << "Viua VM ";
+            }
+            std::cout
+                << (verbosity_level ? VIUAVM_VERSION_FULL : VIUAVM_VERSION)
+                << "\n";
+            return 0;
         }
-        std::cout << (verbosity_level ? VIUAVM_VERSION_FULL : VIUAVM_VERSION)
-                  << "\n";
-        return 0;
     }
 
     {
@@ -603,6 +617,13 @@ auto main(int argc, char* argv[]) -> int
 
     std::cout << esc(1, COLOR_FG_WHITE) << "Viua REPL (debugger) "
         << esc(1, ATTR_RESET) << VIUAVM_VERSION << "\n";
+
+    auto state = std::make_unique<Global_state>();
+    REPL_STATE = std::experimental::make_observer(state.get());
+
+    if (not args.empty()) {
+        load_module(MAIN_MODULE_MNEMONIC, args.front());
+    }
 
     repl_main();
 
