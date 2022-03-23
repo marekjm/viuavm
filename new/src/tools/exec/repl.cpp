@@ -483,6 +483,8 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
 
         auto const limit = std::stoull(std::string{p(1).value_or("1")});
 
+        REPL_STATE->selected_frame.reset();
+
         try {
             for (auto i = size_t{0}; i < limit; ++i) {
                 proc->stack.ip = viua::vm::ins::execute(proc->stack, proc->stack.ip);
@@ -510,6 +512,8 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
 
         auto const limit = std::stoull(std::string{p(1).value_or("1")});
 
+        REPL_STATE->selected_frame.reset();
+
         try {
             for (auto i = size_t{0}; i < limit; ++i) {
                 auto instruction = viua::arch::instruction_type{};
@@ -523,6 +527,64 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
                 << ": aborted execution: " << e.what() << "\n\r";
             return true;
         }
+    } else if (*p(0) == "up") {
+        if (not REPL_STATE->selected_pid) {
+            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+                      << ": no selected actor\n";
+            return true;
+        }
+
+        auto const proc = REPL_STATE->core.find(*REPL_STATE->selected_pid);
+        if (not proc) {
+            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+                      << ": actor " << esc(2, COLOR_FG_WHITE)
+                      << REPL_STATE->selected_pid->to_string()
+                      << esc(2, ATTR_RESET) << " does not exist\n\r";
+            return true;
+        }
+
+        auto const user_frame_index =
+            REPL_STATE->selected_frame.value_or(0) + 1;
+        if (user_frame_index >= proc->stack.frames.size()) {
+            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+                      << ": frame " << user_frame_index
+                      << " does not exist\n\r";
+            return true;
+        }
+
+        REPL_STATE->selected_frame = user_frame_index;
+        auto const physical_frame_index =
+            proc->stack.frames.size() - user_frame_index - 1;
+        viua::vm::ins::print_backtrace(proc->stack, physical_frame_index);
+    } else if (*p(0) == "down") {
+        if (not REPL_STATE->selected_pid) {
+            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+                      << ": no selected actor\n";
+            return true;
+        }
+
+        auto const proc = REPL_STATE->core.find(*REPL_STATE->selected_pid);
+        if (not proc) {
+            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+                      << ": actor " << esc(2, COLOR_FG_WHITE)
+                      << REPL_STATE->selected_pid->to_string()
+                      << esc(2, ATTR_RESET) << " does not exist\n\r";
+            return true;
+        }
+
+        auto const user_frame_index =
+            REPL_STATE->selected_frame.value_or(0) - 1;
+        if (user_frame_index >= proc->stack.frames.size()) {
+            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+                      << ": frame " << user_frame_index
+                      << " does not exist\n\r";
+            return true;
+        }
+
+        REPL_STATE->selected_frame = user_frame_index;
+        auto const physical_frame_index =
+            proc->stack.frames.size() - user_frame_index - 1;
+        viua::vm::ins::print_backtrace(proc->stack, physical_frame_index);
     }
 
     return true;
