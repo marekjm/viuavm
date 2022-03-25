@@ -1,7 +1,11 @@
 ################################################################################
 # Base directories
 BUILD=./build
+
 PREFIX=~/.local
+BINDIR=$(PREFIX)/bin
+SHAREDIR=$(PREFIX)/share
+MANDIR=$(SHAREDIR)/man
 
 BUILD_EXEC_DIR=$(BUILD)/tools/exec
 CORE_DIR=$(PREFIX)/lib/viua/core
@@ -68,6 +72,8 @@ install: all
 	mkdir -p $(PREFIX)/lib/viua/{core,site}/{bin,lib,share,man}
 	@cp -v $(BUILD_EXEC_DIR)/{asm,dis,readelf,vm} $(CORE_BIN_DIR)/
 	@cp -v $(BUILD_EXEC_DIR)/viua $(PREFIX)/bin/
+	mkdir -p $(MANDIR)/man1
+	@cp -v docs/man/*.1 $(MANDIR)/man1
 
 install-binfmt:
 	mkdir -p $(PREFIX)/lib/binfmt.d
