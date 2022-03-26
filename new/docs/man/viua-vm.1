@@ -20,12 +20,23 @@ viua-vm \- run ELF executables with Viua bytecode
 .sp
 .B viua-vm
 is the kernel of Viua virtual machine, responsible for executing bytecode
-programs. If any
+programs.
+.PP
+If any
 .I <args>
 are passed on the command line they are forwarded to the main function defined
 by the
 .I <executable>
 module.
+.PP
+Standard input stream is not used by the kernel, the program executed has
+direct, uninterrupted, and unfiltered access to the file descriptor. The same is
+true for standard output stream - the kernel never uses it. The virtual machine
+may interfere with the output on the standard error stream. By default, the
+standard error stream is where the trace output from the kernel goes. It can be
+redirected to a different stream using the
+.B VIUA_VM_TRACE_FD
+environment variable.
 .SH "OPTIONS"
 .SS Help and information
 .PP
