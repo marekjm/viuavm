@@ -27,6 +27,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <filesystem>
 
 
 namespace viua::libs::lexer {
@@ -261,6 +262,10 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
 };
 
 auto lex(std::string_view) -> std::vector<Lexeme>;
+
+namespace stage {
+auto lexical_analysis(std::filesystem::path const, std::string_view const) -> std::vector<Lexeme>;
+}
 }  // namespace viua::libs::lexer
 
 #endif

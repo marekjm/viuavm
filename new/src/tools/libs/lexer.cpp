@@ -28,7 +28,9 @@
 
 #include <viua/libs/errors/compile_time.h>
 #include <viua/libs/lexer.h>
+#include <viua/libs/stage.h>
 #include <viua/support/string.h>
+#include <viua/support/tty.h>
 
 
 namespace viua::libs::lexer {
@@ -379,5 +381,91 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
     }
 
     return lexemes;
+}
+
+namespace stage {
+auto lexical_analysis(std::filesystem::path const source_path,
+                      std::string_view const source_text) -> std::vector<Lexeme>
+{
+    try {
+        return viua::libs::lexer::lex(source_text);
+    } catch (viua::libs::lexer::Location const& location) {
+        using viua::support::tty::ATTR_RESET;
+        using viua::support::tty::COLOR_FG_ORANGE_RED_1;
+        using viua::support::tty::COLOR_FG_RED;
+        using viua::support::tty::COLOR_FG_RED_1;
+        using viua::support::tty::COLOR_FG_WHITE;
+        using viua::support::tty::send_escape_seq;
+        constexpr auto esc = send_escape_seq;
+
+        auto const SEPARATOR         = std::string{" |  "};
+        constexpr auto LINE_NO_WIDTH = size_t{5};
+
+        auto source_line    = std::ostringstream{};
+        auto highlight_line = std::ostringstream{};
+
+        std::cerr << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR << "\n";
+
+        struct {
+            std::string text;
+        } e;
+        e.text = std::string(1, source_text[location.offset]);
+
+        {
+            auto line = viua::libs::stage::view_line_of(source_text, location);
+
+            source_line << esc(2, COLOR_FG_RED) << std::setw(LINE_NO_WIDTH)
+                        << (location.line + 1) << esc(2, ATTR_RESET)
+                        << SEPARATOR;
+            highlight_line << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR;
+
+            source_line << std::string_view{line.data(), location.character};
+            highlight_line << std::string(location.character, ' ');
+            line.remove_prefix(location.character);
+
+            /*
+             * This if is required because of TERMINATOR tokens in unexpected
+             * places. In case a TERMINATOR token is the cause of the error it
+             * will not appear in line. If we attempted to shift line's head, it
+             * would be removing a prefix from an empty std::string_view which
+             * is undefined behaviour.
+             *
+             * I think the "bad TERMINATOR" is the only situation when this is
+             * important.
+             *
+             * When it happens, we just don't print the terminator (which is a
+             * newline), because a newline character will be added anyway.
+             */
+            if (not line.empty()) {
+                source_line << esc(2, COLOR_FG_RED_1) << e.text
+                            << esc(2, ATTR_RESET);
+                line.remove_prefix(e.text.size());
+            }
+            highlight_line << esc(2, COLOR_FG_RED) << '^';
+            highlight_line << esc(2, COLOR_FG_ORANGE_RED_1)
+                           << std::string((e.text.size() - 1), '~');
+
+            source_line << line;
+        }
+
+        std::cerr << source_line.str() << "\n";
+        std::cerr << highlight_line.str() << "\n";
+
+        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
+                  << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
+                  << (location.line + 1) << esc(2, ATTR_RESET) << ':'
+                  << esc(2, COLOR_FG_WHITE) << (location.character + 1)
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET) << ": "
+                  << "no token match at character "
+                  << viua::support::string::CORNER_QUOTE_LL
+                  << esc(2, COLOR_FG_WHITE) << e.text << esc(2, ATTR_RESET)
+                  << viua::support::string::CORNER_QUOTE_UR << "\n";
+
+        exit(1);
+    } catch (viua::libs::errors::compile_time::Error const& e) {
+        viua::libs::stage::display_error_and_exit(source_path, source_text, e);
+    }
+}
 }
 }  // namespace viua::libs::lexer

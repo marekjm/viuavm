@@ -98,6 +98,7 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
     candidates.push_back("show frame");
     candidates.push_back("up");
     candidates.push_back("down");
+    candidates.push_back("eval");
 
     for (auto const& each : candidates) {
         if (not each.starts_with(buf)) {
@@ -342,6 +343,11 @@ auto load_module(std::string_view const name, std::filesystem::path elf_path)
     REPL_STATE->core.modules.emplace(
         ((name == MAIN_MODULE_MNEMONIC) ? "" : name),
         viua::vm::Module{elf_path, mod});
+}
+
+auto evaluate_asm_expression(std::string const asm_text) -> void
+{
+    std::cerr << asm_text;
 }
 
 auto repl_eval(std::vector<std::string_view> const parts) -> bool
@@ -596,6 +602,18 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
         auto const physical_frame_index =
             proc->stack.frames.size() - user_frame_index - 1;
         viua::vm::ins::print_backtrace(proc->stack, physical_frame_index);
+    } else if (*p(0) == "eval" and (p(1).has_value() and *p(1) == "asm")) {
+        if (not p(2).has_value()) {
+            return true;
+        }
+
+        auto asm_text = std::ostringstream{};
+        asm_text << *p(2);
+        for (auto i = size_t{3}; p(i).has_value(); ++i) {
+            asm_text << ' ' << *p(i);
+        }
+        asm_text << '\n';
+        evaluate_asm_expression(asm_text.str());
     }
 
     return true;

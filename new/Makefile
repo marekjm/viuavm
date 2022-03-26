@@ -160,6 +160,7 @@ $(BUILD)/tools/exec/asm: \
 	$(BUILD)/tools/libs/lexer.o \
 	$(BUILD)/tools/libs/parser.o \
 	$(BUILD)/tools/libs/assembler.o \
+	$(BUILD)/tools/libs/stage.o \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
 
