@@ -1,0 +1,90 @@
+'\" t
+.\"
+.TH "VIUA-VM" "1" "2022-03-24" "Viua VM 0.11.1" "Viua VM Manual"
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+viua-vm \- run ELF executables with Viua bytecode
+.SH "SYNOPSIS"
+.SY "viua vm"
+.OP \-\-
+.I <executable>
+.RI [ <args>
+\&.\|.\|.\&]
+.SY "viua vm"
+.OP \-\-verbose
+.B \-\-version
+.YS
+.SH "DESCRIPTION"
+.sp
+.B viua-vm
+is the kernel of Viua virtual machine, responsible for executing bytecode
+programs. If any
+.I <args>
+are passed on the command line they are forwarded to the main function defined
+by the
+.I <executable>
+module.
+.SH "OPTIONS"
+.SS Help and information
+.PP
+.BR \-v ,
+.B \-\-verbose
+.RS 4
+Show verbose output, where applicable.
+.RE
+.PP
+.B \-\-version
+.RS 4
+Show version information.
+.RE
+.SH "EXIT STATUS"
+.TP
+.B 0
+Successful program execution.
+.TP
+.B 1
+Error in one of the user code modules.
+.TP
+.B 127
+Error in virtual machine's code.
+.SH "FILES"
+.PP
+.I <executable>
+.RS 4
+The main module loaded by the kernel. The module must be an executable ELF file
+containing Viua bytecode. It must contain a main function.
+.RE
+.SH "ENVIRONMENT"
+.PP
+.TP
+.BR VIUA_VM_TRACE_FD = \fI<fd>\fR
+Redirect trace output ie, log stream of executed instructions and
+.B ip
+values, as well as output of
+.B ebreak
+instructions to file descriptor
+.IR <fd> .
+If this environment variable is not defined trace output is written to standard
+error stream.
+.TP
+.BR VIUA_VM_PID_SEED = \fI<seed>\fR
+Set PID seed to
+.IR <seed> .
+The seed must be a valid IPv6 address. The highest 64 bits identify a virtual
+machine instance, and lower 64 bits are used as a counter. By default, the seed
+is
+.B [fe80::]
+with random lower 64 bits.
+.SH "SEE ALSO"
+.sp
+.BR viua\-asm (1),
+.BR viua\-dis (1),
+.BR viua\-readelf (1),
+.BR viua\-repl (1),
+.BR readelf (1),
+.BR elf (5)
+.SH "VIUA VM"
+.sp
+Part of the \fBviua\fR(1) toolchain
