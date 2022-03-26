@@ -5,13 +5,13 @@
 .\" * MAIN CONTENT STARTS HERE *
 .\" -----------------------------------------------------------------
 .SH "NAME"
-viua-asm \- Convert Viua assembly source code to ELF binaries
+viua-asm \- convert Viua assembly source code to ELF binaries
 .SH "SYNOPSIS"
 .SY "viua asm"
 .OP \-o <output>
 .OP \-c
 .OP \-\-
-\fI<source>\fR...
+.IR <source> \&.\|.\|.\&
 .YS
 .SH "DESCRIPTION"
 .sp
@@ -20,24 +20,26 @@ files to be consumed by the virtual machine's kernel.
 .SH "OPTIONS"
 .SS General options
 .PP
-\-c
+.B \-c
 .RS 4
 Output a linkable module. The default is to output an executable.
 .RE
 .PP
-\-o \fIoutput\fR
+.B \-o
+.I output
 .RS 4
 Write produced ELF binary into \fIoutput\fR file, instead of the default a.out
 file.
 .RE
 .SS Help and information
 .PP
-\-v, \-\-verbose
+.BR \-v ,
+.B \-\-verbose
 .RS 4
 Show verbose output, where applicable.
 .RE
 .PP
-\-\-version
+.B \-\-version
 .RS 4
 Show version information.
 .RE
