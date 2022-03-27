@@ -122,6 +122,8 @@ auto did_you_mean(viua::libs::errors::compile_time::Error&&, std::string)
 auto did_you_mean(viua::libs::errors::compile_time::Error&, std::string)
     -> viua::libs::errors::compile_time::Error&;
 
+auto parse_instruction(
+    viua::support::vector_view<viua::libs::lexer::Lexeme>&) -> ast::Instruction;
 auto parse(viua::support::vector_view<viua::libs::lexer::Lexeme>)
     -> std::vector<std::unique_ptr<ast::Node>>;
 }  // namespace viua::libs::parser

@@ -260,6 +260,164 @@ auto parse_attr_list(
 
     return attrs;
 }
+auto parse_instruction(
+    viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes) -> ast::Instruction
+{
+    auto instruction = ast::Instruction{};
+
+    using viua::libs::lexer::TOKEN;
+    try {
+        instruction.opcode = consume_token_of(TOKEN::OPCODE, lexemes);
+    } catch (viua::libs::lexer::Lexeme const& e) {
+        if (e.token != viua::libs::lexer::TOKEN::LITERAL_ATOM) {
+            throw;
+        }
+
+        using viua::libs::lexer::OPCODE_NAMES;
+        using viua::support::string::levenshtein_filter;
+        auto misspell_candidates = levenshtein_filter(e.text, OPCODE_NAMES);
+        if (misspell_candidates.empty()) {
+            throw;
+        }
+
+        using viua::support::string::levenshtein_best;
+        auto best_candidate = levenshtein_best(
+            e.text, misspell_candidates, (e.text.size() / 2));
+        if (best_candidate.second == e.text) {
+            throw;
+        }
+
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw did_you_mean(Error{e, Cause::Unknown_opcode, e.text},
+                           best_candidate.second);
+    }
+
+    /*
+     * Special case for instructions with no operands. It is here to make
+     * the loop that extracts the operands simpler.
+     */
+    if (lexemes.front() == TOKEN::TERMINATOR) {
+        consume_token_of(TOKEN::TERMINATOR, lexemes);
+        return instruction;
+    }
+
+    while ((not lexemes.empty()) and lexemes.front() != TOKEN::END) {
+        if (lexemes.front().token == TOKEN::END) {
+            break;
+        }
+
+        auto operand = ast::Operand{};
+
+        /*
+         * Attributes come before the element they describe, so let's try to
+         * parse them before an operand.
+         */
+        if (lexemes.front() == TOKEN::ATTR_LIST_OPEN) {
+            operand.attributes = parse_attr_list(lexemes);
+        }
+
+        /*
+         * Consume the operand: void, register access, a literal value. This
+         * will supply some value for the instruction to work on. This chain
+         * of if-else should handle valid operands - and ONLY operands, not
+         * their separators.
+         */
+        if (lexemes.front() == TOKEN::RA_VOID) {
+            operand.ingredients.push_back(
+                consume_token_of(TOKEN::RA_VOID, lexemes));
+        } else if (look_ahead({TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF},
+                              lexemes)) {
+            auto const access = consume_token_of(
+                {TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF}, lexemes);
+            auto index = viua::libs::lexer::Lexeme{};
+            try {
+                index = consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
+            } catch (viua::libs::lexer::Lexeme const& e) {
+                using viua::libs::errors::compile_time::Cause;
+                using viua::libs::errors::compile_time::Error;
+                throw Error{e, Cause::Invalid_register_access}
+                    .add(access)
+                    .aside("register index must be an integer");
+            }
+            try {
+                auto const n = std::stoul(index.text);
+                if (n > viua::arch::MAX_REGISTER_INDEX) {
+                    throw std::out_of_range{""};
+                }
+            } catch (std::out_of_range const&) {
+                using viua::libs::errors::compile_time::Cause;
+                using viua::libs::errors::compile_time::Error;
+                throw Error{index, Cause::Invalid_register_access}
+                    .add(access)
+                    .aside(
+                        "register index range is 0-"
+                        + std::to_string(viua::arch::MAX_REGISTER_INDEX));
+            }
+            operand.ingredients.push_back(access);
+            operand.ingredients.push_back(index);
+
+            if (look_ahead(TOKEN::DOT, lexemes)) {
+                operand.ingredients.push_back(
+                    consume_token_of(TOKEN::DOT, lexemes));
+                operand.ingredients.push_back(
+                    consume_token_of(TOKEN::LITERAL_ATOM, lexemes));
+            }
+        } else if (look_ahead(TOKEN::AT, lexemes)) {
+            auto const access = consume_token_of(TOKEN::AT, lexemes);
+            auto atom         = viua::libs::lexer::Lexeme{};
+            try {
+                atom = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
+            } catch (viua::libs::lexer::Lexeme const& e) {
+                using viua::libs::errors::compile_time::Cause;
+                using viua::libs::errors::compile_time::Error;
+                throw Error{e, Cause::Unexpected_token}.add(access).aside(
+                    "label name must be an atom");
+            }
+            operand.ingredients.push_back(access);
+            operand.ingredients.push_back(atom);
+        } else if (lexemes.front() == TOKEN::LITERAL_INTEGER) {
+            auto const value =
+                consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
+            operand.ingredients.push_back(value);
+        } else if (lexemes.front() == TOKEN::LITERAL_FLOAT) {
+            auto const value =
+                consume_token_of(TOKEN::LITERAL_FLOAT, lexemes);
+            operand.ingredients.push_back(value);
+        } else if (lexemes.front() == TOKEN::LITERAL_STRING) {
+            auto const value =
+                consume_token_of(TOKEN::LITERAL_STRING, lexemes);
+            operand.ingredients.push_back(value);
+        } else if (lexemes.front() == TOKEN::LITERAL_ATOM) {
+            auto const value =
+                consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
+            operand.ingredients.push_back(value);
+        } else {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+            throw Error{lexemes.front(), Cause::Unexpected_token};
+        }
+
+        instruction.operands.push_back(std::move(operand));
+
+        /*
+         * Consume either a comma (meaning that there will be some more
+         * operands), or a terminator (meaning that there will be no more
+         * operands).
+         */
+        if (lexemes.front() == TOKEN::COMMA) {
+            consume_token_of(TOKEN::COMMA, lexemes);
+            continue;
+        }
+        if (lexemes.front() == TOKEN::TERMINATOR) {
+            consume_token_of(TOKEN::TERMINATOR, lexemes);
+            break;
+        }
+        throw lexemes.front();
+    }
+
+    return instruction;
+}
 auto parse_function_definition(
     viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes)
     -> std::unique_ptr<ast::Node>
@@ -280,160 +438,7 @@ auto parse_function_definition(
     auto instructions       = std::vector<std::unique_ptr<ast::Node>>{};
     auto ins_physical_index = size_t{0};
     while ((not lexemes.empty()) and lexemes.front() != TOKEN::END) {
-        auto instruction = ast::Instruction{};
-
-        try {
-            instruction.opcode = consume_token_of(TOKEN::OPCODE, lexemes);
-        } catch (viua::libs::lexer::Lexeme const& e) {
-            if (e.token != viua::libs::lexer::TOKEN::LITERAL_ATOM) {
-                throw;
-            }
-
-            using viua::libs::lexer::OPCODE_NAMES;
-            using viua::support::string::levenshtein_filter;
-            auto misspell_candidates = levenshtein_filter(e.text, OPCODE_NAMES);
-            if (misspell_candidates.empty()) {
-                throw;
-            }
-
-            using viua::support::string::levenshtein_best;
-            auto best_candidate = levenshtein_best(
-                e.text, misspell_candidates, (e.text.size() / 2));
-            if (best_candidate.second == e.text) {
-                throw;
-            }
-
-            using viua::libs::errors::compile_time::Cause;
-            using viua::libs::errors::compile_time::Error;
-            throw did_you_mean(Error{e, Cause::Unknown_opcode, e.text},
-                               best_candidate.second);
-        }
-
-        /*
-         * Special case for instructions with no operands. It is here to make
-         * the loop that extracts the operands simpler.
-         */
-        if (lexemes.front() == TOKEN::TERMINATOR) {
-            consume_token_of(TOKEN::TERMINATOR, lexemes);
-            fn->instructions.push_back(std::move(instruction));
-            fn->instructions.back().physical_index = ins_physical_index++;
-            continue;
-        }
-
-        while ((not lexemes.empty()) and lexemes.front() != TOKEN::END) {
-            if (lexemes.front().token == TOKEN::END) {
-                break;
-            }
-
-            auto operand = ast::Operand{};
-
-            /*
-             * Attributes come before the element they describe, so let's try to
-             * parse them before an operand.
-             */
-            if (lexemes.front() == TOKEN::ATTR_LIST_OPEN) {
-                operand.attributes = parse_attr_list(lexemes);
-            }
-
-            /*
-             * Consume the operand: void, register access, a literal value. This
-             * will supply some value for the instruction to work on. This chain
-             * of if-else should handle valid operands - and ONLY operands, not
-             * their separators.
-             */
-            if (lexemes.front() == TOKEN::RA_VOID) {
-                operand.ingredients.push_back(
-                    consume_token_of(TOKEN::RA_VOID, lexemes));
-            } else if (look_ahead({TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF},
-                                  lexemes)) {
-                auto const access = consume_token_of(
-                    {TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF}, lexemes);
-                auto index = viua::libs::lexer::Lexeme{};
-                try {
-                    index = consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
-                } catch (viua::libs::lexer::Lexeme const& e) {
-                    using viua::libs::errors::compile_time::Cause;
-                    using viua::libs::errors::compile_time::Error;
-                    throw Error{e, Cause::Invalid_register_access}
-                        .add(access)
-                        .aside("register index must be an integer");
-                }
-                try {
-                    auto const n = std::stoul(index.text);
-                    if (n > viua::arch::MAX_REGISTER_INDEX) {
-                        throw std::out_of_range{""};
-                    }
-                } catch (std::out_of_range const&) {
-                    using viua::libs::errors::compile_time::Cause;
-                    using viua::libs::errors::compile_time::Error;
-                    throw Error{index, Cause::Invalid_register_access}
-                        .add(access)
-                        .aside(
-                            "register index range is 0-"
-                            + std::to_string(viua::arch::MAX_REGISTER_INDEX));
-                }
-                operand.ingredients.push_back(access);
-                operand.ingredients.push_back(index);
-
-                if (look_ahead(TOKEN::DOT, lexemes)) {
-                    operand.ingredients.push_back(
-                        consume_token_of(TOKEN::DOT, lexemes));
-                    operand.ingredients.push_back(
-                        consume_token_of(TOKEN::LITERAL_ATOM, lexemes));
-                }
-            } else if (look_ahead(TOKEN::AT, lexemes)) {
-                auto const access = consume_token_of(TOKEN::AT, lexemes);
-                auto atom         = viua::libs::lexer::Lexeme{};
-                try {
-                    atom = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
-                } catch (viua::libs::lexer::Lexeme const& e) {
-                    using viua::libs::errors::compile_time::Cause;
-                    using viua::libs::errors::compile_time::Error;
-                    throw Error{e, Cause::Unexpected_token}.add(access).aside(
-                        "label name must be an atom");
-                }
-                operand.ingredients.push_back(access);
-                operand.ingredients.push_back(atom);
-            } else if (lexemes.front() == TOKEN::LITERAL_INTEGER) {
-                auto const value =
-                    consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
-                operand.ingredients.push_back(value);
-            } else if (lexemes.front() == TOKEN::LITERAL_FLOAT) {
-                auto const value =
-                    consume_token_of(TOKEN::LITERAL_FLOAT, lexemes);
-                operand.ingredients.push_back(value);
-            } else if (lexemes.front() == TOKEN::LITERAL_STRING) {
-                auto const value =
-                    consume_token_of(TOKEN::LITERAL_STRING, lexemes);
-                operand.ingredients.push_back(value);
-            } else if (lexemes.front() == TOKEN::LITERAL_ATOM) {
-                auto const value =
-                    consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
-                operand.ingredients.push_back(value);
-            } else {
-                using viua::libs::errors::compile_time::Cause;
-                using viua::libs::errors::compile_time::Error;
-                throw Error{lexemes.front(), Cause::Unexpected_token};
-            }
-
-            instruction.operands.push_back(std::move(operand));
-
-            /*
-             * Consume either a comma (meaning that there will be some more
-             * operands), or a terminator (meaning that there will be no more
-             * operands).
-             */
-            if (lexemes.front() == TOKEN::COMMA) {
-                consume_token_of(TOKEN::COMMA, lexemes);
-                continue;
-            }
-            if (lexemes.front() == TOKEN::TERMINATOR) {
-                consume_token_of(TOKEN::TERMINATOR, lexemes);
-                break;
-            }
-            throw lexemes.front();
-        }
-
+        auto instruction = parse_instruction(lexemes);
         fn->instructions.push_back(std::move(instruction));
         fn->instructions.back().physical_index = ins_physical_index++;
     }

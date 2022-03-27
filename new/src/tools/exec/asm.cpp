@@ -59,22 +59,9 @@
 constexpr auto DEBUG_LEX       = false;
 constexpr auto DEBUG_EXPANSION = false;
 
+using viua::libs::stage::save_string;
 
 namespace {
-auto save_string(std::vector<uint8_t>& strings, std::string_view const data)
-    -> size_t
-{
-    auto const data_size = htole64(static_cast<uint64_t>(data.size()));
-    strings.resize(strings.size() + sizeof(data_size));
-    memcpy((strings.data() + strings.size() - sizeof(data_size)),
-           &data_size,
-           sizeof(data_size));
-
-    auto const saved_location = strings.size();
-    std::copy(data.begin(), data.end(), std::back_inserter(strings));
-
-    return saved_location;
-}
 auto save_fn_address(std::vector<uint8_t>& strings, std::string_view const fn)
     -> size_t
 {
@@ -764,20 +751,6 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
     return baked;
 }
 
-auto operand_or_throw(ast::Instruction const& insn, size_t const index)
-    -> ast::Operand const&
-{
-    try {
-        return insn.operands.at(index);
-    } catch (std::out_of_range const&) {
-        using viua::libs::errors::compile_time::Cause;
-        using viua::libs::errors::compile_time::Error;
-        throw Error{insn.opcode,
-                    Cause::Too_few_operands,
-                    ("operand " + std::to_string(index) + " not found")};
-    }
-}
-
 auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes,
                    std::vector<viua::arch::instruction_type>& text,
                    std::vector<uint8_t>& fn_table,
@@ -836,103 +809,7 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes,
         }
 
         for (auto const& insn : fn.instructions) {
-            using viua::arch::opcode_type;
-            using viua::arch::ops::FORMAT;
-            using viua::arch::ops::FORMAT_MASK;
-
-            auto opcode = opcode_type{};
-            try {
-                opcode = insn.parse_opcode();
-            } catch (std::invalid_argument const&) {
-                auto const e = insn.opcode;
-
-                using viua::libs::errors::compile_time::Cause;
-                using viua::libs::errors::compile_time::Error;
-                throw Error{e, Cause::Unknown_opcode, e.text};
-            }
-            auto format = static_cast<FORMAT>(opcode & FORMAT_MASK);
-            switch (format) {
-            case FORMAT::N:
-                *ip++ = static_cast<uint64_t>(opcode);
-                break;
-            case FORMAT::T:
-                *ip++ =
-                    viua::arch::ops::T{opcode,
-                                       operand_or_throw(insn, 0).make_access(),
-                                       operand_or_throw(insn, 1).make_access(),
-                                       operand_or_throw(insn, 2).make_access()}
-                        .encode();
-                break;
-            case FORMAT::D:
-                *ip++ =
-                    viua::arch::ops::D{opcode,
-                                       operand_or_throw(insn, 0).make_access(),
-                                       operand_or_throw(insn, 1).make_access()}
-                        .encode();
-                break;
-            case FORMAT::S:
-                *ip++ =
-                    viua::arch::ops::S{opcode,
-                                       operand_or_throw(insn, 0).make_access()}
-                        .encode();
-                break;
-            case FORMAT::F:
-                break;  // FIXME
-            case FORMAT::E:
-                *ip++ =
-                    viua::arch::ops::E{
-                        opcode,
-                        operand_or_throw(insn, 0).make_access(),
-                        std::stoull(
-                            operand_or_throw(insn, 1).ingredients.front().text)}
-                        .encode();
-                break;
-            case FORMAT::R:
-            {
-                auto const imm = insn.operands.back().ingredients.front();
-                auto const is_unsigned = (static_cast<opcode_type>(opcode)
-                                          & viua::arch::ops::UNSIGNED);
-                if (is_unsigned and imm.text.at(0) == '-'
-                    and (imm.text != "-1" and imm.text != "-1u")) {
-                    using viua::libs::errors::compile_time::Cause;
-                    using viua::libs::errors::compile_time::Error;
-                    throw Error{imm,
-                                Cause::Value_out_of_range,
-                                "signed integer used for unsigned immediate"}
-                        .note("the only signed value allowed in this context "
-                              "is -1, and\n"
-                              "it is used a symbol for maximum unsigned "
-                              "immediate value");
-                }
-                if ((not is_unsigned) and imm.text.back() == 'u') {
-                    using viua::libs::errors::compile_time::Cause;
-                    using viua::libs::errors::compile_time::Error;
-                    throw Error{imm,
-                                Cause::Value_out_of_range,
-                                "unsigned integer used for signed immediate"};
-                }
-                try {
-                    *ip++ =
-                        viua::arch::ops::R{
-                            opcode,
-                            insn.operands.at(0).make_access(),
-                            insn.operands.at(1).make_access(),
-                            (is_unsigned
-                                 ? static_cast<uint32_t>(std::stoul(imm.text))
-                                 : static_cast<uint32_t>(std::stoi(imm.text)))}
-                            .encode();
-                } catch (std::invalid_argument const&) {
-                    using viua::libs::errors::compile_time::Cause;
-                    using viua::libs::errors::compile_time::Error;
-                    // FIXME make the error more precise, maybe encapsulate
-                    // just the immediate operand conversion
-                    throw Error{imm,
-                                Cause::Invalid_operand,
-                                "expected integer as immediate operand"};
-                }
-                break;
-            }
-            }
+            *ip++ = viua::libs::stage::emit_instruction(insn);
         }
     }
 
@@ -1028,6 +905,192 @@ auto load_function_labels(AST_nodes const& nodes,
     }
 }
 
+auto cook_long_immediates(ast::Instruction insn,
+                          std::vector<uint8_t>& strings_table,
+                          std::map<std::string, size_t>& var_offsets) -> std::vector<ast::Instruction>
+{
+    auto cooked = std::vector<ast::Instruction>{};
+
+    if (insn.opcode == "atom" or insn.opcode == "g.atom") {
+        auto const lx = insn.operands.back().ingredients.front();
+        auto s        = lx.text;
+        auto saved_at = size_t{0};
+        if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
+            s        = s.substr(1, s.size() - 2);
+            s        = viua::support::string::unescape(s);
+            saved_at = save_string(strings_table, s);
+        } else if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
+            auto s   = lx.text;
+            saved_at = save_string(strings_table, s);
+        } else if (lx.token == viua::libs::lexer::TOKEN::AT) {
+            auto const label = insn.operands.back().ingredients.back();
+            try {
+                saved_at = var_offsets.at(label.text);
+            } catch (std::out_of_range const&) {
+                using viua::libs::errors::compile_time::Cause;
+                using viua::libs::errors::compile_time::Error;
+
+                auto e = Error{label, Cause::Unknown_label, label.text};
+                e.add(lx);
+
+                using viua::support::string::levenshtein_filter;
+                auto misspell_candidates =
+                    levenshtein_filter(label.text, var_offsets);
+                if (not misspell_candidates.empty()) {
+                    using viua::support::string::levenshtein_best;
+                    auto best_candidate =
+                        levenshtein_best(label.text,
+                                         misspell_candidates,
+                                         (label.text.size() / 2));
+                    if (best_candidate.second != label.text) {
+                        did_you_mean(e, best_candidate.second);
+                    }
+                }
+
+                throw e;
+            }
+        } else {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+
+            auto e = Error{lx, Cause::Invalid_operand}.aside(
+                "expected string literal, atom literal, or a label "
+                "reference");
+
+            if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
+                did_you_mean(e, '@' + lx.text);
+            }
+
+            throw e;
+        }
+
+        auto synth           = ast::Instruction{};
+        synth.opcode         = insn.opcode;
+        synth.opcode.text    = "g.li";
+        synth.physical_index = insn.physical_index;
+
+        synth.operands.push_back(insn.operands.front());
+        synth.operands.push_back(insn.operands.back());
+        synth.operands.back().ingredients.front().text =
+            std::to_string(saved_at) + 'u';
+
+        cooked.push_back(synth);
+
+        insn.operands.pop_back();
+        cooked.push_back(std::move(insn));
+    } else if (insn.opcode == "string" or insn.opcode == "g.string") {
+        auto const lx = insn.operands.back().ingredients.front();
+        auto saved_at = size_t{0};
+        if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
+            auto s   = lx.text;
+            s        = s.substr(1, s.size() - 2);
+            s        = viua::support::string::unescape(s);
+            saved_at = save_string(strings_table, s);
+        } else if (lx.token == viua::libs::lexer::TOKEN::AT) {
+            auto const label = insn.operands.back().ingredients.back();
+            try {
+                saved_at = var_offsets.at(label.text);
+            } catch (std::out_of_range const&) {
+                using viua::libs::errors::compile_time::Cause;
+                using viua::libs::errors::compile_time::Error;
+
+                auto e = Error{label, Cause::Unknown_label, label.text};
+                e.add(lx);
+
+                using viua::support::string::levenshtein_filter;
+                auto misspell_candidates =
+                    levenshtein_filter(label.text, var_offsets);
+                if (not misspell_candidates.empty()) {
+                    using viua::support::string::levenshtein_best;
+                    auto best_candidate =
+                        levenshtein_best(label.text,
+                                         misspell_candidates,
+                                         (label.text.size() / 2));
+                    if (best_candidate.second != label.text) {
+                        did_you_mean(e, best_candidate.second);
+                    }
+                }
+
+                throw e;
+            }
+        } else {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+
+            auto e = Error{lx, Cause::Invalid_operand}.aside(
+                "expected string literal, or a label reference");
+
+            if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
+                did_you_mean(e, '@' + lx.text);
+            }
+
+            throw e;
+        }
+
+        auto synth           = ast::Instruction{};
+        synth.opcode         = insn.opcode;
+        synth.opcode.text    = "g.li";
+        synth.physical_index = insn.physical_index;
+
+        synth.operands.push_back(insn.operands.front());
+        synth.operands.push_back(insn.operands.back());
+        synth.operands.back().ingredients.front().text =
+            std::to_string(saved_at) + 'u';
+
+        cooked.push_back(synth);
+
+        insn.operands.pop_back();
+        cooked.push_back(std::move(insn));
+    } else if (insn.opcode == "float" or insn.opcode == "g.float") {
+        constexpr auto SIZE_OF_SINGLE_PRECISION_FLOAT = size_t{4};
+        auto f =
+            std::stof(insn.operands.back().ingredients.front().text);
+        auto s = std::string(SIZE_OF_SINGLE_PRECISION_FLOAT, '\0');
+        memcpy(s.data(), &f, SIZE_OF_SINGLE_PRECISION_FLOAT);
+        auto const saved_at = save_string(strings_table, s);
+
+        auto synth           = ast::Instruction{};
+        synth.opcode         = insn.opcode;
+        synth.opcode.text    = "g.li";
+        synth.physical_index = insn.physical_index;
+
+        synth.operands.push_back(insn.operands.front());
+        synth.operands.push_back(insn.operands.back());
+        synth.operands.back().ingredients.front().text =
+            std::to_string(saved_at) + 'u';
+
+        cooked.push_back(synth);
+
+        insn.operands.pop_back();
+        cooked.push_back(std::move(insn));
+    } else if (insn.opcode == "double" or insn.opcode == "g.double") {
+        constexpr auto SIZE_OF_DOUBLE_PRECISION_FLOAT = size_t{8};
+        auto f =
+            std::stod(insn.operands.back().ingredients.front().text);
+        auto s = std::string(SIZE_OF_DOUBLE_PRECISION_FLOAT, '\0');
+        memcpy(s.data(), &f, SIZE_OF_DOUBLE_PRECISION_FLOAT);
+        auto const saved_at = save_string(strings_table, s);
+
+        auto synth           = ast::Instruction{};
+        synth.opcode         = insn.opcode;
+        synth.opcode.text    = "g.li";
+        synth.physical_index = insn.physical_index;
+
+        synth.operands.push_back(insn.operands.front());
+        synth.operands.push_back(insn.operands.back());
+        synth.operands.back().ingredients.front().text =
+            std::to_string(saved_at) + 'u';
+
+        cooked.push_back(synth);
+
+        insn.operands.pop_back();
+        cooked.push_back(std::move(insn));
+    } else {
+        cooked.push_back(std::move(insn));
+    }
+
+    return cooked;
+}
 auto cook_long_immediates(std::filesystem::path const source_path,
                           std::string_view const source_text,
                           AST_nodes const& nodes,
@@ -1043,186 +1106,12 @@ auto cook_long_immediates(std::filesystem::path const source_path,
 
         auto cooked = std::vector<ast::Instruction>{};
         for (auto& insn : fn.instructions) {
-            if (insn.opcode == "atom" or insn.opcode == "g.atom") {
-                auto const lx = insn.operands.back().ingredients.front();
-                auto s        = lx.text;
-                auto saved_at = size_t{0};
-                if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
-                    s        = s.substr(1, s.size() - 2);
-                    s        = viua::support::string::unescape(s);
-                    saved_at = save_string(strings_table, s);
-                } else if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
-                    auto s   = lx.text;
-                    saved_at = save_string(strings_table, s);
-                } else if (lx.token == viua::libs::lexer::TOKEN::AT) {
-                    auto const label = insn.operands.back().ingredients.back();
-                    try {
-                        saved_at = var_offsets.at(label.text);
-                    } catch (std::out_of_range const&) {
-                        using viua::libs::errors::compile_time::Cause;
-                        using viua::libs::errors::compile_time::Error;
-
-                        auto e = Error{label, Cause::Unknown_label, label.text};
-                        e.add(lx);
-
-                        using viua::support::string::levenshtein_filter;
-                        auto misspell_candidates =
-                            levenshtein_filter(label.text, var_offsets);
-                        if (not misspell_candidates.empty()) {
-                            using viua::support::string::levenshtein_best;
-                            auto best_candidate =
-                                levenshtein_best(label.text,
-                                                 misspell_candidates,
-                                                 (label.text.size() / 2));
-                            if (best_candidate.second != label.text) {
-                                did_you_mean(e, best_candidate.second);
-                            }
-                        }
-
-                        viua::libs::stage::display_error_in_function(source_path, e, fn.name.text);
-                        viua::libs::stage::display_error_and_exit(source_path, source_text, e);
-                    }
-                } else {
-                    using viua::libs::errors::compile_time::Cause;
-                    using viua::libs::errors::compile_time::Error;
-
-                    auto e = Error{lx, Cause::Invalid_operand}.aside(
-                        "expected string literal, atom literal, or a label "
-                        "reference");
-
-                    if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
-                        did_you_mean(e, '@' + lx.text);
-                    }
-
-                    viua::libs::stage::display_error_in_function(source_path, e, fn.name.text);
-                    viua::libs::stage::display_error_and_exit(source_path, source_text, e);
-                }
-
-                auto synth           = ast::Instruction{};
-                synth.opcode         = insn.opcode;
-                synth.opcode.text    = "g.li";
-                synth.physical_index = insn.physical_index;
-
-                synth.operands.push_back(insn.operands.front());
-                synth.operands.push_back(insn.operands.back());
-                synth.operands.back().ingredients.front().text =
-                    std::to_string(saved_at) + 'u';
-
-                cooked.push_back(synth);
-
-                insn.operands.pop_back();
-                cooked.push_back(std::move(insn));
-            } else if (insn.opcode == "string" or insn.opcode == "g.string") {
-                auto const lx = insn.operands.back().ingredients.front();
-                auto saved_at = size_t{0};
-                if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
-                    auto s   = lx.text;
-                    s        = s.substr(1, s.size() - 2);
-                    s        = viua::support::string::unescape(s);
-                    saved_at = save_string(strings_table, s);
-                } else if (lx.token == viua::libs::lexer::TOKEN::AT) {
-                    auto const label = insn.operands.back().ingredients.back();
-                    try {
-                        saved_at = var_offsets.at(label.text);
-                    } catch (std::out_of_range const&) {
-                        using viua::libs::errors::compile_time::Cause;
-                        using viua::libs::errors::compile_time::Error;
-
-                        auto e = Error{label, Cause::Unknown_label, label.text};
-                        e.add(lx);
-
-                        using viua::support::string::levenshtein_filter;
-                        auto misspell_candidates =
-                            levenshtein_filter(label.text, var_offsets);
-                        if (not misspell_candidates.empty()) {
-                            using viua::support::string::levenshtein_best;
-                            auto best_candidate =
-                                levenshtein_best(label.text,
-                                                 misspell_candidates,
-                                                 (label.text.size() / 2));
-                            if (best_candidate.second != label.text) {
-                                did_you_mean(e, best_candidate.second);
-                            }
-                        }
-
-                        viua::libs::stage::display_error_in_function(source_path, e, fn.name.text);
-                        viua::libs::stage::display_error_and_exit(source_path, source_text, e);
-                    }
-                } else {
-                    using viua::libs::errors::compile_time::Cause;
-                    using viua::libs::errors::compile_time::Error;
-
-                    auto e = Error{lx, Cause::Invalid_operand}.aside(
-                        "expected string literal, or a label reference");
-
-                    if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
-                        did_you_mean(e, '@' + lx.text);
-                    }
-
-                    viua::libs::stage::display_error_in_function(source_path, e, fn.name.text);
-                    viua::libs::stage::display_error_and_exit(source_path, source_text, e);
-                }
-
-                auto synth           = ast::Instruction{};
-                synth.opcode         = insn.opcode;
-                synth.opcode.text    = "g.li";
-                synth.physical_index = insn.physical_index;
-
-                synth.operands.push_back(insn.operands.front());
-                synth.operands.push_back(insn.operands.back());
-                synth.operands.back().ingredients.front().text =
-                    std::to_string(saved_at) + 'u';
-
-                cooked.push_back(synth);
-
-                insn.operands.pop_back();
-                cooked.push_back(std::move(insn));
-            } else if (insn.opcode == "float" or insn.opcode == "g.float") {
-                constexpr auto SIZE_OF_SINGLE_PRECISION_FLOAT = size_t{4};
-                auto f =
-                    std::stof(insn.operands.back().ingredients.front().text);
-                auto s = std::string(SIZE_OF_SINGLE_PRECISION_FLOAT, '\0');
-                memcpy(s.data(), &f, SIZE_OF_SINGLE_PRECISION_FLOAT);
-                auto const saved_at = save_string(strings_table, s);
-
-                auto synth           = ast::Instruction{};
-                synth.opcode         = insn.opcode;
-                synth.opcode.text    = "g.li";
-                synth.physical_index = insn.physical_index;
-
-                synth.operands.push_back(insn.operands.front());
-                synth.operands.push_back(insn.operands.back());
-                synth.operands.back().ingredients.front().text =
-                    std::to_string(saved_at) + 'u';
-
-                cooked.push_back(synth);
-
-                insn.operands.pop_back();
-                cooked.push_back(std::move(insn));
-            } else if (insn.opcode == "double" or insn.opcode == "g.double") {
-                constexpr auto SIZE_OF_DOUBLE_PRECISION_FLOAT = size_t{8};
-                auto f =
-                    std::stod(insn.operands.back().ingredients.front().text);
-                auto s = std::string(SIZE_OF_DOUBLE_PRECISION_FLOAT, '\0');
-                memcpy(s.data(), &f, SIZE_OF_DOUBLE_PRECISION_FLOAT);
-                auto const saved_at = save_string(strings_table, s);
-
-                auto synth           = ast::Instruction{};
-                synth.opcode         = insn.opcode;
-                synth.opcode.text    = "g.li";
-                synth.physical_index = insn.physical_index;
-
-                synth.operands.push_back(insn.operands.front());
-                synth.operands.push_back(insn.operands.back());
-                synth.operands.back().ingredients.front().text =
-                    std::to_string(saved_at) + 'u';
-
-                cooked.push_back(synth);
-
-                insn.operands.pop_back();
-                cooked.push_back(std::move(insn));
-            } else {
-                cooked.push_back(std::move(insn));
+            try {
+                auto c = cook_long_immediates(insn, strings_table, var_offsets);
+                std::copy(c.begin(), c.end(), std::back_inserter(cooked));
+            } catch (viua::libs::errors::compile_time::Error const& e) {
+                viua::libs::stage::display_error_in_function(source_path, e, fn.name.text);
+                viua::libs::stage::display_error_and_exit(source_path, source_text, e);
             }
         }
         fn.instructions = std::move(cooked);

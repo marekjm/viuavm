@@ -36,6 +36,8 @@
 #include <viua/support/tty.h>
 #include <viua/vm/core.h>
 #include <viua/vm/ins.h>
+#include <viua/libs/stage.h>
+#include <viua/libs/parser.h>
 
 
 struct Global_state {
@@ -99,6 +101,7 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
     candidates.push_back("up");
     candidates.push_back("down");
     candidates.push_back("eval");
+    candidates.push_back("eval asm");
 
     for (auto const& each : candidates) {
         if (not each.starts_with(buf)) {
@@ -347,7 +350,21 @@ auto load_module(std::string_view const name, std::filesystem::path elf_path)
 
 auto evaluate_asm_expression(std::string const asm_text) -> void
 {
-    std::cerr << asm_text;
+    auto lexemes = viua::libs::lexer::stage::lexical_analysis("-", asm_text);
+    lexemes = viua::libs::parser::ast::remove_noise(std::move(lexemes));
+
+    auto lv = viua::support::vector_view{lexemes};
+    auto p = viua::libs::parser::parse_instruction(lv);
+
+    auto strings_table = std::vector<uint8_t>{};
+    auto var_offsets   = std::map<std::string, size_t>{};
+    auto const cooked = viua::libs::stage::cook_long_immediates(p, strings_table, var_offsets);
+
+    auto proc = REPL_STATE->core.find(*REPL_STATE->selected_pid);
+    for (auto const& each : cooked) {
+        auto instruction = viua::libs::stage::emit_instruction(each);
+        viua::vm::ins::execute(proc->stack, &instruction);
+    }
 }
 
 auto repl_eval(std::vector<std::string_view> const parts) -> bool

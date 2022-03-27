@@ -186,6 +186,10 @@ $(BUILD)/tools/exec/repl: \
 	$(BUILD)/vm/types/traits.o \
 	$(BUILD)/support/string.o \
 	$(BUILD)/support/tty.o \
+	$(BUILD)/tools/libs/errors/compile_time.o \
+	$(BUILD)/tools/libs/stage.o \
+	$(BUILD)/tools/libs/lexer.o \
+	$(BUILD)/tools/libs/parser.o \
 	$(BUILD)/runtime/pid.o \
 	3rd-party/linenoise/linenoise.o \
 	3rd-party/linenoise/encodings/utf8.o

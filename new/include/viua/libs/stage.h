@@ -20,12 +20,15 @@
 #ifndef VIUA_LIBS_STAGE_H
 #define VIUA_LIBS_STAGE_H
 
+#include <stdint.h>
 #include <sys/types.h>
 
+#include <map>
 #include <vector>
 #include <string_view>
 
 #include <viua/libs/errors/compile_time.h>
+#include <viua/libs/parser.h>
 
 namespace viua::libs::stage {
 auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
@@ -46,6 +49,14 @@ auto display_error_and_exit
 auto display_error_in_function(std::filesystem::path const source_path,
                                viua::libs::errors::compile_time::Error const& e,
                                std::string_view const fn_name) -> void;
+
+auto save_string(std::vector<uint8_t>&, std::string_view const)
+    -> size_t;
+auto cook_long_immediates(viua::libs::parser::ast::Instruction,
+                          std::vector<uint8_t>&,
+                          std::map<std::string, size_t>&) -> std::vector<viua::libs::parser::ast::Instruction>;
+
+auto emit_instruction(viua::libs::parser::ast::Instruction const) -> viua::arch::instruction_type;
 }  // namespace viua::libs::stage
 
 #endif
