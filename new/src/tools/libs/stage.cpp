@@ -361,7 +361,8 @@ auto save_string(std::vector<uint8_t>& strings, std::string_view const data)
 }
 auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
                           std::vector<uint8_t>& strings_table,
-                          std::map<std::string, size_t>& var_offsets) -> std::vector<viua::libs::parser::ast::Instruction>
+                          std::map<std::string, size_t>& var_offsets)
+    -> std::vector<viua::libs::parser::ast::Instruction>
 {
     auto cooked = std::vector<viua::libs::parser::ast::Instruction>{};
 
@@ -397,7 +398,8 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
                                          misspell_candidates,
                                          (label.text.size() / 2));
                     if (best_candidate.second != label.text) {
-                        viua::libs::parser::did_you_mean(e, best_candidate.second);
+                        viua::libs::parser::did_you_mean(e,
+                                                         best_candidate.second);
                     }
                 }
 
@@ -461,7 +463,8 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
                                          misspell_candidates,
                                          (label.text.size() / 2));
                     if (best_candidate.second != label.text) {
-                        viua::libs::parser::did_you_mean(e, best_candidate.second);
+                        viua::libs::parser::did_you_mean(e,
+                                                         best_candidate.second);
                     }
                 }
 
@@ -497,8 +500,7 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
         cooked.push_back(std::move(insn));
     } else if (insn.opcode == "float" or insn.opcode == "g.float") {
         constexpr auto SIZE_OF_SINGLE_PRECISION_FLOAT = size_t{4};
-        auto f =
-            std::stof(insn.operands.back().ingredients.front().text);
+        auto f = std::stof(insn.operands.back().ingredients.front().text);
         auto s = std::string(SIZE_OF_SINGLE_PRECISION_FLOAT, '\0');
         memcpy(s.data(), &f, SIZE_OF_SINGLE_PRECISION_FLOAT);
         auto const saved_at = save_string(strings_table, s);
@@ -519,8 +521,7 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
         cooked.push_back(std::move(insn));
     } else if (insn.opcode == "double" or insn.opcode == "g.double") {
         constexpr auto SIZE_OF_DOUBLE_PRECISION_FLOAT = size_t{8};
-        auto f =
-            std::stod(insn.operands.back().ingredients.front().text);
+        auto f = std::stod(insn.operands.back().ingredients.front().text);
         auto s = std::string(SIZE_OF_DOUBLE_PRECISION_FLOAT, '\0');
         memcpy(s.data(), &f, SIZE_OF_DOUBLE_PRECISION_FLOAT);
         auto const saved_at = save_string(strings_table, s);
@@ -546,7 +547,8 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
     return cooked;
 }
 
-auto operand_or_throw(viua::libs::parser::ast::Instruction const& insn, size_t const index)
+auto operand_or_throw(viua::libs::parser::ast::Instruction const& insn,
+                      size_t const index)
     -> viua::libs::parser::ast::Operand const&
 {
     try {
@@ -559,7 +561,8 @@ auto operand_or_throw(viua::libs::parser::ast::Instruction const& insn, size_t c
                     ("operand " + std::to_string(index) + " not found")};
     }
 }
-auto emit_instruction(viua::libs::parser::ast::Instruction const insn) -> viua::arch::instruction_type
+auto emit_instruction(viua::libs::parser::ast::Instruction const insn)
+    -> viua::arch::instruction_type
 {
     using viua::arch::opcode_type;
     using viua::arch::ops::FORMAT;
@@ -581,35 +584,32 @@ auto emit_instruction(viua::libs::parser::ast::Instruction const insn) -> viua::
         return static_cast<uint64_t>(opcode);
     case FORMAT::T:
         return viua::arch::ops::T{opcode,
-                               operand_or_throw(insn, 0).make_access(),
-                               operand_or_throw(insn, 1).make_access(),
-                               operand_or_throw(insn, 2).make_access()}
-                .encode();
+                                  operand_or_throw(insn, 0).make_access(),
+                                  operand_or_throw(insn, 1).make_access(),
+                                  operand_or_throw(insn, 2).make_access()}
+            .encode();
     case FORMAT::D:
         return viua::arch::ops::D{opcode,
-                               operand_or_throw(insn, 0).make_access(),
-                               operand_or_throw(insn, 1).make_access()}
-                .encode();
+                                  operand_or_throw(insn, 0).make_access(),
+                                  operand_or_throw(insn, 1).make_access()}
+            .encode();
     case FORMAT::S:
-                return
-            viua::arch::ops::S{opcode,
-                               operand_or_throw(insn, 0).make_access()}
-                .encode();
+        return viua::arch::ops::S{opcode,
+                                  operand_or_throw(insn, 0).make_access()}
+            .encode();
     case FORMAT::F:
         return uint64_t{0};  // FIXME
     case FORMAT::E:
-        return
-            viua::arch::ops::E{
-                opcode,
-                operand_or_throw(insn, 0).make_access(),
-                std::stoull(
-                    operand_or_throw(insn, 1).ingredients.front().text)}
-                .encode();
+        return viua::arch::ops::E{
+            opcode,
+            operand_or_throw(insn, 0).make_access(),
+            std::stoull(operand_or_throw(insn, 1).ingredients.front().text)}
+            .encode();
     case FORMAT::R:
     {
         auto const imm = insn.operands.back().ingredients.front();
-        auto const is_unsigned = (static_cast<opcode_type>(opcode)
-                                  & viua::arch::ops::UNSIGNED);
+        auto const is_unsigned =
+            (static_cast<opcode_type>(opcode) & viua::arch::ops::UNSIGNED);
         if (is_unsigned and imm.text.at(0) == '-'
             and (imm.text != "-1" and imm.text != "-1u")) {
             using viua::libs::errors::compile_time::Cause;
@@ -630,15 +630,13 @@ auto emit_instruction(viua::libs::parser::ast::Instruction const insn) -> viua::
                         "unsigned integer used for signed immediate"};
         }
         try {
-            return
-                viua::arch::ops::R{
-                    opcode,
-                    insn.operands.at(0).make_access(),
-                    insn.operands.at(1).make_access(),
-                    (is_unsigned
-                         ? static_cast<uint32_t>(std::stoul(imm.text))
-                         : static_cast<uint32_t>(std::stoi(imm.text)))}
-                    .encode();
+            return viua::arch::ops::R{
+                opcode,
+                insn.operands.at(0).make_access(),
+                insn.operands.at(1).make_access(),
+                (is_unsigned ? static_cast<uint32_t>(std::stoul(imm.text))
+                             : static_cast<uint32_t>(std::stoi(imm.text)))}
+                .encode();
         } catch (std::invalid_argument const&) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
@@ -652,7 +650,8 @@ auto emit_instruction(viua::libs::parser::ast::Instruction const insn) -> viua::
     default:
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{insn.opcode, Cause::Unknown_opcode, "cannot emit instruction"};
+        throw Error{
+            insn.opcode, Cause::Unknown_opcode, "cannot emit instruction"};
     }
 }
 }  // namespace viua::libs::stage

@@ -46,11 +46,11 @@
 
 #include <viua/arch/arch.h>
 #include <viua/arch/ops.h>
-#include <viua/libs/stage.h>
 #include <viua/libs/assembler.h>
 #include <viua/libs/errors/compile_time.h>
 #include <viua/libs/lexer.h>
 #include <viua/libs/parser.h>
+#include <viua/libs/stage.h>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
 #include <viua/support/vector.h>
@@ -870,7 +870,8 @@ auto load_value_labels(std::filesystem::path const source_path,
                                            .add(ct.value.at(i - 2))
                                            .aside("right-hand side must be an "
                                                   "positive integer");
-                        viua::libs::stage::display_error_and_exit(source_path, source_text, e);
+                        viua::libs::stage::display_error_and_exit(
+                            source_path, source_text, e);
                     }
 
                     auto x = ston<size_t>(next.text);
@@ -907,7 +908,8 @@ auto load_function_labels(AST_nodes const& nodes,
 
 auto cook_long_immediates(ast::Instruction insn,
                           std::vector<uint8_t>& strings_table,
-                          std::map<std::string, size_t>& var_offsets) -> std::vector<ast::Instruction>
+                          std::map<std::string, size_t>& var_offsets)
+    -> std::vector<ast::Instruction>
 {
     auto cooked = std::vector<ast::Instruction>{};
 
@@ -1043,8 +1045,7 @@ auto cook_long_immediates(ast::Instruction insn,
         cooked.push_back(std::move(insn));
     } else if (insn.opcode == "float" or insn.opcode == "g.float") {
         constexpr auto SIZE_OF_SINGLE_PRECISION_FLOAT = size_t{4};
-        auto f =
-            std::stof(insn.operands.back().ingredients.front().text);
+        auto f = std::stof(insn.operands.back().ingredients.front().text);
         auto s = std::string(SIZE_OF_SINGLE_PRECISION_FLOAT, '\0');
         memcpy(s.data(), &f, SIZE_OF_SINGLE_PRECISION_FLOAT);
         auto const saved_at = save_string(strings_table, s);
@@ -1065,8 +1066,7 @@ auto cook_long_immediates(ast::Instruction insn,
         cooked.push_back(std::move(insn));
     } else if (insn.opcode == "double" or insn.opcode == "g.double") {
         constexpr auto SIZE_OF_DOUBLE_PRECISION_FLOAT = size_t{8};
-        auto f =
-            std::stod(insn.operands.back().ingredients.front().text);
+        auto f = std::stod(insn.operands.back().ingredients.front().text);
         auto s = std::string(SIZE_OF_DOUBLE_PRECISION_FLOAT, '\0');
         memcpy(s.data(), &f, SIZE_OF_DOUBLE_PRECISION_FLOAT);
         auto const saved_at = save_string(strings_table, s);
@@ -1110,8 +1110,10 @@ auto cook_long_immediates(std::filesystem::path const source_path,
                 auto c = cook_long_immediates(insn, strings_table, var_offsets);
                 std::copy(c.begin(), c.end(), std::back_inserter(cooked));
             } catch (viua::libs::errors::compile_time::Error const& e) {
-                viua::libs::stage::display_error_in_function(source_path, e, fn.name.text);
-                viua::libs::stage::display_error_and_exit(source_path, source_text, e);
+                viua::libs::stage::display_error_in_function(
+                    source_path, e, fn.name.text);
+                viua::libs::stage::display_error_and_exit(
+                    source_path, source_text, e);
             }
         }
         fn.instructions = std::move(cooked);
@@ -1134,8 +1136,10 @@ auto cook_pseudoinstructions(std::filesystem::path const source_path,
             fn.instructions = ::expand_pseudoinstructions(
                 std::move(fn.instructions), fn_offsets);
         } catch (viua::libs::errors::compile_time::Error const& e) {
-            viua::libs::stage::display_error_in_function(source_path, e, fn.name.text);
-            viua::libs::stage::display_error_and_exit(source_path, source_text, e);
+            viua::libs::stage::display_error_in_function(
+                source_path, e, fn.name.text);
+            viua::libs::stage::display_error_and_exit(
+                source_path, source_text, e);
         }
 
         if constexpr (DEBUG_EXPANSION) {
@@ -1171,7 +1175,8 @@ auto find_entry_point(std::filesystem::path const source_path,
                         dup.name, Cause::Duplicated_entry_point, dup.name.text}
                         .add(dup.attr("entry_point").value())
                         .note("first entry point was: " + entry_point_fn->text);
-                viua::libs::stage::display_error_and_exit(source_path, source_text, e);
+                viua::libs::stage::display_error_and_exit(
+                    source_path, source_text, e);
             }
             entry_point_fn = static_cast<ast::Fn_def&>(*each).name;
         }
@@ -1242,7 +1247,8 @@ auto emit_bytecode(std::filesystem::path const source_path,
         }
 
         if (fn_name.has_value()) {
-            viua::libs::stage::display_error_in_function(source_path, e, *fn_name);
+            viua::libs::stage::display_error_in_function(
+                source_path, e, *fn_name);
         }
         viua::libs::stage::display_error_and_exit(source_path, source_text, e);
     }
@@ -1718,7 +1724,8 @@ auto main(int argc, char* argv[]) -> int
      * processing later. The first point at which errors are detected eg, if
      * illegal characters are used, strings are unclosed, etc.
      */
-    auto lexemes = viua::libs::lexer::stage::lexical_analysis(source_path, source_text);
+    auto lexemes =
+        viua::libs::lexer::stage::lexical_analysis(source_path, source_text);
     if constexpr (DEBUG_LEX) {
         std::cerr << lexemes.size() << " raw lexeme(s)\n";
         for (auto const& each : lexemes) {

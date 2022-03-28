@@ -467,5 +467,5 @@ auto lexical_analysis(std::filesystem::path const source_path,
         viua::libs::stage::display_error_and_exit(source_path, source_text, e);
     }
 }
-}
+}  // namespace stage
 }  // namespace viua::libs::lexer

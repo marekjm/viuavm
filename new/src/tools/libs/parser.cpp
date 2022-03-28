@@ -261,7 +261,8 @@ auto parse_attr_list(
     return attrs;
 }
 auto parse_instruction(
-    viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes) -> ast::Instruction
+    viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes)
+    -> ast::Instruction
 {
     auto instruction = ast::Instruction{};
 
@@ -281,8 +282,8 @@ auto parse_instruction(
         }
 
         using viua::support::string::levenshtein_best;
-        auto best_candidate = levenshtein_best(
-            e.text, misspell_candidates, (e.text.size() / 2));
+        auto best_candidate =
+            levenshtein_best(e.text, misspell_candidates, (e.text.size() / 2));
         if (best_candidate.second == e.text) {
             throw;
         }
@@ -350,9 +351,8 @@ auto parse_instruction(
                 using viua::libs::errors::compile_time::Error;
                 throw Error{index, Cause::Invalid_register_access}
                     .add(access)
-                    .aside(
-                        "register index range is 0-"
-                        + std::to_string(viua::arch::MAX_REGISTER_INDEX));
+                    .aside("register index range is 0-"
+                           + std::to_string(viua::arch::MAX_REGISTER_INDEX));
             }
             operand.ingredients.push_back(access);
             operand.ingredients.push_back(index);
@@ -381,16 +381,13 @@ auto parse_instruction(
                 consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
             operand.ingredients.push_back(value);
         } else if (lexemes.front() == TOKEN::LITERAL_FLOAT) {
-            auto const value =
-                consume_token_of(TOKEN::LITERAL_FLOAT, lexemes);
+            auto const value = consume_token_of(TOKEN::LITERAL_FLOAT, lexemes);
             operand.ingredients.push_back(value);
         } else if (lexemes.front() == TOKEN::LITERAL_STRING) {
-            auto const value =
-                consume_token_of(TOKEN::LITERAL_STRING, lexemes);
+            auto const value = consume_token_of(TOKEN::LITERAL_STRING, lexemes);
             operand.ingredients.push_back(value);
         } else if (lexemes.front() == TOKEN::LITERAL_ATOM) {
-            auto const value =
-                consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
+            auto const value = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
             operand.ingredients.push_back(value);
         } else {
             using viua::libs::errors::compile_time::Cause;
