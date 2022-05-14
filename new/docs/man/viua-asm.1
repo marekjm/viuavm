@@ -1,6 +1,6 @@
 '\" t
 .\"
-.TH "VIUA-ASM" "1" "2022-03-24" "Viua VM 0.11.1" "Viua VM Manual"
+.TH "VIUA-ASM" "1" "2022-05-14" "Viua VM 0.11.1" "Viua VM Manual"
 .\" -----------------------------------------------------------------
 .\" * MAIN CONTENT STARTS HERE *
 .\" -----------------------------------------------------------------
@@ -8,10 +8,10 @@
 viua-asm \- convert Viua assembly source code to ELF binaries
 .SH "SYNOPSIS"
 .SY "viua asm"
-.OP \-o <output>
+.OP \-o output
 .OP \-c
 .OP \-\-
-.IR <source> \&.\|.\|.\&
+.IR source \&.\|.\|.\&
 .YS
 .SH "DESCRIPTION"
 .sp
@@ -19,54 +19,41 @@ viua-asm \- convert Viua assembly source code to ELF binaries
 files to be consumed by the virtual machine's kernel.
 .SH "OPTIONS"
 .SS General options
-.PP
+.TP
 .B \-c
-.RS 4
 Output a linkable module. The default is to output an executable.
-.RE
 .PP
 .B \-o
 .I output
-.RS 4
+.RS
 Write produced ELF binary into \fIoutput\fR file, instead of the default a.out
 file.
-.RE
 .SS Help and information
-.PP
-.BR \-v ,
-.B \-\-verbose
-.RS 4
+.TP
+.BR \-v ", " \-\-verbose
 Show verbose output, where applicable.
-.RE
-.PP
+.TP
 .B \-\-version
-.RS 4
 Show version information.
-.RE
 .SH "EXIT STATUS"
 .TP
-\fB0\fR
+.B 0
 Successful program execution.
 .TP
-\fB1\fR
+.B 1
 Syntax, semantic, type, or other error in input source code.
 .SH "FILES"
-.PP
-\fIsource\fR
-.RS 4
+.TP
+.I source
 The assembler opens its input files read-only. They must contain valid Viua VM
 assembly source code.
-.RE
-.PP
-\fIoutput\fR
-.RS 4
+.TP
+.I output
 The assembler outputs ELF binaries. They can be inspected using the usual
 .BR readelf (1)
 program, or the Viua-flavoured variant
 .BR viua\-readelf (1).
-.RE
 .SH "SEE ALSO"
-.sp
 .BR viua\-dis (1),
 .BR viua\-readelf (1),
 .BR viua\-repl (1),
@@ -74,5 +61,13 @@ program, or the Viua-flavoured variant
 .BR readelf (1),
 .BR elf (5)
 .SH "VIUA VM"
-.sp
 Part of the \fBviua\fR(1) toolchain
+.SH NOTES
+.TP
+Web site
+.UR https://viuavm.org
+.UE
+.TP
+Source code repository
+.UR https://git.sr.ht/~maelkum/viuavm
+.UE
