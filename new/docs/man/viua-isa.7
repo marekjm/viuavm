@@ -1,0 +1,501 @@
+'\" t
+.\"
+.TH "VIUA-ISA" "7" "2022-05-14" "Viua VM 0.11.1" "Viua VM Manual"
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+viua-isa \- Viua VM instruction set architecture
+.SH "SYNOPSIS"
+.SY "t-format"
+.IR register ,
+.IR register ,
+.I register
+.SY "d-format"
+.IR register ,
+.I register
+.SY "s-format"
+.I register
+.SY "n-format"
+.SY "e-format"
+.IR register ,
+.I 36-bit-immediate
+.SY "r-format"
+.IR register ,
+.IR register ,
+.I 24-bit-immediate
+.YS
+.SH "DESCRIPTION"
+This manual page describes Viua VM's ISA. It explains the operation of
+instructions, relationships between them, and provides examples of use.
+.SH "INSTRUCTION FORMATS"
+All Viua instructions are encoded on 64 bits, with the most sigificant 16 bits
+reserved the opcode, and the rest for the operands.
+.sp
+If an instruction produces a value, the output register is
+.B always
+the first (left-most) register.
+.SS "N-format"
+Instruction with no operands.
+.SS "T-format"
+Three-way register access.
+.sp
+Instructions of the
+.B T-format
+kind can be used to access at most three different registers at once. They are
+used, for example, for arithmetic and logic operations, as well as for
+instructions mutating the built-in compound data types.
+.SS "D-format"
+Two-way register access.
+.sp
+Instructions of the
+.B D-format
+kind can be used to access at most two different registers at once. They are
+used, for example, for moving values between registers, and for function calls.
+.SS "S-format"
+One-way register access.
+.sp
+Instructions of the
+.B S-format
+kind only access a single register. They are used mostly for constructor-type
+operations (construction objects of the built-in data types), and for returning
+values from function.
+.SS "E-format"
+One-way register access, and a 36-bit immediate.
+.sp
+Instructions of the
+.B E-format
+kind access a single register. These are used for construction wide integers, as
+well as addresses for use by other instructions.
+.SS "R-format"
+Two-way register access, and a 24-bit immediate.
+.sp
+Instructions of the
+.B R-format
+kind access at most two different registers at once. They are used for
+arithmetic operations with immediate values eg, "add immediate to register".
+.SH "REGISTERS"
+Registers are slots containing objects representing values of various data
+types, or being void (ie, empty). They are accessed by instructions to fetch
+objects to operate on, to store outputs of the instructions' operation, or to
+mutate objects already existing in the registers.
+.SS "Register access"
+Registers are accessed by specifying three things: access type, register index,
+and register set.
+.PP
+.B Access type
+is used to specify either
+.B indirect
+access (ie, when one register contains a reference to a
+value stored in another register, rather than storing the value directly), or
+.B direct
+access.
+Direct access is indicated by the
+.B $
+sigil, while indirect access is indicated by the
+.B *
+sigil.
+.PP
+.B Register index
+is an unsigned integer used to specify exactly which register should be
+accessed. There are
+.B 256
+registers available in each set.
+.PP
+.B Register set
+is a single-letter optional tag following the register index. It is used to
+specify which register set should be used. There are three register sets:
+.RS 2
+.TP
+\fBl\fR - \fBlocal\fR
+The default set, storing local variables of a function.
+.TP
+\fBa\fR - \fBarguments\fR
+The set created ad-hoc by the
+.B frame
+instruction. Used by the caller to prepare arguments (actual parameters) for a
+function call.
+.TP
+\fBp\fR - \fBparameters\fR
+The mirror image of the
+.B arguments
+set, used by the callee to access the values assigned to their formal parameters
+by a caller.
+.RE
+.sp
+The default register set is
+.B l
+ie, the
+.B local
+one. If access to the default register set is wanted the set tag may be omitted.
+.SS "Examples"
+.TP
+$1
+Directly access register number 1 in the
+.B local
+register set.
+.TP
+$2.p
+Directly access register number 2 in the
+.B parameters
+register set ie, the third formal parameter.
+.TP
+$0.a
+Directly access register number 0 in the
+.B arguments
+register set ie, the first actual parameter.
+.TP
+*0.p
+Use the reference in register number 0 in the
+.B parameters
+register set (ie, the first formal parameter) to access the value being
+referenced.
+This is how the
+.I this
+object could be accessed in C++.
+.SH "INSTRUCTIONS"
+Instructions represent operations implemented by the VM.
+.SS "Function calls"
+.\" * NEXT INSTRUCTION *
+.PP
+.B frame
+.I register
+.RS
+The instruction constructs an
+.B arguments
+set, with the requested number of registers.
+.PP
+.B frame
+.RI $ 4 . a
+.RS
+Create an
+.B arguments
+register set with four registers.
+.RE
+.RE
+.\" * NEXT INSTRUCTION *
+.PP
+.B actor
+.RI ( id:register
+|
+.BR void ) "" ,
+.I addr:register
+.RS
+Create an actor (a concurrently executing function call), calling function
+whose name is stored at address stored in register
+.I addr
+and storing the ID of the newly created actor in register
+.IR id .
+.PP
+.B actor
+.RI $ 2 . l ,
+.RI $ 1 . a
+.RS
+Call function identified by the name whose address is stored in register
+.RI $ 1 . a
+in a concurrently executing process, and store the ID of the newly created
+process in register 
+.RI $ 2 . l .
+.RE
+.PP
+.B actor
+.BR void ,
+.RI $ 1 . a
+.RS
+Call function identified by the name whose address is stored in register
+.RI $ 1 . a
+in a concurrently executing process, and discard the process' ID.
+.RE
+.RE
+.\" * NEXT INSTRUCTION *
+.PP
+.B return
+.RI [ register
+|
+.BR void ]
+.RS
+Return from a function call, optionally returning a value. Returned value is
+.B moved
+if the function was invoked in a synchronous call; it is
+.B copied
+if the function was invoked in a concurrent call (see the
+.B actor
+instruction).
+.PP
+.B return
+.RI $ 2 . l
+.RS
+Finish the current function call, and return the value stored in register
+.RI $ 2 . l .
+.RE
+.PP
+.B return
+.RB [ void ]
+.RS
+Finish the current function call and return nothing.
+.RE
+.RE
+.SS "Immediate arithmetic"
+These instructions take a value from a register and manipulate it using a
+24-bit, signed or unsigned, integer:
+.sp
+.\" use .PD 0 to remove vertical space from between paragraphs acting as list
+.\" items
+.PD 0
+.RS 2
+.TP
+.B addi
+adds signed immediate to value from register
+.I lhs
+.TP
+.B subi
+subtracts signed immediate from value from register
+.I lhs
+.TP
+.B muli
+multiplies value from register
+.I lhs
+by signed immediate
+.TP
+.B divi
+divides value from register
+.I lhs
+by signed immediate
+.TP
+.B lui
+loads signed immediate into a register
+.RE 2
+.\" use .PD without operand to reset veritcal spacing between paragraphs to the
+.\" default value
+.PD
+.RE
+.sp
+Each instruction also comes in an unsigned variant. The unsigned variant is
+requested by using an immediate arithmetic instruction whose name ends with
+.BR u .
+For example
+.B addi
+becomes
+.BR addiu ,
+and
+.B divi
+becomes
+.BR diviu .
+.sp
+The signedness of the immediate matches that of the instruction. The value taken
+from register (in case of
+.B r-format
+instructions) is converted to a register-wide integer with signedness matching
+that of the immediate operand.
+.\" * NEXT INSTRUCTION *
+.PP
+.PD 0
+.BR addi [ u ] "" | subi [ u ] "" | muli [ u ] "" | divi [ u ]
+.IR out:register ,
+.IR lhs:register ,
+.I n
+.PP
+.BR addi [ u ] "" | subi [ u ] ""
+.IR out:register ,
+.BR void ,
+.I n
+.PD
+.RS
+Take a value from register
+.IR lhs ,
+and manipulate it using the 24-bit integer immediate
+.IR n .
+The value taken from register
+.I lhs
+is converted to a register-wide integer with signedness matching that of the
+instruction.
+.sp
+If the
+.I lhs
+register is specified as
+.B void
+the instruction can be used to load the immediate into a register.
+.sp
+See
+.B PSEUDOINSTRUCTIONS
+for an example of use.
+.RE
+.\" * NEXT INSTRUCTION *
+.PP
+.BR lui [ u ]
+.IR out:register ,
+.I n
+.RS
+Load the immediate into upper 36 bits of the lowest 64 bits of register
+.IR out .
+.sp
+See
+.B PSEUDOINSTRUCTIONS
+for an example of use.
+.RE
+.SS "Miscellaneous"
+These instructions do not belong to any other group, and each of them has some
+unique characteristics.
+.\" * NEXT INSTRUCTION *
+.PP
+.B ebreak
+.RS
+Break to debugger. When running with no debugger attached, the instruction dumps
+the actor's state snapshot to the trace file descriptor (see
+.BR viua-vm (1)
+for more information about the trace file descriptor).
+.RE
+.SH "PSEUDOINSTRUCTIONS"
+Pseudoinstructions represent operations not implemented directly by the VM, but
+ones which can be easily represented by the real instructions.
+
+Pseudoinstructions are a convenience mechanism for programmers, abstracting
+common operations which would be a wee bit too complex to be a real
+instruction.
+.\" * NEXT PSEUDOINSTRUCTION *
+.PP
+.B actor
+.IR register ,
+.I fn
+.RS
+Create an actor (a concurrently executing function call), calling function
+.I fn
+and storing the ID of the newly created actor in
+.IR register .
+.PP
+.B actor
+.RI $ 2 . l ,
+.I foo
+.RS
+Call function
+.I foo
+in a concurrently executing process and store its ID in register
+.RI $ 2 . l .
+.RE
+.RE
+.\" * NEXT PSEUDOINSTRUCTION *
+.PP
+.B li
+.IR register ,
+.I n
+.RS
+Store a 64-bit, signed or unsigned, integer
+.I n
+in register
+.IR register .
+The integer is signed by default, and can be made unsigned by appending
+lowercase
+.B u
+to the integer literal. For example
+.I 42
+is signed, and
+.IB 42 u
+is unsigned.
+.PP
+.B li
+.RI $ 2 . l ,
+.I 42u
+.RS
+Store unsigned integer
+.I 42
+in register
+.RI $ 2 . l .
+.RE
+.PP
+.B li
+.RI $ 1 . a ,
+.I -4
+.RS
+Store signed integer
+.I -4
+in register
+.RI $ 1 . a .
+.RE
+.RE
+.\" * NEXT PSEUDOINSTRUCTION *
+.PP
+.BR addi | subi | muli | divi
+.IR out:register ,
+.IR lhs:register ,
+.I n
+.RS
+Take a value from register
+.IR lhs ,
+and manipulate it using the 24-bit, signed or unsigned, integer immediate
+.IR n :
+.sp
+.\" use .PD 0 to remove vertical space from between paragraphs acting as list
+.\" items
+.PD 0
+.RS 2
+.TP
+.B addi
+adds immediate to value from register
+.I lhs
+.TP
+.B subi
+subtracts immediate from value from register
+.I lhs
+.TP
+.B muli
+multiplies value from register
+.I lhs
+by immediate
+.TP
+.B divi
+divides value from register
+.I lhs
+by immediate
+.RE
+.\" use .PD without operand to reset veritcal spacing between paragraphs to the
+.\" default value
+.PD
+.RE 2
+.sp
+The value taken from register
+.I lhs
+is converted to integer with signedness matching that of the immediate value.
+.PP
+.B addi
+.RI $ 2 . l ,
+.RI $ 0 . a ,
+.I -4
+.RS
+Multiply value from register
+.RI $ 0 . a
+by -4, and store the result in register
+.RI $ 2 . l .
+The result is a signed integer, because the immediate value is signed.
+.RE
+.PP
+.B divi
+.RI $ 1 . l ,
+.RI $ 1 . l ,
+.I 2u
+.RS
+Divide value from register
+.RI $ 1 . l
+by 2, and store the result in register
+.RI $ 1 . l .
+This halves the value in register
+.RI $ 1 . l .
+The result is an unsigned integer, because the immediate value is unsigned.
+.RE
+.RE
+.SH "SEE ALSO"
+.BR viua\-asm (1),
+.BR viua\-dis (1),
+.BR viua\-vm (1)
+.SH "VIUA VM"
+Part of the
+.BR viua (1)
+toolchain
+.SH NOTES
+.TP
+Web site
+.UR https://viuavm.org
+.UE
+.TP
+Source code repository
+.UR https://git.sr.ht/~maelkum/viuavm
+.UE
