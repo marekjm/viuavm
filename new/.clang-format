@@ -54,7 +54,11 @@ IncludeBlocks: Regroup
 SortIncludes: true
 IncludeCategories: 
   - Regex:    '^<(viua)/'
+    Priority: 4
+  - Regex:    '^<(linenoise)/'
     Priority: 3
+  - Regex:    '^<(experimental/[a-z][a-z_]+)>'
+    Priority: 2
   - Regex:    '^<([a-z][a-z_]+)>'
     Priority: 2
   - Regex:    '.*'
