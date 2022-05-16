@@ -12,9 +12,15 @@ BUILD_EXEC_DIR=$(BUILD)/tools/exec
 VIUA_LIB_DIR=$(LIBDIR)/viua
 VIUA_CORE_DIR=$(VIUA_LIB_DIR)/viua-core
 
-
 VIUAVM_VERSION=$(shell sh ./scripts/make_version.sh)
 VIUAVM_VERSION_FULL=$(shell sh ./scripts/make_version.sh full)
+
+OPTNAME=$(VIUAVM_VERSION)
+VIUA_OPT_PREFIX=$(PREFIX)/opt/viua
+VIUA_OPT_ROOT=$(VIUA_OPT_PREFIX)/$(OPTNAME)
+VIUA_OPT_LIB_DIR=$(VIUA_OPT_ROOT)/lib
+VIUA_OPT_CORE_DIR=$(VIUA_OPT_LIB_DIR)/viua-core
+VIUA_OPT_ETC_DIR=$(VIUA_OPT_ROOT)/etc
 
 
 ################################################################################
@@ -70,7 +76,8 @@ clean:
 install: all
 	mkdir -p $(VIUA_CORE_DIR)
 	@cp -v $(BUILD_EXEC_DIR)/{asm,dis,readelf,vm,repl} $(VIUA_CORE_DIR)/
-	@cp -v $(BUILD_EXEC_DIR)/viua $(PREFIX)/bin/
+	mkdir -p $(BINDIR)
+	@cp -v $(BUILD_EXEC_DIR)/viua $(BINDIR)/
 	mkdir -p \
 		$(MANDIR)/man1 \
 		$(MANDIR)/man7
@@ -81,6 +88,14 @@ erase:
 	rm $(BINDIR)/viua
 	rm -r $(VIUA_LIB_DIR)
 	rm -v $(MANDIR)/man*/viua*
+
+install-opt:
+	make PREFIX=$(VIUA_OPT_ROOT) install
+	mkdir -p $(VIUA_OPT_ETC_DIR)/viua
+	echo "$(VIUAVM_VERSION_FULL)" > $(VIUA_OPT_ETC_DIR)/viua/version
+
+erase-opt:
+	rm -r $(VIUA_OPT_ROOT)
 
 install-binfmt:
 	mkdir -p $(PREFIX)/lib/binfmt.d
