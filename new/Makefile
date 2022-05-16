@@ -4,14 +4,13 @@ BUILD=./build
 
 PREFIX=~/.local
 BINDIR=$(PREFIX)/bin
+LIBDIR=$(PREFIX)/lib
 SHAREDIR=$(PREFIX)/share
 MANDIR=$(SHAREDIR)/man
 
 BUILD_EXEC_DIR=$(BUILD)/tools/exec
-CORE_DIR=$(PREFIX)/lib/viua/core
-CORE_BIN_DIR=$(CORE_DIR)/bin
-CORE_LIB_DIR=$(CORE_DIR)/lib
-CORE_MAN_DIR=$(CORE_DIR)/man
+VIUA_LIB_DIR=$(LIBDIR)/viua
+VIUA_CORE_DIR=$(VIUA_LIB_DIR)/viua-core
 
 
 VIUAVM_VERSION=$(shell sh ./scripts/make_version.sh)
@@ -69,14 +68,19 @@ clean:
 	find ./tests -type f -name '*.bin' -delete
 
 install: all
-	mkdir -p $(PREFIX)/lib/viua/{core,site}/{bin,lib,share,man}
-	@cp -v $(BUILD_EXEC_DIR)/{asm,dis,readelf,vm} $(CORE_BIN_DIR)/
+	mkdir -p $(VIUA_CORE_DIR)
+	@cp -v $(BUILD_EXEC_DIR)/{asm,dis,readelf,vm,repl} $(VIUA_CORE_DIR)/
 	@cp -v $(BUILD_EXEC_DIR)/viua $(PREFIX)/bin/
 	mkdir -p \
 		$(MANDIR)/man1 \
 		$(MANDIR)/man7
 	@cp -v docs/man/*.1 $(MANDIR)/man1
 	@cp -v docs/man/*.7 $(MANDIR)/man7
+
+erase:
+	rm $(BINDIR)/viua
+	rm -r $(VIUA_LIB_DIR)
+	rm -v $(MANDIR)/man*/viua*
 
 install-binfmt:
 	mkdir -p $(PREFIX)/lib/binfmt.d
