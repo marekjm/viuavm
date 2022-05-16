@@ -473,6 +473,7 @@ auto main(int argc, char* argv[]) -> int
     auto demangle_li           = true;
     auto verbosity_level       = 0;
     auto show_version          = false;
+    auto show_help          = false;
 
     for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
         auto const& each = args.at(i);
@@ -495,8 +496,12 @@ auto main(int argc, char* argv[]) -> int
             ++verbosity_level;
         } else if (each == "--version") {
             show_version = true;
+        } else if (each == "--help") {
+            show_help = true;
         } else if (each.front() == '-') {
-            // unknown option
+            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+                      << ": unknown option: " << each << "\n";
+            return 1;
         } else {
             // input files start here
             break;
@@ -510,6 +515,13 @@ auto main(int argc, char* argv[]) -> int
         std::cout << (verbosity_level ? VIUAVM_VERSION_FULL : VIUAVM_VERSION)
                   << "\n";
         return 0;
+    }
+    if (show_help) {
+        if (execlp("man", "man", "1", "viua-dis", nullptr) == -1) {
+            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+                      << ": man(1) page not installed or not found\n";
+            return 1;
+        }
     }
 
     /*
