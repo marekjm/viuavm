@@ -1,0 +1,80 @@
+'\" t
+.\"
+.TH "VIUA" "1" "2022-05-17" "Viua VM 0.11.1" "Viua VM Manual"
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.nh
+.SH "NAME"
+viua \- a bytecode virtual machine for highly concurrent software
+.SH "SYNOPSIS"
+.SY "viua"
+.BR asm | dis | vm | readelf | repl
+.RI [ file ]
+.SY "viua asm"
+.OP \-o outfile
+.IR infile ...
+.sp
+.SY "viua help"
+.RI [ tool ]
+.SY "viua"
+.B \-\-help
+.sp
+.SY "viua"
+.B \-\-version
+.YS
+.SH "DESCRIPTION"
+.B Viua
+is a bytecode virtual machine designed to effectively run highly concurrent
+software. The high-level execution model exposed to user code is based on the
+Actor model.
+See
+.BR viua-isa (7)
+for description of thevirtual machine's instruction set and architecture.
+.sp
+The
+.BR viua (1)
+driver program is the entry point to the toolchain provided by the VM.
+.SH "TOOLCHAIN"
+The default Viua distribution comes with a few core tools.
+.TP
+.B viua
+The entry point into the toolchain.
+.TP
+.B asm
+The assembler turns source code written in Viua assembly language into ELF
+files to be run by the VM.
+.TP
+.B dis
+The disassembler turns ELF files with Viua bytecode into assembly source code.
+The recreated source will be functionally equivallent to the original source
+code used to build the ELF, but may look a little bit different.
+.TP
+.B vm
+The virtual machine's kernel executes the ELF files produced by the assembler.
+It is the core of the VM.
+.TP
+.B readelf
+ELF file analyser customised for ELFs produced by Viua.
+.TP
+.B repl
+The interactive evaluator and debugger.
+.SH "SEE ALSO"
+.BR viua\-asm (1),
+.BR viua\-dis (1),
+.BR viua\-readelf (1),
+.BR viua\-repl (1),
+.BR viua\-vm (1),
+.BR readelf (1),
+.BR elf (5)
+.SH "VIUA VM"
+Part of the \fBviua\fR(1) toolchain
+.SH NOTES
+.TP
+Web site
+.UR https://viuavm.org
+.UE
+.TP
+Source code repository
+.UR https://git.sr.ht/~maelkum/viuavm
+.UE
