@@ -41,6 +41,14 @@ function main {
         --version)
             exec ${VIUA_DIR}/viua-core/vm ${@:1}
             ;;
+        --opt)
+            OPT_NAME=${2}
+            if [[ ${OPT_NAME} == '-' ]]; then
+                OPT_NAME=default
+            fi
+            export VIUA_DIR=${VIUA_OPT_DIR}/${OPT_NAME}/lib/viua
+            main "${@:3}"
+            ;;
         -*)
             2>&1 echo "viua: error: unknown option \`${TOOL}'"
             exit 1
