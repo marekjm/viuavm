@@ -6,8 +6,9 @@ VIUA_DIR=${VIUA_DIR:-~/.local/lib/viua}
 VIUA_OPT_DIR=${VIUA_OPT_DIR:-~/.local/opt/viua}
 
 function show_help {
-    local WHAT_FOR=${1:-overview}
-    exec man 1 viua-${WHAT_FOR}
+    local WHAT_FOR=${1:-viua}
+    export MANPATH=${VIUA_DIR}/../../share/man:
+    exec man viua-${WHAT_FOR}
 }
 
 function viua_opt {

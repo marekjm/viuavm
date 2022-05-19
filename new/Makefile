@@ -83,6 +83,7 @@ install: all
 		$(MANDIR)/man7
 	@cp -v docs/man/*.1 $(MANDIR)/man1
 	@cp -v docs/man/*.7 $(MANDIR)/man7
+	@cp -v docs/man/viua.1 $(MANDIR)/man1/viua-viua.1
 
 erase:
 	rm $(BINDIR)/viua
