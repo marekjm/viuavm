@@ -1,0 +1,187 @@
+'\" t
+.\"
+.TH "VIUA-ISA" "7" "2022-05-14" "Viua VM 0.11.1" "Viua VM Manual"
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+viua-asm-lang \- Viua VM assembly language
+.SH "SYNOPSIS"
+.SY ".directive:"
+.I argument
+.SY ".directive"
+.YS
+.
+.SY "instruction"
+.RI [ argument "" ... ]
+.YS
+.SH "DESCRIPTION"
+This manual page describes Viua VM's assembly language syntax. The description
+is mostly abstract and high-level; for explanation of individual instructions
+and the ISA as a whole refer to
+.BR viua\-isa (7).
+.SS Modules
+Modules are files containing definitions of logic (functions) and data. Source
+modules are human-readable plaintext files whose content is text written in Viua
+VM assembly language. They are usually saved with either
+.BR .asm " or " .s
+extension.
+.sp
+Source modules are processed by the assembler and the linker to produce binary
+modules representing either executable files extensions or libraries (ie, shared
+objects).
+.TP
+.B Example
+dummy.asm
+.SS Directives
+The top-level elements of source modules are
+.IR directives .
+They are used to define functions (using
+.BR .function: ),
+label static pieces of data (using
+.BR .label: )
+and provide other information to the assembler, linker, and VM kernel.
+Some directives may also appear as children of other directives.
+.TP
+.B Example
+.nf
+\&.function: main
+    return
+\&.end
+.fi
+.SS "Instructions and pseudoinstructions"
+Instructions and pseudoinstructions are used to represent instructions of Viua
+VM ISA. Unless explicitly stated otherwise, "instruction" in this manual page
+may mean either a real instruction or a pseudoinstruction.
+.TP
+.B Example
+.nf
+noop
+li $2.l, 42
+move $1.a, $2.l
+call $1.l, some_fn
+return void
+.fi
+.SS Attributes
+Attributes are values enclosed between pairs of square brackets ie, between a
+.B [[
+and a
+.BR ]] .
+They provide the assembler with additional information related to the
+.I next
+token. For example, marking a function as the entry point of an executable is
+achieved by setting the
+.B entry_point
+attribute on a function:
+.RS
+.sp
+.nf
+\&.function: [[\fBentry_point\fP]] \fImain\fP
+    return
+\&.end
+.fi
+.sp
+.RE
+Similarly, to force the assembler to use the full, unoptimised sequence of
+instructions to load an integer into a register one would use the
+.B full
+attribute:
+.RS
+.sp
+.nf
+li $1.l, [[\fBfull\fP]] \fI42\fP
+.fi
+.sp
+.RE
+.SH "DIRECTIVES"
+Directives are the only allowed top-level elements of a source module, but not
+all directives are legal in a top-level position. This section lists available
+directives and specifies what is their legal position.
+.SS "Top-level directives"
+.TP
+.B .function:\c
+.RI " " name
+Instruct the assembler that the following sequence of instructions represents a
+function named
+.IR name .
+The name is given either as an atom (a sequence of lower- and uppercase letters
+and underscores), or as a string (enclosed in double quotes).
+.RS
+.RS
+.sp
+.nf
+\&.function: main
+\&.function: some_fn
+\&.function: "main (int, char**) -> int"
+.fi
+.RE
+.RE
+.TP
+.B .end
+Instruct the assembler that the sequence of instructions which began with the
+previous
+.B .function:
+directive ends. Function definitions must appear between
+.B .function:
+and
+.B .end 
+directives.
+.RS
+.RS
+.sp
+.nf
+\&.function: main
+    li $1.l, 42
+    ebreak
+    return
+\&.end
+.fi
+.RE
+.RE
+.TP
+.B .label:\c
+.RI " " name
+Instruct the assembler label a static piece of data with
+.IR name .
+The
+.B .label:
+directive must appear just before a
+.B .value:
+directive.
+.TP
+.B .value:\c
+.RI " " type " " value
+Instruct the assembler to append an object of type
+.I type
+with a value of
+.I value
+to the global, static, initialised data segment. The
+.BR elf (5)
+files produced and consumed by Viua toolchain store such data in the
+.B .rodata
+segment.
+.RS
+.RS
+.sp
+.nf
+\&.label: hello_world
+\&.value: string "Hello, World!"
+.fi
+.RE
+.RE
+.SH "SEE ALSO"
+.BR viua\-asm (1),
+.BR viua\-isa (7)
+.SH "VIUA VM"
+Part of the
+.BR viua (1)
+toolchain
+.SH NOTES
+.TP
+Web site
+.UR https://viuavm.org
+.UE
+.TP
+Source code repository
+.UR https://git.sr.ht/~maelkum/viuavm
+.UE

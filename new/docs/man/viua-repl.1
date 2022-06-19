@@ -1,0 +1,114 @@
+'\" t
+.\"
+.TH "VIUA-REPL" "7" "2022-06-12" "Viua VM 0.11.1" "Viua VM Manual"
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+viua-repl \- Viua VM debugger
+.SH "SYNOPSIS"
+.SY "viua repl"
+.OP \-\-
+.I executable
+.RI [ args
+\&.\|.\|.\&]
+.YS
+.
+.SY "viua repl"
+.B \-\-version
+.SY "viua repl"
+.B \-\-help
+.YS
+.SH "DESCRIPTION"
+The REPL allows inspecting what is going on inside Viua bytecode executables
+while they run; and experimenting, by providing means of interactive evaluation
+of snippets of Viua assembly code.
+.PP
+These two modes can be mixed eg, an piece of assembly code may be written ad-hoc
+and evaluated in the context of an executable being debugged.
+.SH "OPTIONS"
+.SS General options
+.TP
+.BR \-v ", " \-\-verbose
+Show verbose output, where applicable.
+.SS Help and information
+.TP
+.B \-\-help
+Show this
+.BR man (1)
+page.
+.TP
+.B \-\-version
+Show version information.
+.SH "FILES"
+.TP
+.I executable
+The executable file containing the program to be debugged. Any shared libraries
+that may be needed will be loaded automatically, as if the program was run
+unsupervised.
+.SH "COMMANDS"
+The debugger is controlled using commands.
+.TP
+.B quit
+Abandon the debugging session, and quit the debugger. The program being
+debugged, if any, is killed.
+.TP
+.B "repl pid-base"
+Show PID base used for the debugging session. See the description of
+.B VIUA_VM_PID_SEED
+environment variable in
+.BR viua-vm (1).
+.TP
+.BI "load " "name file"
+Load
+.I file
+as module named
+.IR name .
+The symbols stored in the module will be made available in the debugging
+session.
+.TP
+.B "actor new \fIfn\fR"
+Create new actor using function
+.IR fn .
+The debugger immediately switches to the newly spawned actor.
+.TP
+.BR backtrace | bt
+Display the stack of the current actor.
+.TP
+.B "show frame \fR[\fIn\fP]"
+Display contents of frame
+.IR n .
+By default, the top-most frame is selected.
+.TP
+.BR stepi [. g ] " \fR[\fIn\fP]"
+Step through a single instruction. The
+.RB . g
+variant of the command steps through sequences of greedy instructions.
+Optionally, the command allows stepping through
+.I n
+instructions.
+.TP
+.BR up | down
+Select a higher or lower frame on the active actor's stack.
+.TP
+.BI "eval asm " instruction
+Evaluate
+.I instruction
+in the context of the current frame.
+.SH "SEE ALSO"
+.BR viua\-asm (1),
+.BR viua\-dis (1),
+.BR viua\-vm (1)
+.SH "VIUA VM"
+Part of the
+.BR viua (1)
+toolchain.
+.SH NOTES
+.TP
+Web site
+.UR https://viuavm.org
+.UE
+.TP
+Source code repository
+.UR https://git.sr.ht/~maelkum/viuavm
+.UE
