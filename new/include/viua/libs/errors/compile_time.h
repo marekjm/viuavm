@@ -42,6 +42,7 @@ enum class Cause {
 
     Unexpected_token,
 
+    Unknown_directive,
     Unknown_opcode,
     Invalid_register_access,
     Too_few_operands,

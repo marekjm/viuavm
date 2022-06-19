@@ -285,7 +285,9 @@ auto parse_instruction(
         auto best_candidate =
             levenshtein_best(e.text, misspell_candidates, (e.text.size() / 2));
         if (best_candidate.second == e.text) {
-            throw;
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+            throw Error{e, Cause::Unknown_opcode, e.text};
         }
 
         using viua::libs::errors::compile_time::Cause;
@@ -556,7 +558,11 @@ auto parse(viua::support::vector_view<viua::libs::lexer::Lexeme> lexemes)
             auto node = parse_constant_definition(lexemes);
             nodes.push_back(std::move(node));
         } else {
-            throw each;
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+            throw Error{each, Cause::Unexpected_token}
+                .aside("only directives can be top-level tokens")
+                .note("refer to viua-asm-lang(1) for more information");
         }
     }
 

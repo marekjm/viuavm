@@ -89,6 +89,12 @@ enum class TOKEN {
      */
     WHITESPACE,
     COMMENT,
+
+    /*
+     * Used for synthetic errors during lexical analysis phase, when there are
+     * no tokens available yet.
+     */
+    INVALID,
 };
 auto to_string(TOKEN const) -> std::string;
 

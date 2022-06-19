@@ -122,6 +122,8 @@ auto to_string(TOKEN const token) -> std::string
         return "WHITESPACE";
     case TOKEN::COMMENT:
         return "COMMENT";
+    case TOKEN::INVALID:
+        return "INVALID";
     }
 
     // impossible, because all cases are handled in the enumeration above
@@ -134,6 +136,7 @@ const auto DEF_FUNCTION = std::regex{"^.function:"};
 const auto END          = std::regex{"^.end"};
 const auto DEF_LABEL    = std::regex{"^.label:"};
 const auto DEF_VALUE    = std::regex{"^.value:"};
+const auto DIRECTIVE_LOOKALIKE = std::regex{"^\\.[a-zA-Z_]+:?"};
 
 const auto WHITESPACE = std::regex{"^[ \t]+"};
 
@@ -177,8 +180,17 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
         }
         if (source_text[0] == '\\') {
             if (source_text.size() == 1 or source_text[1] != '\n') {
-                throw Location{line, character, offset};  // invalid line
-                                                          // continuation
+                using viua::libs::errors::compile_time::Cause;
+                using viua::libs::errors::compile_time::Error;
+
+                auto const lexeme = Lexeme{
+                    std::string{1, source_text[0]},
+                    TOKEN::INVALID,
+                    Location{line, character, offset}
+                };
+
+                throw Error{lexeme, Cause::Unexpected_token}
+                    .aside("line continuation not immediately followed by \\n character");
             }
 
             line += 1;
@@ -292,6 +304,12 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
         if (try_match(DEF_VALUE, TOKEN::DEF_VALUE)) {
             continue;
         }
+        if (try_match(DIRECTIVE_LOOKALIKE, TOKEN::INVALID)) {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+
+            throw Error{lexemes.back(), Cause::Unknown_directive};
+        }
         if (try_match(COMMA, TOKEN::COMMA)) {
             continue;
         }
@@ -377,7 +395,16 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
             continue;
         }
 
-        throw Location{line, character, offset};
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+
+        auto const lexeme = Lexeme{
+            std::string(1, source_text[0]),
+            TOKEN::INVALID,
+            Location{line, character, offset}
+        };
+
+        throw Error{lexeme, Cause::Unexpected_token};
     }
 
     return lexemes;
