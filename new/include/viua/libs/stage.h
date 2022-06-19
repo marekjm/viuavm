@@ -41,10 +41,14 @@ auto view_line_after(std::string_view sv, viua::libs::lexer::Location loc)
 auto cook_spans(
     std::vector<viua::libs::errors::compile_time::Error::span_type> raw)
     -> std::vector<std::tuple<bool, size_t, size_t>>;
+
+auto display_error(std::filesystem::path,
+                       std::string_view,
+                       viua::libs::errors::compile_time::Error const&) -> void;
 auto display_error_and_exit
-    [[noreturn]] (std::filesystem::path source_path,
-                  std::string_view source_text,
-                  viua::libs::errors::compile_time::Error const& e) -> void;
+    [[noreturn]] (std::filesystem::path,
+                  std::string_view,
+                  viua::libs::errors::compile_time::Error const&) -> void;
 
 auto display_error_in_function(std::filesystem::path const source_path,
                                viua::libs::errors::compile_time::Error const& e,

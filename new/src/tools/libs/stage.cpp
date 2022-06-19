@@ -185,8 +185,9 @@ auto cook_spans(
 
     return cooked;
 }
-auto display_error_and_exit
-    [[noreturn]] (std::filesystem::path source_path,
+
+auto display_error
+    (std::filesystem::path source_path,
                   std::string_view source_text,
                   viua::libs::errors::compile_time::Error const& e) -> void
 {
@@ -361,7 +362,13 @@ auto display_error_and_exit
             } while (sv.find('\n') != std::string::npos);
         }
     }
-
+}
+auto display_error_and_exit
+    [[noreturn]] (std::filesystem::path source_path,
+                  std::string_view source_text,
+                  viua::libs::errors::compile_time::Error const& e) -> void
+{
+    display_error(source_path, source_text, e);
     exit(1);
 }
 
