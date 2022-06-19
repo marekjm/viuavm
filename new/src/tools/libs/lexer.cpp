@@ -132,10 +132,10 @@ auto to_string(TOKEN const token) -> std::string
 
 const auto COMMENT = std::regex{"^[;#].*"};
 
-const auto DEF_FUNCTION = std::regex{"^.function:"};
-const auto END          = std::regex{"^.end"};
-const auto DEF_LABEL    = std::regex{"^.label:"};
-const auto DEF_VALUE    = std::regex{"^.value:"};
+const auto DEF_FUNCTION = std::regex{"^\\.function:"};
+const auto END          = std::regex{"^\\.end"};
+const auto DEF_LABEL    = std::regex{"^\\.label:"};
+const auto DEF_VALUE    = std::regex{"^\\.value:"};
 const auto DIRECTIVE_LOOKALIKE = std::regex{"^\\.[a-zA-Z_]+:?"};
 
 const auto WHITESPACE = std::regex{"^[ \t]+"};
