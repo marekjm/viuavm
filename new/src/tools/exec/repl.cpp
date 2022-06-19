@@ -348,23 +348,45 @@ auto load_module(std::string_view const name, std::filesystem::path elf_path)
         viua::vm::Module{elf_path, mod});
 }
 
-auto evaluate_asm_expression(std::string const asm_text) -> void
+auto evaluate_asm_expression(std::string const source_text) -> void
 {
-    auto lexemes = viua::libs::lexer::stage::lexical_analysis("-", asm_text);
-    lexemes      = viua::libs::parser::ast::remove_noise(std::move(lexemes));
+    auto lexemes = std::vector<viua::libs::lexer::Lexeme>{};
+    try {
+        lexemes = viua::libs::lexer::lex(source_text);
+        lexemes = viua::libs::parser::ast::remove_noise(std::move(lexemes));
+    } catch (viua::libs::errors::compile_time::Error const& e) {
+        viua::libs::stage::display_error("-", source_text, e);
+        return;
+    }
 
     auto lv = viua::support::vector_view{lexemes};
-    auto p  = viua::libs::parser::parse_instruction(lv);
+    auto p  = viua::libs::parser::ast::Instruction{};
+    try {
+        p = viua::libs::parser::parse_instruction(lv);
+    } catch (viua::libs::errors::compile_time::Error const& e) {
+        viua::libs::stage::display_error("-", source_text, e);
+        return;
+    }
 
     auto strings_table = std::vector<uint8_t>{};
     auto var_offsets   = std::map<std::string, size_t>{};
     auto const cooked =
         viua::libs::stage::cook_long_immediates(p, strings_table, var_offsets);
 
-    auto proc = REPL_STATE->core.find(*REPL_STATE->selected_pid);
+    auto instructions = std::vector<viua::arch::instruction_type>{};
     for (auto const& each : cooked) {
-        auto instruction = viua::libs::stage::emit_instruction(each);
-        viua::vm::ins::execute(proc->stack, &instruction);
+        try {
+            auto const i = viua::libs::stage::emit_instruction(each);
+            instructions.push_back(i);
+        } catch (viua::libs::errors::compile_time::Error const& e) {
+            viua::libs::stage::display_error("-", source_text, e);
+            return;
+        }
+    }
+
+    auto proc = REPL_STATE->core.find(*REPL_STATE->selected_pid);
+    for (auto const each : instructions) {
+        viua::vm::ins::execute(proc->stack, &each);
     }
 }
 
@@ -430,6 +452,8 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
                 auto pid           = REPL_STATE->core.spawn(mod_name, fn_addr);
                 REPL_STATE->selected_pid =
                     std::make_unique<viua::runtime::PID>(pid);
+
+                break;
             }
         }
     } else if (*p(0) == "backtrace" or *p(0) == "bt") {
