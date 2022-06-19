@@ -114,20 +114,58 @@ auto cook_spans(
     -> std::vector<std::tuple<bool, size_t, size_t>>
 {
     /*
-     * In case of synthesized lexemes, there may be several of them that have
+     * In case of synthesised lexemes, there may be several of them that have
      * the same offset. Naively including all of them in spans produces... weird
      * results when the output is formatted for an error report.
      *
-     * Let's only use the first span at a given offset.
+     * Let's only use the first span at a given offsets.
      */
     auto seen_offsets = std::set<size_t>{};
 
+    /*
+     * Cooked spans vector covers a whole line, so we need to record the
+     * following information:
+     *
+     *   1/ whether a region should be highlighted
+     *   2/ where does a region start
+     *   3/ how long it is
+     *
+     * This makes life easy for us later, when we can just std::string::substr()
+     * to success, and switch on the highlight-or-not member of the tuple.
+     */
     auto cooked = std::vector<std::tuple<bool, size_t, size_t>>{};
-    if (std::get<1>(raw.front()) != 0) {
+    if (raw.empty()) {
+        return cooked;
+    }
+
+    /*
+     * Cooked spans cover the whole line, both regions which should be
+     * highlighted and those which should not be. This means that whitespace
+     * must also be considered.
+     *
+     * Thus, if the first span is not at offset 0 we must produce a span that
+     * covers the region of the line leading to that first span (eg, the
+     * indentation).
+     *
+     * Otherwise, we have to push the first raw span. The cooking loop needs
+     * to look at the last cooked span when cooking a raw one, so the cooked
+     * vector MUST contain AT LEAST ONE cooked span.
+     */
+    if (std::get<0>(raw.front()) != 0) {
         cooked.emplace_back(false, 0, raw.front().first);
         seen_offsets.insert(0);
+    } else {
+        auto const& each = raw.front();
+        cooked.emplace_back(true, each.first, each.second);
+        seen_offsets.insert(each.first);
     }
+
     for (auto const& each : raw) {
+        /*
+         * Check if we have a gap between last cooked span and the next raw one.
+         * In the final cooked span vector the MUST BE NO GAPS so we have to
+         * fill any that are found. Of course, gaps should not be highlighted.
+         */
         auto const& [hl, offset, size] = cooked.back();
         if (auto const want = (offset + size); want < each.first) {
             if (not seen_offsets.contains(want)) {
@@ -135,6 +173,10 @@ auto cook_spans(
                 seen_offsets.insert(want);
             }
         }
+
+        /*
+         * Last, but not least, cook the actual raw span.
+         */
         if (not seen_offsets.contains(each.first)) {
             cooked.emplace_back(true, each.first, each.second);
             seen_offsets.insert(each.first);
