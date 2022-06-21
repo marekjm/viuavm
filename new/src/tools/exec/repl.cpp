@@ -370,8 +370,17 @@ auto evaluate_asm_expression(std::string const source_text) -> void
 
     auto strings_table = std::vector<uint8_t>{};
     auto var_offsets   = std::map<std::string, size_t>{};
-    auto const cooked =
-        viua::libs::stage::cook_long_immediates(p, strings_table, var_offsets);
+    auto fn_offsets    = std::map<std::string, size_t>{};
+    auto cooked        = std::vector<viua::libs::parser::ast::Instruction>{};
+    try {
+        cooked = viua::libs::stage::cook_long_immediates(
+            p, strings_table, var_offsets);
+        cooked =
+            viua::libs::stage::expand_pseudoinstructions(cooked, fn_offsets);
+    } catch (viua::libs::errors::compile_time::Error const& e) {
+        viua::libs::stage::display_error("-", source_text, e);
+        return;
+    }
 
     auto instructions = std::vector<viua::arch::instruction_type>{};
     for (auto const& each : cooked) {

@@ -211,6 +211,7 @@ $(BUILD)/tools/exec/repl: \
 	$(BUILD)/support/tty.o \
 	$(BUILD)/tools/libs/errors/compile_time.o \
 	$(BUILD)/tools/libs/stage.o \
+	$(BUILD)/tools/libs/assembler.o \
 	$(BUILD)/tools/libs/lexer.o \
 	$(BUILD)/tools/libs/parser.o \
 	$(BUILD)/runtime/pid.o \

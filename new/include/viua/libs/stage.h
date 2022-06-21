@@ -60,6 +60,18 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction,
                           std::map<std::string, size_t>&)
     -> std::vector<viua::libs::parser::ast::Instruction>;
 
+auto expand_delete(std::vector<viua::libs::parser::ast::Instruction>&,
+                   viua::libs::parser::ast::Instruction const&) -> void;
+auto expand_li(std::vector<viua::libs::parser::ast::Instruction>&,
+               viua::libs::parser::ast::Instruction const&) -> void;
+auto expand_if(std::vector<viua::libs::parser::ast::Instruction>&,
+               viua::libs::parser::ast::Instruction&,
+               std::map<size_t, size_t>) -> void;
+auto expand_pseudoinstructions(
+    std::vector<viua::libs::parser::ast::Instruction>,
+    std::map<std::string, size_t> const&)
+    -> std::vector<viua::libs::parser::ast::Instruction>;
+
 auto emit_instruction(viua::libs::parser::ast::Instruction const)
     -> viua::arch::instruction_type;
 }  // namespace viua::libs::stage
