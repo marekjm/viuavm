@@ -187,10 +187,9 @@ auto cook_spans(
     return cooked;
 }
 
-auto display_error
-    (std::filesystem::path source_path,
-                  std::string_view source_text,
-                  viua::libs::errors::compile_time::Error const& e) -> void
+auto display_error(std::filesystem::path source_path,
+                   std::string_view source_text,
+                   viua::libs::errors::compile_time::Error const& e) -> void
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_CYAN;

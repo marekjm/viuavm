@@ -159,7 +159,8 @@ const auto LITERAL_INTEGER =
 const auto LITERAL_FLOAT = std::regex{"^-?(?:0|[1-9][0-9]*)?\\.[0-9]+\\b"};
 
 namespace {
-auto match_lookbehind(std::vector<Lexeme> const& lexemes, std::vector<TOKEN> const pattern) -> bool
+auto match_lookbehind(std::vector<Lexeme> const& lexemes,
+                      std::vector<TOKEN> const pattern) -> bool
 {
     if (pattern.empty()) {
         return true;
@@ -180,24 +181,26 @@ auto match_lookbehind(std::vector<Lexeme> const& lexemes, std::vector<TOKEN> con
     return true;
 }
 
-auto synth_lookbehind(std::vector<Lexeme> const& lexemes, size_t const n) -> Lexeme
+auto synth_lookbehind(std::vector<Lexeme> const& lexemes, size_t const n)
+    -> Lexeme
 {
     if (n > lexemes.size()) {
-        std::cerr << "internal error: cannot synthesize lexeme from lookbehind\n";
+        std::cerr
+            << "internal error: cannot synthesize lexeme from lookbehind\n";
         assert(false);
     }
 
     auto const location = lexemes.at(lexemes.size() - n).location;
-    auto const token = lexemes.at(lexemes.size() - n).token;
+    auto const token    = lexemes.at(lexemes.size() - n).token;
 
     auto text = std::string{};
     for (auto i = size_t{0}; i < n; ++i) {
         text += lexemes.at(lexemes.size() - n + i).text;
     }
 
-    return Lexeme{ text, token, location };
+    return Lexeme{text, token, location};
 }
-}
+}  // namespace
 
 auto lex(std::string_view source_text) -> std::vector<Lexeme>
 {
@@ -224,14 +227,13 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
 
-                auto const lexeme = Lexeme{
-                    std::string{1, source_text[0]},
-                    TOKEN::INVALID,
-                    Location{line, character, offset}
-                };
+                auto const lexeme = Lexeme{std::string{1, source_text[0]},
+                                           TOKEN::INVALID,
+                                           Location{line, character, offset}};
 
-                throw Error{lexeme, Cause::Unexpected_token}
-                    .aside("line continuation not immediately followed by \\n character");
+                throw Error{lexeme, Cause::Unexpected_token}.aside(
+                    "line continuation not immediately followed by \\n "
+                    "character");
             }
 
             line += 1;
@@ -435,32 +437,36 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
          * we can detect why did it happen.
          */
         if (try_match(COLON, TOKEN::INVALID)) {
-            if (match_lookbehind(lexemes, { TOKEN::DOT, TOKEN::LITERAL_ATOM, TOKEN::INVALID })) {
+            if (match_lookbehind(
+                    lexemes,
+                    {TOKEN::DOT, TOKEN::LITERAL_ATOM, TOKEN::INVALID})) {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
                 auto const lexeme = synth_lookbehind(lexemes, 3);
-                auto e = Error{lexeme, Cause::Unknown_directive};
+                auto e            = Error{lexeme, Cause::Unknown_directive};
 
                 using viua::libs::lexer::OPCODE_NAMES;
                 using viua::support::string::levenshtein_filter;
-                auto const misspell_candidates = levenshtein_filter(lexeme.text, {
-                    ".function:",
-                    ".label:",
-                    ".end",
-                });
+                auto const misspell_candidates =
+                    levenshtein_filter(lexeme.text,
+                                       {
+                                           ".function:",
+                                           ".label:",
+                                           ".end",
+                                       });
                 if (misspell_candidates.empty()) {
                     throw e;
                 }
 
                 using viua::support::string::levenshtein_best;
-                auto best_candidate =
-                    levenshtein_best(lexeme.text, misspell_candidates, (lexeme.text.size() / 2));
+                auto best_candidate = levenshtein_best(
+                    lexeme.text, misspell_candidates, (lexeme.text.size() / 2));
                 if (best_candidate.second == lexeme.text) {
                     throw e;
                 }
 
-                throw Error{lexeme, Cause::Unknown_directive}
-                    .aside("did you mean \"" + best_candidate.second + "\"?");
+                throw Error{lexeme, Cause::Unknown_directive}.aside(
+                    "did you mean \"" + best_candidate.second + "\"?");
             }
             continue;
         }
@@ -468,11 +474,9 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
 
-        auto const lexeme = Lexeme{
-            std::string(1, source_text[0]),
-            TOKEN::INVALID,
-            Location{line, character, offset}
-        };
+        auto const lexeme = Lexeme{std::string(1, source_text[0]),
+                                   TOKEN::INVALID,
+                                   Location{line, character, offset}};
 
         throw Error{lexeme, Cause::Unexpected_token};
     }

@@ -217,7 +217,7 @@ auto main(int argc, char* argv[]) -> int
 
     auto verbosity_level = 0;
     auto show_version    = false;
-    auto show_help    = false;
+    auto show_help       = false;
 
     for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
         auto const& each = args.at(i);

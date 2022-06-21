@@ -705,7 +705,7 @@ auto main(int argc, char* argv[]) -> int
     auto verbosity_level = 0;
     {
         auto show_version = false;
-        auto show_help = false;
+        auto show_help    = false;
 
         auto i = decltype(args)::size_type{};
         for (; i < args.size(); ++i) {
@@ -726,8 +726,9 @@ auto main(int argc, char* argv[]) -> int
             } else if (each == "--help") {
                 show_help = true;
             } else if (each.front() == '-') {
-                std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                          << ": unknown option: " << each << "\n";
+                std::cerr << esc(2, COLOR_FG_RED) << "error"
+                          << esc(2, ATTR_RESET) << ": unknown option: " << each
+                          << "\n";
                 return 1;
             } else {
                 // input files start here
@@ -748,7 +749,8 @@ auto main(int argc, char* argv[]) -> int
         }
         if (show_help) {
             if (execlp("man", "man", "1", "viua-repl", nullptr) == -1) {
-                std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+                std::cerr << esc(2, COLOR_FG_RED) << "error"
+                          << esc(2, ATTR_RESET)
                           << ": man(1) page not installed or not found\n";
                 return 1;
             }

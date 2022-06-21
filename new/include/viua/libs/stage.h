@@ -43,8 +43,8 @@ auto cook_spans(
     -> std::vector<std::tuple<bool, size_t, size_t>>;
 
 auto display_error(std::filesystem::path,
-                       std::string_view,
-                       viua::libs::errors::compile_time::Error const&) -> void;
+                   std::string_view,
+                   viua::libs::errors::compile_time::Error const&) -> void;
 auto display_error_and_exit
     [[noreturn]] (std::filesystem::path,
                   std::string_view,
