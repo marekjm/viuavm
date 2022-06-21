@@ -369,9 +369,19 @@ auto evaluate_asm_expression(std::string const source_text) -> void
         return;
     }
 
+    auto fn_offsets = std::map<std::string, size_t>{};
+    {
+        for (auto const& [mod_name, mod] : REPL_STATE->core.modules) {
+            for (auto const& [fn_off, fn] : mod.elf.function_table()) {
+                auto const fn_id = (mod_name.empty() ? "" : (mod_name + "::"))
+                                   + std::get<0>(fn);
+                fn_offsets[fn_id] = fn_off;
+            }
+        }
+    }
+
     auto strings_table = std::vector<uint8_t>{};
     auto var_offsets   = std::map<std::string, size_t>{};
-    auto fn_offsets    = std::map<std::string, size_t>{};
     auto cooked        = std::vector<viua::libs::parser::ast::Instruction>{};
     try {
         cooked = viua::libs::stage::cook_long_immediates(

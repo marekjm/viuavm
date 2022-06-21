@@ -1272,7 +1272,7 @@ auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
         throw abort_execution{ip, "invalid IP after call"};
     }
 
-    auto const fr_return = (ip + 1);
+    auto const fr_return = (stack.ip + 1);
     auto const fr_entry  = (stack.proc.module.ip_base
                            + (fn_addr / sizeof(viua::arch::instruction_type)));
 
