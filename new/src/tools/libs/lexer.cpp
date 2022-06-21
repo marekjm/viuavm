@@ -478,7 +478,7 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
                                    TOKEN::INVALID,
                                    Location{line, character, offset}};
 
-        throw Error{lexeme, Cause::Unexpected_token};
+        throw Error{lexeme, Cause::Illegal_token};
     }
 
     return lexemes;

@@ -40,6 +40,16 @@ enum class Cause {
      */
     None,
 
+    /*
+     * Encountered character does not form a legal token. This error is only
+     * thrown during lexical analysis.
+     */
+    Illegal_token,
+
+    /*
+     * Encountered token was not expected at current position. This error is
+     * reported during either lexical or syntactical analysis.
+     */
     Unexpected_token,
 
     Unknown_directive,

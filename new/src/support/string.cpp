@@ -52,6 +52,19 @@ auto quote_squares(std::string_view const sv) -> std::string
     out << CORNER_QUOTE_LL << sv << CORNER_QUOTE_UR;
     return out.str();
 }
+auto quote_math_angle(std::string_view const sv) -> std::string
+{
+    auto out = std::ostringstream{};
+    out << MATHEMATICAL_ANGLE_BRACKET_LEFT << sv
+        << MATHEMATICAL_ANGLE_BRACKET_RIGHT;
+    return out.str();
+}
+auto quote_single_marks(std::string_view const sv) -> std::string
+{
+    auto out = std::ostringstream{};
+    out << SINGLE_QUOTATION_MARK_LEFT << sv << SINGLE_QUOTATION_MARK_RIGHT;
+    return out.str();
+}
 
 auto unescape(std::string_view const sv) -> std::string
 {

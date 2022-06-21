@@ -18,6 +18,8 @@
  */
 
 #include <viua/libs/parser.h>
+#include <viua/support/string.h>
+#include <viua/support/tty.h>
 
 
 namespace viua::libs::parser {
@@ -199,7 +201,34 @@ auto consume_token_of(
     -> viua::libs::lexer::Lexeme
 {
     if (ts.count(lexemes.front().token) == 0) {
-        throw lexemes.front();
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        auto e = Error{lexemes.front(), Cause::Unexpected_token};
+        {
+            auto s = std::ostringstream{};
+            s << "expected ";
+            if (ts.size() > 1) {
+                s << "one of: ";
+            }
+
+            constexpr auto esc = viua::support::tty::send_escape_seq;
+            constexpr auto q   = viua::support::string::quote_single_marks;
+            using viua::support::tty::ATTR_FONT_BOLD;
+            using viua::support::tty::ATTR_FONT_NORMAL;
+
+            auto const BOLD = std::string{esc(2, ATTR_FONT_BOLD)};
+            auto const NORM = std::string{esc(2, ATTR_FONT_NORMAL)};
+
+            auto it = ts.begin();
+            s << q(BOLD + viua::libs::lexer::to_string(*it) + NORM);
+            while (++it != ts.end()) {
+                s << ", ";
+                s << q(BOLD + viua::libs::lexer::to_string(*it) + NORM);
+            }
+
+            e.aside(s.str());
+        }
+        throw e;
     }
     auto lx = std::move(lexemes.front());
     lexemes.remove_prefix(1);

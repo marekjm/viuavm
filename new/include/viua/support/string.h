@@ -31,8 +31,19 @@ namespace viua::support::string {
 constexpr auto CORNER_QUOTE_LL = std::string_view{"⌞"};  // lower left
 constexpr auto CORNER_QUOTE_UR = std::string_view{"⌝"};  // upper right
 
+constexpr auto MATHEMATICAL_ANGLE_BRACKET_LEFT =
+    std::string_view{"⟨"};  // u+27e8
+constexpr auto MATHEMATICAL_ANGLE_BRACKET_RIGHT =
+    std::string_view{"⟩"};  // u+27e9
+
+constexpr auto SINGLE_QUOTATION_MARK_LEFT  = std::string_view{"‘"};  // u+2018
+constexpr auto SINGLE_QUOTATION_MARK_RIGHT = std::string_view{"’"};  // u+2019
+
 auto quoted(std::string_view const) -> std::string;
+
 auto quote_squares(std::string_view const) -> std::string;
+auto quote_math_angle(std::string_view const) -> std::string;
+auto quote_single_marks(std::string_view const) -> std::string;
 
 auto unescape(std::string_view const) -> std::string;
 
