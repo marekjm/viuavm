@@ -174,8 +174,6 @@ auto syntactical_analysis(std::filesystem::path const source_path,
 {
     try {
         return parse(lexemes);
-    } catch (viua::libs::lexer::Lexeme const& e) {
-        viua::libs::stage::display_error_and_exit(source_path, source_text, e);
     } catch (viua::libs::errors::compile_time::Error const& e) {
         viua::libs::stage::display_error_and_exit(source_path, source_text, e);
     }

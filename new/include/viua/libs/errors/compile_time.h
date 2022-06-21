@@ -162,8 +162,6 @@ class Error {
     viua::libs::lexer::Lexeme aside_lexeme;
 
   public:
-    inline Error(viua::libs::lexer::Lexeme lx) : Error{lx, Cause::Unknown}
-    {}
     Error(viua::libs::lexer::Lexeme, Cause const, std::string = "");
 
     auto aside(std::string) -> Error&;
