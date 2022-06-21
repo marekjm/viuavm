@@ -98,6 +98,7 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
     candidates.push_back("stepi");
     candidates.push_back("stepi.g");
     candidates.push_back("show frame");
+    candidates.push_back("show ip");
     candidates.push_back("up");
     candidates.push_back("down");
     candidates.push_back("eval");
@@ -521,6 +522,38 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
             viua::vm::ins::dump_registers(frame.parameters, "p");
             viua::vm::ins::dump_registers(frame.registers, "l");
             viua::vm::ins::dump_registers(proc->stack.args, "a");
+        } else if (p(1).value_or("") == "ip") {
+            if (not REPL_STATE->selected_pid) {
+                std::cerr << esc(2, COLOR_FG_RED) << "error"
+                          << esc(2, ATTR_RESET) << ": no selected actor\n";
+                return true;
+            }
+
+            auto const proc = REPL_STATE->core.find(*REPL_STATE->selected_pid);
+            if (not proc) {
+                std::cerr << esc(2, COLOR_FG_RED) << "error"
+                          << esc(2, ATTR_RESET) << ": actor "
+                          << esc(2, COLOR_FG_WHITE)
+                          << REPL_STATE->selected_pid->to_string()
+                          << esc(2, ATTR_RESET) << " does not exist\n\r";
+                return true;
+            }
+
+            auto const& module = proc->module;
+            std::cout << "  " << std::hex << std::setfill(' ') << std::setw(16)
+                      << proc->stack.ip << " " << module.elf_path.native()
+                      << "[.text+0x" << std::hex << std::setfill('0')
+                      << std::setw(16) << (proc->stack.ip - module.ip_base)
+                      << "]"
+                      << "\n";
+            std::cout
+                << "  " << std::string(16, ' ') << " "
+                << module.elf_path.native() << "[.text+0x" << std::hex
+                << std::setfill('0') << std::setw(16) << unsigned{1} << " -- "
+                << "0x" << std::hex << std::setfill('0') << std::setw(16)
+                << ((module.ip_base + module.text.size()) - module.ip_base)
+                << "]"
+                << "\n";
         }
     } else if (*p(0) == "stepi") {
         if (not REPL_STATE->selected_pid) {
