@@ -1198,19 +1198,18 @@ auto execute(ATOM const op, Stack& stack, ip_type const ip) -> void
 {
     auto target = get_proxy(stack, op.instruction.out, ip);
 
-    auto const& mod        = stack.proc.module;
+    auto const& strtab     = *stack.proc.strtab;
     auto const data_offset = cast_to<uint64_t>(target.view());
-    auto const data_size   = [&mod, data_offset]() -> uint64_t {
+    auto const data_size   = [&strtab, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
-        memcpy(&tmp, &mod.strings_table[size_offset], sizeof(uint64_t));
+        memcpy(&tmp, &strtab[size_offset], sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto s     = std::make_unique<viua::vm::types::Atom>();
     s->content = std::string{
-        reinterpret_cast<char const*>(&mod.strings_table[0] + data_offset),
-        data_size};
+        reinterpret_cast<char const*>(&strtab[0] + data_offset), data_size};
 
     target = std::move(s);
 }
@@ -1218,19 +1217,18 @@ auto execute(STRING const op, Stack& stack, ip_type const ip) -> void
 {
     auto target = get_proxy(stack, op.instruction.out, ip);
 
-    auto const& mod        = stack.proc.module;
+    auto const& strtab     = *stack.proc.strtab;
     auto const data_offset = cast_to<uint64_t>(target.view());
-    auto const data_size   = [&mod, data_offset]() -> uint64_t {
+    auto const data_size   = [&strtab, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
-        memcpy(&tmp, &mod.strings_table[size_offset], sizeof(uint64_t));
+        memcpy(&tmp, &strtab[size_offset], sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto s     = std::make_unique<viua::vm::types::String>();
     s->content = std::string{
-        reinterpret_cast<char const*>(&mod.strings_table[0] + data_offset),
-        data_size};
+        reinterpret_cast<char const*>(&strtab[0] + data_offset), data_size};
 
     target = std::move(s);
 }
@@ -1333,19 +1331,20 @@ auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
 
     auto& target = registers.at(op.instruction.out.index);
 
+    auto const& strtab = *stack.proc.strtab;
+
     auto const data_offset = target.value.get<uint64_t>();
-    auto const data_size   = [&stack, data_offset]() -> uint64_t {
+    auto const data_size   = [&strtab, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
         memcpy(&tmp,
-               &stack.proc.module.strings_table[size_offset],
+               &strtab[size_offset],
                sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto tmp = uint32_t{};
-    memcpy(
-        &tmp, (&stack.proc.module.strings_table[0] + data_offset), data_size);
+    memcpy(&tmp, (&strtab[0] + data_offset), data_size);
     tmp = le32toh(tmp);
 
     auto v = float{};
@@ -1364,14 +1363,13 @@ auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
         memcpy(&tmp,
-               &stack.proc.module.strings_table[size_offset],
+               &stack.proc.strtab->operator[](size_offset),
                sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto tmp = uint64_t{};
-    memcpy(
-        &tmp, (&stack.proc.module.strings_table[0] + data_offset), data_size);
+    memcpy(&tmp, (&stack.proc.strtab->operator[](0) + data_offset), data_size);
     tmp = le64toh(tmp);
 
     auto v = double{};

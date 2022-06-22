@@ -432,13 +432,19 @@ struct Process {
     pid_type const pid;
 
     Core* core{};
+
     Module const& module;
+    Module::strtab_type const* strtab;
 
     using stack_type = Stack;
     stack_type stack;
 
     explicit inline Process(pid_type const p, Core* c, Module const& m)
-            : pid{p}, core{c}, module{m}, stack{*this}
+            : pid{p}
+            , core{c}
+            , module{m}
+            , strtab{&m.strings_table}
+            , stack{*this}
     {}
 
     inline auto push_frame(size_t const locals,

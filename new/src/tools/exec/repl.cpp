@@ -405,9 +405,14 @@ auto evaluate_asm_expression(std::string const source_text) -> void
     }
 
     auto proc = REPL_STATE->core.find(*REPL_STATE->selected_pid);
+
+    proc->strtab = &strings_table;
+
     for (auto const each : instructions) {
         viua::vm::ins::execute(proc->stack, &each);
     }
+
+    proc->strtab = &proc->module.strings_table;
 }
 
 auto repl_eval(std::vector<std::string_view> const parts) -> bool
