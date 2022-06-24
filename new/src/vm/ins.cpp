@@ -1337,9 +1337,7 @@ auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
     auto const data_size   = [&strtab, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
-        memcpy(&tmp,
-               &strtab[size_offset],
-               sizeof(uint64_t));
+        memcpy(&tmp, &strtab[size_offset], sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
