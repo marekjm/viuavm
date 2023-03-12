@@ -19,6 +19,7 @@
 
 #include <endian.h>
 
+#include <array>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
