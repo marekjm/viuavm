@@ -35,7 +35,8 @@ CXXFLAGS_WARNING=\
 				 -Wextra \
 				 -Wpedantic \
 				 -Werror \
-				 -Wfatal-errors
+				 -Wfatal-errors \
+				 -Wno-error=dangling-reference
 
 CXXFLAGS_INCLUDE=\
 				 -I./include \

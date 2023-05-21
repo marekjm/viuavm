@@ -191,7 +191,7 @@ auto consume_token_of(
     if (lexemes.front().token != tt) {
         throw lexemes.front();
     }
-    auto lx = std::move(lexemes.front());
+    auto lx = lexemes.front();
     lexemes.remove_prefix(1);
     return lx;
 }
@@ -230,7 +230,7 @@ auto consume_token_of(
         }
         throw e;
     }
-    auto lx = std::move(lexemes.front());
+    auto lx = lexemes.front();
     lexemes.remove_prefix(1);
     return lx;
 }
