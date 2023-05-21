@@ -65,7 +65,7 @@ auto PID::to_string() const -> std::string
     return "[" + std::string{buf.data()} + "]";
 }
 
-Pid_emitter::Pid_emitter() : base{{0xfe, 0x80, 0x00}}, counter{0}
+Pid_emitter::Pid_emitter() : base{{{0xfe, 0x80, 0x00}}}, counter{0}
 {
     if (auto seed = getenv("VIUA_VM_PID_SEED"); seed != nullptr) {
         if (inet_pton(AF_INET6, seed, &base) == 0) {

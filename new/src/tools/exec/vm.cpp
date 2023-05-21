@@ -69,7 +69,7 @@ auto run_instruction(viua::vm::Stack& stack)
     do {
         instruction = *stack.ip;
         stack.ip    = viua::vm::ins::execute(stack, stack.ip);
-        ++stack.proc.core->perf_counters.total_ops_executed;
+        ++stack.proc->core->perf_counters.total_ops_executed;
     } while ((stack.ip != nullptr) and (instruction & viua::arch::ops::GREEDY));
 
     return stack.ip;

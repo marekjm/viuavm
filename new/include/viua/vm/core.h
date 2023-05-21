@@ -361,7 +361,7 @@ struct Performance_counters {
     }
 };
 
-class Process;
+struct Process;
 
 struct Core {
     std::map<std::string, Module> modules;
@@ -396,20 +396,20 @@ struct Core {
 struct Stack {
     using addr_type = viua::arch::instruction_type const*;
 
-    Process& proc;
+    Process* proc;
 
     addr_type ip{nullptr};
 
     std::vector<Frame> frames;
     std::vector<Value> args;
 
-    explicit inline Stack(Process& p) : proc{p}
+    explicit inline Stack(Process& p) : proc{&p}
     {}
 
     Stack(Stack const&) = delete;
     Stack(Stack&&)      = default;
     auto operator=(Stack const&) -> Stack& = delete;
-    auto operator=(Stack&&) -> Stack& = default;
+    inline auto operator=(Stack&&) -> Stack& = default;
 
     inline auto push(size_t const sz, addr_type const e, addr_type const r)
         -> void

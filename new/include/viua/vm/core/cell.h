@@ -44,7 +44,7 @@ struct Cell_view {
     value_type content;
 
     Cell_view() = delete;
-    Cell_view(class Cell&);
+    Cell_view(struct Cell&);
     explicit Cell_view(boxed_type&);
 
     template<typename T> auto holds() const -> bool

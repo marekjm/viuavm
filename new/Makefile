@@ -30,13 +30,19 @@ CXXSTD=c++20
 
 CXXFLAGS_OPTIMISATION=-g -Og
 
+CXXFLAGS_NOERROR=
+ifeq ($(CXX),g++)
+CXXFLAGS_NOERROR=\
+				 -Wno-error=dangling-reference
+endif
+
 CXXFLAGS_WARNING=\
 				 -Wall \
 				 -Wextra \
 				 -Wpedantic \
 				 -Werror \
 				 -Wfatal-errors \
-				 -Wno-error=dangling-reference
+				 $(CXXFLAGS_NOERROR)
 
 CXXFLAGS_INCLUDE=\
 				 -I./include \

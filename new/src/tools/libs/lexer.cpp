@@ -256,7 +256,7 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
                  * four characters), \0 (with two characters) or something else.
                  * The important thing is that it will not appear as ITSELF.
                  *
-                 * If we used the \ ie, the backslash character all hell would
+                 * If we used the \ ie, the backslash character, all hell would
                  * break loose and the code would stop working because
                  * std::quoted() would remove it, even if it appeared as a part
                  * of an escape sequence - for example \n.
@@ -275,9 +275,9 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
                  */
                 auto const shift_by = (extracted_string.size() + 2);
 
-                lexemes.emplace_back(std::move(extracted_string),
+                lexemes.emplace_back(Lexeme{std::move(extracted_string),
                                      TOKEN::LITERAL_STRING,
-                                     Location{line, character, offset});
+                                     Location{line, character, offset}});
 
                 character += shift_by;
                 offset += shift_by;

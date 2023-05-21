@@ -76,7 +76,7 @@ class Value {
         return (dynamic_cast<Trait const*>(this) != nullptr);
     }
 
-    auto reference_to() -> std::unique_ptr<class Ref>;
+    auto reference_to() -> std::unique_ptr<struct Ref>;
 };
 }  // namespace viua::vm::types
 

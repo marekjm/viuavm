@@ -366,7 +366,7 @@ auto get_slot(viua::arch::Register_access const ra,
               ip_type const ip) -> std::optional<viua::vm::Value*>
 {
     switch (ra.set) {
-        using enum viua::arch::RS;
+        using enum viua::arch::REGISTER_SET;
     case VOID:
         return {};
     case LOCAL:
@@ -463,7 +463,7 @@ auto get_proxy(Stack& stack,
                ip_type const ip) -> Proxy
 {
     switch (a.set) {
-        using enum viua::arch::Register_access::set_type;
+        using enum viua::arch::REGISTER_SET;
     case VOID:
         throw abort_execution{ip, "cannot access a void register"};
     case LOCAL:
@@ -1198,7 +1198,7 @@ auto execute(ATOM const op, Stack& stack, ip_type const ip) -> void
 {
     auto target = get_proxy(stack, op.instruction.out, ip);
 
-    auto const& strtab     = *stack.proc.strtab;
+    auto const& strtab     = *stack.proc->strtab;
     auto const data_offset = cast_to<uint64_t>(target.view());
     auto const data_size   = [&strtab, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
@@ -1217,7 +1217,7 @@ auto execute(STRING const op, Stack& stack, ip_type const ip) -> void
 {
     auto target = get_proxy(stack, op.instruction.out, ip);
 
-    auto const& strtab     = *stack.proc.strtab;
+    auto const& strtab     = *stack.proc->strtab;
     auto const data_offset = cast_to<uint64_t>(target.view());
     auto const data_size   = [&strtab, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
@@ -1262,7 +1262,7 @@ auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
     {
         auto fn = get_proxy(stack, op.instruction.in, ip);
         std::tie(fn_name, fn_addr) =
-            stack.proc.module.function_at(cast_to<uint64_t>(fn.view()));
+            stack.proc->module.function_at(cast_to<uint64_t>(fn.view()));
         fn.overwrite().make_void();
     }
 
@@ -1271,7 +1271,7 @@ auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
     }
 
     auto const fr_return = (stack.ip + 1);
-    auto const fr_entry  = (stack.proc.module.ip_base
+    auto const fr_entry  = (stack.proc->module.ip_base
                            + (fn_addr / sizeof(viua::arch::instruction_type)));
 
     stack.frames.emplace_back(
@@ -1331,7 +1331,7 @@ auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
 
     auto& target = registers.at(op.instruction.out.index);
 
-    auto const& strtab = *stack.proc.strtab;
+    auto const& strtab = *stack.proc->strtab;
 
     auto const data_offset = target.value.get<uint64_t>();
     auto const data_size   = [&strtab, data_offset]() -> uint64_t {
@@ -1361,13 +1361,13 @@ auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
         memcpy(&tmp,
-               &stack.proc.strtab->operator[](size_offset),
+               &stack.proc->strtab->operator[](size_offset),
                sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto tmp = uint64_t{};
-    memcpy(&tmp, (&stack.proc.strtab->operator[](0) + data_offset), data_size);
+    memcpy(&tmp, (&stack.proc->strtab->operator[](0) + data_offset), data_size);
     tmp = le64toh(tmp);
 
     auto v = double{};
@@ -1404,7 +1404,7 @@ auto execute_arithmetic_immediate_op(Op const op,
     constexpr auto const signed_immediate =
         std::is_signed_v<typename Op::value_type>;
     using immediate_type =
-        std::conditional<signed_immediate, int64_t, uint64_t>::type;
+        typename std::conditional<signed_immediate, int64_t, uint64_t>::type;
     auto const immediate =
         (signed_immediate
              ? static_cast<immediate_type>(
@@ -1767,7 +1767,7 @@ auto execute(IO_SUBMIT const op, Stack& stack, ip_type const ip) -> void
                                  .boxed_of<viua::vm::types::String>()
                                  ->get()
                                  .content);
-        auto const rd = stack.proc.core->io.schedule(
+        auto const rd = stack.proc->core->io.schedule(
             port.get<int64_t>(), IORING_OP_READ, std::move(buf));
         dst = rd;
         break;
@@ -1781,7 +1781,7 @@ auto execute(IO_SUBMIT const op, Stack& stack, ip_type const ip) -> void
                                  .boxed_of<viua::vm::types::String>()
                                  ->get()
                                  .content);
-        auto const rd = stack.proc.core->io.schedule(
+        auto const rd = stack.proc->core->io.schedule(
             port.get<int64_t>(), IORING_OP_WRITE, std::move(buf));
         dst = rd;
         break;
@@ -1794,16 +1794,16 @@ auto execute(IO_WAIT const op, Stack& stack, ip_type const ip) -> void
     auto req = get_value(stack, op.instruction.lhs, ip);
 
     auto const want_id = req.get<uint64_t>();
-    if (not stack.proc.core->io.requests.contains(want_id)) {
+    if (not stack.proc->core->io.requests.contains(want_id)) {
         io_uring_cqe* cqe{};
         do {
-            io_uring_wait_cqe(&stack.proc.core->io.ring, &cqe);
+            io_uring_wait_cqe(&stack.proc->core->io.ring, &cqe);
 
             if (cqe->res == -1) {
-                stack.proc.core->io.requests[cqe->user_data]->status =
+                stack.proc->core->io.requests[cqe->user_data]->status =
                     IO_request::Status::Error;
             } else {
-                auto& rd  = *stack.proc.core->io.requests[cqe->user_data];
+                auto& rd  = *stack.proc->core->io.requests[cqe->user_data];
                 rd.status = IO_request::Status::Success;
 
                 if (rd.opcode == IORING_OP_READ) {
@@ -1813,13 +1813,13 @@ auto execute(IO_WAIT const op, Stack& stack, ip_type const ip) -> void
                 }
             }
 
-            io_uring_cqe_seen(&stack.proc.core->io.ring, cqe);
+            io_uring_cqe_seen(&stack.proc->core->io.ring, cqe);
         } while (cqe->user_data != want_id);
     }
 
     dst = std::make_unique<types::String>(
-        std::move(stack.proc.core->io.requests[want_id]->buffer));
-    stack.proc.core->io.requests.erase(want_id);
+        std::move(stack.proc->core->io.requests[want_id]->buffer));
+    stack.proc->core->io.requests.erase(want_id);
 }
 auto execute(IO_SHUTDOWN const, Stack&, ip_type const) -> void
 {}
@@ -1844,7 +1844,7 @@ auto execute(ACTOR const op, Stack& stack, ip_type const ip) -> void
         }
 
         std::tie(fn_name, fn_addr) =
-            stack.proc.module.function_at(fn_offset.value.get<uint64_t>());
+            stack.proc->module.function_at(fn_offset.value.get<uint64_t>());
 
         get_proxy(stack, op.instruction.in, ip).overwrite().make_void();
     }
@@ -1855,7 +1855,7 @@ auto execute(ACTOR const op, Stack& stack, ip_type const ip) -> void
 
     auto const fr_entry = (fn_addr / sizeof(viua::arch::instruction_type));
 
-    auto const pid     = stack.proc.core->spawn("", fr_entry);
+    auto const pid     = stack.proc->core->spawn("", fr_entry);
     auto dst           = get_slot(op.instruction.out, stack, ip);
     dst.value()->value = std::make_unique<viua::vm::types::PID>(pid);
 }
@@ -1864,7 +1864,7 @@ auto execute(SELF const op, Stack& stack, ip_type const) -> void
     auto& registers = stack.back().registers;
     auto& target    = registers.at(op.instruction.out.index);
 
-    auto s       = std::make_unique<viua::vm::types::PID>(stack.proc.pid);
+    auto s       = std::make_unique<viua::vm::types::PID>(stack.proc->pid);
     target.value = std::move(s);
 }
 
@@ -1952,24 +1952,24 @@ auto print_backtrace_line(
     viua::TRACE_STREAM << (each.parameters.empty() ? " ()" : " (...)")
                        << " at ";
 
-    viua::TRACE_STREAM << stack.proc.module.elf_path.native() << "[.text+0x"
+    viua::TRACE_STREAM << stack.proc->module.elf_path.native() << "[.text+0x"
                        << std::hex << std::setw(8) << std::setfill('0');
 
     auto ip_offset = size_t{};
     if (frame_index < (stack.frames.size() - 1)) {
         ip_offset = (stack.frames.at(frame_index + 1).return_address
-                     - stack.proc.module.ip_base);
+                     - stack.proc->module.ip_base);
     } else {
-        ip_offset = (stack.ip - stack.proc.module.ip_base);
+        ip_offset = (stack.ip - stack.proc->module.ip_base);
     }
     viua::TRACE_STREAM << (ip_offset * sizeof(viua::arch::instruction_type));
     viua::TRACE_STREAM << std::dec << ']';
 
     viua::TRACE_STREAM << " return to ";
     if (each.return_address) {
-        viua::TRACE_STREAM << stack.proc.module.elf_path.native() << "[.text+0x"
+        viua::TRACE_STREAM << stack.proc->module.elf_path.native() << "[.text+0x"
                            << std::hex << std::setw(8) << std::setfill('0')
-                           << ((each.return_address - stack.proc.module.ip_base)
+                           << ((each.return_address - stack.proc->module.ip_base)
                                * sizeof(viua::arch::instruction_type))
                            << std::dec << ']';
     } else {
@@ -1984,10 +1984,10 @@ auto print_backtrace(Stack const& stack, std::optional<size_t> const only_for)
     auto fn_entry_to_name = std::map<Frame::addr_type, std::string>{};
     {
         for (auto const& [fn_off, fn] :
-             stack.proc.module.elf.function_table()) {
+             stack.proc->module.elf.function_table()) {
             auto const [fn_name, fn_entry] = fn;
             auto const entry_addr =
-                (stack.proc.module.ip_base
+                (stack.proc->module.ip_base
                  + (fn_entry / sizeof(viua::arch::instruction_type)));
             fn_entry_to_name.emplace(entry_addr, fn_name);
         }
@@ -2004,7 +2004,7 @@ auto print_backtrace(Stack const& stack, std::optional<size_t> const only_for)
 auto execute(EBREAK const, Stack& stack, ip_type const) -> void
 {
     viua::TRACE_STREAM << "begin ebreak in process "
-                       << stack.proc.pid.to_string() << viua::TRACE_STREAM.endl;
+                       << stack.proc->pid.to_string() << viua::TRACE_STREAM.endl;
 
     viua::TRACE_STREAM << "  backtrace:" << viua::TRACE_STREAM.endl;
     print_backtrace(stack);
@@ -2020,7 +2020,7 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
     }
     dump_registers(stack.args, "a");
 
-    viua::TRACE_STREAM << "end ebreak in process " << stack.proc.pid.to_string()
+    viua::TRACE_STREAM << "end ebreak in process " << stack.proc->pid.to_string()
                        << viua::TRACE_STREAM.endl;
 }
 }  // namespace viua::vm::ins
