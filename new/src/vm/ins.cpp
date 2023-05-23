@@ -2025,6 +2025,29 @@ auto print_backtrace(Stack const& stack, std::optional<size_t> const only_for)
         }
     }
 }
+auto dump_memory(std::vector<std::array<uint8_t, Process::MEM_PAGE_SIZE>> const& memory) -> void
+{
+    viua::TRACE_STREAM << "  memory:" << viua::TRACE_STREAM.endl;
+    constexpr auto MEMORY_LINE_SIZE = size_t{16};
+
+    viua::TRACE_STREAM << std::hex << std::setfill('0');
+    for (auto line = size_t{0}; line < (memory.front().size() / MEMORY_LINE_SIZE); ++line) {
+        viua::TRACE_STREAM << "    ";
+        viua::TRACE_STREAM << std::setw(16) << (line * MEMORY_LINE_SIZE) << "  ";
+        for (auto i = size_t{0}; i < MEMORY_LINE_SIZE; ++i) {
+            viua::TRACE_STREAM
+                << std::setw(2)
+                << static_cast<int>(memory.front().at(line * MEMORY_LINE_SIZE + i))
+                << ' ';
+        }
+        viua::TRACE_STREAM << " | ";
+        for (auto i = size_t{0}; i < MEMORY_LINE_SIZE; ++i) {
+            auto const c = memory.front().at(line * MEMORY_LINE_SIZE + i);
+            viua::TRACE_STREAM << (isprint(c) ? static_cast<char>(c) : '.');
+        }
+        viua::TRACE_STREAM << viua::TRACE_STREAM.endl;
+    }
+}
 auto execute(EBREAK const, Stack& stack, ip_type const) -> void
 {
     viua::TRACE_STREAM << "begin ebreak in process "
@@ -2044,27 +2067,7 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
     }
     dump_registers(stack.args, "a");
 
-    viua::TRACE_STREAM << "  memory:" << viua::TRACE_STREAM.endl;
-    constexpr auto MEMORY_LINE_SIZE = size_t{16};
-    auto const& memory = stack.proc->memory;
-
-    viua::TRACE_STREAM << std::hex << std::setfill('0');
-    for (auto line = size_t{0}; line < (memory.front().size() / MEMORY_LINE_SIZE); ++line) {
-        viua::TRACE_STREAM << "    ";
-        viua::TRACE_STREAM << std::setw(16) << (line * MEMORY_LINE_SIZE) << "  ";
-        for (auto i = size_t{0}; i < MEMORY_LINE_SIZE; ++i) {
-            viua::TRACE_STREAM
-                << std::setw(2)
-                << static_cast<int>(memory.front().at(line * MEMORY_LINE_SIZE + i))
-                << ' ';
-        }
-        viua::TRACE_STREAM << " | ";
-        for (auto i = size_t{0}; i < MEMORY_LINE_SIZE; ++i) {
-            auto const c = memory.front().at(line * MEMORY_LINE_SIZE + i);
-            viua::TRACE_STREAM << (isprint(c) ? static_cast<char>(c) : '.');
-        }
-        viua::TRACE_STREAM << viua::TRACE_STREAM.endl;
-    }
+    dump_memory(stack.proc->memory);
 
     viua::TRACE_STREAM << "end ebreak in process " << stack.proc->pid.to_string()
                        << viua::TRACE_STREAM.endl;

@@ -129,6 +129,7 @@ auto execute(viua::vm::Stack&, viua::arch::instruction_type const* const)
 auto print_backtrace(viua::vm::Stack const&,
                      std::optional<size_t> const = std::nullopt) -> void;
 auto dump_registers(std::vector<Value> const&, std::string_view const) -> void;
+auto dump_memory(std::vector<std::array<uint8_t, Process::MEM_PAGE_SIZE>> const&) -> void;
 }  // namespace viua::vm::ins
 
 #endif

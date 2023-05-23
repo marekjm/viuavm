@@ -549,6 +549,7 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
             viua::vm::ins::dump_registers(frame.parameters, "p");
             viua::vm::ins::dump_registers(frame.registers, "l");
             viua::vm::ins::dump_registers(proc->stack.args, "a");
+            viua::vm::ins::dump_memory(proc->memory);
         } else if (p(1).value_or("") == "ip") {
             if (not REPL_STATE->selected_pid) {
                 std::cerr << esc(2, COLOR_FG_RED) << "error"
