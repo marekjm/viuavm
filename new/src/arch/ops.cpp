@@ -386,7 +386,7 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
 {
     auto sv = raw;
 
-    auto greedy = sv.starts_with("g.");
+    auto const greedy = sv.starts_with("g.");
     if (greedy) {
         sv.remove_prefix(2);
     }
