@@ -258,6 +258,8 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "halt";
     case OPCODE::EBREAK:
         return greedy + "ebreak";
+    case OPCODE::ECALL:
+        return greedy + "ecall";
     case OPCODE::RETURN:
         return greedy + "return";
     case OPCODE::ADD:
@@ -396,6 +398,8 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::HALT));
     } else if (sv == "ebreak") {
         return (op | static_cast<opcode_type>(OPCODE::EBREAK));
+    } else if (sv == "ecall") {
+        return (op | static_cast<opcode_type>(OPCODE::ECALL));
     } else if (sv == "return") {
         return (op | static_cast<opcode_type>(OPCODE::RETURN));
     } else if (sv == "add") {

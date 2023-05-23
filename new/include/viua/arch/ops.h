@@ -203,6 +203,7 @@ enum class OPCODE : opcode_type {
     NOOP   = (FORMAT_N | 0x0000),
     HALT   = (FORMAT_N | 0x0001),
     EBREAK = (FORMAT_N | 0x0002),
+    ECALL  = (FORMAT_N | 0x0003),
 
     ADD = (FORMAT_T | 0x0001),
     SUB = (FORMAT_T | 0x0002),
@@ -361,6 +362,7 @@ enum class OPCODE_N : opcode_type {
     Make_entry(NOOP),
     Make_entry(HALT),
     Make_entry(EBREAK),
+    Make_entry(ECALL),
 };
 #undef Make_entry
 }  // namespace viua::arch::ops

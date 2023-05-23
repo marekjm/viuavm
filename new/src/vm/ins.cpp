@@ -263,6 +263,9 @@ auto execute(viua::vm::Stack& stack,
         case OPCODE_N::EBREAK:
             execute(EBREAK{viua::arch::ops::N::decode(raw)}, stack, ip);
             break;
+        case OPCODE_N::ECALL:
+            execute(ECALL{viua::arch::ops::N::decode(raw)}, stack, ip);
+            break;
         }
         break;
     }
@@ -2022,5 +2025,8 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
 
     viua::TRACE_STREAM << "end ebreak in process " << stack.proc->pid.to_string()
                        << viua::TRACE_STREAM.endl;
+}
+auto execute(ECALL const, Stack&, ip_type const) -> void
+{
 }
 }  // namespace viua::vm::ins

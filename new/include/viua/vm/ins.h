@@ -103,6 +103,7 @@ Work_instruction(REF);
 Flow_instruction(IF);
 
 Work_instruction(EBREAK);
+Work_instruction(ECALL);
 
 Work_instruction(IO_SUBMIT);
 Work_instruction(IO_WAIT);

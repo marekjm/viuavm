@@ -41,6 +41,12 @@ struct EBREAK : Instruction {
     EBREAK(viua::arch::ops::N i) : instruction{i}
     {}
 };
+struct ECALL : Instruction {
+    viua::arch::ops::N instruction;
+
+    ECALL(viua::arch::ops::N i) : instruction{i}
+    {}
+};
 
 struct FRAME : Instruction {
     viua::arch::ops::S instruction;
