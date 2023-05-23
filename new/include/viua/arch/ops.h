@@ -308,7 +308,6 @@ enum class OPCODE : opcode_type {
 
     SM = (FORMAT_M | 0x0001),
     LM = (FORMAT_M | 0x0002),
-    MM = (FORMAT_M | 0x0003),
 };
 auto to_string(opcode_type const) -> std::string;
 auto parse_opcode(std::string_view) -> opcode_type;
@@ -396,7 +395,6 @@ enum class OPCODE_N : opcode_type {
 enum class OPCODE_M : opcode_type {
     Make_entry(SM),
     Make_entry(LM),
-    Make_entry(MM),
 };
 #undef Make_entry
 }  // namespace viua::arch::ops

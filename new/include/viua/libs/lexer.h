@@ -268,8 +268,6 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "g.sm",
     "lm",
     "g.lm",
-    "mm",
-    "g.mm",
 
     /*
      * Pseudoinstructions listed below.

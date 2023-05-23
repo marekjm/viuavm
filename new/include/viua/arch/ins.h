@@ -479,12 +479,6 @@ struct LM : Instruction {
     LM(viua::arch::ops::M i) : instruction{i}
     {}
 };
-struct MM : Instruction {
-    viua::arch::ops::M instruction;
-
-    MM(viua::arch::ops::M i) : instruction{i}
-    {}
-};
 }  // namespace viua::arch::ins
 
 #endif

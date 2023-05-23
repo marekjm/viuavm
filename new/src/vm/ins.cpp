@@ -284,9 +284,6 @@ auto execute(viua::vm::Stack& stack,
             case OPCODE_M::LM:
                 execute(LM{viua::arch::ops::M::decode(raw)}, stack, ip);
                 break;
-            case OPCODE_M::MM:
-                execute(MM{viua::arch::ops::M::decode(raw)}, stack, ip);
-                break;
         }
         break;
     }
@@ -2055,9 +2052,6 @@ auto execute(SM const, Stack&, ip_type const) -> void
 {
 }
 auto execute(LM const, Stack&, ip_type const) -> void
-{
-}
-auto execute(MM const, Stack&, ip_type const) -> void
 {
 }
 }  // namespace viua::vm::ins

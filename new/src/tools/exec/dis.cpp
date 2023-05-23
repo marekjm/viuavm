@@ -416,7 +416,7 @@ auto demangle_memory(Cooked_text& text) -> void
     using enum viua::arch::ops::OPCODE;
     for (auto i = size_t{0}; i < text.size(); ++i) {
         using viua::arch::ops::GREEDY;
-        if (m(i, SM) or m(i, LM) or m(i, MM)) {
+        if (m(i, SM) or m(i, LM)) {
             using viua::arch::ops::M;
             auto const op         = M::decode(ins_at(i));
 
@@ -427,9 +427,6 @@ auto demangle_memory(Cooked_text& text) -> void
                     break;
                 case LM:
                     name = "l";
-                    break;
-                case MM:
-                    name = "m";
                     break;
                 default:
                     abort();
