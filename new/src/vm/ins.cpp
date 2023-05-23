@@ -271,8 +271,9 @@ auto execute(viua::vm::Stack& stack,
     }
     case M:
     {
+        auto instruction = viua::arch::ops::M::decode(raw);
         if constexpr (VIUA_TRACE_CYCLES) {
-            viua::TRACE_STREAM << "    " << viua::arch::ops::to_string(opcode)
+            viua::TRACE_STREAM << "    " << instruction.to_string()
                                << viua::TRACE_STREAM.endl;
         }
 
