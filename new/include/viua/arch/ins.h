@@ -466,6 +466,25 @@ struct SELF : Instruction {
     SELF(viua::arch::ops::S i) : instruction{i}
     {}
 };
+
+struct SM : Instruction {
+    viua::arch::ops::M instruction;
+
+    SM(viua::arch::ops::M i) : instruction{i}
+    {}
+};
+struct LM : Instruction {
+    viua::arch::ops::M instruction;
+
+    LM(viua::arch::ops::M i) : instruction{i}
+    {}
+};
+struct MM : Instruction {
+    viua::arch::ops::M instruction;
+
+    MM(viua::arch::ops::M i) : instruction{i}
+    {}
+};
 }  // namespace viua::arch::ins
 
 #endif

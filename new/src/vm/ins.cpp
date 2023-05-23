@@ -269,6 +269,27 @@ auto execute(viua::vm::Stack& stack,
         }
         break;
     }
+    case M:
+    {
+        if constexpr (VIUA_TRACE_CYCLES) {
+            viua::TRACE_STREAM << "    " << viua::arch::ops::to_string(opcode)
+                               << viua::TRACE_STREAM.endl;
+        }
+
+        using viua::arch::ops::OPCODE_M;
+        switch (static_cast<OPCODE_M>(opcode)) {
+            case OPCODE_M::SM:
+                execute(SM{viua::arch::ops::M::decode(raw)}, stack, ip);
+                break;
+            case OPCODE_M::LM:
+                execute(LM{viua::arch::ops::M::decode(raw)}, stack, ip);
+                break;
+            case OPCODE_M::MM:
+                execute(MM{viua::arch::ops::M::decode(raw)}, stack, ip);
+                break;
+        }
+        break;
+    }
     case D:
     {
         auto instruction = viua::arch::ops::D::decode(raw);
@@ -2027,6 +2048,16 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
                        << viua::TRACE_STREAM.endl;
 }
 auto execute(ECALL const, Stack&, ip_type const) -> void
+{
+}
+
+auto execute(SM const, Stack&, ip_type const) -> void
+{
+}
+auto execute(LM const, Stack&, ip_type const) -> void
+{
+}
+auto execute(MM const, Stack&, ip_type const) -> void
 {
 }
 }  // namespace viua::vm::ins

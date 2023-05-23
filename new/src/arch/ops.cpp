@@ -221,6 +221,52 @@ auto N::encode() const -> instruction_type
     return uint64_t{opcode};
 }
 }  // namespace viua::arch::ops
+namespace viua::arch::ops {
+M::M(viua::arch::opcode_type const op,
+     Register_access const o,
+     Register_access const i,
+     uint16_t const im,
+     uint8_t const s)
+        : opcode{op}, out{o}, in{i}, immediate{im}, spec{s}
+{}
+auto M::decode(instruction_type const raw) -> M
+{
+    auto const opcode =
+        static_cast<viua::arch::opcode_type>(raw & 0x000000000000ffff);
+    auto const out = Register_access::decode((raw & 0x00000000ffff0000) >> 16);
+    auto const in  = Register_access::decode((raw & 0x0000ffff00000000) >> 32);
+
+    auto const low_short =
+        static_cast<uint16_t>((raw & 0xffff000000000000) >> 48);
+    auto const low_nibble =
+        static_cast<uint16_t>((raw & 0x0000f00000000000) >> 44);
+    auto const high_nibble =
+        static_cast<uint16_t>((raw & 0x00000000f0000000) >> 28);
+
+    auto const immediate = low_short;
+    auto const spec = static_cast<uint8_t>(low_nibble | (high_nibble << 4));
+
+    return M{opcode, out, in, immediate, spec};
+}
+auto M::encode() const -> instruction_type
+{
+    auto base            = uint64_t{opcode};
+    auto output_register = uint64_t{out.encode()};
+    auto input_register  = uint64_t{in.encode()};
+
+    auto const high_nibble = static_cast<uint64_t>(spec & 0xf0);
+    auto const low_nibble = static_cast<uint64_t>(spec & 0x0f);
+    auto const low_short   = static_cast<uint64_t>((immediate & 0x0000ffff) >> 0);
+
+    return base | (output_register << 16) | (input_register << 32)
+           | (low_short << 48) | (high_nibble << 28) | (low_nibble << 44);
+}
+auto M::to_string() const -> std::string
+{
+    return (viua::arch::ops::to_string(opcode) + " " + std::to_string(spec) + ", " + out.to_string() + ", "
+            + in.to_string() + ", " + std::to_string(immediate));
+}
+}  // namespace viua::arch::ops
 
 namespace viua::arch::ops {
 auto to_string(FORMAT const raw) -> std::string
@@ -240,6 +286,8 @@ auto to_string(FORMAT const raw) -> std::string
         return "E";
     case FORMAT::R:
         return "R";
+    case FORMAT::M:
+        return "M";
     }
 
     return "<unknown>";
@@ -378,6 +426,12 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "actor";
     case OPCODE::SELF:
         return greedy + "self";
+    case OPCODE::SM:
+        return greedy + "sm";
+    case OPCODE::LM:
+        return greedy + "lm";
+    case OPCODE::MM:
+        return greedy + "mm";
     }
 
     return "<unknown>";
@@ -518,6 +572,14 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::ACTOR));
     } else if (sv == "self") {
         return (op | static_cast<opcode_type>(OPCODE::SELF));
+    } else if (sv == "self") {
+        return (op | static_cast<opcode_type>(OPCODE::SELF));
+    } else if (sv == "sm") {
+        return (op | static_cast<opcode_type>(OPCODE::SM));
+    } else if (sv == "lm") {
+        return (op | static_cast<opcode_type>(OPCODE::LM));
+    } else if (sv == "mm") {
+        return (op | static_cast<opcode_type>(OPCODE::MM));
     } else {
         throw std::invalid_argument{"viua::arch::ops::parse_opcode: "
                                     + std::string{raw}};

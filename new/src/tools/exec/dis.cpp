@@ -60,6 +60,8 @@ auto ins_to_string(viua::arch::instruction_type const ip) -> std::string
         return viua::arch::ops::E::decode(ip).to_string();
     case R:
         return viua::arch::ops::R::decode(ip).to_string();
+    case M:
+        return viua::arch::ops::M::decode(ip).to_string();
     default:
         return ("; " + std::string(16, '^') + " invalid instruction");
     }
@@ -388,6 +390,81 @@ auto demangle_addiu(Cooked_text& text) -> void
                 ((needs_greedy ? "g." : "") + std::string{"addi "}
                  + addi.out.to_string() + ", " + addi.in.to_string() + ", "
                  + std::to_string(addi.immediate) + 'u'));
+            continue;
+        }
+
+        tmp.push_back(std::move(text.at(i)));
+    }
+
+    text = std::move(tmp);
+}
+
+auto demangle_memory(Cooked_text& text) -> void
+{
+    auto tmp = Cooked_text{};
+
+    auto const ins_at =
+        [&text](size_t const n) -> viua::arch::instruction_type {
+        return text.at(n).instruction.value_or(0);
+    };
+    auto const m = [ins_at](size_t const n,
+                            viua::arch::ops::OPCODE const op,
+                            viua::arch::opcode_type const flags = 0) -> bool {
+        return match_opcode(ins_at(n), op, flags);
+    };
+
+    using enum viua::arch::ops::OPCODE;
+    for (auto i = size_t{0}; i < text.size(); ++i) {
+        using viua::arch::ops::GREEDY;
+        if (m(i, SM) or m(i, LM) or m(i, MM)) {
+            using viua::arch::ops::M;
+            auto const op         = M::decode(ins_at(i));
+
+            auto name = std::string{};
+            switch (static_cast<viua::arch::ops::OPCODE>(op.opcode)) {
+                case SM:
+                    name = "s";
+                    break;
+                case LM:
+                    name = "l";
+                    break;
+                case MM:
+                    name = "m";
+                    break;
+                default:
+                    abort();
+                    break;
+            }
+            switch (op.spec) {
+                case 0:
+                    name += "b";
+                    break;
+                case 1:
+                    name += "h";
+                    break;
+                case 2:
+                    name += "w";
+                    break;
+                case 3:
+                    name += "d";
+                    break;
+                case 4:
+                    name += "q";
+                    break;
+                default:
+                    abort();
+                    break;
+            }
+
+            auto idx          = text.at(i).index;
+            idx.physical_span = idx.physical;
+            tmp.emplace_back(
+                idx,
+                std::nullopt,
+                std::nullopt,
+                (name + " "
+                 + op.out.to_string() + ", " + op.in.to_string() + ", "
+                 + std::to_string(op.immediate)));
             continue;
         }
 
@@ -746,6 +823,7 @@ auto main(int argc, char* argv[]) -> int
                 cooked_text, rodata->get(), fntab->get());
         }
         cook::demangle_addiu(cooked_text);
+        cook::demangle_memory(cooked_text);
 
         auto const physical_to_logical = cook::demangle_branches(cooked_text);
 

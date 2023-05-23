@@ -984,6 +984,41 @@ auto expand_if(std::vector<ast::Instruction>& cooked,
     each.operands.push_back(reg);
     cooked.push_back(std::move(each));
 }
+auto expand_memory_access(std::vector<ast::Instruction>& cooked,
+                   ast::Instruction const& raw) -> void
+{
+    using namespace std::string_literals;
+    auto synth        = ast::Instruction{};
+    synth.opcode      = raw.opcode;
+    synth.opcode.text[1] = 'm';
+    synth.physical_index = raw.physical_index;
+
+    synth.operands.push_back(raw.operands.at(0));
+    synth.operands.push_back(raw.operands.at(0));
+    synth.operands.push_back(raw.operands.at(1));
+    synth.operands.push_back(raw.operands.at(2));
+
+    switch (raw.opcode.text[1]) {
+        case 'b':
+            synth.operands.front().ingredients.front().text = "0";
+            break;
+        case 'h':
+            synth.operands.front().ingredients.front().text = "1";
+            break;
+        case 'w':
+            synth.operands.front().ingredients.front().text = "2";
+            break;
+        case 'd':
+            synth.operands.front().ingredients.front().text = "3";
+            break;
+        case 'q':
+            synth.operands.front().ingredients.front().text = "4";
+            break;
+    }
+    synth.operands.front().ingredients.resize(1);
+
+    cooked.push_back(synth);
+}
 auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
                                std::map<std::string, size_t> const& fn_offsets)
     -> std::vector<ast::Instruction>
@@ -997,6 +1032,23 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
         "g.muli",
         "divi",
         "g.divi",
+    };
+    auto const memory_access = std::set<std::string>{
+        "sb",
+        "lb",
+        "mb",
+        "sh",
+        "lh",
+        "mh",
+        "sw",
+        "lw",
+        "mw",
+        "sd",
+        "ld",
+        "md",
+        "sq",
+        "lq",
+        "mq",
     };
 
     /*
@@ -1160,6 +1212,8 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
                 each.opcode.text += 'u';
             }
             cooked.push_back(std::move(each));
+        } else if (memory_access.count(each.opcode.text)) {
+            expand_memory_access(cooked, each);
         } else {
             /*
              * Real instructions should be pushed without any modification.
@@ -1348,6 +1402,19 @@ auto emit_instruction(viua::libs::parser::ast::Instruction const insn)
                         Cause::Invalid_operand,
                         "expected integer as immediate operand"};
         }
+    }
+    case FORMAT::M:
+    {
+        auto const unit = insn.operands.front().ingredients.front();
+        auto const off = insn.operands.back().ingredients.front();
+
+        return viua::arch::ops::M{
+            opcode,
+            insn.operands.at(1).make_access(),
+            insn.operands.at(2).make_access(),
+            static_cast<uint16_t>(std::stoull(off.text)),
+            static_cast<uint8_t>(std::stoull(unit.text))}
+            .encode();
     }
     default:
         using viua::libs::errors::compile_time::Cause;

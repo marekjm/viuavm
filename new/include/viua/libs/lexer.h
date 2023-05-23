@@ -264,6 +264,13 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "self",
     "g.self",
 
+    "sm",
+    "g.sm",
+    "lm",
+    "g.lm",
+    "mm",
+    "g.mm",
+
     /*
      * Pseudoinstructions listed below.
      */
@@ -273,6 +280,22 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "g.delete",
     "jump",
     "g.jump",
+
+    "sb",
+    "lb",
+    "mb",
+    "sh",
+    "lh",
+    "mh",
+    "sw",
+    "lw",
+    "mw",
+    "sd",
+    "ld",
+    "md",
+    "sq",
+    "lq",
+    "mq",
 };
 
 auto lex(std::string_view) -> std::vector<Lexeme>;

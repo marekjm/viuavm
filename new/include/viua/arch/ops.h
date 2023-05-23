@@ -35,6 +35,7 @@ constexpr auto FORMAT_S = opcode_type{0x3000};
 constexpr auto FORMAT_F = opcode_type{0x4000};
 constexpr auto FORMAT_E = opcode_type{0x5000};
 constexpr auto FORMAT_R = opcode_type{0x6000};
+constexpr auto FORMAT_M = opcode_type{0x7000};
 
 /*
  * Create an enum to make use of switch statement's exhaustiveness checks.
@@ -54,6 +55,7 @@ enum class FORMAT : opcode_type {
     F = FORMAT_F,
     E = FORMAT_E,
     R = FORMAT_R,
+    M = FORMAT_M,
 };
 auto to_string(FORMAT const) -> std::string;
 
@@ -90,6 +92,29 @@ struct D {
       Register_access const);
 
     static auto decode(instruction_type const) -> D;
+    auto encode() const -> instruction_type;
+
+    auto to_string() const -> std::string;
+};
+
+/*
+ * Two-way register access, with 16-bit memory offset, and 8-bit specifier.
+ * "M" because it is used for loads and stored, which interact with "memory".
+ */
+struct M {
+    viua::arch::opcode_type opcode;
+    Register_access const out;
+    Register_access const in;
+    uint16_t const immediate;
+    uint8_t const spec;
+
+    M(viua::arch::opcode_type const,
+      Register_access const,
+      Register_access const,
+      uint16_t const,
+      uint8_t const);
+
+    static auto decode(instruction_type const) -> M;
     auto encode() const -> instruction_type;
 
     auto to_string() const -> std::string;
@@ -280,6 +305,10 @@ enum class OPCODE : opcode_type {
     MULIU = (FORMAT_R | 0x0003 | UNSIGNED),
     DIVI  = (FORMAT_R | 0x0004),
     DIVIU = (FORMAT_R | 0x0004 | UNSIGNED),
+
+    SM = (FORMAT_M | 0x0001),
+    LM = (FORMAT_M | 0x0002),
+    MM = (FORMAT_M | 0x0003),
 };
 auto to_string(opcode_type const) -> std::string;
 auto parse_opcode(std::string_view) -> opcode_type;
@@ -363,6 +392,11 @@ enum class OPCODE_N : opcode_type {
     Make_entry(HALT),
     Make_entry(EBREAK),
     Make_entry(ECALL),
+};
+enum class OPCODE_M : opcode_type {
+    Make_entry(SM),
+    Make_entry(LM),
+    Make_entry(MM),
 };
 #undef Make_entry
 }  // namespace viua::arch::ops

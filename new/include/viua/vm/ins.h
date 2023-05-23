@@ -114,6 +114,10 @@ Work_instruction(IO_PEEK);
 Work_instruction(ACTOR);
 Work_instruction(SELF);
 
+Work_instruction(SM);
+Work_instruction(LM);
+Work_instruction(MM);
+
 constexpr auto VIUA_TRACE_CYCLES = true;
 auto execute(viua::vm::Stack&, viua::arch::instruction_type const* const)
     -> viua::arch::instruction_type const*;
