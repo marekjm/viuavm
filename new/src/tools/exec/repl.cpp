@@ -48,6 +48,7 @@ struct Global_state {
     std::optional<size_t> selected_frame;
 
     std::string last_input;
+    bool crash_on_internal { false };
 };
 
 
@@ -91,6 +92,9 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
     candidates.push_back("quit");
     candidates.push_back("repl");
     candidates.push_back("repl pid-base");
+    candidates.push_back("repl abort-internal");
+    candidates.push_back("repl abort-internal true");
+    candidates.push_back("repl abort-internal false");
     candidates.push_back("actor");
     candidates.push_back("actor new");
     candidates.push_back("load");
@@ -436,6 +440,14 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
         if (*p(1) == "pid-base") {
             using viua::runtime::PID;
             std::cout << PID{REPL_STATE->core.pids.base}.to_string() << "\n\r";
+        } else if (*p(1) == "abort-internal") {
+            if (*p(2) == "true") {
+                REPL_STATE->crash_on_internal = true;
+            } else if (*p(2) == "false") {
+                REPL_STATE->crash_on_internal = false;
+            } else {
+                std::cout << REPL_STATE->crash_on_internal << "\n\r";
+            }
         }
     } else if (*p(0) == "load") {
         auto const name     = *p(1);
@@ -641,6 +653,13 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
         } catch (viua::vm::abort_execution const& e) {
             std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
                       << ": aborted execution: " << e.what() << "\n\r";
+            return true;
+        } catch (std::exception const& e) {
+            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+                      << ": internal VM error: " << e.what() << "\n\r";
+            if (REPL_STATE->crash_on_internal) {
+                throw;
+            }
             return true;
         }
     } else if (*p(0) == "up") {
