@@ -17,6 +17,8 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <endian.h>
+
 #include <algorithm>
 #include <functional>
 #include <iomanip>
@@ -2071,10 +2073,86 @@ auto execute(ECALL const, Stack&, ip_type const) -> void
 {
 }
 
-auto execute(SM const, Stack&, ip_type const) -> void
+auto execute(SM const op, Stack& stack, ip_type const ip) -> void
 {
+    auto& registers = stack.frames.back().registers;
+    auto const base       = get_value(registers, op.instruction.in, ip);
+    auto const offset     = op.instruction.immediate;
+
+    auto const unit       = op.instruction.spec;
+    auto const copy_size  = (1 << unit);
+
+    auto const addr = offset + (base.holds<void>() ? 0 : base.get<uint64_t>());
+    auto& memory = stack.proc->memory.front();
+
+    auto const in         = get_value(registers, op.instruction.out, ip).get<uint64_t>();
+    switch (unit) {
+        case 0: {
+            auto const val = static_cast<uint8_t>(in);
+            memcpy(memory.data() + addr, &val, copy_size);
+            break;
+        }
+        case 1: {
+            auto const val = htole16(static_cast<uint16_t>(in));
+            memcpy(memory.data() + addr, &val, copy_size);
+            break;
+        }
+        case 2: {
+            auto const val = htole32(static_cast<uint32_t>(in));
+            memcpy(memory.data() + addr, &val, copy_size);
+            break;
+        }
+        case 3: {
+            auto const val = htole64(static_cast<uint64_t>(in));
+            memcpy(memory.data() + addr, &val, copy_size);
+            break;
+        }
+        case 4:
+        default:
+            throw abort_execution{ip, "invalid unit in memory instruction: " + std::to_string(unit)};
+    }
 }
-auto execute(LM const, Stack&, ip_type const) -> void
+auto execute(LM const op, Stack& stack, ip_type const ip) -> void
 {
+    auto& registers = stack.frames.back().registers;
+    auto const base       = get_value(registers, op.instruction.in, ip);
+    auto const offset     = op.instruction.immediate;
+
+    auto const unit       = op.instruction.spec;
+    auto const copy_size  = (1 << unit);
+
+    auto const addr = offset + (base.holds<void>() ? 0 : base.get<uint64_t>());
+    auto& memory = stack.proc->memory.front();
+
+    auto out         = get_proxy(registers, op.instruction.out, ip);
+    switch (unit) {
+        case 0: {
+            auto val = uint8_t{};
+            memcpy(&val, memory.data() + addr, copy_size);
+            out = static_cast<uint64_t>(val);
+            break;
+        }
+        case 1: {
+            auto val = uint16_t{};
+            memcpy(&val, memory.data() + addr, copy_size);
+            out = static_cast<uint64_t>(le16toh(val));
+            break;
+        }
+        case 2: {
+            auto val = uint32_t{};
+            memcpy(&val, memory.data() + addr, copy_size);
+            out = static_cast<uint64_t>(le32toh(val));
+            break;
+        }
+        case 3: {
+            auto val = uint64_t{};
+            memcpy(&val, memory.data() + addr, copy_size);
+            out = le64toh(val);
+            break;
+        }
+        case 4:
+        default:
+            throw abort_execution{ip, "invalid unit in memory instruction: " + std::to_string(unit)};
+    }
 }
 }  // namespace viua::vm::ins
