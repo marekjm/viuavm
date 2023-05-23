@@ -57,6 +57,7 @@ SKIP_DISASSEMBLER_TESTS = False
 
 EBREAK_LINE_BOXED = re.compile(r'\[(\d+)\.([lap])\] (\*?[a-zA-Z_][a-zA-Z_0-9]*) = (.*)')
 EBREAK_LINE_PRIMITIVE = re.compile(r'\[(\d+)\.([lap])\] (is|iu|fl|db) (.*)')
+EBREAK_MEMORY_LINE = re.compile(r'([0-9a-f]{16})  ((?:[0-9a-f]{2} ){16}) \| (.{16})')
 PERF_OPS_AND_RUNTIME = re.compile(r'\[vm:perf\] executed ops (\d+), run time (.+)')
 PERF_APPROX_FREQ = re.compile(r'\[vm:perf\] approximate frequency (.+ [kMG]?Hz)')
 
@@ -229,6 +230,27 @@ def walk_ebreak_test(errors, want_ebreak, live_ebreak):
             frame = int(frame)
             continue
 
+        if (mem := EBREAK_MEMORY_LINE.match(line)):
+            addr, want_bin, want_ascii = mem.groups()
+
+            live_bin = live_ebreak[pid][ebreak_index]['memory'][addr][0]
+            live_ascii = live_ebreak[pid][ebreak_index]['memory'][addr][1]
+            if want_bin != live_bin:
+                leader = f'    memory line {addr}'
+                errors.write('{} actual   {} | {}\n'.format(
+                    leader,
+                    colorise('red', live_bin),
+                    colorise('red', live_ascii),
+                ))
+                errors.write('{} expected {} | {}\n'.format(
+                    (len(leader) * ' '),
+                    colorise('green', want_bin),
+                    colorise('green', want_ascii),
+                ))
+                raise Unexpected_value()
+
+            continue
+
         b = EBREAK_LINE_BOXED.match(line)
         p = EBREAK_LINE_PRIMITIVE.match(line)
         if not (b or p):
@@ -330,10 +352,20 @@ def consume_register_contents(ebreak_lines):
 
     return contents
 
+def consume_memory_contents(ebreak_lines):
+    contents = {}
+
+    while ebreak_lines and (line := EBREAK_MEMORY_LINE.match(ebreak_lines[0])):
+        ebreak_lines.pop(0)
+        contents[line.group(1)] = (line.group(2), line.group(3),)
+
+    return contents
+
 def consume_live_ebreak_lines(ebreak_lines):
     ebreak = {
         'pid': None,
         'backtrace': [],
+        'memory': {},
     }
 
     if (pid := EBREAK_BEGIN.match(ebreak_lines[0])):
@@ -363,6 +395,12 @@ def consume_live_ebreak_lines(ebreak_lines):
     else:
         raise Exception('invalid ebreak snapshot (expected register contents)')
 
+    if ebreak_lines[0] == 'memory:':
+        ebreak_lines.pop(0)
+
+        ebreak['memory'] = consume_memory_contents(ebreak_lines)
+    else:
+        raise Exception('invalid ebreak snapshot (expected memory contents)')
 
     if (pid := EBREAK_END.match(ebreak_lines[0])):
         ebreak_lines.pop(0)
