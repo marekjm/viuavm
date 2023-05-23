@@ -439,9 +439,18 @@ struct Process {
     using stack_type = Stack;
     stack_type stack;
 
+    static inline constexpr auto MEM_PAGE_SIZE = size_t{256};
+    std::vector<std::array<uint8_t, MEM_PAGE_SIZE>> memory;
+
+    using Pointer = std::pair<bool, uintptr_t>;
+    auto memory_at(Pointer const) const -> void const*;
+    auto memory_at(Pointer const) -> void*;
+
     explicit inline Process(pid_type const p, Core* c, Module const& m)
             : pid{p}, core{c}, module{m}, strtab{&m.strings_table}, stack{*this}
-    {}
+    {
+        memory.emplace_back();
+    }
 
     inline auto push_frame(size_t const locals,
                            stack_type::addr_type const entry_ip,
