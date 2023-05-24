@@ -427,6 +427,38 @@ struct Stack {
     }
 };
 
+inline constexpr auto MEM_LINE_SIZE = size_t{16};
+inline constexpr auto MEM_PAGE_SIZE = MEM_LINE_SIZE * 16;
+struct Page {
+    using unit_type = uint8_t;
+    using storage_type = std::array<unit_type, MEM_PAGE_SIZE>;
+
+    alignas(uint64_t) storage_type storage;
+
+    inline constexpr auto data() -> uint8_t*
+    {
+        return storage.data();
+    }
+    inline constexpr auto data() const -> uint8_t const*
+    {
+        return storage.data();
+    }
+
+    inline constexpr auto at(size_t const i) -> uint8_t&
+    {
+        return storage.at(i);
+    }
+    inline constexpr auto at(size_t const i) const -> uint8_t
+    {
+        return storage.at(i);
+    }
+
+    inline constexpr auto size() const -> size_t
+    {
+        return storage.size();
+    }
+};
+
 struct Process {
     using pid_type = viua::runtime::PID;
     pid_type const pid;
@@ -439,8 +471,7 @@ struct Process {
     using stack_type = Stack;
     stack_type stack;
 
-    static inline constexpr auto MEM_PAGE_SIZE = size_t{256};
-    std::vector<std::array<uint8_t, MEM_PAGE_SIZE>> memory;
+    std::vector<Page> memory;
 
     using Pointer = std::pair<bool, uintptr_t>;
     auto memory_at(Pointer const) const -> void const*;
