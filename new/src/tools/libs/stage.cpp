@@ -302,11 +302,11 @@ auto display_error(std::filesystem::path source_path,
     if (not e.aside().empty()) {
         std::cerr << std::string(ERROR_MARKER.size(), ' ')
                   << std::string(LINE_NO_WIDTH, ' ') << esc(2, COLOR_FG_CYAN)
-                  << SEPARATOR_ASIDE << std::string(e.character(), ' ') << '|'
+                  << SEPARATOR_ASIDE << std::string(e.aside_character(), ' ') << '|'
                   << esc(2, ATTR_RESET) << "\n";
         std::cerr << std::string(ERROR_MARKER.size(), ' ')
                   << std::string(LINE_NO_WIDTH, ' ') << esc(2, COLOR_FG_CYAN)
-                  << SEPARATOR_ASIDE << std::string(e.character(), ' ')
+                  << SEPARATOR_ASIDE << std::string(e.aside_character(), ' ')
                   << e.aside() << esc(2, ATTR_RESET) << "\n";
         std::cerr << esc(2, COLOR_FG_CYAN)
                   << std::string(ERROR_MARKER.size(), ' ')

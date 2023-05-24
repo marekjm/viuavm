@@ -63,9 +63,13 @@ Error::Error(viua::libs::lexer::Lexeme lx, Cause const ce, std::string m)
         : cause{ce}, message{std::move(m)}, main_lexeme{lx}
 {}
 
-auto Error::aside(std::string s) -> Error&
+auto Error::aside(std::string s, std::optional<Lexeme> l) -> Error&
 {
     aside_note = std::move(s);
+    aside_lexeme = l;
+    if (l.has_value()) {
+        add(*l);
+    }
     return *this;
 }
 auto Error::aside() const -> std::string_view

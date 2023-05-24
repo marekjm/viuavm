@@ -159,13 +159,20 @@ class Error {
      * Its location is independent of the main lexeme.
      */
     std::string aside_note;
-    viua::libs::lexer::Lexeme aside_lexeme;
+    std::optional<viua::libs::lexer::Lexeme> aside_lexeme;
 
   public:
     Error(viua::libs::lexer::Lexeme, Cause const, std::string = "");
 
-    auto aside(std::string) -> Error&;
+    auto aside(std::string, std::optional<Lexeme> = std::nullopt) -> Error&;
     auto aside() const -> std::string_view;
+    auto aside_character() const -> size_t
+    {
+        if (aside_lexeme.has_value()) {
+            return aside_lexeme->location.character;
+        }
+        return character();
+    }
 
     auto note(std::string) -> Error&;
     auto notes() const -> std::vector<std::string> const&;
