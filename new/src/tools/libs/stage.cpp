@@ -632,7 +632,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
     } catch (std::invalid_argument const&) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{raw_value, Cause::Invalid_operand, "expected integer"};
+        throw Error{raw_value, Cause::Invalid_operand, "expected integer"}.add(each.opcode);
     }
 
     using viua::libs::assembler::to_loading_parts_unsigned;
