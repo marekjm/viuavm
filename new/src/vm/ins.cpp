@@ -535,7 +535,20 @@ auto get_value(Stack& stack,
                viua::arch::Register_access const a,
                ip_type const ip) -> viua::vm::types::Cell_view
 {
-    return get_value(stack.frames.back().registers, a, ip);
+    static viua::vm::Value void_placeholder;
+    switch (a.set) {
+        using enum viua::arch::REGISTER_SET;
+        case VOID:
+            return void_placeholder.value.view();
+        case LOCAL:
+            return get_value(stack.frames.back().registers, a, ip);
+        case PARAMETER:
+            return get_value(stack.frames.back().parameters, a, ip);
+        case ARGUMENT:
+            return get_value(stack.args, a, ip);
+        default:
+            throw abort_execution{ip, "illegal read access to register " + a.to_string()};
+    }
 }
 }  // namespace
 
