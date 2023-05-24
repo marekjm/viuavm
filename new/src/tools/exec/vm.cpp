@@ -115,7 +115,7 @@ auto run(viua::vm::Process& proc) -> bool
                            << proc.pid.to_string() << viua::TRACE_STREAM.endl;
     }
 
-    constexpr auto PREEMPTION_THRESHOLD = size_t{2};
+    constexpr auto PREEMPTION_THRESHOLD = size_t{42};
     for (auto i = size_t{0}; i < PREEMPTION_THRESHOLD and ip_ok(); ++i) {
         /*
          * This is needed to detect greedy bundles and adjust preemption
