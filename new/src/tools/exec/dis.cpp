@@ -430,7 +430,7 @@ auto demangle_memory(Cooked_text& text) -> void
                     break;
                 case AA:
                 case AD:
-                    name = "a";
+                    name = "am";
                     break;
                 default:
                     abort();

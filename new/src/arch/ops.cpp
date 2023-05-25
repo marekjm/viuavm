@@ -431,9 +431,9 @@ auto to_string(opcode_type const raw) -> std::string
     case OPCODE::LM:
         return greedy + "lm";
     case OPCODE::AA:
-        return greedy + "aa";
+        return greedy + "ama";
     case OPCODE::AD:
-        return greedy + "ad";
+        return greedy + "amd";
     case OPCODE::PTR:
         return greedy + "ptr";
     }
@@ -582,9 +582,9 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::SM));
     } else if (sv == "lm") {
         return (op | static_cast<opcode_type>(OPCODE::LM));
-    } else if (sv == "aa") {
+    } else if (sv == "ama") {
         return (op | static_cast<opcode_type>(OPCODE::AA));
-    } else if (sv == "ad") {
+    } else if (sv == "amd") {
         return (op | static_cast<opcode_type>(OPCODE::AD));
     } else if (sv == "ptr") {
         return (op | static_cast<opcode_type>(OPCODE::PTR));
