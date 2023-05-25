@@ -1029,6 +1029,8 @@ auto expand_memory_access(std::vector<ast::Instruction>& cooked,
         case 'q':
             synth.operands.front().ingredients.front().text = "4";
             break;
+        default:
+            abort();
     }
     synth.operands.front().ingredients.resize(1);
 
