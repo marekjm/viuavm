@@ -1319,9 +1319,8 @@ auto execute_arithmetic_immediate_op(Op const op,
                                      Stack& stack,
                                      ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto out        = get_proxy(registers, op.instruction.out, ip);
-    auto in         = get_value(registers, op.instruction.in, ip);
+    auto out        = get_proxy(stack, op.instruction.out, ip);
+    auto in         = get_value(stack, op.instruction.in, ip);
 
     constexpr auto const signed_immediate =
         std::is_signed_v<typename Op::value_type>;
