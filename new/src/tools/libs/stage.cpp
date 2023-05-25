@@ -991,6 +991,18 @@ auto expand_memory_access(std::vector<ast::Instruction>& cooked,
     auto synth        = ast::Instruction{};
     synth.opcode      = raw.opcode;
     synth.opcode.text[1] = 'm';
+    if (synth.opcode.text[0] == 'a') {
+        switch (synth.opcode.text.back()) {
+            case 'a':
+                synth.opcode.text = "aa";
+                break;
+            case 'd':
+                synth.opcode.text = "ad";
+                break;
+            default:
+                abort();
+        }
+    }
     synth.physical_index = raw.physical_index;
 
     synth.operands.push_back(raw.operands.at(0));
@@ -1049,6 +1061,16 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
         "sq",
         "lq",
         "mq",
+        "aba",
+        "aha",
+        "awa",
+        "ada",
+        "aqa",
+        "abd",
+        "ahd",
+        "awd",
+        "add",
+        "aqd",
     };
 
     /*
