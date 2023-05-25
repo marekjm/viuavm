@@ -211,6 +211,9 @@ auto execute(viua::vm::Stack& stack,
 #define Work(OP) case OPCODE_M::OP: execute(OP{instruction}, stack, ip); break
             Work(SM);
             Work(LM);
+            Work(AA);
+            Work(AD);
+            Work(PTR);
 #undef Work
         }
         break;
@@ -2090,5 +2093,14 @@ auto execute(LM const op, Stack& stack, ip_type const ip) -> void
         default:
             throw abort_execution{ip, "invalid unit in memory instruction: " + std::to_string(unit)};
     }
+}
+auto execute(AA const, Stack&, ip_type const) -> void
+{
+}
+auto execute(AD const, Stack&, ip_type const) -> void
+{
+}
+auto execute(PTR const, Stack&, ip_type const) -> void
+{
 }
 }  // namespace viua::vm::ins

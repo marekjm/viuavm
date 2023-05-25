@@ -430,6 +430,12 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "sm";
     case OPCODE::LM:
         return greedy + "lm";
+    case OPCODE::AA:
+        return greedy + "aa";
+    case OPCODE::AD:
+        return greedy + "ad";
+    case OPCODE::PTR:
+        return greedy + "ptr";
     }
 
     return "<unknown>";
@@ -576,6 +582,12 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::SM));
     } else if (sv == "lm") {
         return (op | static_cast<opcode_type>(OPCODE::LM));
+    } else if (sv == "aa") {
+        return (op | static_cast<opcode_type>(OPCODE::AA));
+    } else if (sv == "ad") {
+        return (op | static_cast<opcode_type>(OPCODE::AD));
+    } else if (sv == "ptr") {
+        return (op | static_cast<opcode_type>(OPCODE::PTR));
     } else {
         throw std::invalid_argument{"viua::arch::ops::parse_opcode: "
                                     + std::string{raw}};

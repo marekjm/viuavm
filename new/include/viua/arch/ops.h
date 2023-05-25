@@ -306,8 +306,11 @@ enum class OPCODE : opcode_type {
     DIVI  = (FORMAT_R | 0x0004),
     DIVIU = (FORMAT_R | 0x0004 | UNSIGNED),
 
-    SM = (FORMAT_M | 0x0001),
-    LM = (FORMAT_M | 0x0002),
+    SM = (FORMAT_M | 0x0001),   /* Store Memory */
+    LM = (FORMAT_M | 0x0002),   /* Load Memory */
+    AA = (FORMAT_M | 0x0003),   /* Allocate Automatic */
+    AD = (FORMAT_M | 0x0004),   /* Allocate Dynamic */
+    PTR = (FORMAT_M | 0x0005),  /* PoinTeR */
 };
 auto to_string(opcode_type const) -> std::string;
 auto parse_opcode(std::string_view) -> opcode_type;
@@ -395,6 +398,9 @@ enum class OPCODE_N : opcode_type {
 enum class OPCODE_M : opcode_type {
     Make_entry(SM),
     Make_entry(LM),
+    Make_entry(AA),
+    Make_entry(AD),
+    Make_entry(PTR),
 };
 #undef Make_entry
 }  // namespace viua::arch::ops

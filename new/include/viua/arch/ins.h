@@ -479,6 +479,24 @@ struct LM : Instruction {
     LM(viua::arch::ops::M i) : instruction{i}
     {}
 };
+struct AA : Instruction {
+    viua::arch::ops::M instruction;
+
+    AA(viua::arch::ops::M i) : instruction{i}
+    {}
+};
+struct AD : Instruction {
+    viua::arch::ops::M instruction;
+
+    AD(viua::arch::ops::M i) : instruction{i}
+    {}
+};
+struct PTR : Instruction {
+    viua::arch::ops::M instruction;
+
+    PTR(viua::arch::ops::M i) : instruction{i}
+    {}
+};
 }  // namespace viua::arch::ins
 
 #endif
