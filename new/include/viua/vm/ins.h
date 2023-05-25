@@ -133,6 +133,76 @@ auto print_backtrace(viua::vm::Stack const&,
                      std::optional<size_t> const = std::nullopt) -> void;
 auto dump_registers(std::vector<Value> const&, std::string_view const) -> void;
 auto dump_memory(std::vector<Page> const&) -> void;
+
+/*
+ * Implementation details.
+ */
+auto get_value(std::vector<viua::vm::Value>&,
+               viua::arch::Register_access const,
+               viua::arch::instruction_type const*) -> viua::vm::types::Cell_view;
+auto get_value(viua::vm::Stack&,
+               viua::arch::Register_access const,
+               viua::arch::instruction_type const*) -> viua::vm::types::Cell_view;
+
+struct Proxy {
+    using slot_type = std::reference_wrapper<viua::vm::Value>;
+    using cell_type = viua::vm::types::Cell_view;
+
+    std::variant<slot_type, cell_type> slot;
+
+    explicit Proxy(slot_type s) : slot{s}
+    {}
+    explicit Proxy(cell_type c) : slot{c}
+    {}
+
+    auto hard() const -> bool
+    {
+        return std::holds_alternative<slot_type>(slot);
+    }
+    auto soft() const -> bool
+    {
+        return not hard();
+    }
+
+    auto view() const -> cell_type const
+    {
+        if (hard()) {
+            return std::get<slot_type>(slot).get().value.view();
+        } else {
+            return std::get<cell_type>(slot);
+        }
+    }
+    auto view() -> cell_type
+    {
+        if (hard()) {
+            return std::get<slot_type>(slot).get().value.view();
+        } else {
+            return std::get<cell_type>(slot);
+        }
+    }
+    auto overwrite() -> slot_type::type&
+    {
+        return std::get<slot_type>(slot).get();
+    }
+
+    template<typename T> auto operator=(T&& v) -> Proxy&
+    {
+        overwrite() = std::move(v);
+        return *this;
+    }
+
+    template<typename T>
+    inline auto boxed_of() -> std::optional<std::reference_wrapper<T>>
+    {
+        return view().boxed_of<T>();
+    }
+};
+auto get_proxy(std::vector<viua::vm::Value>&,
+               viua::arch::Register_access const,
+               viua::arch::instruction_type const*) -> Proxy;
+auto get_proxy(Stack&,
+               viua::arch::Register_access const,
+               viua::arch::instruction_type const*) -> Proxy;
 }  // namespace viua::vm::ins
 
 #endif

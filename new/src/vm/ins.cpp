@@ -318,59 +318,12 @@ auto get_slot(viua::arch::Register_access const ra,
     throw abort_execution{ip, "impossible"};
 }
 
-struct Proxy {
-    using slot_type = std::reference_wrapper<viua::vm::Value>;
-    using cell_type = viua::vm::types::Cell_view;
+auto type_name(Proxy const& p) -> std::string
+{
+    return type_name(p.view());
+}
+}  // namespace
 
-    std::variant<slot_type, cell_type> slot;
-
-    explicit Proxy(slot_type s) : slot{s}
-    {}
-    explicit Proxy(cell_type c) : slot{c}
-    {}
-
-    auto hard() const -> bool
-    {
-        return std::holds_alternative<slot_type>(slot);
-    }
-    auto soft() const -> bool
-    {
-        return not hard();
-    }
-
-    auto view() const -> cell_type const
-    {
-        if (hard()) {
-            return std::get<slot_type>(slot).get().value.view();
-        } else {
-            return std::get<cell_type>(slot);
-        }
-    }
-    auto view() -> cell_type
-    {
-        if (hard()) {
-            return std::get<slot_type>(slot).get().value.view();
-        } else {
-            return std::get<cell_type>(slot);
-        }
-    }
-    auto overwrite() -> slot_type::type&
-    {
-        return std::get<slot_type>(slot).get();
-    }
-
-    template<typename T> auto operator=(T&& v) -> Proxy&
-    {
-        overwrite() = std::move(v);
-        return *this;
-    }
-
-    template<typename T>
-    inline auto boxed_of() -> std::optional<std::reference_wrapper<T>>
-    {
-        return view().boxed_of<T>();
-    }
-};
 auto get_proxy(std::vector<viua::vm::Value>& registers,
                viua::arch::Register_access const a,
                ip_type const ip) -> Proxy
@@ -413,11 +366,6 @@ auto get_proxy(Stack& stack,
     default:
         throw abort_execution{ip, "access to invalid register set"};
     }
-}
-
-auto type_name(Proxy const& p) -> std::string
-{
-    return type_name(p.view());
 }
 
 auto get_value(std::vector<viua::vm::Value>& registers,
@@ -464,7 +412,6 @@ auto get_value(Stack& stack,
             throw abort_execution{ip, "illegal read access to register " + a.to_string()};
     }
 }
-}  // namespace
 
 template<typename T> auto cast_to(viua::vm::types::Cell_view value) -> T
 {
