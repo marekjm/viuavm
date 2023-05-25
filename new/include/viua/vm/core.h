@@ -283,6 +283,11 @@ struct Frame {
 
     viua::arch::Register_access result_to;
 
+    struct {
+        uint64_t fp { 0 };
+        uint64_t sbrk { 0 };
+    } saved;
+
     inline Frame(size_t const sz, addr_type const e, addr_type const r)
             : registers(sz), entry_address{e}, return_address{r}
     {}
@@ -472,6 +477,8 @@ struct Process {
     stack_type stack;
 
     std::vector<Page> memory;
+    uint64_t frame_pointer { 0 };
+    uint64_t stack_break { 0 };
 
     using Pointer = std::pair<bool, uintptr_t>;
     auto memory_at(Pointer const) const -> void const*;

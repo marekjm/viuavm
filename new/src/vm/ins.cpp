@@ -1221,6 +1221,18 @@ auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
         throw abort_execution{ip, "invalid IP after call"};
     }
 
+    /*
+     * Save:
+     *
+     *  - frame pointer ie, pointer to where the frames memory area begins
+     *  - stack break ie, pointer to where next unallocated pointer is on the
+     *    stack memory
+     *
+     * They should be restored when the frame is popped.
+     */
+    stack.frames.back().saved.fp = stack.proc->frame_pointer;
+    stack.frames.back().saved.sbrk = stack.proc->stack_break;
+
     auto const fr_return = (stack.ip + 1);
     auto const fr_entry  = (stack.proc->module.ip_base
                            + (fn_addr / sizeof(viua::arch::instruction_type)));
@@ -1229,6 +1241,15 @@ auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
         viua::arch::MAX_REGISTER_INDEX, fr_entry, fr_return);
     stack.frames.back().parameters = std::move(stack.args);
     stack.frames.back().result_to  = op.instruction.out;
+
+    /*
+     * Set the frame pointer to stack break to. Usually, one of the first
+     * instructions in the callee is AMA which will increase the stack break
+     * giving the function some memory to work with.
+     */
+    stack.proc->frame_pointer = stack.proc->stack_break;
+    stack.frames.back().saved.fp = stack.proc->frame_pointer;
+    stack.frames.back().saved.sbrk = stack.proc->stack_break;
 
     return fr_entry;
 }
@@ -1259,6 +1280,9 @@ auto execute(RETURN const op, Stack& stack, ip_type const ip) -> ip_type
         // such errors and refused to produce the ELF output.
         out = std::move(fr.registers.at(op.instruction.out.index));
     }
+
+    stack.proc->frame_pointer = fr.saved.fp;
+    stack.proc->stack_break = fr.saved.sbrk;
 
     return fr.return_address;
 }
