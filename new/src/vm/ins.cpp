@@ -67,63 +67,30 @@ auto execute(viua::vm::Stack& stack,
 
         using viua::arch::ops::OPCODE_T;
         switch (static_cast<OPCODE_T>(opcode)) {
-        case OPCODE_T::ADD:
-            execute(ADD{instruction}, stack, ip);
-            break;
-        case OPCODE_T::SUB:
-            execute(SUB{instruction}, stack, ip);
-            break;
-        case OPCODE_T::MUL:
-            execute(MUL{instruction}, stack, ip);
-            break;
-        case OPCODE_T::DIV:
-            execute(DIV{instruction}, stack, ip);
-            break;
-        case OPCODE_T::MOD:
-            execute(MOD{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BITSHL:
-            execute(BITSHL{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BITSHR:
-            execute(BITSHR{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BITASHR:
-            execute(BITASHR{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BITROL:
-            execute(BITROL{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BITROR:
-            execute(BITROR{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BITAND:
-            execute(BITAND{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BITOR:
-            execute(BITOR{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BITXOR:
-            execute(BITXOR{instruction}, stack, ip);
-            break;
-        case OPCODE_T::EQ:
-            execute(EQ{instruction}, stack, ip);
-            break;
-        case OPCODE_T::GT:
-            execute(GT{instruction}, stack, ip);
-            break;
-        case OPCODE_T::LT:
-            execute(LT{instruction}, stack, ip);
-            break;
-        case OPCODE_T::CMP:
-            execute(CMP{instruction}, stack, ip);
-            break;
-        case OPCODE_T::AND:
-            execute(AND{instruction}, stack, ip);
-            break;
-        case OPCODE_T::OR:
-            execute(OR{instruction}, stack, ip);
-            break;
+#define Work(OP) case OPCODE_T::OP: execute(OP{instruction}, stack, ip); break
+            Work(ADD);
+            Work(SUB);
+            Work(MUL);
+            Work(DIV);
+            Work(MOD);
+            Work(BITSHL);
+            Work(BITSHR);
+            Work(BITASHR);
+            Work(BITROL);
+            Work(BITROR);
+            Work(BITAND);
+            Work(BITOR);
+            Work(BITXOR);
+            Work(EQ);
+            Work(GT);
+            Work(LT);
+            Work(CMP);
+            Work(AND);
+            Work(OR);
+            Work(IO_SUBMIT);
+            Work(IO_WAIT);
+            Work(IO_SHUTDOWN);
+            Work(IO_CTL);
         case OPCODE_T::BUFFER_AT:
             execute(BUFFER_AT{instruction}, stack, ip);
             break;
@@ -139,18 +106,7 @@ auto execute(viua::vm::Stack& stack,
         case OPCODE_T::STRUCT_REMOVE:
             execute(STRUCT_REMOVE{instruction}, stack, ip);
             break;
-        case OPCODE_T::IO_SUBMIT:
-            execute(IO_SUBMIT{instruction}, stack, ip);
-            break;
-        case OPCODE_T::IO_WAIT:
-            execute(IO_WAIT{instruction}, stack, ip);
-            break;
-        case OPCODE_T::IO_SHUTDOWN:
-            execute(IO_SHUTDOWN{instruction}, stack, ip);
-            break;
-        case OPCODE_T::IO_CTL:
-            execute(IO_CTL{instruction}, stack, ip);
-            break;
+#undef Work
         }
         break;
     }
@@ -164,32 +120,19 @@ auto execute(viua::vm::Stack& stack,
 
         using viua::arch::ops::OPCODE_S;
         switch (static_cast<OPCODE_S>(opcode)) {
-        case OPCODE_S::FRAME:
-            execute(FRAME{instruction}, stack, ip);
-            break;
-        case OPCODE_S::RETURN:
-            return execute(RETURN{instruction}, stack, ip);
-        case OPCODE_S::ATOM:
-            execute(ATOM{instruction}, stack, ip);
-            break;
-        case OPCODE_S::STRING:
-            execute(STRING{instruction}, stack, ip);
-            break;
-        case OPCODE_S::FLOAT:
-            execute(FLOAT{instruction}, stack, ip);
-            break;
-        case OPCODE_S::DOUBLE:
-            execute(DOUBLE{instruction}, stack, ip);
-            break;
-        case OPCODE_S::STRUCT:
-            execute(STRUCT{instruction}, stack, ip);
-            break;
-        case OPCODE_S::BUFFER:
-            execute(BUFFER{instruction}, stack, ip);
-            break;
-        case OPCODE_S::SELF:
-            execute(SELF{instruction}, stack, ip);
-            break;
+#define Work(OP) case OPCODE_S::OP: execute(OP{instruction}, stack, ip); break
+#define Flow(OP) case OPCODE_S::OP: return execute(OP{instruction}, stack, ip)
+            Work(FRAME);
+            Flow(RETURN);
+            Work(ATOM);
+            Work(STRING);
+            Work(FLOAT);
+            Work(DOUBLE);
+            Work(STRUCT);
+            Work(BUFFER);
+            Work(SELF);
+#undef Work
+#undef Flow
         }
         break;
     }
@@ -203,12 +146,10 @@ auto execute(viua::vm::Stack& stack,
 
         using viua::arch::ops::OPCODE_E;
         switch (static_cast<OPCODE_E>(opcode)) {
-        case OPCODE_E::LUI:
-            execute(LUI{instruction}, stack, ip);
-            break;
-        case OPCODE_E::LUIU:
-            execute(LUIU{instruction}, stack, ip);
-            break;
+#define Work(OP) case OPCODE_E::OP: execute(OP{instruction}, stack, ip); break
+            Work(LUI);
+            Work(LUIU);
+#undef Work
         }
         break;
     }
@@ -222,30 +163,16 @@ auto execute(viua::vm::Stack& stack,
 
         using viua::arch::ops::OPCODE_R;
         switch (static_cast<OPCODE_R>(opcode)) {
-        case OPCODE_R::ADDI:
-            execute(ADDI{instruction}, stack, ip);
-            break;
-        case OPCODE_R::ADDIU:
-            execute(ADDIU{instruction}, stack, ip);
-            break;
-        case OPCODE_R::SUBI:
-            execute(SUBI{instruction}, stack, ip);
-            break;
-        case OPCODE_R::SUBIU:
-            execute(SUBIU{instruction}, stack, ip);
-            break;
-        case OPCODE_R::MULI:
-            execute(MULI{instruction}, stack, ip);
-            break;
-        case OPCODE_R::MULIU:
-            execute(MULIU{instruction}, stack, ip);
-            break;
-        case OPCODE_R::DIVI:
-            execute(DIVI{instruction}, stack, ip);
-            break;
-        case OPCODE_R::DIVIU:
-            execute(DIVIU{instruction}, stack, ip);
-            break;
+#define Work(OP) case OPCODE_R::OP: execute(OP{instruction}, stack, ip); break
+            Work(ADDI);
+            Work(ADDIU);
+            Work(SUBI);
+            Work(SUBIU);
+            Work(MULI);
+            Work(MULIU);
+            Work(DIVI);
+            Work(DIVIU);
+#undef Work
         }
         break;
     }
@@ -281,12 +208,10 @@ auto execute(viua::vm::Stack& stack,
 
         using viua::arch::ops::OPCODE_M;
         switch (static_cast<OPCODE_M>(opcode)) {
-            case OPCODE_M::SM:
-                execute(SM{viua::arch::ops::M::decode(raw)}, stack, ip);
-                break;
-            case OPCODE_M::LM:
-                execute(LM{viua::arch::ops::M::decode(raw)}, stack, ip);
-                break;
+#define Work(OP) case OPCODE_M::OP: execute(OP{instruction}, stack, ip); break
+            Work(SM);
+            Work(LM);
+#undef Work
         }
         break;
     }
@@ -300,7 +225,8 @@ auto execute(viua::vm::Stack& stack,
 
         using viua::arch::ops::OPCODE_D;
         switch (static_cast<OPCODE_D>(opcode)) {
-        case OPCODE_D::CALL:
+#define Work(OP) case OPCODE_D::OP: execute(OP{instruction}, stack, ip); break
+#define Flow(OP) case OPCODE_D::OP: return execute(OP{instruction}, stack, ip)
             /*
              * Call is a special instruction. It transfers the IP to a
              * semi-random location, instead of just increasing it to the next
@@ -309,44 +235,29 @@ auto execute(viua::vm::Stack& stack,
              * This is why we return here, and not use the default behaviour for
              * most of the other instructions.
              */
-            return execute(CALL{instruction}, stack, ip);
-        case OPCODE_D::BITNOT:
-            execute(BITNOT{instruction}, stack, ip);
-            break;
-        case OPCODE_D::NOT:
-            execute(NOT{instruction}, stack, ip);
-            break;
-        case OPCODE_D::COPY:
-            execute(COPY{instruction}, stack, ip);
-            break;
-        case OPCODE_D::MOVE:
-            execute(MOVE{instruction}, stack, ip);
-            break;
-        case OPCODE_D::SWAP:
-            execute(SWAP{instruction}, stack, ip);
-            break;
+            Flow(CALL);
+            Work(BITNOT);
+            Work(NOT);
+            Work(COPY);
+            Work(MOVE);
+            Work(SWAP);
+            Work(REF);
+            /*
+             * If is a special instruction. It transfers IP to a semi-random
+             * location instead of just increasing it to the next unit. This is
+             * why the return is used instead of break.
+             */
+            Flow(IF);
+            Work(IO_PEEK);
+            Work(ACTOR);
         case OPCODE_D::BUFFER_PUSH:
             execute(BUFFER_PUSH{instruction}, stack, ip);
             break;
         case OPCODE_D::BUFFER_SIZE:
             execute(BUFFER_SIZE{instruction}, stack, ip);
             break;
-        case OPCODE_D::REF:
-            execute(REF{instruction}, stack, ip);
-            break;
-        case OPCODE_D::IF:
-            /*
-             * If is a special instruction. It transfers IP to a semi-random
-             * location instead of just increasing it to the next unit. This is
-             * why the return is used instead of break.
-             */
-            return execute(IF{instruction}, stack, ip);
-        case OPCODE_D::IO_PEEK:
-            execute(IO_PEEK{instruction}, stack, ip);
-            break;
-        case OPCODE_D::ACTOR:
-            execute(ACTOR{instruction}, stack, ip);
-            break;
+#undef Work
+#undef Flow
         }
         break;
     }
