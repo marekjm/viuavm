@@ -1958,6 +1958,19 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
 
         viua::TRACE_STREAM << "    of #" << i << viua::TRACE_STREAM.endl;
 
+        auto const fptr = each.saved.fp;
+        auto const sbrk = each.saved.sbrk;
+        TRACE_STREAM << "        [fptr] "
+            << "iu " << std::hex << std::setw(16)
+                     << std::setfill('0') << fptr
+                     << " " << std::dec << fptr
+                     << '\n';
+        TRACE_STREAM << "        [sbrk] "
+            << "iu " << std::hex << std::setw(16)
+                     << std::setfill('0') << sbrk
+                     << " " << std::dec << sbrk
+                     << '\n';
+
         dump_registers(each.parameters, "p");
         dump_registers(each.registers, "l");
     }

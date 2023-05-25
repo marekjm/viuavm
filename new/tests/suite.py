@@ -57,6 +57,7 @@ SKIP_DISASSEMBLER_TESTS = False
 
 EBREAK_LINE_BOXED = re.compile(r'\[(\d+)\.([lap])\] (\*?[a-zA-Z_][a-zA-Z_0-9]*) = (.*)')
 EBREAK_LINE_PRIMITIVE = re.compile(r'\[(\d+)\.([lap])\] (is|iu|fl|db) (.*)')
+EBREAK_LINE_SPECIAL = re.compile(r'\[(fptr|sbrk)\] (is|iu|fl|db) (.*)')
 EBREAK_MEMORY_LINE = re.compile(r'([0-9a-f]{16})  ((?:[0-9a-f]{2} ){16}) \| (.{16})')
 PERF_OPS_AND_RUNTIME = re.compile(r'\[vm:perf\] executed ops (\d+), run time (.+)')
 PERF_APPROX_FREQ = re.compile(r'\[vm:perf\] approximate frequency (.+ [kMG]?Hz)')
@@ -342,6 +343,14 @@ def consume_register_contents(ebreak_lines):
                 object_type = m.group(3)
                 object_value = m.group(4)
                 registers[register_set][index] = (object_type, object_value,)
+
+                ebreak_lines.pop(0)
+                continue
+            elif (m := EBREAK_LINE_SPECIAL.match(ebreak_lines[0])):
+                special_register = m.group(1)
+                object_type = m.group(2)
+                object_value = m.group(3)
+                registers[special_register] = (object_type, object_value,)
 
                 ebreak_lines.pop(0)
                 continue
