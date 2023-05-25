@@ -194,12 +194,16 @@ $(BUILD)/tools/exec/asm: \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
 
+VIUA_INSTRUCTION_IMPLS=\
+					   $(BUILD)/vm/ins/aa.o
+
 $(BUILD)/tools/exec/vm: \
 	$(BUILD)/support/tty.o \
 	$(BUILD)/support/string.o \
 	$(BUILD)/vm/core.o \
 	$(BUILD)/vm/elf.o \
 	$(BUILD)/vm/ins.o \
+	$(VIUA_INSTRUCTION_IMPLS) \
 	$(BUILD)/vm/types.o \
 	$(BUILD)/vm/types/traits.o \
 	$(BUILD)/runtime/pid.o \
@@ -212,6 +216,7 @@ $(BUILD)/tools/exec/repl: \
 	$(BUILD)/vm/core.o \
 	$(BUILD)/vm/elf.o \
 	$(BUILD)/vm/ins.o \
+	$(VIUA_INSTRUCTION_IMPLS) \
 	$(BUILD)/vm/types.o \
 	$(BUILD)/vm/types/traits.o \
 	$(BUILD)/support/string.o \

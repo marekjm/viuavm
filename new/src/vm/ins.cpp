@@ -2064,9 +2064,6 @@ auto execute(LM const op, Stack& stack, ip_type const ip) -> void
             throw abort_execution{ip, "invalid unit in memory instruction: " + std::to_string(unit)};
     }
 }
-auto execute(AA const, Stack&, ip_type const) -> void
-{
-}
 auto execute(AD const, Stack&, ip_type const) -> void
 {
 }
