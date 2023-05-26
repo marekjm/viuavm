@@ -192,10 +192,6 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "g.atom",
     "string",
     "g.string",
-    "struct",
-    "g.struct",
-    "buffer",
-    "g.buffer",
 
     "lui",
     "g.lui",
@@ -226,24 +222,8 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "swap",
     "g.swap",
 
-    "buffer_push",
-    "g.buffer_push",
-    "buffer_size",
-    "g.buffer_size",
-    "buffer_at",
-    "g.buffer_at",
-    "buffer_pop",
-    "g.buffer_pop",
-
     "ref",
     "g.ref",
-
-    "struct_at",
-    "g.struct_at",
-    "struct_insert",
-    "g.struct_insert",
-    "struct_remove",
-    "g.struct_remove",
 
     "if",
     "g.if",

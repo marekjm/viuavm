@@ -254,18 +254,6 @@ struct DOUBLE : Instruction {
     DOUBLE(viua::arch::ops::S i) : instruction{i}
     {}
 };
-struct STRUCT : Instruction {
-    viua::arch::ops::S instruction;
-
-    STRUCT(viua::arch::ops::S i) : instruction{i}
-    {}
-};
-struct BUFFER : Instruction {
-    viua::arch::ops::S instruction;
-
-    BUFFER(viua::arch::ops::S i) : instruction{i}
-    {}
-};
 
 /*
  * LUI loads upper bits of a 64-bit value, sign-extending it to register
@@ -362,50 +350,6 @@ struct DIVIU : Instruction {
     viua::arch::ops::R instruction;
 
     DIVIU(viua::arch::ops::R i) : instruction{i}
-    {}
-};
-
-struct BUFFER_PUSH : Instruction {
-    viua::arch::ops::D instruction;
-
-    BUFFER_PUSH(viua::arch::ops::D i) : instruction{i}
-    {}
-};
-struct BUFFER_SIZE : Instruction {
-    viua::arch::ops::D instruction;
-
-    BUFFER_SIZE(viua::arch::ops::D i) : instruction{i}
-    {}
-};
-struct BUFFER_AT : Instruction {
-    viua::arch::ops::T instruction;
-
-    BUFFER_AT(viua::arch::ops::T i) : instruction{i}
-    {}
-};
-struct BUFFER_POP : Instruction {
-    viua::arch::ops::T instruction;
-
-    BUFFER_POP(viua::arch::ops::T i) : instruction{i}
-    {}
-};
-
-struct STRUCT_AT : Instruction {
-    viua::arch::ops::T instruction;
-
-    STRUCT_AT(viua::arch::ops::T i) : instruction{i}
-    {}
-};
-struct STRUCT_INSERT : Instruction {
-    viua::arch::ops::T instruction;
-
-    STRUCT_INSERT(viua::arch::ops::T i) : instruction{i}
-    {}
-};
-struct STRUCT_REMOVE : Instruction {
-    viua::arch::ops::T instruction;
-
-    STRUCT_REMOVE(viua::arch::ops::T i) : instruction{i}
     {}
 };
 

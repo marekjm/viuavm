@@ -358,10 +358,6 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "atom";
     case OPCODE::STRING:
         return greedy + "string";
-    case OPCODE::STRUCT:
-        return greedy + "struct";
-    case OPCODE::BUFFER:
-        return greedy + "buffer";
     case OPCODE::FRAME:
         return greedy + "frame";
     case OPCODE::LUI:
@@ -394,20 +390,6 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "move";
     case OPCODE::SWAP:
         return greedy + "swap";
-    case OPCODE::BUFFER_PUSH:
-        return greedy + "buffer_push";
-    case OPCODE::BUFFER_SIZE:
-        return greedy + "buffer_size";
-    case OPCODE::BUFFER_AT:
-        return greedy + "buffer_at";
-    case OPCODE::BUFFER_POP:
-        return greedy + "buffer_pop";
-    case OPCODE::STRUCT_AT:
-        return greedy + "struct_at";
-    case OPCODE::STRUCT_INSERT:
-        return greedy + "struct_insert";
-    case OPCODE::STRUCT_REMOVE:
-        return greedy + "struct_remove";
     case OPCODE::REF:
         return greedy + "ref";
     case OPCODE::IF:
@@ -508,10 +490,6 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::ATOM));
     } else if (sv == "string") {
         return (op | static_cast<opcode_type>(OPCODE::STRING));
-    } else if (sv == "struct") {
-        return (op | static_cast<opcode_type>(OPCODE::STRUCT));
-    } else if (sv == "buffer") {
-        return (op | static_cast<opcode_type>(OPCODE::BUFFER));
     } else if (sv == "frame") {
         return (op | static_cast<opcode_type>(OPCODE::FRAME));
     } else if (sv == "lui") {
@@ -544,22 +522,8 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::MOVE));
     } else if (sv == "swap") {
         return (op | static_cast<opcode_type>(OPCODE::SWAP));
-    } else if (sv == "buffer_push") {
-        return (op | static_cast<opcode_type>(OPCODE::BUFFER_PUSH));
-    } else if (sv == "buffer_size") {
-        return (op | static_cast<opcode_type>(OPCODE::BUFFER_SIZE));
-    } else if (sv == "buffer_at") {
-        return (op | static_cast<opcode_type>(OPCODE::BUFFER_AT));
-    } else if (sv == "buffer_pop") {
-        return (op | static_cast<opcode_type>(OPCODE::BUFFER_POP));
     } else if (sv == "ref") {
         return (op | static_cast<opcode_type>(OPCODE::REF));
-    } else if (sv == "struct_at") {
-        return (op | static_cast<opcode_type>(OPCODE::STRUCT_AT));
-    } else if (sv == "struct_insert") {
-        return (op | static_cast<opcode_type>(OPCODE::STRUCT_INSERT));
-    } else if (sv == "struct_remove") {
-        return (op | static_cast<opcode_type>(OPCODE::STRUCT_REMOVE));
     } else if (sv == "if") {
         return (op | static_cast<opcode_type>(OPCODE::IF));
     } else if (sv == "io_submit") {

@@ -91,21 +91,6 @@ auto execute(viua::vm::Stack& stack,
             Work(IO_WAIT);
             Work(IO_SHUTDOWN);
             Work(IO_CTL);
-        case OPCODE_T::BUFFER_AT:
-            execute(BUFFER_AT{instruction}, stack, ip);
-            break;
-        case OPCODE_T::BUFFER_POP:
-            execute(BUFFER_POP{instruction}, stack, ip);
-            break;
-        case OPCODE_T::STRUCT_AT:
-            execute(STRUCT_AT{instruction}, stack, ip);
-            break;
-        case OPCODE_T::STRUCT_INSERT:
-            execute(STRUCT_INSERT{instruction}, stack, ip);
-            break;
-        case OPCODE_T::STRUCT_REMOVE:
-            execute(STRUCT_REMOVE{instruction}, stack, ip);
-            break;
 #undef Work
         }
         break;
@@ -128,8 +113,6 @@ auto execute(viua::vm::Stack& stack,
             Work(STRING);
             Work(FLOAT);
             Work(DOUBLE);
-            Work(STRUCT);
-            Work(BUFFER);
             Work(SELF);
 #undef Work
 #undef Flow
@@ -253,12 +236,6 @@ auto execute(viua::vm::Stack& stack,
             Flow(IF);
             Work(IO_PEEK);
             Work(ACTOR);
-        case OPCODE_D::BUFFER_PUSH:
-            execute(BUFFER_PUSH{instruction}, stack, ip);
-            break;
-        case OPCODE_D::BUFFER_SIZE:
-            execute(BUFFER_SIZE{instruction}, stack, ip);
-            break;
 #undef Work
 #undef Flow
         }
@@ -1297,22 +1274,6 @@ auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
 
     target.value = v;
 }
-auto execute(STRUCT const op, Stack& stack, ip_type const) -> void
-{
-    auto& registers = stack.back().registers;
-    auto& target    = registers.at(op.instruction.out.index);
-
-    auto s       = std::make_unique<viua::vm::types::Struct>();
-    target.value = std::move(s);
-}
-auto execute(BUFFER const op, Stack& stack, ip_type const) -> void
-{
-    auto& registers = stack.back().registers;
-    auto& target    = registers.at(op.instruction.out.index);
-
-    auto s       = std::make_unique<viua::vm::types::Buffer>();
-    target.value = std::move(s);
-}
 
 template<typename Op>
 auto execute_arithmetic_immediate_op(Op const op,
@@ -1418,207 +1379,6 @@ auto execute(DIVI const op, Stack& stack, ip_type const ip) -> void
 auto execute(DIVIU const op, Stack& stack, ip_type const ip) -> void
 {
     execute_arithmetic_immediate_op(op, stack, ip);
-}
-
-auto execute(BUFFER_PUSH const op, Stack& stack, ip_type const ip) -> void
-{
-    auto dst = get_value(stack, op.instruction.out, ip);
-    auto src = get_proxy(stack, op.instruction.in, ip);
-
-    if (src.view().is_void()) {
-        throw abort_execution{ip, "cannot buffer_push out of void"};
-    }
-
-    if (not dst.holds<viua::vm::types::Buffer>()) {
-        throw abort_execution{ip,
-                              "invalid destination operand for buffer_push"};
-    }
-    auto& b = dst.boxed_of<viua::vm::types::Buffer>().value().get();
-    b.push(std::move(src.overwrite().value_cell()));
-}
-auto execute(BUFFER_SIZE const op, Stack& stack, ip_type const ip) -> void
-{
-    auto dst = get_proxy(stack, op.instruction.out, ip);
-    auto src = get_proxy(stack, op.instruction.in, ip);
-
-    if (src.view().is_void()) {
-        throw abort_execution{ip, "cannot take buffer_size of void"};
-    }
-    auto const& b =
-        src.view().boxed_of<viua::vm::types::Buffer>().value().get();
-    dst.overwrite() = b.size();
-}
-auto execute(BUFFER_AT const op, Stack& stack, ip_type const ip) -> void
-{
-    auto dst = get_slot(op.instruction.out, stack, ip);
-    auto src = get_value(stack, op.instruction.lhs, ip);
-    auto idx = get_value(stack, op.instruction.rhs, ip);
-
-    if (src.is_void()) {
-        throw abort_execution{ip, "cannot buffer_at out of void"};
-    }
-
-    auto& buf = src.boxed_of<viua::vm::types::Buffer>().value().get();
-    auto off  = (buf.size() - 1);
-    if (idx.is_void()) {
-        // do nothing, and use the default value
-    } else if (idx.holds<uint64_t>()) {
-        off = idx.get<uint64_t>();
-    } else if (idx.holds<int64_t>()) {
-        auto const i = idx.get<int64_t>();
-        if (i < 0) {
-            off = (buf.size() + i);
-        } else {
-            off = i;
-        }
-    } else {
-        throw abort_execution{ip, "buffer index must be an integer"};
-    }
-
-    if (buf.size() <= off) {
-        throw abort_execution{ip,
-                              ("index " + std::to_string(off) + " out of range "
-                               + std::to_string(buf.size()))};
-    }
-
-    auto& v = buf.at(off);
-
-    using viua::vm::types::Float_double;
-    using viua::vm::types::Float_single;
-    using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
-    if (std::holds_alternative<int64_t>(v.content)) {
-        v.content = std::make_unique<Signed_integer>(v.get<int64_t>());
-    } else if (std::holds_alternative<uint64_t>(v.content)) {
-        v.content = std::make_unique<Unsigned_integer>(v.get<uint64_t>());
-    } else if (std::holds_alternative<float>(v.content)) {
-        v.content = std::make_unique<Float_single>(v.get<float>());
-    } else if (std::holds_alternative<double>(v.content)) {
-        v.content = std::make_unique<Float_double>(v.get<double>());
-    }
-
-    using viua::vm::types::Cell;
-    *dst.value() = v.get<Cell::boxed_type>()->reference_to();
-}
-auto execute(BUFFER_POP const op, Stack& stack, ip_type const ip) -> void
-{
-    auto dst = get_slot(op.instruction.out, stack, ip);
-    auto src = get_value(stack, op.instruction.lhs, ip);
-    auto idx = get_value(stack, op.instruction.rhs, ip);
-
-    if (src.is_void()) {
-        throw abort_execution{ip, "cannot buffer_pop out of void"};
-    }
-
-    auto& buf = src.boxed_of<viua::vm::types::Buffer>().value().get();
-    auto off  = (buf.size() - 1);
-    if (idx.is_void()) {
-        // do nothing, and use the default value
-    } else if (idx.holds<uint64_t>()) {
-        off = idx.get<uint64_t>();
-    } else if (idx.holds<int64_t>()) {
-        auto const i = idx.get<int64_t>();
-        if (i < 0) {
-            off = (buf.size() + i);
-        } else {
-            off = i;
-        }
-    } else {
-        throw abort_execution{ip, "buffer index must be an integer"};
-    }
-
-    using viua::vm::types::Cell;
-    auto v = buf.pop(off);
-
-    if (std::holds_alternative<int64_t>(v.content)) {
-        *dst.value() = v.get<int64_t>();
-    } else if (std::holds_alternative<uint64_t>(v.content)) {
-        *dst.value() = v.get<uint64_t>();
-    } else if (std::holds_alternative<float>(v.content)) {
-        *dst.value() = v.get<float>();
-    } else if (std::holds_alternative<double>(v.content)) {
-        *dst.value() = v.get<double>();
-    } else if (std::holds_alternative<Cell::boxed_type>(v.content)) {
-        dst.value()->value = std::move(v.get<Cell::boxed_type>());
-    }
-}
-
-auto execute(STRUCT_AT const op, Stack& stack, ip_type const ip) -> void
-{
-    auto dst = get_proxy(stack, op.instruction.out, ip);
-    auto src = get_value(stack, op.instruction.lhs, ip);
-    auto key = get_value(stack, op.instruction.rhs, ip);
-
-    if (src.is_void()) {
-        throw abort_execution{ip, "cannot struct_at out of void"};
-    }
-    if (key.is_void()) {
-        throw abort_execution{ip, "cannot struct_at with a void key"};
-    }
-
-    auto& str = src.boxed_of<viua::vm::types::Struct>().value().get();
-    auto k    = key.boxed_of<viua::vm::types::Atom>().value().get().content;
-    auto& v   = str.at(k);
-
-    using viua::vm::types::Float_double;
-    using viua::vm::types::Float_single;
-    using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
-    if (std::holds_alternative<int64_t>(v.content)) {
-        v.content = std::make_unique<Signed_integer>(v.get<int64_t>());
-    } else if (std::holds_alternative<uint64_t>(v.content)) {
-        v.content = std::make_unique<Unsigned_integer>(v.get<uint64_t>());
-    } else if (std::holds_alternative<float>(v.content)) {
-        v.content = std::make_unique<Float_single>(v.get<float>());
-    } else if (std::holds_alternative<double>(v.content)) {
-        v.content = std::make_unique<Float_double>(v.get<double>());
-    }
-
-    using viua::vm::types::Cell;
-    dst = v.get<Cell::boxed_type>()->reference_to();
-}
-auto execute(STRUCT_INSERT const op, Stack& stack, ip_type const ip) -> void
-{
-    auto dst = get_proxy(stack, op.instruction.out, ip);
-    auto key = get_value(stack, op.instruction.lhs, ip);
-    auto src = get_proxy(stack, op.instruction.rhs, ip);
-
-    if (key.is_void()) {
-        throw abort_execution{ip, "cannot struct_insert with a void key"};
-    }
-    if (src.view().is_void()) {
-        throw abort_execution{ip, "cannot struct_insert with a void value"};
-    }
-
-    if (not dst.view().holds<viua::vm::types::Struct>()) {
-        throw abort_execution{ip,
-                              "invalid destination operand for struct_insert"};
-    }
-
-    auto k    = key.boxed_of<viua::vm::types::Atom>().value().get().content;
-    auto& str = dst.boxed_of<viua::vm::types::Struct>().value().get();
-    str.insert(k, std::move(src.overwrite().value_cell()));
-}
-auto execute(STRUCT_REMOVE const op, Stack& stack, ip_type const ip) -> void
-{
-    auto dst = get_slot(op.instruction.out, stack, ip);
-    auto src = get_value(stack, op.instruction.lhs, ip);
-    auto key = get_proxy(stack, op.instruction.rhs, ip);
-
-    if (key.view().is_void()) {
-        throw abort_execution{ip, "cannot struct_remove with a void key"};
-    }
-    if (src.is_void()) {
-        throw abort_execution{ip, "cannot struct_remove with a void value"};
-    }
-
-    auto k    = key.boxed_of<viua::vm::types::Atom>().value().get().content;
-    auto& str = src.boxed_of<viua::vm::types::Struct>().value().get();
-
-    auto v = str.remove(k);
-    if (dst) {
-        dst.value()->value = std::move(v);
-    }
 }
 
 auto execute(REF const op, Stack& stack, ip_type const ip) -> void

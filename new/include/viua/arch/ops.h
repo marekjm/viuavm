@@ -235,7 +235,6 @@ enum class OPCODE : opcode_type {
     MUL = (FORMAT_T | 0x0003),
     DIV = (FORMAT_T | 0x0004),
     MOD = (FORMAT_T | 0x0005),
-
     BITSHL  = (FORMAT_T | 0x0006),
     BITSHR  = (FORMAT_T | 0x0007),
     BITASHR = (FORMAT_T | 0x0008),
@@ -244,44 +243,27 @@ enum class OPCODE : opcode_type {
     BITAND  = (FORMAT_T | 0x000b),
     BITOR   = (FORMAT_T | 0x000c),
     BITXOR  = (FORMAT_T | 0x000d),
-
     EQ  = (FORMAT_T | 0x000e),
     LT  = (FORMAT_T | 0x000f),
     GT  = (FORMAT_T | 0x0010),
     CMP = (FORMAT_T | 0x0011),
     AND = (FORMAT_T | 0x0012),
     OR  = (FORMAT_T | 0x0013),
-
-    BUFFER_AT  = (FORMAT_T | 0x0014),
-    BUFFER_POP = (FORMAT_T | 0x0015),
-
-    STRUCT_AT     = (FORMAT_T | 0x0016),
-    STRUCT_INSERT = (FORMAT_T | 0x0017),
-    STRUCT_REMOVE = (FORMAT_T | 0x0018),
-
-    IO_SUBMIT   = (FORMAT_T | 0x0019),
-    IO_WAIT     = (FORMAT_T | 0x001a),
-    IO_SHUTDOWN = (FORMAT_T | 0x001b),
-    IO_CTL      = (FORMAT_T | 0x001c),
+    IO_SUBMIT   = (FORMAT_T | 0x0014),
+    IO_WAIT     = (FORMAT_T | 0x0015),
+    IO_SHUTDOWN = (FORMAT_T | 0x0016),
+    IO_CTL      = (FORMAT_T | 0x0017),
 
     CALL   = (FORMAT_D | 0x0001),
     BITNOT = (FORMAT_D | 0x0002),
     NOT    = (FORMAT_D | 0x0003),
-
     COPY = (FORMAT_D | 0x0004),
     MOVE = (FORMAT_D | 0x0005),
     SWAP = (FORMAT_D | 0x0006),
-
-    BUFFER_PUSH = (FORMAT_D | 0x0007),
-    BUFFER_SIZE = (FORMAT_D | 0x0008),
-
-    REF = (FORMAT_D | 0x0009),
-
-    IF = (FORMAT_D | 0x000a),
-
-    IO_PEEK = (FORMAT_D | 0x000b),
-
-    ACTOR = (FORMAT_D | 0x000c),
+    REF = (FORMAT_D | 0x0007),
+    IF = (FORMAT_D | 0x0008),
+    IO_PEEK = (FORMAT_D | 0x0009),
+    ACTOR = (FORMAT_D | 0x000a),
 
     FRAME  = (FORMAT_S | 0x0001),
     RETURN = (FORMAT_S | 0x0002),
@@ -289,10 +271,7 @@ enum class OPCODE : opcode_type {
     STRING = (FORMAT_S | 0x0004),
     FLOAT  = (FORMAT_S | 0x0005),
     DOUBLE = (FORMAT_S | 0x0006),
-    STRUCT = (FORMAT_S | 0x0007),
-    BUFFER = (FORMAT_S | 0x0008),
-
-    SELF = (FORMAT_S | 0x0009),
+    SELF = (FORMAT_S | 0x0007),
 
     LUI  = (FORMAT_E | 0x0001),
     LUIU = (FORMAT_E | 0x0001 | UNSIGNED),
@@ -340,11 +319,6 @@ enum class OPCODE_T : opcode_type {
     Make_entry(CMP),
     Make_entry(AND),
     Make_entry(OR),
-    Make_entry(BUFFER_AT),
-    Make_entry(BUFFER_POP),
-    Make_entry(STRUCT_AT),
-    Make_entry(STRUCT_INSERT),
-    Make_entry(STRUCT_REMOVE),
     Make_entry(IO_SUBMIT),
     Make_entry(IO_WAIT),
     Make_entry(IO_SHUTDOWN),
@@ -357,8 +331,6 @@ enum class OPCODE_D : opcode_type {
     Make_entry(COPY),
     Make_entry(MOVE),
     Make_entry(SWAP),
-    Make_entry(BUFFER_PUSH),
-    Make_entry(BUFFER_SIZE),
     Make_entry(REF),
     Make_entry(IF),
     Make_entry(IO_PEEK),
@@ -371,8 +343,6 @@ enum class OPCODE_S : opcode_type {
     Make_entry(STRING),
     Make_entry(FLOAT),
     Make_entry(DOUBLE),
-    Make_entry(STRUCT),
-    Make_entry(BUFFER),
     Make_entry(SELF),
 };
 enum class OPCODE_E : opcode_type {

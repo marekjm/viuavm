@@ -67,8 +67,6 @@ Work_instruction(SWAP);
 
 Work_instruction(ATOM);
 Work_instruction(STRING);
-Work_instruction(STRUCT);
-Work_instruction(BUFFER);
 
 Work_instruction(FRAME);
 Flow_instruction(CALL);
@@ -88,15 +86,6 @@ Work_instruction(MULI);
 Work_instruction(MULIU);
 Work_instruction(DIVI);
 Work_instruction(DIVIU);
-
-Work_instruction(BUFFER_PUSH);
-Work_instruction(BUFFER_SIZE);
-Work_instruction(BUFFER_AT);
-Work_instruction(BUFFER_POP);
-
-Work_instruction(STRUCT_AT);
-Work_instruction(STRUCT_INSERT);
-Work_instruction(STRUCT_REMOVE);
 
 Work_instruction(REF);
 
