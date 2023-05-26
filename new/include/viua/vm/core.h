@@ -432,8 +432,25 @@ struct Stack {
     }
 };
 
+/*
+ * Why 16?
+ * Because it means that line addresses in hexadecimal are 0, 10, 20, etc.
+ */
 inline constexpr auto MEM_LINE_SIZE = size_t{16};
 inline constexpr auto MEM_PAGE_SIZE = MEM_LINE_SIZE * 16;
+
+/*
+ * Why not 0, since null pointers are not possible?
+ * Because we identify pointers by a tuple of {addr, parent.addr}, and origin
+ * pointers (ie, those allocated by AA or AD instruction) have their parent set
+ * to 0.
+ *
+ * If creating pointers at address zero was legal, it would not be possible to
+ * distinguish origin pointers from subobjects of an area allocated at address
+ * zero.
+ */
+inline constexpr auto MEM_FIRST_VALID_ADDRESS = size_t{8};
+
 struct Page {
     using unit_type = uint8_t;
     using storage_type = std::array<unit_type, MEM_PAGE_SIZE>;
@@ -464,6 +481,68 @@ struct Page {
     }
 };
 
+struct Pointer {
+    /*
+     * Foreign pointer is a pointer to memory that was not allocated on the
+     * process' stack and heap managed by the VM.
+     * These are pointers to host OS structures, objects received from FFI, etc.
+     */
+    bool foreign { false };
+
+    /*
+     * For foreign pointers: host OS pointer.
+     * For VM pointers: offset from stack break 0.
+     */
+    uintptr_t ptr { 0 };
+
+    /*
+     * The page() and offset() functions only make sense for VM pointers, where
+     * the pointer is really an offset into the vector of pages allocated for a
+     * process' stack.
+     */
+    inline auto page() const -> size_t
+    {
+        return (ptr / MEM_PAGE_SIZE);
+    }
+    inline auto offset() const -> size_t
+    {
+        return (ptr % MEM_PAGE_SIZE);
+    }
+
+    /*
+     * For foreign pointers: 0.
+     * For VM pointers: size of the area pointed to.
+     */
+    size_t size { 0 };
+
+    /*
+     * This member is only non-zero for VM pointers, which were created by
+     * pointer arithmetic (ie, not allocated by AA or AD instruction). It serves
+     * to identify overlapping memory areas eg,
+     *
+     *      +-----------------+
+     *      | SUBOBJECT  |    |
+     *      +------------+    |
+     *      |                 |
+     *      |     OBJECT      |
+     *      |                 |
+     *      +-----------------+
+     *
+     * The OBJECT must have been allocated using either AA or AD instruction.
+     * Its parent field will be 0.
+     *
+     * The SUBOBJECT must have been created using either ADDIU or ADD
+     * instruction to which the lhs operand was a pointer to the OBJECT. Its
+     * parent field will be set to address of OBJECT.
+     */
+    uintptr_t parent { 0 };
+
+    inline auto id() const -> std::pair<uintptr_t, uintptr_t>
+    {
+        return { ptr, parent };
+    }
+};
+
 struct Process {
     using pid_type = viua::runtime::PID;
     pid_type const pid;
@@ -477,12 +556,10 @@ struct Process {
     stack_type stack;
 
     std::vector<Page> memory;
-    uint64_t frame_pointer { 0 };
-    uint64_t stack_break { 0 };
+    std::vector<Pointer> pointers;
+    uint64_t frame_pointer { MEM_FIRST_VALID_ADDRESS };
+    uint64_t stack_break { MEM_FIRST_VALID_ADDRESS };
 
-    using Pointer = std::pair<bool, uintptr_t>;
-    auto memory_at(Pointer const) const -> void const*;
-    auto memory_at(Pointer const) -> void*;
     inline auto memory_at(size_t const ptr) -> uint8_t*
     {
         if (ptr >= (MEM_PAGE_SIZE * memory.size())) {

@@ -50,12 +50,16 @@ auto execute(AA const op, Stack& stack, ip_type const ip) -> void
     // FIXME Ensure that enough memory is available to satisfy both size and
     // alignment request.
 
-    auto const old_sb = stack.proc->stack_break;
+    auto const pointer_address = stack.proc->stack_break;
     stack.proc->stack_break += size;
     stack.frames.back().saved.sbrk = stack.proc->stack_break;
 
     auto& registers = stack.frames.back().registers;
     auto out        = get_proxy(registers, op.instruction.out, ip);
-    out = old_sb;
+    out = pointer_address;
+
+    auto pointer_info = Pointer{};
+    pointer_info.ptr = pointer_address;
+    stack.proc->pointers.push_back(pointer_info);
 }
 }  // namespace viua::vm::ins
