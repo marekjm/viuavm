@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import datetime
+import enum
 import glob
 import io
 import os
@@ -115,6 +116,9 @@ class Suite_error(Exception):
 class No_check_file_for(Suite_error):
     pass
 
+class Status(enum.Enum):
+    Normal = 0
+    Skip = 1
 
 def make_local(idx):
     return ('l', idx,)
@@ -184,7 +188,7 @@ EBREAK_CONTENTS_OF = re.compile(r'^of #(\d+|last)')
 EBREAK_SELECT = re.compile(r'^ebreak (-?\d+) in proc(?:ess)? (\[[a-f0-9:]+\])')
 
 EBREAK_LINE_BOXED = re.compile(r'\[(\d+)\.([lap])\] (\*?[a-zA-Z_][a-zA-Z_0-9]*) = (.*)')
-EBREAK_LINE_PRIMITIVE = re.compile(r'\[(\d+)\.([lap])\] (is|iu|fl|db) (.*)')
+EBREAK_LINE_PRIMITIVE = re.compile(r'\[(\d+)\.([lap])\] (is|iu|fl|db|ptr|pid) (.*)')
 
 
 class Missing_value(Exception):
@@ -508,11 +512,18 @@ def detect_check_kind(test_path):
     raise No_check_file_for(test_path)
 
 def test_case(case_name, test_program, errors):
+    if os.path.isfile(skip_file := (os.path.splitext(test_program)[0] +
+                                     '.skip')):
+        skip_reason : str = None
+        with open(skip_file, "r") as stream:
+            skip_reason = (stream.read().strip() or "skipped")
+        return (Status.Skip, False, skip_reason, None, None,)
+
     check_kind = None
     try:
         check_kind = detect_check_kind(test_program)
     except No_check_file_for:
-        return (False, 'no check file', None, None,)
+        return (Status.Normal, False, 'no check file', None, None,)
 
     test_executable = (os.path.splitext(test_program)[0] + '.elf')
 
@@ -526,15 +537,20 @@ def test_case(case_name, test_program, errors):
         test_program,
     ), stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
     if asm_return != 0:
-        return (False, 'failed to assemble', count_runtime(), None,)
+        return (Status.Normal, False, 'failed to assemble', count_runtime(), None,)
 
-    result, ebreak, perf = run_and_capture(
-        INTERPRETER,
-        test_executable,
-    )
+    try:
+        result, ebreak, perf = run_and_capture(
+            INTERPRETER,
+            test_executable,
+        )
+    except Exception as e:
+        result = e
 
-    if result != 0:
-        return (False, 'crashed', count_runtime(), None,)
+    if type(result) is Exception:
+        return (Status.Normal, False, 'crashed', count_runtime(), None,)
+    elif result != 0:
+        return (Status.Normal, False, 'crashed', count_runtime(), None,)
 
     if check_kind == 'ebreak':
         ebreak_dump = (os.path.splitext(test_program)[0] + '.ebreak')
@@ -542,21 +558,21 @@ def test_case(case_name, test_program, errors):
             ebreak_dump = ifstream.read().splitlines()
 
         if not ebreak_dump:
-            return (False, 'empty ebreak file', count_runtime(), None,)
+            return (Status.Normal, False, 'empty ebreak file', count_runtime(), None,)
 
         if ebreak is None:
-            return (False, 'program did not emit ebreak', count_runtime(), None,)
+            return (Status.Normal, False, 'program did not emit ebreak', count_runtime(), None,)
 
 
         try:
             walk_ebreak_test(errors, ebreak_dump, ebreak)
         except (Missing_value, Unexpected_type, Unexpected_value,) as e:
-            return (False, e.to_string(), count_runtime(), None,)
+            return (Status.Normal, False, e.to_string(), count_runtime(), None,)
         except Bad_ebreak_script as e:
-            return (False, f'bad ebreak script, error on line {e.args[0]}', count_runtime(), None,)
+            return (Status.Normal, False, f'bad ebreak script, error on line {e.args[0]}', count_runtime(), None,)
 
     if SKIP_DISASSEMBLER_TESTS:
-        return (True, None, count_runtime(), perf,)
+        return (Status.Normal, True, None, count_runtime(), perf,)
 
     test_disassembled_program = test_program + DIS_EXTENSION
     dis_return = subprocess.call(args = (
@@ -566,7 +582,7 @@ def test_case(case_name, test_program, errors):
         test_executable,
     ), stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
     if dis_return != 0:
-        return (False, 'failed to disassemble', count_runtime(), None,)
+        return (Status.Normal, False, 'failed to disassemble', count_runtime(), None,)
 
     asm_return = subprocess.call(args = (
         ASSEMBLER,
@@ -575,7 +591,7 @@ def test_case(case_name, test_program, errors):
         test_disassembled_program,
     ), stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
     if asm_return != 0:
-        return (False, 'failed to reassemble', count_runtime(), None,)
+        return (Status.Normal, False, 'failed to reassemble', count_runtime(), None,)
 
     result, ebreak, _ = run_and_capture(
         INTERPRETER,
@@ -583,7 +599,7 @@ def test_case(case_name, test_program, errors):
     )
 
     if result != 0:
-        return (False, 'crashed after reassembly', count_runtime(), None,)
+        return (Status.Normal, False, 'crashed after reassembly', count_runtime(), None,)
 
     if check_kind == 'ebreak':
         ebreak_dump = (os.path.splitext(test_program)[0] + '.ebreak')
@@ -591,19 +607,19 @@ def test_case(case_name, test_program, errors):
             ebreak_dump = ifstream.read().splitlines()
 
         if not ebreak_dump:
-            return (False, 'empty ebreak file', count_runtime(), None,)
+            return (Status.Normal, False, 'empty ebreak file', count_runtime(), None,)
 
         if ebreak is None:
-            return (False, 'program did not emit ebreak', count_runtime(), None,)
+            return (Status.Normal, False, 'program did not emit ebreak', count_runtime(), None,)
 
         try:
             walk_ebreak_test(errors, ebreak_dump, ebreak)
         except (Missing_value, Unexpected_type, Unexpected_value,) as e:
-            return (False, e.to_string(), count_runtime(), None,)
+            return (Status.Normal, False, e.to_string(), count_runtime(), None,)
         except Bad_ebreak_script as e:
-            return (False, f'bad ebreak script, error on line {e.args[0]}', count_runtime(), None,)
+            return (Status.Normal, False, f'bad ebreak script, error on line {e.args[0]}', count_runtime(), None,)
 
-    return (True, None, count_runtime(), perf)
+    return (Status.Normal, True, None, count_runtime(), perf)
 
 
 def main(args):
@@ -648,29 +664,43 @@ def main(args):
         rc = lambda: test_case(case_name, test_program, error_stream)
 
         result, symptom, run_time = (False, None, None,)
+        tag_color : str = None
+        tag : str = None
+
         if type(result := rc()) is tuple:
-            result, symptom, run_time, perf = result
-            if run_time:
-                run_times.append(run_time)
-            if perf:
-                def make_vm_time(s):
-                    if s.endswith('us'):
-                        return int(s[:-2])
-                    elif s.endswith('ms'):
-                        return int(float(s[:-2]) * 1000)
-                    else:
-                        raise
-                vm_time = make_vm_time(perf['run_time'])
+            status, result, symptom, run_time, perf = result
+            if status == Status.Normal:
+                if run_time:
+                    run_times.append(run_time)
+                if perf:
+                    def make_vm_time(s):
+                        if s.endswith('us'):
+                            return int(s[:-2])
+                        elif s.endswith('ms'):
+                            return int(float(s[:-2]) * 1000)
+                        else:
+                            raise
+                    vm_time = make_vm_time(perf['run_time'])
 
-                def make_hz(s):
-                    n, hz = s.split()
-                    return int(float(n) * {
-                        'kHz': 1e3,
-                        'MHz': 1e6,
-                    }[hz])
-                freq = make_hz(perf['freq'])
+                    def make_hz(s):
+                        n, hz = s.split()
+                        return int(float(n) * {
+                            'kHz': 1e3,
+                            'MHz': 1e6,
+                        }[hz])
+                    freq = make_hz(perf['freq'])
 
-                perf_stats.append((perf['ops'], vm_time, freq,))
+                    perf_stats.append((perf['ops'], vm_time, freq,))
+
+                if result:
+                    tag = ' ok '
+                    tag_color = 'green'
+                else:
+                    tag = 'fail'
+                    tag_color = 'red'
+            elif status == Status.Skip:
+                tag = 'skip'
+                tag_color = 'yellow'
 
         if result:
             success_cases += 1
@@ -678,10 +708,7 @@ def main(args):
         print('  case {}. of {}: [{}] {}  {}'.format(
             colorise('white', str(case_no).rjust(pad_case_no)),
             colorise('white', case_name.ljust(pad_case_name)),
-            colorise(
-                ('green' if result else 'red'),
-                (' ok ' if result else 'fail'),
-            ) + ((' => ' + colorise('light_red', symptom)) if symptom else ''),
+            colorise(tag_color, tag) + ((' => ' + colorise('light_red', symptom)) if symptom else ''),
             (colorise(CASE_RUNTIME_COLOUR, format_run_time(run_time))
                 if run_time else ''),
             (('perf: {} ops in {} at {}'.format(

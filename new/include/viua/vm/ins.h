@@ -110,8 +110,12 @@ Work_instruction(AD);
 Work_instruction(PTR);
 
 constexpr auto VIUA_TRACE_CYCLES = true;
-auto execute(viua::vm::Stack&, viua::arch::instruction_type const* const)
-    -> viua::arch::instruction_type const*;
+
+using ip_type = viua::arch::instruction_type const*;
+using access_type = viua::arch::Register_access;
+using register_type = viua::vm::Register;
+
+auto execute(viua::vm::Stack&, ip_type const) -> ip_type;
 
 /*
  * Utility functions. Used in implementation of EBREAK, but also accessed by the
@@ -120,78 +124,91 @@ auto execute(viua::vm::Stack&, viua::arch::instruction_type const* const)
  */
 auto print_backtrace(viua::vm::Stack const&,
                      std::optional<size_t> const = std::nullopt) -> void;
-auto dump_registers(std::vector<Value> const&, std::string_view const) -> void;
+auto dump_registers(std::vector<register_type> const&, std::string_view const) -> void;
 auto dump_memory(std::vector<Page> const&) -> void;
 
-/*
- * Implementation details.
- */
-auto get_value(std::vector<viua::vm::Value>&,
-               viua::arch::Register_access const,
-               viua::arch::instruction_type const*) -> viua::vm::types::Cell_view;
-auto get_value(viua::vm::Stack&,
-               viua::arch::Register_access const,
-               viua::arch::instruction_type const*) -> viua::vm::types::Cell_view;
+struct Fetch_proxy {
+    register_type const& target;
 
-struct Proxy {
-    using slot_type = std::reference_wrapper<viua::vm::Value>;
-    using cell_type = viua::vm::types::Cell_view;
+    Fetch_proxy(register_type const& t): target{t} {}
 
-    std::variant<slot_type, cell_type> slot;
-
-    explicit Proxy(slot_type s) : slot{s}
-    {}
-    explicit Proxy(cell_type c) : slot{c}
-    {}
-
-    auto hard() const -> bool
+    template<typename T> auto holds() const -> bool
     {
-        return std::holds_alternative<slot_type>(slot);
+        return target.holds<T>();
     }
-    auto soft() const -> bool
+    template<typename T> auto cast_to() const
     {
-        return not hard();
+        return target.cast_to<T>();
     }
-
-    auto view() const -> cell_type const
+    template<typename T> auto get() const
     {
-        if (hard()) {
-            return std::get<slot_type>(slot).get().value.view();
-        } else {
-            return std::get<cell_type>(slot);
+        return target.get<T>();
+    }
+    auto type_name() const
+    {
+        return target.type_name();
+    }
+};
+struct Save_proxy {
+    register_type* const target;
+
+    template<typename T> auto holds() const -> bool
+    {
+        if (target == nullptr) {
+            return false;
         }
+        return target->holds<T>();
     }
-    auto view() -> cell_type
+    template<typename T> auto cast_to() const -> std::optional<T>
     {
-        if (hard()) {
-            return std::get<slot_type>(slot).get().value.view();
-        } else {
-            return std::get<cell_type>(slot);
+        if (target == nullptr) {
+            return std::nullopt;
         }
+        return target->cast_to<T>();
     }
-    auto overwrite() -> slot_type::type&
+    template<typename T> auto get() const -> std::optional<T>
     {
-        return std::get<slot_type>(slot).get();
+        if (target == nullptr) {
+            return std::nullopt;
+        }
+        return target->get<T>();
+    }
+    auto type_name() const
+    {
+        if (target == nullptr) {
+            return std::string_view{"void"};
+        }
+        return target->type_name();
     }
 
-    template<typename T> auto operator=(T&& v) -> Proxy&
+    auto operator=(Fetch_proxy const& fp) const -> Save_proxy const&
     {
-        overwrite() = std::move(v);
+        if (target) {
+            *target = fp.target;
+        }
+        return *this;
+    }
+    template<typename T> auto operator=(T&& value) const -> Save_proxy const&
+    {
+        /*
+         * If the target is not set it means that the save proxy refers to the
+         * void register set. Saves to void just drop the value.
+         */
+        if (target) {
+            *target = std::move(value);
+        }
         return *this;
     }
 
-    template<typename T>
-    inline auto boxed_of() -> std::optional<std::reference_wrapper<T>>
+    inline auto reset() const -> void
     {
-        return view().boxed_of<T>();
+        if (target) {
+            target->reset();
+        }
     }
 };
-auto get_proxy(std::vector<viua::vm::Value>&,
-               viua::arch::Register_access const,
-               viua::arch::instruction_type const*) -> Proxy;
-auto get_proxy(Stack&,
-               viua::arch::Register_access const,
-               viua::arch::instruction_type const*) -> Proxy;
+auto save_proxy(viua::vm::Stack&, access_type const, ip_type const) -> Save_proxy;
+auto fetch_proxy(viua::vm::Stack&, access_type const, ip_type const) -> Fetch_proxy;
 }  // namespace viua::vm::ins
 
 #endif

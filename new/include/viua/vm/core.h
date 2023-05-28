@@ -272,11 +272,148 @@ struct Value {
     }
 };
 
+struct Register {
+    using void_type = std::monostate;
+    using int_type = int64_t;
+    using uint_type = uint64_t;
+    using float_type = float;
+    using double_type = double;
+    struct pointer_type {
+        uint64_t ptr;
+    };
+    using pid_type = in6_addr;
+
+    using value_type = std::variant<
+        void_type,
+        int64_t,
+        uint64_t,
+        float,
+        double,
+        pointer_type,
+        pid_type>;
+    value_type value;
+
+    template<typename T> auto holds() const -> bool
+    {
+        if constexpr (std::is_same_v<T, void>) {
+            return is_void();
+        } else {
+            return std::holds_alternative<T>(value);
+        }
+    }
+    auto is_void() const -> bool
+    {
+        return std::holds_alternative<void_type>(value);
+    }
+    auto reset() -> void
+    {
+        value = void_type{};
+    }
+
+    template<typename T> auto get() const -> std::optional<T>
+    {
+        if (not std::holds_alternative<T>(value)) {
+            return {};
+        }
+        return std::get<T>(value);
+    }
+
+    template<typename T> auto cast_to() const -> std::optional<T>
+    {
+        if (holds<void_type>()) {
+            return {};
+        }
+        if (holds<pointer_type>()) {
+            return {};
+        }
+        if (holds<pid_type>()) {
+            return {};
+        }
+
+        if (auto v = get<int_type>(); v) {
+            return static_cast<T>(*v);
+        }
+        if (auto v = get<uint_type>(); v) {
+            return static_cast<T>(*v);
+        }
+        if (auto v = get<float_type>(); v) {
+            return static_cast<T>(*v);
+        }
+        if (auto v = get<double_type>(); v) {
+            return static_cast<T>(*v);
+        }
+
+        return {};
+    }
+
+    Register() = default;
+    explicit Register(value_type v): value{v} {}
+    Register(Register const&) = delete;
+    Register(Register&&) = default;
+    auto operator=(Register const& v) -> Register&
+    {
+        value = v.value;
+        return *this;
+    }
+    auto operator=(Register&& v) -> Register&
+    {
+        value = std::move(v.value);
+        return *this;
+    }
+    template<typename T> auto operator=(T const& v) -> Register&
+    {
+        value = v;
+        return *this;
+    }
+    template<typename T> auto operator=(T&& v) -> Register&
+    {
+        if constexpr (std::is_same_v<T, bool>) {
+            value = static_cast<uint_type>(v);
+        } else {
+            value = std::move(v);
+        }
+        return *this;
+    }
+
+    inline auto type_name() const -> std::string_view
+    {
+        if (holds<void_type>()) {
+            return "void";
+        } else if (holds<int_type>()) {
+            return "int";
+        } else if (holds<uint_type>()) {
+            return "uint";
+        } else if (holds<float_type>()) {
+            return "float";
+        } else if (holds<double_type>()) {
+            return "double";
+        } else if (holds<pointer_type>()) {
+            return "ptr";
+        } else if (holds<pid_type>()) {
+            return "pid";
+        } else {
+            return "void";
+        }
+    }
+};
+
+/*
+ * Why not 0, since null pointers are not possible?
+ * Because we identify pointers by a tuple of {addr, parent.addr}, and origin
+ * pointers (ie, those allocated by AA or AD instruction) have their parent set
+ * to 0.
+ *
+ * If creating pointers at address zero was legal, it would not be possible to
+ * distinguish origin pointers from subobjects of an area allocated at address
+ * zero.
+ */
+inline constexpr auto MEM_FIRST_VALID_ADDRESS = size_t{8};
+
 struct Frame {
     using addr_type = viua::arch::instruction_type const*;
 
-    std::vector<Value> parameters;
-    std::vector<Value> registers;
+    std::vector<Register> parameters;
+    std::vector<Register> registers;
 
     addr_type const entry_address;
     addr_type const return_address;
@@ -284,8 +421,8 @@ struct Frame {
     viua::arch::Register_access result_to;
 
     struct {
-        uint64_t fp { 0 };
-        uint64_t sbrk { 0 };
+        uint64_t fp { MEM_FIRST_VALID_ADDRESS };
+        uint64_t sbrk { MEM_FIRST_VALID_ADDRESS };
     } saved;
 
     inline Frame(size_t const sz, addr_type const e, addr_type const r)
@@ -406,7 +543,7 @@ struct Stack {
     addr_type ip{nullptr};
 
     std::vector<Frame> frames;
-    std::vector<Value> args;
+    std::vector<Register> args;
 
     explicit inline Stack(Process& p) : proc{&p}
     {}
@@ -438,18 +575,6 @@ struct Stack {
  */
 inline constexpr auto MEM_LINE_SIZE = size_t{16};
 inline constexpr auto MEM_PAGE_SIZE = MEM_LINE_SIZE * 16;
-
-/*
- * Why not 0, since null pointers are not possible?
- * Because we identify pointers by a tuple of {addr, parent.addr}, and origin
- * pointers (ie, those allocated by AA or AD instruction) have their parent set
- * to 0.
- *
- * If creating pointers at address zero was legal, it would not be possible to
- * distinguish origin pointers from subobjects of an area allocated at address
- * zero.
- */
-inline constexpr auto MEM_FIRST_VALID_ADDRESS = size_t{8};
 
 struct Page {
     using unit_type = uint8_t;

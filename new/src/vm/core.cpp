@@ -19,8 +19,12 @@
 
 #include <memory>
 
+#include <viua/support/fdstream.h>
 #include <viua/vm/core.h>
 
+namespace viua {
+extern viua::support::fdstream TRACE_STREAM;
+}
 
 namespace viua::vm {
 auto IO_scheduler::schedule(int const fd,

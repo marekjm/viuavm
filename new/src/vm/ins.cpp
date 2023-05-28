@@ -18,6 +18,7 @@
  */
 
 #include <endian.h>
+#include <string.h>
 
 #include <algorithm>
 #include <functional>
@@ -40,7 +41,6 @@ extern viua::support::fdstream TRACE_STREAM;
 namespace viua::vm::ins {
 using namespace viua::arch::ins;
 using viua::vm::Stack;
-using ip_type = viua::arch::instruction_type const*;
 
 auto execute(viua::vm::Stack& stack,
              viua::arch::instruction_type const* const ip)
@@ -250,257 +250,49 @@ auto execute(viua::vm::Stack& stack,
     return (ip + 1);
 }
 
-namespace {
-auto type_name(viua::vm::types::Cell_view const c) -> std::string
+auto save_proxy(Stack& stack, access_type const a, ip_type const ip) -> Save_proxy
 {
-    using viua::vm::types::Cell_view;
-
-    if (std::holds_alternative<std::monostate>(c.content)) {
-        return "void";
-    } else if (std::holds_alternative<std::reference_wrapper<int64_t>>(
-                   c.content)) {
-        return "int";
-    } else if (std::holds_alternative<std::reference_wrapper<uint64_t>>(
-                   c.content)) {
-        return "uint";
-    } else if (std::holds_alternative<std::reference_wrapper<float>>(
-                   c.content)) {
-        return "float";
-    } else if (std::holds_alternative<std::reference_wrapper<double>>(
-                   c.content)) {
-        return "double";
-    } else {
-        return std::get<std::reference_wrapper<Cell_view::boxed_type>>(
-                   c.content)
-            .get()
-            .type_name();
-    }
-}
-auto get_slot(viua::arch::Register_access const ra,
-              Stack& stack,
-              ip_type const ip) -> std::optional<viua::vm::Value*>
-{
-    switch (ra.set) {
-        using enum viua::arch::REGISTER_SET;
-    case VOID:
-        return {};
-    case LOCAL:
-        return &stack.frames.back().registers.at(ra.index);
-    case ARGUMENT:
-        return &stack.args.at(ra.index);
-    case PARAMETER:
-        return &stack.frames.back().parameters.at(ra.index);
+    if (not a.direct) {
+        throw abort_execution{ip, "dereferences are not implemented"};
     }
 
-    throw abort_execution{ip, "impossible"};
-}
-
-auto type_name(Proxy const& p) -> std::string
-{
-    return type_name(p.view());
-}
-}  // namespace
-
-auto get_proxy(std::vector<viua::vm::Value>& registers,
-               viua::arch::Register_access const a,
-               ip_type const ip) -> Proxy
-{
-    auto& c = registers.at(a.index);
-    if (a.direct) {
-        return Proxy{c};
-    }
-
-    using viua::vm::types::Cell;
-    using viua::vm::types::Cell_view;
-
-    if (not std::holds_alternative<Cell::boxed_type>(c.value.content)) {
-        throw abort_execution{
-            ip, "cannot dereference a value of type " + type_name(c.value)};
-    }
-
-    auto& boxed = std::get<Cell::boxed_type>(c.value.content);
-    if (auto p = dynamic_cast<types::Ref*>(boxed.get()); p) {
-        return Proxy{Cell_view{*p->value}};
-    }
-
-    throw abort_execution{
-        ip, "cannot dereference a value of type " + type_name(c.value)};
-}
-auto get_proxy(Stack& stack,
-               viua::arch::Register_access const a,
-               ip_type const ip) -> Proxy
-{
-    switch (a.set) {
-        using enum viua::arch::REGISTER_SET;
-    case VOID:
-        throw abort_execution{ip, "cannot access a void register"};
-    case LOCAL:
-        return get_proxy(stack.frames.back().registers, a, ip);
-    case ARGUMENT:
-        return get_proxy(stack.args, a, ip);
-    case PARAMETER:
-        return get_proxy(stack.frames.back().parameters, a, ip);
-    default:
-        throw abort_execution{ip, "access to invalid register set"};
-    }
-}
-
-auto get_value(std::vector<viua::vm::Value>& registers,
-               viua::arch::Register_access const a,
-               ip_type const ip) -> viua::vm::types::Cell_view
-{
-    using viua::vm::types::Cell;
-    using viua::vm::types::Cell_view;
-
-    auto& c = registers.at(a.index);
-    if (a.direct) {
-        return c.value.view();
-    }
-
-    if (not std::holds_alternative<Cell::boxed_type>(c.value.content)) {
-        throw abort_execution{
-            ip, "cannot dereference a value of type " + type_name(c.value)};
-    }
-
-    auto& boxed = std::get<Cell::boxed_type>(c.value.content);
-    if (auto p = dynamic_cast<types::Ref*>(boxed.get()); p) {
-        return Cell_view{*p->value};
-    }
-
-    throw abort_execution{
-        ip, "cannot dereference a value of type " + type_name(c.value)};
-}
-auto get_value(Stack& stack,
-               viua::arch::Register_access const a,
-               ip_type const ip) -> viua::vm::types::Cell_view
-{
-    static viua::vm::Value void_placeholder;
     switch (a.set) {
         using enum viua::arch::REGISTER_SET;
         case VOID:
-            return void_placeholder.value.view();
+            return {nullptr};
         case LOCAL:
-            return get_value(stack.frames.back().registers, a, ip);
+            return {&stack.frames.back().registers.at(a.index)};
         case PARAMETER:
-            return get_value(stack.frames.back().parameters, a, ip);
+            return {&stack.frames.back().parameters.at(a.index)};
         case ARGUMENT:
-            return get_value(stack.args, a, ip);
+            return {&stack.args.at(a.index)};
+        default:
+            throw abort_execution{ip, "illegal write access to register " + a.to_string()};
+    }
+}
+auto fetch_proxy(Stack& stack, access_type const a, ip_type const ip) -> Fetch_proxy
+{
+    if (not a.direct) {
+        throw abort_execution{ip, "dereferences are not implemented"};
+    }
+
+    static register_type const void_placeholder;
+    switch (a.set) {
+        using enum viua::arch::REGISTER_SET;
+        case VOID:
+            return void_placeholder;
+        case LOCAL:
+            return stack.frames.back().registers.at(a.index);
+        case PARAMETER:
+            return stack.frames.back().parameters.at(a.index);
+        case ARGUMENT:
+            return stack.args.at(a.index);
         default:
             throw abort_execution{ip, "illegal read access to register " + a.to_string()};
     }
 }
 
-template<typename T> auto cast_to(viua::vm::types::Cell_view value) -> T
-{
-    using viua::vm::types::Cell_view;
-
-    using Tr = std::reference_wrapper<T>;
-
-    if (std::holds_alternative<Tr>(value.content)) {
-        return value.template get<T>();
-    }
-
-    if (value.template holds<int64_t>()) {
-        return static_cast<T>(value.template get<int64_t>());
-    }
-    if (value.template holds<uint64_t>()) {
-        return static_cast<T>(value.template get<uint64_t>());
-    }
-    if (value.template holds<float>()) {
-        return static_cast<T>(value.template get<float>());
-    }
-    if (value.template holds<double>()) {
-        return static_cast<T>(value.template get<double>());
-    }
-
-    if (not value.template holds<Cell_view::boxed_type>()) {
-        throw std::bad_cast{};
-    }
-
-    auto const bv = &value.template get<Cell_view::boxed_type>();
-
-    using viua::vm::types::Float_double;
-    using viua::vm::types::Float_single;
-    using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
-    if (auto x = dynamic_cast<Signed_integer const*>(bv); x) {
-        return static_cast<T>(x->value);
-    }
-    if (auto x = dynamic_cast<Unsigned_integer const*>(bv); x) {
-        return static_cast<T>(x->value);
-    }
-    if (auto x = dynamic_cast<Float_single const*>(bv); x) {
-        return static_cast<T>(x->value);
-    }
-    if (auto x = dynamic_cast<Float_double const*>(bv); x) {
-        return static_cast<T>(x->value);
-    }
-
-    throw std::bad_cast{};
-}
-template<> auto cast_to<bool>(viua::vm::types::Cell_view value) -> bool
-{
-    return static_cast<bool>(cast_to<uint64_t>(value));
-}
-
-template<typename Boxed, typename T>
-auto store_impl(ip_type const ip,
-                Proxy& out,
-                T value,
-                std::string_view const tn) -> void
-{
-    /*
-     * This is the simple case. We got an output operand which was specified as
-     * a direct register access ie, a "hard" access. This means we can just
-     * blindly assign the result to the proxy and perform a destructive store.
-     *
-     * Example code:
-     *
-     *      li $1, 23
-     *      li $2, 19
-     *      add $2, $1, $2
-     *
-     * The value 19 in local register 2 will be destroyed and overwritten with a
-     * new one - a 42. It does not matter that they are both signed 64-bit wide
-     * integers. A direct store is a destructive store. Always.
-     *
-     * Keep in mind that this will invalidate any references that were pointing
-     * to the old value, since the old value will be destroyed to make space for
-     * the new one. A static analyser should catch this situations and reject
-     * any code which contains a use of such dangling references.
-     */
-    if (out.hard()) {
-        out = std::move(value);
-        return;
-    }
-
-    /*
-     * If the output operand is not a hard access which allows destructive
-     * stores then it must be soft access ie, through a reference, which allows
-     * mutation.
-     *
-     * If that is the case then the register selected by the output operand MUST
-     * contain a value of the same type as the result value produced by the
-     * operation. Otherwise, the operation is illegal because it is not
-     * reasonable to mutate, for example, a string using an unsigned integer or
-     * vice versa.
-     */
-    if (not out.view().template holds<Boxed>()) {
-        throw abort_execution{ip,
-                              (std::string{"cannot mutate "} + tn.data()
-                               + " through a reference to " + type_name(out))};
-    }
-
-    /*
-     * After ruling out hard and illegal accesses, the only case left is soft
-     * access. This means that we have a dereference as the output operand and
-     * the program wants to mutate a value instead of performing a destructive
-     * store.
-     */
-    auto b                = out.view().template boxed_of<Boxed>();
-    b.value().get().value = std::move(value);
-}
-
+#if 0
 using viua::vm::types::Cell_view;
 template<typename Op, typename Lhs, typename Boxed_lhs>
 auto execute_arithmetic_op_impl(ip_type const ip,
@@ -517,44 +309,6 @@ auto execute_arithmetic_op_impl(ip_type const ip,
      */
     auto r = typename Op::functor_type{}(cast_to<Lhs>(lhs), cast_to<Lhs>(rhs));
     store_impl<Boxed_lhs>(ip, out, std::move(r), tn);
-}
-template<typename Op, typename Trait>
-auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
-{
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    auto lhs = get_value(stack, op.instruction.lhs, ip);
-    auto rhs = get_value(stack, op.instruction.rhs, ip);
-
-    using viua::vm::types::Float_double;
-    using viua::vm::types::Float_single;
-    using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
-
-    auto const holds_i64 =
-        (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
-    auto const holds_u64 = (lhs.template holds<uint64_t>()
-                            or lhs.template holds<Unsigned_integer>());
-    auto const holds_f32 =
-        (lhs.template holds<float>() or lhs.template holds<Float_single>());
-    auto const holds_f64 =
-        (lhs.template holds<double>() or lhs.template holds<Float_double>());
-
-    if (holds_i64) {
-        execute_arithmetic_op_impl<Op, int64_t, Signed_integer>(
-            ip, out, lhs, rhs, "i64");
-    } else if (holds_u64) {
-        execute_arithmetic_op_impl<Op, uint64_t, Unsigned_integer>(
-            ip, out, lhs, rhs, "u64");
-    } else if (holds_f32) {
-        execute_arithmetic_op_impl<Op, float, Float_single>(
-            ip, out, lhs, rhs, "fl");
-    } else if (holds_f64) {
-        execute_arithmetic_op_impl<Op, double, Float_double>(
-            ip, out, lhs, rhs, "db");
-    } else {
-        throw abort_execution{
-            ip, "unsupported operand types for arithmetic operation"};
-    }
 }
 template<typename Op>
 auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
@@ -594,79 +348,215 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
             ip, "unsupported operand types for arithmetic operation"};
     }
 }
+#endif
 
 auto execute(ADD const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_arithmetic_op<ADD, viua::vm::types::traits::Plus>(op, stack, ip);
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+
+    auto const lhs_i64 = lhs.holds<register_type::int_type>();
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+    auto const lhs_f32 = lhs.holds<register_type::float_type>();
+    auto const lhs_f64 = lhs.holds<register_type::double_type>();
+    auto const lhs_ptr = lhs.holds<register_type::pointer_type>();
+
+    using fn_type = std::plus<>;
+
+    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
+        out = fn_type{}(*lhs.get<int64_t>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        out = fn_type{}(*lhs.get<uint64_t>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<float>(); lhs_f32 and v) {
+        out = fn_type{}(*lhs.get<float>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<double>(); lhs_f64 and v) {
+        out = fn_type{}(*lhs.get<double>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_ptr and v) {
+        using Pt = register_type::pointer_type;
+        out = Pt{(lhs.get<Pt>()->ptr + *v)};
+        return;
+    }
+
+    throw abort_execution{
+        ip, "unsupported operand types for arithmetic operation"};
 }
 auto execute(SUB const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_arithmetic_op(op, stack, ip);
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+
+    auto const lhs_i64 = lhs.holds<register_type::int_type>();
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+    auto const lhs_f32 = lhs.holds<register_type::float_type>();
+    auto const lhs_f64 = lhs.holds<register_type::double_type>();
+
+    using fn_type = std::minus<>;
+
+    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
+        out = fn_type{}(*lhs.get<int64_t>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        out = fn_type{}(*lhs.get<uint64_t>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<float>(); lhs_f32 and v) {
+        out = fn_type{}(*lhs.get<float>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<double>(); lhs_f64 and v) {
+        out = fn_type{}(*lhs.get<double>(), *v);
+        return;
+    }
+
+    throw abort_execution{
+        ip, "unsupported operand types for arithmetic operation"};
 }
 auto execute(MUL const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_arithmetic_op(op, stack, ip);
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+
+    auto const lhs_i64 = lhs.holds<register_type::int_type>();
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+    auto const lhs_f32 = lhs.holds<register_type::float_type>();
+    auto const lhs_f64 = lhs.holds<register_type::double_type>();
+
+    using fn_type = std::multiplies<>;
+
+    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
+        out = fn_type{}(*lhs.get<int64_t>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        out = fn_type{}(*lhs.get<uint64_t>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<float>(); lhs_f32 and v) {
+        out = fn_type{}(*lhs.get<float>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<double>(); lhs_f64 and v) {
+        out = fn_type{}(*lhs.get<double>(), *v);
+        return;
+    }
+
+    throw abort_execution{
+        ip, "unsupported operand types for arithmetic operation"};
 }
 auto execute(DIV const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_arithmetic_op(op, stack, ip);
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+
+    auto const lhs_i64 = lhs.holds<register_type::int_type>();
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+    auto const lhs_f32 = lhs.holds<register_type::float_type>();
+    auto const lhs_f64 = lhs.holds<register_type::double_type>();
+
+    using fn_type = std::divides<>;
+
+    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
+        out = fn_type{}(*lhs.get<int64_t>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        out = fn_type{}(*lhs.get<uint64_t>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<float>(); lhs_f32 and v) {
+        out = fn_type{}(*lhs.get<float>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<double>(); lhs_f64 and v) {
+        out = fn_type{}(*lhs.get<double>(), *v);
+        return;
+    }
+
+    throw abort_execution{
+        ip, "unsupported operand types for arithmetic operation"};
 }
 auto execute(MOD const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    auto lhs = get_value(stack, op.instruction.lhs, ip);
-    auto rhs = get_value(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
 
-    using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
+    auto const lhs_i64 = lhs.holds<register_type::int_type>();
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
 
-    auto const holds_i64 =
-        (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
-    auto const holds_u64 = (lhs.template holds<uint64_t>()
-                            or lhs.template holds<Unsigned_integer>());
+    using fn_type = std::modulus<>;
 
-    if (holds_i64) {
-        store_impl<Signed_integer>(
-            ip, out, (cast_to<int64_t>(lhs) % cast_to<int64_t>(rhs)), "i64");
-    } else if (holds_u64) {
-        store_impl<Unsigned_integer>(
-            ip, out, (cast_to<uint64_t>(lhs) % cast_to<uint64_t>(rhs)), "u64");
-    } else {
-        throw abort_execution{ip,
-                              "unsupported operand types for modulo operation"};
+    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
+        out = fn_type{}(*lhs.get<int64_t>(), *v);
+        return;
     }
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        out = fn_type{}(*lhs.get<uint64_t>(), *v);
+        return;
+    }
+
+    throw abort_execution{
+        ip, "unsupported operand types for arithmetic operation"};
 }
 
 auto execute(BITSHL const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    auto lhs = get_value(stack, op.instruction.lhs, ip);
-    auto rhs = get_value(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
 
-    using viua::vm::types::Unsigned_integer;
-    store_impl<Unsigned_integer>(
-        ip, out, (lhs.get<uint64_t>() << rhs.get<uint64_t>()), "u64");
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        out = (*lhs.get<uint64_t>() << *v);
+        return;
+    }
+
+    throw abort_execution{
+        ip, "unsupported operand types for bit operation"};
 }
 auto execute(BITSHR const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    auto lhs = get_value(stack, op.instruction.lhs, ip);
-    auto rhs = get_value(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
 
-    using viua::vm::types::Unsigned_integer;
-    store_impl<Unsigned_integer>(
-        ip, out, (lhs.get<uint64_t>() >> rhs.get<uint64_t>()), "u64");
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        out = (*lhs.get<uint64_t>() >> *v);
+        return;
+    }
+
+    throw abort_execution{
+        ip, "unsupported operand types for bit operation"};
 }
 auto execute(BITASHR const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    auto lhs = get_value(stack, op.instruction.lhs, ip);
-    auto rhs = get_value(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
 
-    using viua::vm::types::Unsigned_integer;
-    auto const tmp = static_cast<int64_t>(lhs.get<uint64_t>());
-    store_impl<Unsigned_integer>(
-        ip, out, static_cast<uint64_t>(tmp >> rhs.get<uint64_t>()), "u64");
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        auto const tmp = static_cast<int64_t>(*lhs.get<uint64_t>());
+        out = static_cast<uint64_t>(tmp >> *v);
+        return;
+    }
+
+    throw abort_execution{
+        ip, "unsupported operand types for bit operation"};
 }
 auto execute(BITROL const, Stack&, ip_type const) -> void
 {}
@@ -674,279 +564,266 @@ auto execute(BITROR const, Stack&, ip_type const) -> void
 {}
 auto execute(BITAND const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    auto lhs = get_value(stack, op.instruction.lhs, ip);
-    auto rhs = get_value(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
 
-    using viua::vm::types::Unsigned_integer;
-    store_impl<Unsigned_integer>(
-        ip, out, (lhs.get<uint64_t>() & rhs.get<uint64_t>()), "u64");
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        out = (*lhs.get<uint64_t>() & *v);
+        return;
+    }
+
+    throw abort_execution{
+        ip, "unsupported operand types for bit operation"};
 }
 auto execute(BITOR const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    auto lhs = get_value(stack, op.instruction.lhs, ip);
-    auto rhs = get_value(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
 
-    using viua::vm::types::Unsigned_integer;
-    store_impl<Unsigned_integer>(
-        ip, out, (lhs.get<uint64_t>() | rhs.get<uint64_t>()), "u64");
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        out = (*lhs.get<uint64_t>() | *v);
+        return;
+    }
+
+    throw abort_execution{
+        ip, "unsupported operand types for bit operation"};
 }
 auto execute(BITXOR const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    auto lhs = get_value(stack, op.instruction.lhs, ip);
-    auto rhs = get_value(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
 
-    using viua::vm::types::Unsigned_integer;
-    store_impl<Unsigned_integer>(
-        ip, out, (lhs.get<uint64_t>() ^ rhs.get<uint64_t>()), "u64");
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        out = (*lhs.get<uint64_t>() ^ *v);
+        return;
+    }
+
+    throw abort_execution{
+        ip, "unsupported operand types for bit operation"};
 }
 auto execute(BITNOT const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    auto in  = get_value(stack, op.instruction.in, ip);
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const in = fetch_proxy(stack, op.instruction.in, ip);
+    if (auto const v = in.get<uint64_t>(); v) {
+        out = ~*v;
+        return;
+    }
 
-    using viua::vm::types::Unsigned_integer;
-    store_impl<Unsigned_integer>(ip, out, ~in.get<uint64_t>(), "u64");
+    throw abort_execution{
+        ip, "unsupported operand types for bit operation"};
 }
 
 auto execute(EQ const op, Stack& stack, ip_type const ip) -> void
 {
-    auto lhs = get_value(stack, op.instruction.lhs, ip);
-    auto rhs = get_value(stack, op.instruction.rhs, ip);
-
-    using viua::vm::types::traits::Cmp;
-    using viua::vm::types::traits::Eq;
     auto cmp_result = std::partial_ordering::unordered;
 
-    using viua::vm::types::Float_double;
-    using viua::vm::types::Float_single;
-    using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
 
-    auto const holds_i64 =
-        (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
-    auto const holds_u64 = (lhs.template holds<uint64_t>()
-                            or lhs.template holds<Unsigned_integer>());
-    auto const holds_f32 =
-        (lhs.template holds<float>() or lhs.template holds<Float_single>());
-    auto const holds_f64 =
-        (lhs.template holds<double>() or lhs.template holds<Float_double>());
+    auto const lhs_i64 = lhs.holds<register_type::int_type>();
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+    auto const lhs_f32 = lhs.holds<register_type::float_type>();
+    auto const lhs_f64 = lhs.holds<register_type::double_type>();
+    auto const lhs_ptr = lhs.holds<register_type::pointer_type>();
+    auto const lhs_pid = lhs.holds<register_type::pid_type>();
 
-    if (holds_i64) {
-        auto const l = cast_to<int64_t>(lhs);
-        auto const r = cast_to<int64_t>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (holds_u64) {
-        auto const l = cast_to<uint64_t>(lhs);
-        auto const r = cast_to<uint64_t>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (holds_f32) {
-        auto const l = cast_to<float>(lhs);
-        auto const r = cast_to<float>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (holds_f64) {
-        auto const l = cast_to<double>(lhs);
-        auto const r = cast_to<double>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<Eq>()) {
-        auto const& cmp = lhs.boxed_of<Eq>().value().get();
-        cmp_result      = cmp(cmp, rhs);
-    } else if (lhs.holds<Cmp>()) {
-        auto const& cmp = lhs.boxed_of<Cmp>().value().get();
-        cmp_result      = cmp(cmp, rhs);
-    } else {
-        throw abort_execution{ip, "invalid operands for eq"};
+    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
+        cmp_result = (*lhs.get<int64_t>() <=> *v);
+    }
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        cmp_result = (*lhs.get<uint64_t>() <=> *v);
+    }
+    if (auto const v = rhs.cast_to<float>(); lhs_f32 and v) {
+        cmp_result = (*lhs.get<float>() <=> *v);
+    }
+    if (auto const v = rhs.cast_to<double>(); lhs_f64 and v) {
+        cmp_result = (*lhs.get<double>() <=> *v);
+    }
+    if (auto const v = rhs.get<register_type::pointer_type>(); lhs_ptr and v) {
+        cmp_result = (lhs.get<register_type::pointer_type>()->ptr <=> v->ptr);
+    }
+    if (auto const v = rhs.get<register_type::pid_type>(); lhs_pid and v) {
+        auto const lhs_pid = *lhs.get<register_type::pid_type>();
+        auto const rhs_pid = *v;
+        cmp_result = memcmp(&lhs_pid.s6_addr, &rhs_pid.s6_addr, sizeof(lhs_pid.s6_addr))
+            ? std::partial_ordering::less /* whatever, just not equivalent */
+            : std::partial_ordering::equivalent;
     }
 
     if (cmp_result == std::partial_ordering::unordered) {
         throw abort_execution{ip, "cannot eq unordered values"};
     }
 
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    out      = (cmp_result == 0);
+    out = (cmp_result == 0);
 }
 auto execute(LT const op, Stack& stack, ip_type const ip) -> void
 {
-    auto lhs = get_value(stack, op.instruction.lhs, ip);
-    auto rhs = get_value(stack, op.instruction.rhs, ip);
-
-    using viua::vm::types::traits::Cmp;
     auto cmp_result = std::partial_ordering::unordered;
 
-    using viua::vm::types::Float_double;
-    using viua::vm::types::Float_single;
-    using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
 
-    auto const holds_i64 =
-        (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
-    auto const holds_u64 = (lhs.template holds<uint64_t>()
-                            or lhs.template holds<Unsigned_integer>());
-    auto const holds_f32 =
-        (lhs.template holds<float>() or lhs.template holds<Float_single>());
-    auto const holds_f64 =
-        (lhs.template holds<double>() or lhs.template holds<Float_double>());
+    auto const lhs_i64 = lhs.holds<register_type::int_type>();
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+    auto const lhs_f32 = lhs.holds<register_type::float_type>();
+    auto const lhs_f64 = lhs.holds<register_type::double_type>();
+    auto const lhs_ptr = lhs.holds<register_type::pointer_type>();
+    auto const lhs_pid = lhs.holds<register_type::pid_type>();
 
-    if (holds_i64) {
-        auto const l = cast_to<int64_t>(lhs);
-        auto const r = cast_to<int64_t>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (holds_u64) {
-        auto const l = cast_to<uint64_t>(lhs);
-        auto const r = cast_to<uint64_t>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (holds_f32) {
-        auto const l = cast_to<float>(lhs);
-        auto const r = cast_to<float>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (holds_f64) {
-        auto const l = cast_to<double>(lhs);
-        auto const r = cast_to<double>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<Cmp>()) {
-        auto const& cmp = lhs.boxed_of<Cmp>().value().get();
-        cmp_result      = cmp(cmp, rhs);
-    } else {
-        throw abort_execution{ip, "invalid operands for lt"};
+    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
+        cmp_result = (*lhs.get<int64_t>() <=> *v);
+    }
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        cmp_result = (*lhs.get<uint64_t>() <=> *v);
+    }
+    if (auto const v = rhs.cast_to<float>(); lhs_f32 and v) {
+        cmp_result = (*lhs.get<float>() <=> *v);
+    }
+    if (auto const v = rhs.cast_to<double>(); lhs_f64 and v) {
+        cmp_result = (*lhs.get<double>() <=> *v);
+    }
+    if (auto const v = rhs.get<register_type::pointer_type>(); lhs_ptr and v) {
+        cmp_result = (lhs.get<register_type::pointer_type>()->ptr <=> v->ptr);
+    }
+    if (auto const v = rhs.get<register_type::pid_type>(); lhs_pid and v) {
+        auto const lhs_pid = *lhs.get<register_type::pid_type>();
+        auto const rhs_pid = *v;
+        auto const r = memcmp(&lhs_pid.s6_addr, &rhs_pid.s6_addr, sizeof(lhs_pid.s6_addr));
+        if (r < 0) {
+            cmp_result = std::partial_ordering::less;
+        } else if (r > 0) {
+            cmp_result = std::partial_ordering::greater;
+        } else {
+            cmp_result = std::partial_ordering::equivalent;
+        }
     }
 
     if (cmp_result == std::partial_ordering::unordered) {
         throw abort_execution{ip, "cannot lt unordered values"};
     }
 
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    out      = (cmp_result < 0);
+    out = (cmp_result < 0);
 }
 auto execute(GT const op, Stack& stack, ip_type const ip) -> void
 {
-    auto lhs = get_value(stack, op.instruction.lhs, ip);
-    auto rhs = get_value(stack, op.instruction.rhs, ip);
-
-    using viua::vm::types::traits::Cmp;
     auto cmp_result = std::partial_ordering::unordered;
 
-    using viua::vm::types::Float_double;
-    using viua::vm::types::Float_single;
-    using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
 
-    auto const holds_i64 =
-        (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
-    auto const holds_u64 = (lhs.template holds<uint64_t>()
-                            or lhs.template holds<Unsigned_integer>());
-    auto const holds_f32 =
-        (lhs.template holds<float>() or lhs.template holds<Float_single>());
-    auto const holds_f64 =
-        (lhs.template holds<double>() or lhs.template holds<Float_double>());
+    auto const lhs_i64 = lhs.holds<register_type::int_type>();
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+    auto const lhs_f32 = lhs.holds<register_type::float_type>();
+    auto const lhs_f64 = lhs.holds<register_type::double_type>();
+    auto const lhs_ptr = lhs.holds<register_type::pointer_type>();
+    auto const lhs_pid = lhs.holds<register_type::pid_type>();
 
-    if (holds_i64) {
-        auto const l = cast_to<int64_t>(lhs);
-        auto const r = cast_to<int64_t>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (holds_u64) {
-        auto const l = cast_to<uint64_t>(lhs);
-        auto const r = cast_to<uint64_t>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (holds_f32) {
-        auto const l = cast_to<float>(lhs);
-        auto const r = cast_to<float>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (holds_f64) {
-        auto const l = cast_to<double>(lhs);
-        auto const r = cast_to<double>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<Cmp>()) {
-        auto const& cmp = lhs.boxed_of<Cmp>().value().get();
-        cmp_result      = cmp(cmp, rhs);
-    } else {
-        throw abort_execution{ip, "invalid operands for gt"};
+    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
+        cmp_result = (*lhs.get<int64_t>() <=> *v);
+    }
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        cmp_result = (*lhs.get<uint64_t>() <=> *v);
+    }
+    if (auto const v = rhs.cast_to<float>(); lhs_f32 and v) {
+        cmp_result = (*lhs.get<float>() <=> *v);
+    }
+    if (auto const v = rhs.cast_to<double>(); lhs_f64 and v) {
+        cmp_result = (*lhs.get<double>() <=> *v);
+    }
+    if (auto const v = rhs.get<register_type::pointer_type>(); lhs_ptr and v) {
+        cmp_result = (lhs.get<register_type::pointer_type>()->ptr <=> v->ptr);
+    }
+    if (auto const v = rhs.get<register_type::pid_type>(); lhs_pid and v) {
+        auto const lhs_pid = *lhs.get<register_type::pid_type>();
+        auto const rhs_pid = *v;
+        auto const r = memcmp(&lhs_pid.s6_addr, &rhs_pid.s6_addr, sizeof(lhs_pid.s6_addr));
+        if (r < 0) {
+            cmp_result = std::partial_ordering::less;
+        } else if (r > 0) {
+            cmp_result = std::partial_ordering::greater;
+        } else {
+            cmp_result = std::partial_ordering::equivalent;
+        }
     }
 
     if (cmp_result == std::partial_ordering::unordered) {
-        throw abort_execution{ip, "cannot gt unordered values"};
+        throw abort_execution{ip, "cannot lt unordered values"};
     }
 
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    out      = (cmp_result > 0);
+    out = (cmp_result > 0);
 }
 auto execute(CMP const op, Stack& stack, ip_type const ip) -> void
 {
-    auto lhs = get_value(stack, op.instruction.lhs, ip);
-    auto rhs = get_value(stack, op.instruction.rhs, ip);
-
-    using viua::vm::types::traits::Cmp;
     auto cmp_result = std::partial_ordering::unordered;
 
-    using viua::vm::types::Float_double;
-    using viua::vm::types::Float_single;
-    using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
 
-    auto const holds_i64 =
-        (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
-    auto const holds_u64 = (lhs.template holds<uint64_t>()
-                            or lhs.template holds<Unsigned_integer>());
-    auto const holds_f32 =
-        (lhs.template holds<float>() or lhs.template holds<Float_single>());
-    auto const holds_f64 =
-        (lhs.template holds<double>() or lhs.template holds<Float_double>());
+    auto const lhs_i64 = lhs.holds<register_type::int_type>();
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+    auto const lhs_f32 = lhs.holds<register_type::float_type>();
+    auto const lhs_f64 = lhs.holds<register_type::double_type>();
+    auto const lhs_ptr = lhs.holds<register_type::pointer_type>();
+    auto const lhs_pid = lhs.holds<register_type::pid_type>();
 
-    if (holds_i64) {
-        auto const l = cast_to<int64_t>(lhs);
-        auto const r = cast_to<int64_t>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (holds_u64) {
-        auto const l = cast_to<uint64_t>(lhs);
-        auto const r = cast_to<uint64_t>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (holds_f32) {
-        auto const l = cast_to<float>(lhs);
-        auto const r = cast_to<float>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (holds_f64) {
-        auto const l = cast_to<double>(lhs);
-        auto const r = cast_to<double>(rhs);
-        cmp_result   = (l <=> r);
-    } else if (lhs.holds<Cmp>()) {
-        auto const& cmp = lhs.boxed_of<Cmp>().value().get();
-        cmp_result      = cmp(cmp, rhs);
-    } else {
-        throw abort_execution{ip, "invalid operands for cmp"};
+    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
+        cmp_result = (*lhs.get<int64_t>() <=> *v);
+    }
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        cmp_result = (*lhs.get<uint64_t>() <=> *v);
+    }
+    if (auto const v = rhs.cast_to<float>(); lhs_f32 and v) {
+        cmp_result = (*lhs.get<float>() <=> *v);
+    }
+    if (auto const v = rhs.cast_to<double>(); lhs_f64 and v) {
+        cmp_result = (*lhs.get<double>() <=> *v);
+    }
+    if (auto const v = rhs.get<register_type::pointer_type>(); lhs_ptr and v) {
+        cmp_result = (lhs.get<register_type::pointer_type>()->ptr <=> v->ptr);
+    }
+    if (auto const v = rhs.get<register_type::pid_type>(); lhs_pid and v) {
+        auto const lhs_pid = *lhs.get<register_type::pid_type>();
+        auto const rhs_pid = *v;
+        auto const r = memcmp(&lhs_pid.s6_addr, &rhs_pid.s6_addr, sizeof(lhs_pid.s6_addr));
+        if (r < 0) {
+            cmp_result = std::partial_ordering::less;
+        } else if (r > 0) {
+            cmp_result = std::partial_ordering::greater;
+        } else {
+            cmp_result = std::partial_ordering::equivalent;
+        }
     }
 
     if (cmp_result == std::partial_ordering::unordered) {
         throw abort_execution{ip, "cannot cmp unordered values"};
     }
 
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    out      = (cmp_result < 0) ? -1 : (0 < cmp_result) ? 1 : 0;
+    out = (cmp_result < 0) ? -1 : (0 < cmp_result) ? 1 : 0;
 }
 auto execute(AND const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    auto lhs = get_value(stack, op.instruction.lhs, ip);
-    auto rhs = get_value(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip).cast_to<bool>();
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip).cast_to<bool>();
 
-    using viua::vm::types::traits::Bool;
-    if (lhs.is_boxed() and not lhs.boxed_of<Bool>().has_value()) {
-        throw abort_execution{nullptr, "and: lhs without Bool trait"};
-    }
-    if (rhs.is_boxed() and not rhs.boxed_of<Bool>().has_value()) {
-        throw abort_execution{nullptr, "and: rhs without Bool trait"};
+    if (lhs.has_value() and rhs.has_value()) {
+        out = static_cast<uint64_t>(*lhs and *rhs);
+        return;
     }
 
-    auto const l = (lhs.boxed_of<Bool>().has_value()
-                        ? static_cast<bool>(lhs.boxed_of<Bool>().value().get())
-                        : cast_to<bool>(lhs));
-    auto const r = (rhs.boxed_of<Bool>().has_value()
-                        ? static_cast<bool>(rhs.boxed_of<Bool>().value().get())
-                        : cast_to<uint64_t>(rhs));
-
-    using viua::vm::types::Unsigned_integer;
-    store_impl<Unsigned_integer>(
-        ip, out, static_cast<uint64_t>(l and r), "u64");
+    throw abort_execution{
+        ip, "unsupported operand types for and operation"};
 
     /*
      * This is the old implementation which was moving the operand that
@@ -967,110 +844,56 @@ auto execute(AND const op, Stack& stack, ip_type const ip) -> void
 }
 auto execute(OR const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    auto lhs = get_value(stack, op.instruction.lhs, ip);
-    auto rhs = get_value(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip).cast_to<bool>();
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip).cast_to<bool>();
 
-    using viua::vm::types::traits::Bool;
-    if (lhs.is_boxed() and not lhs.boxed_of<Bool>().has_value()) {
-        throw abort_execution{nullptr, "or: lhs without Bool trait"};
-    }
-    if (rhs.is_boxed() and not rhs.boxed_of<Bool>().has_value()) {
-        throw abort_execution{nullptr, "or: rhs without Bool trait"};
+    if (lhs.has_value() and rhs.has_value()) {
+        out = static_cast<uint64_t>(*lhs or *rhs);
+        return;
     }
 
-    auto const l = (lhs.boxed_of<Bool>().has_value()
-                        ? static_cast<bool>(lhs.boxed_of<Bool>().value().get())
-                        : cast_to<uint64_t>(lhs));
-    auto const r = (rhs.boxed_of<Bool>().has_value()
-                        ? static_cast<bool>(rhs.boxed_of<Bool>().value().get())
-                        : cast_to<uint64_t>(rhs));
-
-    using viua::vm::types::Unsigned_integer;
-    store_impl<Unsigned_integer>(ip, out, static_cast<uint64_t>(l or r), "u64");
+    throw abort_execution{
+        ip, "unsupported operand types for or operation"};
 }
 auto execute(NOT const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    auto in  = get_value(stack, op.instruction.in, ip);
-
-    using viua::vm::types::traits::Bool;
-    if (in.is_boxed() and not in.boxed_of<Bool>().has_value()) {
-        throw abort_execution{nullptr, "not: input without Bool trait"};
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    auto const in = fetch_proxy(stack, op.instruction.in, ip).cast_to<bool>();
+    if (in.has_value()) {
+        out = static_cast<uint64_t>(not *in);
+        return;
     }
 
-    auto const i = (in.boxed_of<Bool>().has_value()
-                        ? static_cast<bool>(in.boxed_of<Bool>().value().get())
-                        : cast_to<uint64_t>(in));
-
-    using viua::vm::types::Unsigned_integer;
-    store_impl<Unsigned_integer>(ip, out, static_cast<uint64_t>(i), "u64");
+    throw abort_execution{
+        ip, "unsupported operand type for not operation"};
 }
 
 auto execute(COPY const op, Stack& stack, ip_type const ip) -> void
 {
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    auto in  = get_value(stack, op.instruction.in, ip);
-
-    using viua::vm::types::traits::Copy;
-    if (in.is_boxed() and not in.boxed_of<Copy>().has_value()) {
-        throw abort_execution{nullptr, "boxed value without Copy trait"};
-    }
-
-    using viua::vm::types::Float_double;
-    using viua::vm::types::Float_single;
-    using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
-
-    auto const holds_i64 =
-        (in.template holds<int64_t>() or in.template holds<Signed_integer>());
-    auto const holds_u64 = (in.template holds<uint64_t>()
-                            or in.template holds<Unsigned_integer>());
-    auto const holds_f32 =
-        (in.template holds<float>() or in.template holds<Float_single>());
-    auto const holds_f64 =
-        (in.template holds<double>() or in.template holds<Float_double>());
-
-    if (holds_i64) {
-        store_impl<Signed_integer>(ip, out, cast_to<int64_t>(in), "i64");
-    } else if (holds_u64) {
-        store_impl<Unsigned_integer>(ip, out, cast_to<uint64_t>(in), "u64");
-    } else if (holds_f32) {
-        store_impl<Float_single>(ip, out, cast_to<float>(in), "fl");
-    } else if (holds_f64) {
-        store_impl<Float_double>(ip, out, cast_to<double>(in), "db");
-    } else if (not out.hard()) {
-        throw abort_execution{
-            ip, "FIXME: storing copies of boxed values through references"};
-    } else {
-        auto const& copier = in.boxed_of<Copy>()->get();
-        out                = copier.copy();
-    }
+    auto const in = fetch_proxy(stack, op.instruction.in, ip);
+    save_proxy(stack, op.instruction.out, ip) = in;
 }
 auto execute(MOVE const op, Stack& stack, ip_type const ip) -> void
 {
-    auto in = get_proxy(stack, op.instruction.in, ip);
-
-    if (in.view().is_void()) {
+    auto in = save_proxy(stack, op.instruction.in, ip);
+    if (in.target->is_void()) {
         throw abort_execution{ip, "cannot move out of void"};
     }
-    if (op.instruction.out.set != viua::arch::Register_access::set_type::VOID) {
-        auto out        = get_proxy(stack, op.instruction.out, ip);
-        out.overwrite() = std::move(in.overwrite());
-    }
-    in.overwrite().make_void();
-}
-auto execute(SWAP const op, Stack& stack, ip_type const) -> void
-{
-    auto& registers = stack.frames.back().registers;
-    auto& lhs       = registers.at(op.instruction.in.index);
-    auto& rhs       = registers.at(op.instruction.out.index);
 
-    std::swap(lhs.value, rhs.value);
+    save_proxy(stack, op.instruction.out, ip) = std::move(*in.target);
+    // FIXME save_proxy(stack, op.instruction.in, ip) = register_type::void_type{};
+}
+auto execute(SWAP const op, Stack& stack, ip_type const ip) -> void
+{
+    auto lhs = save_proxy(stack, op.instruction.in, ip);
+    auto rhs = save_proxy(stack, op.instruction.out, ip);
+    std::swap(*lhs.target, *rhs.target);
 }
 
-auto execute(ATOM const op, Stack& stack, ip_type const ip) -> void
+auto execute(ATOM const, Stack&, ip_type const) -> void
 {
+#if 0
     auto target = get_proxy(stack, op.instruction.out, ip);
 
     auto const& strtab     = *stack.proc->strtab;
@@ -1087,9 +910,11 @@ auto execute(ATOM const op, Stack& stack, ip_type const ip) -> void
         reinterpret_cast<char const*>(&strtab[0] + data_offset), data_size};
 
     target = std::move(s);
+#endif
 }
-auto execute(STRING const op, Stack& stack, ip_type const ip) -> void
+auto execute(STRING const, Stack&, ip_type const) -> void
 {
+#if 0
     auto target = get_proxy(stack, op.instruction.out, ip);
 
     auto const& strtab     = *stack.proc->strtab;
@@ -1106,6 +931,7 @@ auto execute(STRING const op, Stack& stack, ip_type const ip) -> void
         reinterpret_cast<char const*>(&strtab[0] + data_offset), data_size};
 
     target = std::move(s);
+#endif
 }
 
 auto execute(FRAME const op, Stack& stack, ip_type const ip) -> void
@@ -1116,8 +942,12 @@ auto execute(FRAME const op, Stack& stack, ip_type const ip) -> void
     auto capacity = viua::arch::register_index_type{};
     switch (rs) {
     case viua::arch::RS::LOCAL:
-        capacity = static_cast<viua::arch::register_index_type>(
-            cast_to<uint64_t>(get_value(stack, op.instruction.out, ip)));
+        if (auto v = fetch_proxy(stack, op.instruction.out, ip).get<uint64_t>(); v) {
+            capacity = *v;
+        } else {
+            throw abort_execution{
+                ip, "dynamic args count must be an unsigned integer"};
+        }
         break;
     case viua::arch::RS::ARGUMENT:
         capacity = index;
@@ -1127,7 +957,7 @@ auto execute(FRAME const op, Stack& stack, ip_type const ip) -> void
             ip, "args count must come from local or argument register set"};
     }
 
-    stack.args = std::vector<Value>(capacity);
+    stack.args = std::vector<register_type>(capacity);
 }
 
 auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
@@ -1135,10 +965,11 @@ auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
     auto fn_name = std::string{};
     auto fn_addr = size_t{};
     {
-        auto fn = get_proxy(stack, op.instruction.in, ip);
-        std::tie(fn_name, fn_addr) =
-            stack.proc->module.function_at(cast_to<uint64_t>(fn.view()));
-        fn.overwrite().make_void();
+        if (auto fn = fetch_proxy(stack, op.instruction.in, ip).get<uint64_t>(); fn) {
+            std::tie(fn_name, fn_addr) =
+                stack.proc->module.function_at(*fn);
+            save_proxy(stack, op.instruction.in, ip).reset();
+        }
     }
 
     if (fn_addr % sizeof(viua::arch::instruction_type)) {
@@ -1189,11 +1020,7 @@ auto execute(RETURN const op, Stack& stack, ip_type const ip) -> ip_type
                 ip, "return value requested from function returning void"};
         }
 
-        auto out = get_proxy(stack, rt, ip);
-        if (not out.hard()) {
-            throw abort_execution{
-                ip, "return operand must be direct register access"};
-        }
+        auto out = save_proxy(stack, rt, ip);
 
         // FIXME detect trying to return a dereference and throw an exception.
         // The following code is invalid and should be rejected:
@@ -1202,7 +1029,7 @@ auto execute(RETURN const op, Stack& stack, ip_type const ip) -> ip_type
         //
         // It would be best if the static analysis phase during assembly caught
         // such errors and refused to produce the ELF output.
-        out = std::move(fr.registers.at(op.instruction.out.index));
+        out = std::move(*save_proxy(stack, op.instruction.out, ip).target);
     }
 
     stack.proc->frame_pointer = fr.saved.fp;
@@ -1211,68 +1038,70 @@ auto execute(RETURN const op, Stack& stack, ip_type const ip) -> ip_type
     return fr.return_address;
 }
 
-auto execute(LUI const op, Stack& stack, ip_type const) -> void
+auto execute(LUI const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto& value     = registers.at(op.instruction.out.index);
-    value.value     = static_cast<int64_t>(op.instruction.immediate << 28);
+    auto out = save_proxy(stack, op.instruction.out, ip);
+    out = static_cast<int64_t>(op.instruction.immediate << 28);
 }
-auto execute(LUIU const op, Stack& stack, ip_type const) -> void
+auto execute(LUIU const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto& value     = registers.at(op.instruction.out.index);
-    value.value     = (op.instruction.immediate << 28);
+    auto out = save_proxy(stack, op.instruction.out, ip);
+    out = static_cast<uint64_t>(op.instruction.immediate << 28);
 }
 
-auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
+auto execute(FLOAT const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.back().registers;
-
-    auto& target = registers.at(op.instruction.out.index);
+    auto target = save_proxy(stack, op.instruction.out, ip);
 
     auto const& strtab = *stack.proc->strtab;
 
-    auto const data_offset = target.value.get<uint64_t>();
+    auto const data_offset = target.get<uint64_t>();
+    if (not data_offset.has_value()) {
+        throw abort_execution{ip, "invalid operand"};
+    }
+
     auto const data_size   = [&strtab, data_offset]() -> uint64_t {
-        auto const size_offset = (data_offset - sizeof(uint64_t));
+        auto const size_offset = (*data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
         memcpy(&tmp, &strtab[size_offset], sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto tmp = uint32_t{};
-    memcpy(&tmp, (&strtab[0] + data_offset), data_size);
+    memcpy(&tmp, (&strtab[0] + *data_offset), data_size);
     tmp = le32toh(tmp);
 
     auto v = float{};
     memcpy(&v, &tmp, data_size);
 
-    target.value = v;
+    target = v;
 }
-auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
+auto execute(DOUBLE const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.back().registers;
+    auto target = save_proxy(stack, op.instruction.out, ip);
 
-    auto& target = registers.at(op.instruction.out.index);
+    auto const& strtab = *stack.proc->strtab;
 
-    auto const data_offset = target.value.get<uint64_t>();
-    auto const data_size   = [&stack, data_offset]() -> uint64_t {
-        auto const size_offset = (data_offset - sizeof(uint64_t));
+    auto const data_offset = target.get<uint64_t>();
+    if (not data_offset.has_value()) {
+        throw abort_execution{ip, "invalid operand"};
+    }
+
+    auto const data_size   = [&strtab, data_offset]() -> uint64_t {
+        auto const size_offset = (*data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
-        memcpy(&tmp,
-               &stack.proc->strtab->operator[](size_offset),
-               sizeof(uint64_t));
+        memcpy(&tmp, &strtab[size_offset], sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto tmp = uint64_t{};
-    memcpy(&tmp, (&stack.proc->strtab->operator[](0) + data_offset), data_size);
+    memcpy(&tmp, (&stack.proc->strtab->operator[](0) + *data_offset), data_size);
     tmp = le64toh(tmp);
 
     auto v = double{};
     memcpy(&v, &tmp, data_size);
 
-    target.value = v;
+    target = v;
 }
 
 template<typename Op>
@@ -1280,8 +1109,8 @@ auto execute_arithmetic_immediate_op(Op const op,
                                      Stack& stack,
                                      ip_type const ip) -> void
 {
-    auto out        = get_proxy(stack, op.instruction.out, ip);
-    auto in         = get_value(stack, op.instruction.in, ip);
+    auto out = save_proxy(stack, op.instruction.out, ip);
+    auto in  = fetch_proxy(stack, op.instruction.in, ip);
 
     constexpr auto const signed_immediate =
         std::is_signed_v<typename Op::value_type>;
@@ -1293,59 +1122,26 @@ auto execute_arithmetic_immediate_op(Op const op,
                  static_cast<int32_t>(op.instruction.immediate << 8) >> 8)
              : static_cast<immediate_type>(op.instruction.immediate));
 
-    using viua::vm::types::Float_double;
-    using viua::vm::types::Float_single;
-    using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
     if (in.template holds<void>()) {
         out = typename Op::functor_type{}(0, immediate);
-    } else if (in.template holds<uint64_t>()) {
-        out =
-            typename Op::functor_type{}(in.template get<uint64_t>(), immediate);
-    } else if (in.template holds<int64_t>()) {
-        out =
-            typename Op::functor_type{}(in.template get<int64_t>(), immediate);
-    } else if (in.template holds<float>()) {
-        out = typename Op::functor_type{}(in.template get<float>(), immediate);
-    } else if (in.template holds<double>()) {
-        out = typename Op::functor_type{}(in.template get<double>(), immediate);
-    } else if (in.template holds<Signed_integer>()) {
-        if (auto b = out.template boxed_of<Signed_integer>(); b.has_value()) {
-            auto& boxed = b.value().get();
-            boxed.value =
-                typename Op::functor_type{}(cast_to<int64_t>(in), immediate);
-        } else {
-            out = typename Op::functor_type{}(cast_to<int64_t>(in), immediate);
-        }
-    } else if (in.template holds<Unsigned_integer>()) {
-        if (auto b = out.template boxed_of<Unsigned_integer>(); b.has_value()) {
-            auto& boxed = b.value().get();
-            boxed.value =
-                typename Op::functor_type{}(cast_to<uint64_t>(in), immediate);
-        } else {
-            out = typename Op::functor_type{}(cast_to<uint64_t>(in), immediate);
-        }
-    } else if (in.template holds<Float_single>()) {
-        if (auto b = out.template boxed_of<Float_single>(); b.has_value()) {
-            auto& boxed = b.value().get();
-            boxed.value =
-                typename Op::functor_type{}(cast_to<float>(in), immediate);
-        } else {
-            out = typename Op::functor_type{}(cast_to<float>(in), immediate);
-        }
-    } else if (in.template holds<Float_double>()) {
-        if (auto b = out.template boxed_of<Float_double>(); b.has_value()) {
-            auto& boxed = b.value().get();
-            boxed.value =
-                typename Op::functor_type{}(cast_to<double>(in), immediate);
-        } else {
-            out = typename Op::functor_type{}(cast_to<double>(in), immediate);
-        }
+    } else if (auto const v = in.template get<uint64_t>(); v) {
+        out = typename Op::functor_type{}(*v, immediate);
+    } else if (auto const v = in.template get<int64_t>(); v) {
+        out = typename Op::functor_type{}(*v, immediate);
+    } else if (auto const v = in.template get<float>(); v) {
+        out = typename Op::functor_type{}(*v, immediate);
+    } else if (auto const v = in.template get<double>(); v) {
+        out = typename Op::functor_type{}(*v, immediate);
+    } else if (auto const v = in.template get<double>(); v) {
+        out = typename Op::functor_type{}(*v, immediate);
+    } else if (auto const v = in.template get<register_type::pointer_type>(); v and not signed_immediate) {
+        auto const r = typename Op::functor_type{}(v->ptr, immediate);
+        out = register_type::pointer_type{static_cast<uint64_t>(r)};
     } else {
         throw abort_execution{
             ip,
             "unsupported lhs operand type for immediate arithmetic operation: "
-                + type_name(in)};
+                + std::string{in.type_name()}};
     }
 }
 auto execute(ADDI const op, Stack& stack, ip_type const ip) -> void
@@ -1381,8 +1177,9 @@ auto execute(DIVIU const op, Stack& stack, ip_type const ip) -> void
     execute_arithmetic_immediate_op(op, stack, ip);
 }
 
-auto execute(REF const op, Stack& stack, ip_type const ip) -> void
+auto execute(REF const, Stack&, ip_type const) -> void
 {
+#if 0
     auto dst = get_slot(op.instruction.out, stack, ip);
     auto src = get_slot(op.instruction.in, stack, ip);
 
@@ -1409,28 +1206,30 @@ auto execute(REF const op, Stack& stack, ip_type const ip) -> void
     }
 
     dst.value()->value = src.value()->boxed_value().reference_to();
+#endif
 }
 
 auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
 {
-    auto const condition = get_value(stack, op.instruction.out, ip);
-    auto tt              = get_proxy(stack, op.instruction.in, ip);
+    auto const condition = fetch_proxy(stack, op.instruction.out, ip);
+    auto tt              = save_proxy(stack, op.instruction.in, ip);
 
-    auto take_branch = (condition.holds<void>() or cast_to<bool>(condition));
+    auto take_branch = (condition.holds<void>() or *condition.cast_to<bool>());
     auto const target =
         take_branch
-            ? (stack.back().entry_address + cast_to<uint64_t>(tt.view()))
+            ? (stack.back().entry_address + *tt.target->get<uint64_t>())
             : (ip + 1);
 
-    tt.overwrite().make_void();
+    tt.reset();
     return target;
 }
 
-auto execute(IO_SUBMIT const op, Stack& stack, ip_type const ip) -> void
+auto execute(IO_SUBMIT const, Stack&, ip_type const) -> void
 {
-    auto dst [[maybe_unused]] = get_proxy(stack, op.instruction.out, ip);
-    auto port                 = get_value(stack, op.instruction.lhs, ip);
-    auto req                  = get_value(stack, op.instruction.rhs, ip)
+#if 0
+    auto dst = save_proxy(stack, op.instruction.out, ip);
+    auto port = fetch_proxy(stack, op.instruction.lhs, ip);
+    auto req = fetch_proxy(stack, op.instruction.rhs, ip);
                    .boxed_of<viua::vm::types::Struct>();
 
     if (not port.holds<int64_t>()) {
@@ -1468,9 +1267,11 @@ auto execute(IO_SUBMIT const op, Stack& stack, ip_type const ip) -> void
         break;
     }
     }
+#endif
 }
-auto execute(IO_WAIT const op, Stack& stack, ip_type const ip) -> void
+auto execute(IO_WAIT const, Stack&, ip_type const) -> void
 {
+#if 0
     auto dst = get_proxy(stack, op.instruction.out, ip);
     auto req = get_value(stack, op.instruction.lhs, ip);
 
@@ -1501,6 +1302,7 @@ auto execute(IO_WAIT const op, Stack& stack, ip_type const ip) -> void
     dst = std::make_unique<types::String>(
         std::move(stack.proc->core->io.requests[want_id]->buffer));
     stack.proc->core->io.requests.erase(want_id);
+#endif
 }
 auto execute(IO_SHUTDOWN const, Stack&, ip_type const) -> void
 {}
@@ -1514,20 +1316,13 @@ auto execute(ACTOR const op, Stack& stack, ip_type const ip) -> void
     auto fn_name = std::string{};
     auto fn_addr = size_t{};
     {
-        auto const fn_index   = op.instruction.in.index;
-        auto const& fn_offset = stack.frames.back().registers.at(fn_index);
-        if (fn_offset.is_void()) {
-            throw abort_execution{ip, "fn offset cannot be void"};
+        if (auto fn = fetch_proxy(stack, op.instruction.in, ip).get<uint64_t>(); fn) {
+            std::tie(fn_name, fn_addr) =
+                stack.proc->module.function_at(*fn);
+            save_proxy(stack, op.instruction.in, ip).reset();
+        } else {
+            throw abort_execution{ip, "invalid in operand to actor instruction"};
         }
-        if (fn_offset.is_boxed()) {
-            // FIXME only unboxed integers allowed for now
-            throw abort_execution{ip, "fn offset cannot be boxed"};
-        }
-
-        std::tie(fn_name, fn_addr) =
-            stack.proc->module.function_at(fn_offset.value.get<uint64_t>());
-
-        get_proxy(stack, op.instruction.in, ip).overwrite().make_void();
     }
 
     if (fn_addr % sizeof(viua::arch::instruction_type)) {
@@ -1537,19 +1332,16 @@ auto execute(ACTOR const op, Stack& stack, ip_type const ip) -> void
     auto const fr_entry = (fn_addr / sizeof(viua::arch::instruction_type));
 
     auto const pid     = stack.proc->core->spawn("", fr_entry);
-    auto dst           = get_slot(op.instruction.out, stack, ip);
-    dst.value()->value = std::make_unique<viua::vm::types::PID>(pid);
+    auto dst           = save_proxy(stack, op.instruction.out, ip);
+    dst = pid.get();
 }
-auto execute(SELF const op, Stack& stack, ip_type const) -> void
+auto execute(SELF const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.back().registers;
-    auto& target    = registers.at(op.instruction.out.index);
-
-    auto s       = std::make_unique<viua::vm::types::PID>(stack.proc->pid);
-    target.value = std::move(s);
+    auto const out = save_proxy(stack, op.instruction.out, ip);
+    out = stack.proc->pid.get();
 }
 
-auto dump_registers(std::vector<Value> const& registers,
+auto dump_registers(std::vector<register_type> const& registers,
                     std::string_view const suffix) -> void
 {
     for (auto i = size_t{0}; i < registers.size(); ++i) {
@@ -1562,57 +1354,41 @@ auto dump_registers(std::vector<Value> const& registers,
                      << ('[' + std::to_string(i) + '.' + suffix.data() + ']')
                      << ' ';
 
-        using viua::vm::types::Signed_integer;
-        using viua::vm::types::Unsigned_integer;
-        if (auto const& is = each.boxed_of<Signed_integer>(); is) {
-            auto const x = is.value().get().value;
-            TRACE_STREAM << "is " << std::hex << std::setw(16)
-                         << std::setfill('0') << x << " " << std::dec << x
-                         << '\n';
-        } else if (auto const& is = each.boxed_of<Unsigned_integer>(); is) {
-            auto const x = is.value().get().value;
-            TRACE_STREAM << "iu " << std::hex << std::setw(16)
-                         << std::setfill('0') << x << " " << std::dec << x
-                         << '\n';
-        } else if (each.is_boxed()) {
-            auto const& value = each.boxed_value();
-            TRACE_STREAM << value.type_name();
-            value.as_trait<viua::vm::types::traits::To_string>(
-                [](viua::vm::types::traits::To_string const& val) -> void {
-                    TRACE_STREAM << " = " << val.to_string();
-                });
-            TRACE_STREAM << '\n';
-            continue;
-        }
-
         if (each.is_void()) {
             /* do nothing */
-        } else if (each.holds<int64_t>()) {
+        } else if (auto const v = each.get<int64_t>(); v) {
             TRACE_STREAM << "is " << std::hex << std::setw(16)
-                         << std::setfill('0') << each.value.get<int64_t>()
-                         << " " << std::dec << each.value.get<int64_t>()
+                         << std::setfill('0') << *v
+                         << " " << std::dec << *v
                          << '\n';
-        } else if (each.holds<uint64_t>()) {
+        } else if (auto const v = each.get<uint64_t>(); v) {
             TRACE_STREAM << "iu " << std::hex << std::setw(16)
-                         << std::setfill('0') << each.value.get<uint64_t>()
-                         << " " << std::dec << each.value.get<uint64_t>()
+                         << std::setfill('0') << *v
+                         << " " << std::dec << *v
                          << '\n';
-        } else if (each.holds<float>()) {
+        } else if (auto const v = each.get<float>(); v) {
             auto const precision = std::cerr.precision();
             TRACE_STREAM
-                << "fl " << std::hexfloat << each.value.get<float>() << " "
+                << "fl " << std::hexfloat << *v << " "
                 << std::defaultfloat
                 << std::setprecision(std::numeric_limits<float>::digits10 + 1)
-                << each.value.get<float>() << '\n';
+                << *v << '\n';
             TRACE_STREAM << std::setprecision(precision);
-        } else if (each.holds<double>()) {
+        } else if (auto const v = each.get<double>(); v) {
             auto const precision = std::cerr.precision();
             TRACE_STREAM
-                << "db " << std::hexfloat << each.value.get<double>() << " "
+                << "db " << std::hexfloat << *v << " "
                 << std::defaultfloat
                 << std::setprecision(std::numeric_limits<double>::digits10 + 1)
-                << each.value.get<double>() << '\n';
+                << *v << '\n';
             TRACE_STREAM << std::setprecision(precision);
+        } else if (auto const v = each.get<register_type::pointer_type>(); v) {
+            TRACE_STREAM << "ptr " << std::hex << std::setw(16)
+                         << std::setfill('0') << v->ptr
+                         << " " << std::dec << v->ptr
+                         << '\n';
+        } else if (auto const v = each.get<register_type::pid_type>(); v) {
+            TRACE_STREAM << "pid " << viua::runtime::PID{*v}.to_string() << '\n';
         }
     }
 }
@@ -1747,13 +1523,17 @@ auto execute(ECALL const, Stack&, ip_type const) -> void
 
 auto execute(SM const op, Stack& stack, ip_type const ip) -> void
 {
-    auto const base       = get_value(stack, op.instruction.in, ip);
+    auto const base       = fetch_proxy(stack, op.instruction.in, ip);
     auto const offset     = op.instruction.immediate;
 
     auto const unit       = op.instruction.spec;
     auto const copy_size  = (1 << unit);
 
-    auto const user_addr = offset + (base.holds<void>() ? 0 : base.get<uint64_t>());
+    if (not (base.holds<void>() or base.holds<uint64_t>())) {
+        throw abort_execution{ip, "invalid base operand for memory instruction"};
+    }
+
+    auto const user_addr = offset + base.get<uint64_t>().value_or(0);
     auto const addr = stack.proc->memory_at(user_addr);
     if (addr == nullptr) {
         auto o = std::ostringstream{};
@@ -1762,25 +1542,28 @@ auto execute(SM const op, Stack& stack, ip_type const ip) -> void
         throw abort_execution{ip, o.str()};
     }
 
-    auto const in         = get_value(stack, op.instruction.out, ip).get<uint64_t>();
+    auto const in = fetch_proxy(stack, op.instruction.out, ip).get<uint64_t>();
+    if (not in.has_value()) {
+        throw abort_execution{ip, "invalid in operand for memory instruction"};
+    }
     switch (unit) {
         case 0: {
-            auto const val = static_cast<uint8_t>(in);
+            auto const val = static_cast<uint8_t>(*in);
             memcpy(addr, &val, copy_size);
             break;
         }
         case 1: {
-            auto const val = htole16(static_cast<uint16_t>(in));
+            auto const val = htole16(static_cast<uint16_t>(*in));
             memcpy(addr, &val, copy_size);
             break;
         }
         case 2: {
-            auto const val = htole32(static_cast<uint32_t>(in));
+            auto const val = htole32(static_cast<uint32_t>(*in));
             memcpy(addr, &val, copy_size);
             break;
         }
         case 3: {
-            auto const val = htole64(static_cast<uint64_t>(in));
+            auto const val = htole64(static_cast<uint64_t>(*in));
             memcpy(addr, &val, copy_size);
             break;
         }
@@ -1791,22 +1574,26 @@ auto execute(SM const op, Stack& stack, ip_type const ip) -> void
 }
 auto execute(LM const op, Stack& stack, ip_type const ip) -> void
 {
-    auto const base       = get_value(stack, op.instruction.in, ip);
+    auto const base       = fetch_proxy(stack, op.instruction.in, ip);
     auto const offset     = op.instruction.immediate;
 
     auto const unit       = op.instruction.spec;
     auto const copy_size  = (1 << unit);
 
-    auto const user_addr = offset + (base.holds<void>() ? 0 : base.get<uint64_t>());
+    if (not (base.holds<void>() or base.holds<uint64_t>())) {
+        throw abort_execution{ip, "invalid base operand for memory instruction"};
+    }
+
+    auto const user_addr = offset + base.get<uint64_t>().value_or(0);
     auto const addr = stack.proc->memory_at(user_addr);
     if (addr == nullptr) {
         auto o = std::ostringstream{};
-        o << "invalid load address: ";
+        o << "invalid store address: ";
         o << std::hex << std::setfill('0') << std::setw(16) << user_addr;
         throw abort_execution{ip, o.str()};
     }
 
-    auto out         = get_proxy(stack, op.instruction.out, ip);
+    auto out = save_proxy(stack, op.instruction.out, ip);
     switch (unit) {
         case 0: {
             auto val = uint8_t{};

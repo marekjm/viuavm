@@ -7,7 +7,7 @@
     if $3, 9
 
     ; These two instructions are here just to test whether the calculations that
-    ; the assembler makes to conver logical indexes into physical indexes are
+    ; the assembler makes to convert logical indexes into physical indexes are
     ; correct. Why these two? Because li with big numbers expands to more than
     ; one instruction.
     g.li $4, 318736561391831
