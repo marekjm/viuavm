@@ -7,6 +7,6 @@
 .end
 
 .function: dummy
-    string $1, "Hello, World!\n"
+    atom $1, hello_world
     return $1
 .end

@@ -291,6 +291,25 @@ auto fetch_proxy(Stack& stack, access_type const a, ip_type const ip) -> Fetch_p
             throw abort_execution{ip, "illegal read access to register " + a.to_string()};
     }
 }
+auto fetch_proxy(Frame& frame, access_type const a, ip_type const ip) -> Fetch_proxy
+{
+    if (not a.direct) {
+        throw abort_execution{ip, "dereferences are not implemented"};
+    }
+
+    static register_type const void_placeholder;
+    switch (a.set) {
+        using enum viua::arch::REGISTER_SET;
+        case VOID:
+            return void_placeholder;
+        case LOCAL:
+            return frame.registers.at(a.index);
+        case PARAMETER:
+            return frame.parameters.at(a.index);
+        default:
+            throw abort_execution{ip, "illegal read access to register " + a.to_string()};
+    }
+}
 
 #if 0
 using viua::vm::types::Cell_view;
@@ -633,6 +652,7 @@ auto execute(EQ const op, Stack& stack, ip_type const ip) -> void
     auto const lhs_f32 = lhs.holds<register_type::float_type>();
     auto const lhs_f64 = lhs.holds<register_type::double_type>();
     auto const lhs_ptr = lhs.holds<register_type::pointer_type>();
+    auto const lhs_atom = lhs.holds<register_type::atom_type>();
     auto const lhs_pid = lhs.holds<register_type::pid_type>();
 
     if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
@@ -649,6 +669,9 @@ auto execute(EQ const op, Stack& stack, ip_type const ip) -> void
     }
     if (auto const v = rhs.get<register_type::pointer_type>(); lhs_ptr and v) {
         cmp_result = (lhs.get<register_type::pointer_type>()->ptr <=> v->ptr);
+    }
+    if (auto const v = rhs.get<register_type::atom_type>(); lhs_atom and v) {
+        cmp_result = (lhs.get<register_type::atom_type>()->key <=> v->key);
     }
     if (auto const v = rhs.get<register_type::pid_type>(); lhs_pid and v) {
         auto const lhs_pid = *lhs.get<register_type::pid_type>();
@@ -775,6 +798,7 @@ auto execute(CMP const op, Stack& stack, ip_type const ip) -> void
     auto const lhs_f32 = lhs.holds<register_type::float_type>();
     auto const lhs_f64 = lhs.holds<register_type::double_type>();
     auto const lhs_ptr = lhs.holds<register_type::pointer_type>();
+    auto const lhs_atom = lhs.holds<register_type::atom_type>();
     auto const lhs_pid = lhs.holds<register_type::pid_type>();
 
     if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
@@ -791,6 +815,9 @@ auto execute(CMP const op, Stack& stack, ip_type const ip) -> void
     }
     if (auto const v = rhs.get<register_type::pointer_type>(); lhs_ptr and v) {
         cmp_result = (lhs.get<register_type::pointer_type>()->ptr <=> v->ptr);
+    }
+    if (auto const v = rhs.get<register_type::atom_type>(); lhs_atom and v) {
+        cmp_result = (lhs.get<register_type::atom_type>()->key <=> v->key);
     }
     if (auto const v = rhs.get<register_type::pid_type>(); lhs_pid and v) {
         auto const lhs_pid = *lhs.get<register_type::pid_type>();
@@ -891,26 +918,28 @@ auto execute(SWAP const op, Stack& stack, ip_type const ip) -> void
     std::swap(*lhs.target, *rhs.target);
 }
 
-auto execute(ATOM const, Stack&, ip_type const) -> void
+auto execute(ATOM const op, Stack& stack, ip_type const ip) -> void
 {
-#if 0
-    auto target = get_proxy(stack, op.instruction.out, ip);
+    auto target = save_proxy(stack, op.instruction.out, ip);
 
     auto const& strtab     = *stack.proc->strtab;
-    auto const data_offset = cast_to<uint64_t>(target.view());
+    auto const data_offset = target.get<uint64_t>();
+    if (not data_offset.has_value()) {
+        throw abort_execution{ip, "invalid operand for atom constructor"};
+    }
     auto const data_size   = [&strtab, data_offset]() -> uint64_t {
-        auto const size_offset = (data_offset - sizeof(uint64_t));
+        auto const size_offset = (*data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
         memcpy(&tmp, &strtab[size_offset], sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
-    auto s     = std::make_unique<viua::vm::types::Atom>();
-    s->content = std::string{
-        reinterpret_cast<char const*>(&strtab[0] + data_offset), data_size};
+    auto const key = *data_offset;
+    auto value = std::string{
+        reinterpret_cast<char const*>(&strtab[0] + *data_offset), data_size};
+    stack.proc->atoms[key] = std::move(value);
 
-    target = std::move(s);
-#endif
+    target = register_type::atom_type{key};
 }
 auto execute(STRING const, Stack&, ip_type const) -> void
 {
@@ -1014,14 +1043,7 @@ auto execute(RETURN const op, Stack& stack, ip_type const ip) -> ip_type
     auto fr = std::move(stack.frames.back());
     stack.frames.pop_back();
 
-    if (auto const& rt = fr.result_to; not rt.is_void()) {
-        if (op.instruction.out.is_void()) {
-            throw abort_execution{
-                ip, "return value requested from function returning void"};
-        }
-
-        auto out = save_proxy(stack, rt, ip);
-
+    if (auto const rt = fr.result_to; not rt.is_void()) {
         // FIXME detect trying to return a dereference and throw an exception.
         // The following code is invalid and should be rejected:
         //
@@ -1029,7 +1051,13 @@ auto execute(RETURN const op, Stack& stack, ip_type const ip) -> ip_type
         //
         // It would be best if the static analysis phase during assembly caught
         // such errors and refused to produce the ELF output.
-        out = std::move(*save_proxy(stack, op.instruction.out, ip).target);
+        auto const ret = fetch_proxy(fr, op.instruction.out, ip);
+        if (ret.holds<void>()) {
+            throw abort_execution{
+                ip, "return value requested from function returning void"};
+        }
+
+        save_proxy(stack, rt, ip) = ret;
     }
 
     stack.proc->frame_pointer = fr.saved.fp;
@@ -1342,6 +1370,7 @@ auto execute(SELF const op, Stack& stack, ip_type const ip) -> void
 }
 
 auto dump_registers(std::vector<register_type> const& registers,
+                    Process::atoms_map_type const& atoms,
                     std::string_view const suffix) -> void
 {
     for (auto i = size_t{0}; i < registers.size(); ++i) {
@@ -1387,6 +1416,8 @@ auto dump_registers(std::vector<register_type> const& registers,
                          << std::setfill('0') << v->ptr
                          << " " << std::dec << v->ptr
                          << '\n';
+        } else if (auto const v = each.get<register_type::atom_type>(); v) {
+            TRACE_STREAM << "atom " << atoms.at(v->key) << '\n';
         } else if (auto const v = each.get<register_type::pid_type>(); v) {
             TRACE_STREAM << "pid " << viua::runtime::PID{*v}.to_string() << '\n';
         }
@@ -1507,10 +1538,10 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
                      << " " << std::dec << sbrk
                      << '\n';
 
-        dump_registers(each.parameters, "p");
-        dump_registers(each.registers, "l");
+        dump_registers(each.parameters, stack.proc->atoms, "p");
+        dump_registers(each.registers, stack.proc->atoms, "l");
     }
-    dump_registers(stack.args, "a");
+    dump_registers(stack.args, stack.proc->atoms, "a");
 
     dump_memory(stack.proc->memory);
 

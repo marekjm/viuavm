@@ -1,1 +1,1 @@
-[1.l] string = "Hello, World!\n"
+[1.l] atom = hello_world

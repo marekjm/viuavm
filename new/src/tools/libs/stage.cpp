@@ -397,6 +397,32 @@ auto display_error_in_function(std::filesystem::path const source_path,
 auto save_string(std::vector<uint8_t>& strings, std::string_view const data)
     -> size_t
 {
+    {
+        /*
+         * Scan the strings table to see if the requested data is already there.
+         * There is no reason to store extra copies of the same value in .rodata
+         * so let's deduplicate.
+         *
+         * FIXME This is ridiculously slow. Maybe add some cache instead of
+         * linearly browsing through the whole table every time?
+         */
+        auto i = size_t{0};
+        while (i < strings.size()) {
+            auto data_size = uint64_t{};
+            memcpy(&data_size, strings.data() + i, sizeof(data_size));
+            data_size = le64toh(data_size);
+
+            i += sizeof(data_size);
+
+            auto const existing = std::string_view{reinterpret_cast<char const*>(strings.data() + i), data_size};
+            if (existing == data) {
+                return i;
+            }
+
+            i += data_size;
+        }
+    }
+
     auto const data_size = htole64(static_cast<uint64_t>(data.size()));
     strings.resize(strings.size() + sizeof(data_size));
     memcpy((strings.data() + strings.size() - sizeof(data_size)),

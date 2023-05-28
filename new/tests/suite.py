@@ -188,7 +188,7 @@ EBREAK_CONTENTS_OF = re.compile(r'^of #(\d+|last)')
 EBREAK_SELECT = re.compile(r'^ebreak (-?\d+) in proc(?:ess)? (\[[a-f0-9:]+\])')
 
 EBREAK_LINE_BOXED = re.compile(r'\[(\d+)\.([lap])\] (\*?[a-zA-Z_][a-zA-Z_0-9]*) = (.*)')
-EBREAK_LINE_PRIMITIVE = re.compile(r'\[(\d+)\.([lap])\] (is|iu|fl|db|ptr|pid) (.*)')
+EBREAK_LINE_PRIMITIVE = re.compile(r'\[(\d+)\.([lap])\] (is|iu|fl|db|ptr|atom|pid) (.*)')
 
 
 class Missing_value(Exception):

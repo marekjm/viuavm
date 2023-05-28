@@ -546,9 +546,9 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
                 proc->stack.frames.size() - user_frame_index - 1;
             auto const& frame = proc->stack.frames.at(physical_frame_index);
             viua::vm::ins::print_backtrace(proc->stack, physical_frame_index);
-            viua::vm::ins::dump_registers(frame.parameters, "p");
-            viua::vm::ins::dump_registers(frame.registers, "l");
-            viua::vm::ins::dump_registers(proc->stack.args, "a");
+            viua::vm::ins::dump_registers(frame.parameters, proc->atoms, "p");
+            viua::vm::ins::dump_registers(frame.registers, proc->atoms, "l");
+            viua::vm::ins::dump_registers(proc->stack.args, proc->atoms, "a");
             viua::vm::ins::dump_memory(proc->memory);
         } else if (p(1).value_or("") == "ip") {
             if (not REPL_STATE->selected_pid) {

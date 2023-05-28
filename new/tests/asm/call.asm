@@ -1,5 +1,5 @@
 .function: [[entry_point]] main
-    string $1, "Hello, World!\n"
+    atom $1, hello_world
     ebreak
 
     frame $1.a

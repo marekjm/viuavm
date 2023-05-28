@@ -281,6 +281,9 @@ struct Register {
     struct pointer_type {
         uint64_t ptr;
     };
+    struct atom_type {
+        uint64_t key;
+    };
     using pid_type = in6_addr;
 
     using value_type = std::variant<
@@ -290,6 +293,7 @@ struct Register {
         float,
         double,
         pointer_type,
+        atom_type,
         pid_type>;
     value_type value;
 
@@ -389,6 +393,8 @@ struct Register {
             return "double";
         } else if (holds<pointer_type>()) {
             return "ptr";
+        } else if (holds<atom_type>()) {
+            return "atom";
         } else if (holds<pid_type>()) {
             return "pid";
         } else {
@@ -676,6 +682,23 @@ struct Process {
 
     Module const& module;
     Module::strtab_type const* strtab;
+
+    /*
+     * Atoms are stored in .rodata and only instantiated when first referenced
+     * by an instruction executed by the process. Since they can be bigger than
+     * 128 bits and the VM is not able to hold them directly in a register, we
+     * need to use a trick.
+     *
+     * What we really do when executing an ATOM instruction is we create a
+     * useful object representing the atom, stash it aside, and store the key
+     * with which it can be referenced in the register.
+     *
+     * We can easily check if the atom was already instantiated so there is no
+     * need to produce multiple copies of it. When comparing atoms we can also
+     * do it by key and we do not need to compare their text contents.
+     */
+    using atoms_map_type = std::map<uint64_t, std::string>;
+    atoms_map_type atoms;
 
     using stack_type = Stack;
     stack_type stack;
