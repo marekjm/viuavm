@@ -561,6 +561,7 @@ auto main(int argc, char* argv[]) -> int
     auto verbosity_level       = 0;
     auto show_version          = false;
     auto show_help             = false;
+    auto singles               = std::vector<viua::arch::instruction_type>{};
 
     for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
         auto const& each = args.at(i);
@@ -573,6 +574,8 @@ auto main(int argc, char* argv[]) -> int
          */
         else if (each == "--no-demangle-li") {
             demangle_li = false;
+        } else if (each == "-i") {
+            singles.push_back(std::stoull(args.at(++i), nullptr, 0));
         } else if (each == "-o") {
             preferred_output_path = std::filesystem::path{args.at(++i)};
         }
@@ -609,6 +612,19 @@ auto main(int argc, char* argv[]) -> int
                       << ": man(1) page not installed or not found\n";
             return 1;
         }
+    }
+
+    if (singles.size()) {
+        std::cout << std::hex << std::setfill('0');
+        for (auto const each : singles) {
+            std::cout << "0x"
+                << std::setw(16)
+                << each
+                << "  "
+                << ins_to_string(each)
+                << "\n";
+        }
+        return 0;
     }
 
     /*
