@@ -1653,21 +1653,44 @@ auto execute(SM const op, Stack& stack, ip_type const) -> void
 }
 auto execute(LM const op, Stack& stack, ip_type const) -> void
 {
-    auto const base       = fetch_proxy(stack, op.instruction.in);
-    auto const offset     = op.instruction.immediate;
+    auto const base       = fetch_proxy(stack, op.instruction.in).get<register_type::pointer_type>();
 
     auto const unit       = op.instruction.spec;
-    auto const copy_size  = (1 << unit);
+    auto const copy_size  = (1u << unit);
+    auto const offset     = (op.instruction.immediate * copy_size);
 
-    if (not (base.holds<void>() or base.holds<uint64_t>())) {
+    if (not base.has_value()) {
         throw abort_execution{stack, "invalid base operand for memory instruction"};
     }
 
-    auto const user_addr = offset + base.get<uint64_t>().value_or(0);
+    auto const pointer_info = stack.proc->get_pointer(base->ptr);
+    if (not pointer_info.has_value()) {
+        auto o = std::ostringstream{};
+        o << "unknown pointer: ";
+        o << std::hex << std::setfill('0') << std::setw(16) << base->ptr;
+        throw abort_execution{stack, o.str()};
+    }
+
+    if (offset >= pointer_info->size) {
+        auto o = std::ostringstream{};
+        o << "illegal offset of " << offset
+            << " bytes into a region of "
+            << pointer_info->size << " byte(s)";
+        throw abort_execution{stack, o.str()};
+    }
+    if ((offset + copy_size) > pointer_info->size) {
+        auto o = std::ostringstream{};
+        o << "illegal load of " << copy_size
+            << " bytes from a region of "
+            << (pointer_info->size - offset) << " byte(s)";
+        throw abort_execution{stack, o.str()};
+    }
+
+    auto const user_addr = base->ptr + offset;
     auto const addr = stack.proc->memory_at(user_addr);
     if (addr == nullptr) {
         auto o = std::ostringstream{};
-        o << "invalid store address: ";
+        o << "invalid load address: ";
         o << std::hex << std::setfill('0') << std::setw(16) << user_addr;
         throw abort_execution{stack, o.str()};
     }
