@@ -56,7 +56,7 @@
     if $2.l, 10
 
     ; load from src
-    add $3.l, $2.p, $1.l
+    add $3.l, $1.p, $1.l
     lb $2, $3, 0
 
     ; store to dst
