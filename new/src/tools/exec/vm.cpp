@@ -51,7 +51,6 @@
 #include <viua/vm/core.h>
 #include <viua/vm/elf.h>
 #include <viua/vm/ins.h>
-#include <viua/vm/types.h>
 
 
 constexpr auto VIUA_SLOW_CYCLES = false;
