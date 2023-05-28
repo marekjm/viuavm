@@ -1,5 +1,7 @@
 .function: [[entry_point]] main
     li $1, 16u
+    amba $1.l, $1.l, 0
+
     li $2, 0xffu
     li $3, 16u
 

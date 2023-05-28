@@ -647,7 +647,7 @@ struct Pointer {
     size_t size { 0 };
 
     /*
-     * This member is only non-zero for VM pointers, which were created by
+     * This member is only non-zero for VM pointers which were created by
      * pointer arithmetic (ie, not allocated by AA or AD instruction). It serves
      * to identify overlapping memory areas eg,
      *
@@ -668,9 +668,10 @@ struct Pointer {
      */
     uintptr_t parent { 0 };
 
-    inline auto id() const -> std::pair<uintptr_t, uintptr_t>
+    using id_type = decltype(ptr);
+    inline auto id() const -> id_type
     {
-        return { ptr, parent };
+        return ptr;
     }
 };
 
@@ -704,7 +705,7 @@ struct Process {
     stack_type stack;
 
     std::vector<Page> memory;
-    std::vector<Pointer> pointers;
+    std::map<Pointer::id_type, Pointer> pointers;
     uint64_t frame_pointer { MEM_FIRST_VALID_ADDRESS };
     uint64_t stack_break { MEM_FIRST_VALID_ADDRESS };
 
@@ -714,6 +715,21 @@ struct Process {
             return nullptr;
         }
         return memory.front().data() + ptr;
+    }
+    inline auto record_pointer(Pointer ptr) -> void
+    {
+        pointers[ptr.id()] = ptr;
+    }
+    inline auto forget_pointer(Pointer ptr) -> void
+    {
+        pointers.erase(ptr.id());
+    }
+    inline auto get_pointer(uint64_t addr) const -> std::optional<Pointer>
+    {
+        if (pointers.contains(addr)) {
+            return pointers.at(addr);
+        }
+        return std::nullopt;
     }
 
     explicit inline Process(pid_type const p, Core* c, Module const& m)

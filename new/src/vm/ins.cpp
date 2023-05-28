@@ -400,8 +400,29 @@ auto execute(ADD const op, Stack& stack, ip_type const ip) -> void
         return;
     }
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_ptr and v) {
+        auto const offset = *v;
+
         using Pt = register_type::pointer_type;
-        out = Pt{(lhs.get<Pt>()->ptr + *v)};
+        auto const old_address = lhs.get<Pt>()->ptr;
+        auto const new_address = (old_address + offset);
+
+        auto const old_ptr = stack.proc->get_pointer(old_address);
+        if (offset >= old_ptr->size) {
+            auto o = std::ostringstream{};
+            o << "illegal offset of " << offset
+                << " bytes into a region of "
+                << old_ptr->size << " byte(s)";
+            throw abort_execution{ip, o.str()};
+        }
+
+        auto new_ptr = Pointer{};
+        new_ptr.ptr = new_address;
+        new_ptr.size = (old_ptr->size - offset);
+        new_ptr.parent = old_ptr->ptr;
+        stack.proc->record_pointer(new_ptr);
+
+        out = Pt{new_address};
+
         return;
     }
 
@@ -695,6 +716,13 @@ auto execute(LT const op, Stack& stack, ip_type const ip) -> void
     auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
     auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
 
+    if (lhs.holds<void>()) {
+        throw abort_execution{ip, "invalid read from empty register"};
+    }
+    if (rhs.holds<void>()) {
+        throw abort_execution{ip, "invalid read from empty register"};
+    }
+
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
     auto const lhs_f32 = lhs.holds<register_type::float_type>();
@@ -934,11 +962,10 @@ auto execute(ATOM const op, Stack& stack, ip_type const ip) -> void
         return le64toh(tmp);
     }();
 
-    auto const key = *data_offset;
-    auto value = std::string{
-        reinterpret_cast<char const*>(&strtab[0] + *data_offset), data_size};
+    auto const data_address = reinterpret_cast<char const*>(&strtab[0] + *data_offset);
+    auto const key = reinterpret_cast<uint64_t>(data_address);
+    auto value = std::string{data_address, data_size};
     stack.proc->atoms[key] = std::move(value);
-
     target = register_type::atom_type{key};
 }
 auto execute(STRING const, Stack&, ip_type const) -> void
@@ -1429,8 +1456,7 @@ auto print_backtrace_line(
     std::map<Frame::addr_type, std::string> const& fn_entry_to_name) -> void
 {
     auto const& each = stack.frames.at(frame_index);
-    viua::TRACE_STREAM << "    #" << (stack.frames.size() - frame_index - 1)
-                       << "  ";
+    viua::TRACE_STREAM << "    #" << frame_index << "  ";
 
     if (fn_entry_to_name.count(each.entry_address)) {
         viua::TRACE_STREAM << fn_entry_to_name.at(each.entry_address);
@@ -1554,17 +1580,40 @@ auto execute(ECALL const, Stack&, ip_type const) -> void
 
 auto execute(SM const op, Stack& stack, ip_type const ip) -> void
 {
-    auto const base       = fetch_proxy(stack, op.instruction.in, ip);
-    auto const offset     = op.instruction.immediate;
+    auto const base       = fetch_proxy(stack, op.instruction.in, ip).get<register_type::pointer_type>();
 
     auto const unit       = op.instruction.spec;
-    auto const copy_size  = (1 << unit);
+    auto const copy_size  = (1u << unit);
+    auto const offset     = (op.instruction.immediate * copy_size);
 
-    if (not (base.holds<void>() or base.holds<uint64_t>())) {
+    if (not base.has_value()) {
         throw abort_execution{ip, "invalid base operand for memory instruction"};
     }
 
-    auto const user_addr = offset + base.get<uint64_t>().value_or(0);
+    auto const pointer_info = stack.proc->get_pointer(base->ptr);
+    if (not pointer_info.has_value()) {
+        auto o = std::ostringstream{};
+        o << "unknown pointer: ";
+        o << std::hex << std::setfill('0') << std::setw(16) << base->ptr;
+        throw abort_execution{ip, o.str()};
+    }
+
+    if (offset >= pointer_info->size) {
+        auto o = std::ostringstream{};
+        o << "illegal offset of " << offset
+            << " bytes into a region of "
+            << pointer_info->size << " byte(s)";
+        throw abort_execution{ip, o.str()};
+    }
+    if ((offset + copy_size) > pointer_info->size) {
+        auto o = std::ostringstream{};
+        o << "illegal store of " << copy_size
+            << " bytes into a region of "
+            << (pointer_info->size - offset) << " byte(s)";
+        throw abort_execution{ip, o.str()};
+    }
+
+    auto const user_addr = base->ptr + offset;
     auto const addr = stack.proc->memory_at(user_addr);
     if (addr == nullptr) {
         auto o = std::ostringstream{};
