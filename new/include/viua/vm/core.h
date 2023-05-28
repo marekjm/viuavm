@@ -714,6 +714,9 @@ struct Process {
         if (ptr >= (MEM_PAGE_SIZE * memory.size())) {
             return nullptr;
         }
+        if (ptr >= stack_break) {
+            return nullptr;
+        }
         return memory.front().data() + ptr;
     }
     inline auto record_pointer(Pointer ptr) -> void
@@ -730,6 +733,21 @@ struct Process {
             return pointers.at(addr);
         }
         return std::nullopt;
+    }
+    inline auto prune_pointers() -> void
+    {
+        auto tmp = decltype(pointers){};
+        for (auto& [ k, v ] : pointers) {
+            /*
+             * Forget all pointers whose base is greater than current stack
+             * break. They are invalid because they point to deallocated memory.
+             */
+            if ((not v.foreign) and v.ptr >= stack_break) {
+                continue;
+            }
+            tmp[k] = v;
+        }
+        pointers = std::move(tmp);
     }
 
     explicit inline Process(pid_type const p, Core* c, Module const& m)

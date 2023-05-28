@@ -1087,8 +1087,9 @@ auto execute(RETURN const op, Stack& stack, ip_type const ip) -> ip_type
         save_proxy(stack, rt, ip) = ret;
     }
 
-    stack.proc->frame_pointer = fr.saved.fp;
-    stack.proc->stack_break = fr.saved.sbrk;
+    stack.proc->frame_pointer = stack.frames.back().saved.fp;
+    stack.proc->stack_break = stack.frames.back().saved.sbrk;
+    stack.proc->prune_pointers();
 
     return fr.return_address;
 }
