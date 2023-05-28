@@ -1,6 +1,6 @@
 .function: [[entry_point]] main
-    li $1.l, 2u
-    amwa $1.l, $1.l, 0
+    li $1.l, 1u
+    amha $1.l, $1.l, 0
     ebreak
 
     li $2.l, 0xaddeu
