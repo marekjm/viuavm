@@ -42,13 +42,13 @@ using namespace viua::arch::ins;
 using viua::vm::Stack;
 using ip_type = viua::arch::instruction_type const*;
 
-auto execute(AA const op, Stack& stack, ip_type const ip) -> void
+auto execute(AA const op, Stack& stack, ip_type const) -> void
 {
-    auto const base = fetch_proxy(stack, op.instruction.in, ip).get<uint64_t>();
+    auto const base = fetch_proxy(stack, op.instruction.in).get<uint64_t>();
     auto const alignment[[maybe_unused]] = (1u << op.instruction.spec);
 
     if (not base.has_value()) {
-        throw abort_execution{ip, "invalid operand type for aa instruction"};
+        throw abort_execution{stack, "invalid operand type for aa instruction"};
     }
 
     // FIXME Ensure that enough memory is available to satisfy both size and
@@ -59,7 +59,7 @@ auto execute(AA const op, Stack& stack, ip_type const ip) -> void
     stack.proc->stack_break += size;
     stack.frames.back().saved.sbrk = stack.proc->stack_break;
 
-    save_proxy(stack, op.instruction.out, ip) = register_type::pointer_type{pointer_address};
+    save_proxy(stack, op.instruction.out) = register_type::pointer_type{pointer_address};
 
     auto pointer_info = Pointer{};
     pointer_info.ptr = pointer_address;

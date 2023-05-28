@@ -766,12 +766,12 @@ struct Process {
 };
 
 struct abort_execution {
-    using ip_type = viua::arch::instruction_type const*;
-    ip_type const ip;
+    using stack_type = viua::vm::Stack;
+    stack_type const& stack;
     std::string message;
 
-    inline abort_execution(ip_type const i, std::string m = "")
-            : ip{i}, message{std::move(m)}
+    inline abort_execution(stack_type const& s, std::string m = "")
+            : stack{s}, message{std::move(m)}
     {}
 
     inline auto what() const -> std::string_view

@@ -207,9 +207,9 @@ struct Save_proxy {
         }
     }
 };
-auto save_proxy(viua::vm::Stack&, access_type const, ip_type const) -> Save_proxy;
-auto fetch_proxy(viua::vm::Stack&, access_type const, ip_type const) -> Fetch_proxy;
-auto fetch_proxy(viua::vm::Frame&, access_type const, ip_type const) -> Fetch_proxy;
+auto save_proxy(viua::vm::Stack&, access_type const) -> Save_proxy;
+auto fetch_proxy(viua::vm::Stack&, access_type const) -> Fetch_proxy;
+auto fetch_proxy(viua::vm::Frame&, access_type const, viua::vm::Stack const&) -> Fetch_proxy;
 }  // namespace viua::vm::ins
 
 #endif

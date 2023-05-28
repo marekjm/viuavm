@@ -250,10 +250,10 @@ auto execute(viua::vm::Stack& stack,
     return (ip + 1);
 }
 
-auto save_proxy(Stack& stack, access_type const a, ip_type const ip) -> Save_proxy
+auto save_proxy(Stack& stack, access_type const a) -> Save_proxy
 {
     if (not a.direct) {
-        throw abort_execution{ip, "dereferences are not implemented"};
+        throw abort_execution{stack, "dereferences are not implemented"};
     }
 
     switch (a.set) {
@@ -267,13 +267,13 @@ auto save_proxy(Stack& stack, access_type const a, ip_type const ip) -> Save_pro
         case ARGUMENT:
             return {&stack.args.at(a.index)};
         default:
-            throw abort_execution{ip, "illegal write access to register " + a.to_string()};
+            throw abort_execution{stack, "illegal write access to register " + a.to_string()};
     }
 }
-auto fetch_proxy(Stack& stack, access_type const a, ip_type const ip) -> Fetch_proxy
+auto fetch_proxy(Stack& stack, access_type const a) -> Fetch_proxy
 {
     if (not a.direct) {
-        throw abort_execution{ip, "dereferences are not implemented"};
+        throw abort_execution{stack, "dereferences are not implemented"};
     }
 
     static register_type const void_placeholder;
@@ -288,13 +288,13 @@ auto fetch_proxy(Stack& stack, access_type const a, ip_type const ip) -> Fetch_p
         case ARGUMENT:
             return stack.args.at(a.index);
         default:
-            throw abort_execution{ip, "illegal read access to register " + a.to_string()};
+            throw abort_execution{stack, "illegal read access to register " + a.to_string()};
     }
 }
-auto fetch_proxy(Frame& frame, access_type const a, ip_type const ip) -> Fetch_proxy
+auto fetch_proxy(Frame& frame, access_type const a, Stack const& stack) -> Fetch_proxy
 {
     if (not a.direct) {
-        throw abort_execution{ip, "dereferences are not implemented"};
+        throw abort_execution{stack, "dereferences are not implemented"};
     }
 
     static register_type const void_placeholder;
@@ -307,7 +307,7 @@ auto fetch_proxy(Frame& frame, access_type const a, ip_type const ip) -> Fetch_p
         case PARAMETER:
             return frame.parameters.at(a.index);
         default:
-            throw abort_execution{ip, "illegal read access to register " + a.to_string()};
+            throw abort_execution{stack, "illegal read access to register " + a.to_string()};
     }
 }
 
@@ -369,11 +369,11 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
 }
 #endif
 
-auto execute(ADD const op, Stack& stack, ip_type const ip) -> void
+auto execute(ADD const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
 
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
@@ -412,7 +412,7 @@ auto execute(ADD const op, Stack& stack, ip_type const ip) -> void
             o << "illegal offset of " << offset
                 << " bytes into a region of "
                 << old_ptr->size << " byte(s)";
-            throw abort_execution{ip, o.str()};
+            throw abort_execution{stack, o.str()};
         }
 
         auto new_ptr = Pointer{};
@@ -427,13 +427,13 @@ auto execute(ADD const op, Stack& stack, ip_type const ip) -> void
     }
 
     throw abort_execution{
-        ip, "unsupported operand types for arithmetic operation"};
+        stack, "unsupported operand types for arithmetic operation"};
 }
-auto execute(SUB const op, Stack& stack, ip_type const ip) -> void
+auto execute(SUB const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
 
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
@@ -460,13 +460,13 @@ auto execute(SUB const op, Stack& stack, ip_type const ip) -> void
     }
 
     throw abort_execution{
-        ip, "unsupported operand types for arithmetic operation"};
+        stack, "unsupported operand types for arithmetic operation"};
 }
-auto execute(MUL const op, Stack& stack, ip_type const ip) -> void
+auto execute(MUL const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
 
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
@@ -493,13 +493,13 @@ auto execute(MUL const op, Stack& stack, ip_type const ip) -> void
     }
 
     throw abort_execution{
-        ip, "unsupported operand types for arithmetic operation"};
+        stack, "unsupported operand types for arithmetic operation"};
 }
-auto execute(DIV const op, Stack& stack, ip_type const ip) -> void
+auto execute(DIV const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
 
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
@@ -526,13 +526,13 @@ auto execute(DIV const op, Stack& stack, ip_type const ip) -> void
     }
 
     throw abort_execution{
-        ip, "unsupported operand types for arithmetic operation"};
+        stack, "unsupported operand types for arithmetic operation"};
 }
-auto execute(MOD const op, Stack& stack, ip_type const ip) -> void
+auto execute(MOD const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
 
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
@@ -549,14 +549,14 @@ auto execute(MOD const op, Stack& stack, ip_type const ip) -> void
     }
 
     throw abort_execution{
-        ip, "unsupported operand types for arithmetic operation"};
+        stack, "unsupported operand types for arithmetic operation"};
 }
 
-auto execute(BITSHL const op, Stack& stack, ip_type const ip) -> void
+auto execute(BITSHL const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
 
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
@@ -565,13 +565,13 @@ auto execute(BITSHL const op, Stack& stack, ip_type const ip) -> void
     }
 
     throw abort_execution{
-        ip, "unsupported operand types for bit operation"};
+        stack, "unsupported operand types for bit operation"};
 }
-auto execute(BITSHR const op, Stack& stack, ip_type const ip) -> void
+auto execute(BITSHR const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
 
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
@@ -580,13 +580,13 @@ auto execute(BITSHR const op, Stack& stack, ip_type const ip) -> void
     }
 
     throw abort_execution{
-        ip, "unsupported operand types for bit operation"};
+        stack, "unsupported operand types for bit operation"};
 }
-auto execute(BITASHR const op, Stack& stack, ip_type const ip) -> void
+auto execute(BITASHR const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
 
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
@@ -596,17 +596,17 @@ auto execute(BITASHR const op, Stack& stack, ip_type const ip) -> void
     }
 
     throw abort_execution{
-        ip, "unsupported operand types for bit operation"};
+        stack, "unsupported operand types for bit operation"};
 }
 auto execute(BITROL const, Stack&, ip_type const) -> void
 {}
 auto execute(BITROR const, Stack&, ip_type const) -> void
 {}
-auto execute(BITAND const op, Stack& stack, ip_type const ip) -> void
+auto execute(BITAND const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
 
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
@@ -615,13 +615,13 @@ auto execute(BITAND const op, Stack& stack, ip_type const ip) -> void
     }
 
     throw abort_execution{
-        ip, "unsupported operand types for bit operation"};
+        stack, "unsupported operand types for bit operation"};
 }
-auto execute(BITOR const op, Stack& stack, ip_type const ip) -> void
+auto execute(BITOR const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
 
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
@@ -630,13 +630,13 @@ auto execute(BITOR const op, Stack& stack, ip_type const ip) -> void
     }
 
     throw abort_execution{
-        ip, "unsupported operand types for bit operation"};
+        stack, "unsupported operand types for bit operation"};
 }
-auto execute(BITXOR const op, Stack& stack, ip_type const ip) -> void
+auto execute(BITXOR const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
 
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
@@ -645,28 +645,28 @@ auto execute(BITXOR const op, Stack& stack, ip_type const ip) -> void
     }
 
     throw abort_execution{
-        ip, "unsupported operand types for bit operation"};
+        stack, "unsupported operand types for bit operation"};
 }
-auto execute(BITNOT const op, Stack& stack, ip_type const ip) -> void
+auto execute(BITNOT const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const in = fetch_proxy(stack, op.instruction.in, ip);
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const in = fetch_proxy(stack, op.instruction.in);
     if (auto const v = in.get<uint64_t>(); v) {
         out = ~*v;
         return;
     }
 
     throw abort_execution{
-        ip, "unsupported operand types for bit operation"};
+        stack, "unsupported operand types for bit operation"};
 }
 
-auto execute(EQ const op, Stack& stack, ip_type const ip) -> void
+auto execute(EQ const op, Stack& stack, ip_type const) -> void
 {
     auto cmp_result = std::partial_ordering::unordered;
 
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
 
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
@@ -703,24 +703,24 @@ auto execute(EQ const op, Stack& stack, ip_type const ip) -> void
     }
 
     if (cmp_result == std::partial_ordering::unordered) {
-        throw abort_execution{ip, "cannot eq unordered values"};
+        throw abort_execution{stack, "cannot eq unordered values"};
     }
 
     out = (cmp_result == 0);
 }
-auto execute(LT const op, Stack& stack, ip_type const ip) -> void
+auto execute(LT const op, Stack& stack, ip_type const) -> void
 {
     auto cmp_result = std::partial_ordering::unordered;
 
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
 
     if (lhs.holds<void>()) {
-        throw abort_execution{ip, "invalid read from empty register"};
+        throw abort_execution{stack, "invalid read from empty register"};
     }
     if (rhs.holds<void>()) {
-        throw abort_execution{ip, "invalid read from empty register"};
+        throw abort_execution{stack, "invalid read from empty register"};
     }
 
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
@@ -759,18 +759,18 @@ auto execute(LT const op, Stack& stack, ip_type const ip) -> void
     }
 
     if (cmp_result == std::partial_ordering::unordered) {
-        throw abort_execution{ip, "cannot lt unordered values"};
+        throw abort_execution{stack, "cannot lt unordered values"};
     }
 
     out = (cmp_result < 0);
 }
-auto execute(GT const op, Stack& stack, ip_type const ip) -> void
+auto execute(GT const op, Stack& stack, ip_type const) -> void
 {
     auto cmp_result = std::partial_ordering::unordered;
 
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
 
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
@@ -808,18 +808,18 @@ auto execute(GT const op, Stack& stack, ip_type const ip) -> void
     }
 
     if (cmp_result == std::partial_ordering::unordered) {
-        throw abort_execution{ip, "cannot lt unordered values"};
+        throw abort_execution{stack, "cannot lt unordered values"};
     }
 
     out = (cmp_result > 0);
 }
-auto execute(CMP const op, Stack& stack, ip_type const ip) -> void
+auto execute(CMP const op, Stack& stack, ip_type const) -> void
 {
     auto cmp_result = std::partial_ordering::unordered;
 
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip);
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
 
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
@@ -861,16 +861,16 @@ auto execute(CMP const op, Stack& stack, ip_type const ip) -> void
     }
 
     if (cmp_result == std::partial_ordering::unordered) {
-        throw abort_execution{ip, "cannot cmp unordered values"};
+        throw abort_execution{stack, "cannot cmp unordered values"};
     }
 
     out = (cmp_result < 0) ? -1 : (0 < cmp_result) ? 1 : 0;
 }
-auto execute(AND const op, Stack& stack, ip_type const ip) -> void
+auto execute(AND const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip).cast_to<bool>();
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip).cast_to<bool>();
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs).cast_to<bool>();
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs).cast_to<bool>();
 
     if (lhs.has_value() and rhs.has_value()) {
         out = static_cast<uint64_t>(*lhs and *rhs);
@@ -878,7 +878,7 @@ auto execute(AND const op, Stack& stack, ip_type const ip) -> void
     }
 
     throw abort_execution{
-        ip, "unsupported operand types for and operation"};
+        stack, "unsupported operand types for and operation"};
 
     /*
      * This is the old implementation which was moving the operand that
@@ -897,11 +897,11 @@ auto execute(AND const op, Stack& stack, ip_type const ip) -> void
     }
     */
 }
-auto execute(OR const op, Stack& stack, ip_type const ip) -> void
+auto execute(OR const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs, ip).cast_to<bool>();
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs, ip).cast_to<bool>();
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const lhs = fetch_proxy(stack, op.instruction.lhs).cast_to<bool>();
+    auto const rhs = fetch_proxy(stack, op.instruction.rhs).cast_to<bool>();
 
     if (lhs.has_value() and rhs.has_value()) {
         out = static_cast<uint64_t>(*lhs or *rhs);
@@ -909,51 +909,51 @@ auto execute(OR const op, Stack& stack, ip_type const ip) -> void
     }
 
     throw abort_execution{
-        ip, "unsupported operand types for or operation"};
+        stack, "unsupported operand types for or operation"};
 }
-auto execute(NOT const op, Stack& stack, ip_type const ip) -> void
+auto execute(NOT const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    auto const in = fetch_proxy(stack, op.instruction.in, ip).cast_to<bool>();
+    auto const out = save_proxy(stack, op.instruction.out);
+    auto const in = fetch_proxy(stack, op.instruction.in).cast_to<bool>();
     if (in.has_value()) {
         out = static_cast<uint64_t>(not *in);
         return;
     }
 
     throw abort_execution{
-        ip, "unsupported operand type for not operation"};
+        stack, "unsupported operand type for not operation"};
 }
 
-auto execute(COPY const op, Stack& stack, ip_type const ip) -> void
+auto execute(COPY const op, Stack& stack, ip_type const) -> void
 {
-    auto const in = fetch_proxy(stack, op.instruction.in, ip);
-    save_proxy(stack, op.instruction.out, ip) = in;
+    auto const in = fetch_proxy(stack, op.instruction.in);
+    save_proxy(stack, op.instruction.out) = in;
 }
-auto execute(MOVE const op, Stack& stack, ip_type const ip) -> void
+auto execute(MOVE const op, Stack& stack, ip_type const) -> void
 {
-    auto in = save_proxy(stack, op.instruction.in, ip);
+    auto in = save_proxy(stack, op.instruction.in);
     if (in.target->is_void()) {
-        throw abort_execution{ip, "cannot move out of void"};
+        throw abort_execution{stack, "cannot move out of void"};
     }
 
-    save_proxy(stack, op.instruction.out, ip) = std::move(*in.target);
+    save_proxy(stack, op.instruction.out) = std::move(*in.target);
     // FIXME save_proxy(stack, op.instruction.in, ip) = register_type::void_type{};
 }
-auto execute(SWAP const op, Stack& stack, ip_type const ip) -> void
+auto execute(SWAP const op, Stack& stack, ip_type const) -> void
 {
-    auto lhs = save_proxy(stack, op.instruction.in, ip);
-    auto rhs = save_proxy(stack, op.instruction.out, ip);
+    auto lhs = save_proxy(stack, op.instruction.in);
+    auto rhs = save_proxy(stack, op.instruction.out);
     std::swap(*lhs.target, *rhs.target);
 }
 
-auto execute(ATOM const op, Stack& stack, ip_type const ip) -> void
+auto execute(ATOM const op, Stack& stack, ip_type const) -> void
 {
-    auto target = save_proxy(stack, op.instruction.out, ip);
+    auto target = save_proxy(stack, op.instruction.out);
 
     auto const& strtab     = *stack.proc->strtab;
     auto const data_offset = target.get<uint64_t>();
     if (not data_offset.has_value()) {
-        throw abort_execution{ip, "invalid operand for atom constructor"};
+        throw abort_execution{stack, "invalid operand for atom constructor"};
     }
     auto const data_size   = [&strtab, data_offset]() -> uint64_t {
         auto const size_offset = (*data_offset - sizeof(uint64_t));
@@ -990,7 +990,7 @@ auto execute(STRING const, Stack&, ip_type const) -> void
 #endif
 }
 
-auto execute(FRAME const op, Stack& stack, ip_type const ip) -> void
+auto execute(FRAME const op, Stack& stack, ip_type const) -> void
 {
     auto const index = op.instruction.out.index;
     auto const rs    = op.instruction.out.set;
@@ -998,11 +998,11 @@ auto execute(FRAME const op, Stack& stack, ip_type const ip) -> void
     auto capacity = viua::arch::register_index_type{};
     switch (rs) {
     case viua::arch::RS::LOCAL:
-        if (auto v = fetch_proxy(stack, op.instruction.out, ip).get<uint64_t>(); v) {
+        if (auto v = fetch_proxy(stack, op.instruction.out).get<uint64_t>(); v) {
             capacity = *v;
         } else {
             throw abort_execution{
-                ip, "dynamic args count must be an unsigned integer"};
+                stack, "dynamic args count must be an unsigned integer"};
         }
         break;
     case viua::arch::RS::ARGUMENT:
@@ -1010,26 +1010,26 @@ auto execute(FRAME const op, Stack& stack, ip_type const ip) -> void
         break;
     default:
         throw abort_execution{
-            ip, "args count must come from local or argument register set"};
+            stack, "args count must come from local or argument register set"};
     }
 
     stack.args = std::vector<register_type>(capacity);
 }
 
-auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
+auto execute(CALL const op, Stack& stack, ip_type const) -> ip_type
 {
     auto fn_name = std::string{};
     auto fn_addr = size_t{};
     {
-        if (auto fn = fetch_proxy(stack, op.instruction.in, ip).get<uint64_t>(); fn) {
+        if (auto fn = save_proxy(stack, op.instruction.in).get<uint64_t>(); fn) {
             std::tie(fn_name, fn_addr) =
                 stack.proc->module.function_at(*fn);
-            save_proxy(stack, op.instruction.in, ip).reset();
+            fn.reset();
         }
     }
 
     if (fn_addr % sizeof(viua::arch::instruction_type)) {
-        throw abort_execution{ip, "invalid IP after call"};
+        throw abort_execution{stack, "invalid IP after call"};
     }
 
     /*
@@ -1065,7 +1065,7 @@ auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
     return fr_entry;
 }
 
-auto execute(RETURN const op, Stack& stack, ip_type const ip) -> ip_type
+auto execute(RETURN const op, Stack& stack, ip_type const) -> ip_type
 {
     auto fr = std::move(stack.frames.back());
     stack.frames.pop_back();
@@ -1078,13 +1078,13 @@ auto execute(RETURN const op, Stack& stack, ip_type const ip) -> ip_type
         //
         // It would be best if the static analysis phase during assembly caught
         // such errors and refused to produce the ELF output.
-        auto const ret = fetch_proxy(fr, op.instruction.out, ip);
+        auto const ret = fetch_proxy(fr, op.instruction.out, stack);
         if (ret.holds<void>()) {
             throw abort_execution{
-                ip, "return value requested from function returning void"};
+                stack, "return value requested from function returning void"};
         }
 
-        save_proxy(stack, rt, ip) = ret;
+        save_proxy(stack, rt) = ret;
     }
 
     stack.proc->frame_pointer = stack.frames.back().saved.fp;
@@ -1094,26 +1094,26 @@ auto execute(RETURN const op, Stack& stack, ip_type const ip) -> ip_type
     return fr.return_address;
 }
 
-auto execute(LUI const op, Stack& stack, ip_type const ip) -> void
+auto execute(LUI const op, Stack& stack, ip_type const) -> void
 {
-    auto out = save_proxy(stack, op.instruction.out, ip);
+    auto out = save_proxy(stack, op.instruction.out);
     out = static_cast<int64_t>(op.instruction.immediate << 28);
 }
-auto execute(LUIU const op, Stack& stack, ip_type const ip) -> void
+auto execute(LUIU const op, Stack& stack, ip_type const) -> void
 {
-    auto out = save_proxy(stack, op.instruction.out, ip);
+    auto out = save_proxy(stack, op.instruction.out);
     out = static_cast<uint64_t>(op.instruction.immediate << 28);
 }
 
-auto execute(FLOAT const op, Stack& stack, ip_type const ip) -> void
+auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
 {
-    auto target = save_proxy(stack, op.instruction.out, ip);
+    auto target = save_proxy(stack, op.instruction.out);
 
     auto const& strtab = *stack.proc->strtab;
 
     auto const data_offset = target.get<uint64_t>();
     if (not data_offset.has_value()) {
-        throw abort_execution{ip, "invalid operand"};
+        throw abort_execution{stack, "invalid operand"};
     }
 
     auto const data_size   = [&strtab, data_offset]() -> uint64_t {
@@ -1132,15 +1132,15 @@ auto execute(FLOAT const op, Stack& stack, ip_type const ip) -> void
 
     target = v;
 }
-auto execute(DOUBLE const op, Stack& stack, ip_type const ip) -> void
+auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
 {
-    auto target = save_proxy(stack, op.instruction.out, ip);
+    auto target = save_proxy(stack, op.instruction.out);
 
     auto const& strtab = *stack.proc->strtab;
 
     auto const data_offset = target.get<uint64_t>();
     if (not data_offset.has_value()) {
-        throw abort_execution{ip, "invalid operand"};
+        throw abort_execution{stack, "invalid operand"};
     }
 
     auto const data_size   = [&strtab, data_offset]() -> uint64_t {
@@ -1162,11 +1162,10 @@ auto execute(DOUBLE const op, Stack& stack, ip_type const ip) -> void
 
 template<typename Op>
 auto execute_arithmetic_immediate_op(Op const op,
-                                     Stack& stack,
-                                     ip_type const ip) -> void
+                                     Stack& stack) -> void
 {
-    auto out = save_proxy(stack, op.instruction.out, ip);
-    auto in  = fetch_proxy(stack, op.instruction.in, ip);
+    auto out = save_proxy(stack, op.instruction.out);
+    auto in  = fetch_proxy(stack, op.instruction.in);
 
     constexpr auto const signed_immediate =
         std::is_signed_v<typename Op::value_type>;
@@ -1195,42 +1194,42 @@ auto execute_arithmetic_immediate_op(Op const op,
         out = register_type::pointer_type{static_cast<uint64_t>(r)};
     } else {
         throw abort_execution{
-            ip,
+            stack,
             "unsupported lhs operand type for immediate arithmetic operation: "
                 + std::string{in.type_name()}};
     }
 }
-auto execute(ADDI const op, Stack& stack, ip_type const ip) -> void
+auto execute(ADDI const op, Stack& stack, ip_type const) -> void
 {
-    execute_arithmetic_immediate_op(op, stack, ip);
+    execute_arithmetic_immediate_op(op, stack);
 }
-auto execute(ADDIU const op, Stack& stack, ip_type const ip) -> void
+auto execute(ADDIU const op, Stack& stack, ip_type const) -> void
 {
-    execute_arithmetic_immediate_op(op, stack, ip);
+    execute_arithmetic_immediate_op(op, stack);
 }
-auto execute(SUBI const op, Stack& stack, ip_type const ip) -> void
+auto execute(SUBI const op, Stack& stack, ip_type const) -> void
 {
-    execute_arithmetic_immediate_op(op, stack, ip);
+    execute_arithmetic_immediate_op(op, stack);
 }
-auto execute(SUBIU const op, Stack& stack, ip_type const ip) -> void
+auto execute(SUBIU const op, Stack& stack, ip_type const) -> void
 {
-    execute_arithmetic_immediate_op(op, stack, ip);
+    execute_arithmetic_immediate_op(op, stack);
 }
-auto execute(MULI const op, Stack& stack, ip_type const ip) -> void
+auto execute(MULI const op, Stack& stack, ip_type const) -> void
 {
-    execute_arithmetic_immediate_op(op, stack, ip);
+    execute_arithmetic_immediate_op(op, stack);
 }
-auto execute(MULIU const op, Stack& stack, ip_type const ip) -> void
+auto execute(MULIU const op, Stack& stack, ip_type const) -> void
 {
-    execute_arithmetic_immediate_op(op, stack, ip);
+    execute_arithmetic_immediate_op(op, stack);
 }
-auto execute(DIVI const op, Stack& stack, ip_type const ip) -> void
+auto execute(DIVI const op, Stack& stack, ip_type const) -> void
 {
-    execute_arithmetic_immediate_op(op, stack, ip);
+    execute_arithmetic_immediate_op(op, stack);
 }
-auto execute(DIVIU const op, Stack& stack, ip_type const ip) -> void
+auto execute(DIVIU const op, Stack& stack, ip_type const) -> void
 {
-    execute_arithmetic_immediate_op(op, stack, ip);
+    execute_arithmetic_immediate_op(op, stack);
 }
 
 auto execute(REF const, Stack&, ip_type const) -> void
@@ -1240,7 +1239,7 @@ auto execute(REF const, Stack&, ip_type const) -> void
     auto src = get_slot(op.instruction.in, stack, ip);
 
     if (not src.has_value()) {
-        throw abort_execution{ip, "cannot take pointer to void"};
+        throw abort_execution{stack, "cannot take pointer to void"};
     }
 
     using viua::vm::types::Float_double;
@@ -1267,8 +1266,8 @@ auto execute(REF const, Stack&, ip_type const) -> void
 
 auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
 {
-    auto const condition = fetch_proxy(stack, op.instruction.out, ip);
-    auto tt              = save_proxy(stack, op.instruction.in, ip);
+    auto const condition = fetch_proxy(stack, op.instruction.out);
+    auto tt              = save_proxy(stack, op.instruction.in);
 
     auto take_branch = (condition.holds<void>() or *condition.cast_to<bool>());
     auto const target =
@@ -1289,7 +1288,7 @@ auto execute(IO_SUBMIT const, Stack&, ip_type const) -> void
                    .boxed_of<viua::vm::types::Struct>();
 
     if (not port.holds<int64_t>()) {
-        throw abort_execution{ip, "invalid I/O port"};
+        throw abort_execution{stack, "invalid I/O port"};
     }
 
     auto& request = req.value().get();
@@ -1367,34 +1366,33 @@ auto execute(IO_CTL const, Stack&, ip_type const) -> void
 auto execute(IO_PEEK const, Stack&, ip_type const) -> void
 {}
 
-auto execute(ACTOR const op, Stack& stack, ip_type const ip) -> void
+auto execute(ACTOR const op, Stack& stack, ip_type const) -> void
 {
     auto fn_name = std::string{};
     auto fn_addr = size_t{};
     {
-        if (auto fn = fetch_proxy(stack, op.instruction.in, ip).get<uint64_t>(); fn) {
+        if (auto fn = fetch_proxy(stack, op.instruction.in).get<uint64_t>(); fn) {
             std::tie(fn_name, fn_addr) =
                 stack.proc->module.function_at(*fn);
-            save_proxy(stack, op.instruction.in, ip).reset();
+            save_proxy(stack, op.instruction.in).reset();
         } else {
-            throw abort_execution{ip, "invalid in operand to actor instruction"};
+            throw abort_execution{stack, "invalid in operand to actor instruction"};
         }
     }
 
     if (fn_addr % sizeof(viua::arch::instruction_type)) {
-        throw abort_execution{ip, "invalid IP after call"};
+        throw abort_execution{stack, "invalid IP after call"};
     }
 
     auto const fr_entry = (fn_addr / sizeof(viua::arch::instruction_type));
 
     auto const pid     = stack.proc->core->spawn("", fr_entry);
-    auto dst           = save_proxy(stack, op.instruction.out, ip);
+    auto dst           = save_proxy(stack, op.instruction.out);
     dst = pid.get();
 }
-auto execute(SELF const op, Stack& stack, ip_type const ip) -> void
+auto execute(SELF const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out, ip);
-    out = stack.proc->pid.get();
+    save_proxy(stack, op.instruction.out) = stack.proc->pid.get();
 }
 
 auto dump_registers(std::vector<register_type> const& registers,
@@ -1579,16 +1577,16 @@ auto execute(ECALL const, Stack&, ip_type const) -> void
 {
 }
 
-auto execute(SM const op, Stack& stack, ip_type const ip) -> void
+auto execute(SM const op, Stack& stack, ip_type const) -> void
 {
-    auto const base       = fetch_proxy(stack, op.instruction.in, ip).get<register_type::pointer_type>();
+    auto const base       = fetch_proxy(stack, op.instruction.in).get<register_type::pointer_type>();
 
     auto const unit       = op.instruction.spec;
     auto const copy_size  = (1u << unit);
     auto const offset     = (op.instruction.immediate * copy_size);
 
     if (not base.has_value()) {
-        throw abort_execution{ip, "invalid base operand for memory instruction"};
+        throw abort_execution{stack, "invalid base operand for memory instruction"};
     }
 
     auto const pointer_info = stack.proc->get_pointer(base->ptr);
@@ -1596,7 +1594,7 @@ auto execute(SM const op, Stack& stack, ip_type const ip) -> void
         auto o = std::ostringstream{};
         o << "unknown pointer: ";
         o << std::hex << std::setfill('0') << std::setw(16) << base->ptr;
-        throw abort_execution{ip, o.str()};
+        throw abort_execution{stack, o.str()};
     }
 
     if (offset >= pointer_info->size) {
@@ -1604,14 +1602,14 @@ auto execute(SM const op, Stack& stack, ip_type const ip) -> void
         o << "illegal offset of " << offset
             << " bytes into a region of "
             << pointer_info->size << " byte(s)";
-        throw abort_execution{ip, o.str()};
+        throw abort_execution{stack, o.str()};
     }
     if ((offset + copy_size) > pointer_info->size) {
         auto o = std::ostringstream{};
         o << "illegal store of " << copy_size
             << " bytes into a region of "
             << (pointer_info->size - offset) << " byte(s)";
-        throw abort_execution{ip, o.str()};
+        throw abort_execution{stack, o.str()};
     }
 
     auto const user_addr = base->ptr + offset;
@@ -1620,12 +1618,12 @@ auto execute(SM const op, Stack& stack, ip_type const ip) -> void
         auto o = std::ostringstream{};
         o << "invalid store address: ";
         o << std::hex << std::setfill('0') << std::setw(16) << user_addr;
-        throw abort_execution{ip, o.str()};
+        throw abort_execution{stack, o.str()};
     }
 
-    auto const in = fetch_proxy(stack, op.instruction.out, ip).get<uint64_t>();
+    auto const in = fetch_proxy(stack, op.instruction.out).get<uint64_t>();
     if (not in.has_value()) {
-        throw abort_execution{ip, "invalid in operand for memory instruction"};
+        throw abort_execution{stack, "invalid in operand for memory instruction"};
     }
     switch (unit) {
         case 0: {
@@ -1650,19 +1648,19 @@ auto execute(SM const op, Stack& stack, ip_type const ip) -> void
         }
         case 4:
         default:
-            throw abort_execution{ip, "invalid unit in memory instruction: " + std::to_string(unit)};
+            throw abort_execution{stack, "invalid unit in memory instruction: " + std::to_string(unit)};
     }
 }
-auto execute(LM const op, Stack& stack, ip_type const ip) -> void
+auto execute(LM const op, Stack& stack, ip_type const) -> void
 {
-    auto const base       = fetch_proxy(stack, op.instruction.in, ip);
+    auto const base       = fetch_proxy(stack, op.instruction.in);
     auto const offset     = op.instruction.immediate;
 
     auto const unit       = op.instruction.spec;
     auto const copy_size  = (1 << unit);
 
     if (not (base.holds<void>() or base.holds<uint64_t>())) {
-        throw abort_execution{ip, "invalid base operand for memory instruction"};
+        throw abort_execution{stack, "invalid base operand for memory instruction"};
     }
 
     auto const user_addr = offset + base.get<uint64_t>().value_or(0);
@@ -1671,10 +1669,10 @@ auto execute(LM const op, Stack& stack, ip_type const ip) -> void
         auto o = std::ostringstream{};
         o << "invalid store address: ";
         o << std::hex << std::setfill('0') << std::setw(16) << user_addr;
-        throw abort_execution{ip, o.str()};
+        throw abort_execution{stack, o.str()};
     }
 
-    auto out = save_proxy(stack, op.instruction.out, ip);
+    auto out = save_proxy(stack, op.instruction.out);
     switch (unit) {
         case 0: {
             auto val = uint8_t{};
@@ -1702,7 +1700,7 @@ auto execute(LM const op, Stack& stack, ip_type const ip) -> void
         }
         case 4:
         default:
-            throw abort_execution{ip, "invalid unit in memory instruction: " + std::to_string(unit)};
+            throw abort_execution{stack, "invalid unit in memory instruction: " + std::to_string(unit)};
     }
 }
 auto execute(AD const, Stack&, ip_type const) -> void
