@@ -572,7 +572,9 @@ auto main(int argc, char* argv[]) -> int
         /*
          * Tool-specific options.
          */
-        else if (each == "--no-demangle-li") {
+        else if (each == "--no-demangle=all") {
+            demangle_li = false;
+        } else if (each == "--no-demangle=li") {
             demangle_li = false;
         } else if (each == "-i") {
             singles.push_back(std::stoull(args.at(++i), nullptr, 0));
