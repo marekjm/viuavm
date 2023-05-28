@@ -652,6 +652,7 @@ def main(args):
     os.environ['VIUA_VM_PID_SEED'] = os.environ.get('VIUA_VM_PID_SEED', 'fe80::42')
 
     success_cases = 0
+    skip_cases = 0
     pad_case_no = len(str(len(cases) + 1))
     pad_case_name = max(map(lambda _: len(_[0]), cases))
 
@@ -695,15 +696,14 @@ def main(args):
                 if result:
                     tag = ' ok '
                     tag_color = 'green'
+                    success_cases += 1
                 else:
                     tag = 'fail'
                     tag_color = 'red'
             elif status == Status.Skip:
                 tag = 'skip'
                 tag_color = 'yellow'
-
-        if result:
-            success_cases += 1
+                skip_cases += 1
 
         print('  case {}. of {}: [{}] {}  {}'.format(
             colorise('white', str(case_no).rjust(pad_case_no)),
@@ -723,11 +723,19 @@ def main(args):
             sys.stderr.write(error_report)
             sys.stderr.write('\n')
 
+    run_color : str = None
+    if success_cases == len(cases):
+        run_color = "green"
+    elif (success_cases + skip_cases) == len(cases):
+        run_color = "yellow"
+    else:
+        run_color = "red"
+
     print('run {} test case{} with {}% success rate'.format(
         colorise('white', (len(cases) or 'no')),
         ('s' if (len(cases) != 1) else ''),
         colorise(
-            ('green' if (success_cases == len(cases)) else 'red'),
+            run_color,
             '{:5.2f}'.format((success_cases / len(cases)) * 100),
         ),
     ))
