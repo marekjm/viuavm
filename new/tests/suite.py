@@ -430,11 +430,13 @@ def run_and_capture(interpreter, executable, args = ()):
     proc = subprocess.Popen(
         args = (interpreter,) + (executable,) + args,
         stdout = subprocess.DEVNULL,
-        stderr = subprocess.DEVNULL,
+        stderr = subprocess.PIPE,
         pass_fds = (write_fd,),
         env = env,
+        text = True,
     )
     os.close(write_fd)
+    (stdout, stderr) = proc.communicate()
     result = proc.wait()
 
     buffer = b''
@@ -450,6 +452,7 @@ def run_and_capture(interpreter, executable, args = ()):
     lines = list(map(str.strip, buffer.splitlines()))
 
     ebreaks = []
+    abort = None
     i = 0
     while i < len(lines):
         if EBREAK_BEGIN.match(lines[i]):
@@ -464,6 +467,19 @@ def run_and_capture(interpreter, executable, args = ()):
             ebreaks.append(consume_live_ebreak_lines(ebreak_lines))
 
         i += 1
+
+    for line in stderr.splitlines():
+        ABORTED = "Aborted: "
+        ABORTED_IP = "Aborted IP: "
+        ABORTED_IN = "Aborted instruction: "
+
+        if line.startswith(ABORTED):
+            abort = {}
+            abort["message"] = line[len(ABORTED):].strip()
+        if line.startswith(ABORTED_IP):
+            abort["ip"] = line[len(ABORTED_IP):].strip()
+        if line.startswith(ABORTED_IN):
+            abort["instruction"] = line[len(ABORTED_IN):].strip()
 
     perf = {
         'ops': 0,
@@ -492,7 +508,7 @@ def run_and_capture(interpreter, executable, args = ()):
 
         ebreaks = es
 
-    return (result, (ebreaks if ebreaks else None), perf,)
+    return (result, (ebreaks if ebreaks else None), abort, perf,)
 
 
 CHECK_KINDS = (
@@ -500,6 +516,7 @@ CHECK_KINDS = (
     'stderr', # check standard error
     'ebreak', # check ebreak output
     'py',     # use Python script to check test result
+    'abort',  # check if aborted at the expected point
 )
 
 def detect_check_kind(test_path):
@@ -540,7 +557,7 @@ def test_case(case_name, test_program, errors):
         return (Status.Normal, False, 'failed to assemble', count_runtime(), None,)
 
     try:
-        result, ebreak, perf = run_and_capture(
+        result, ebreak, abort_report, perf = run_and_capture(
             INTERPRETER,
             test_executable,
         )
@@ -548,9 +565,11 @@ def test_case(case_name, test_program, errors):
         result = e
 
     if type(result) is Exception:
-        return (Status.Normal, False, 'crashed', count_runtime(), None,)
+        return (Status.Normal, False, 'crashed with Python exception', count_runtime(), None,)
+    elif result == -6 and check_kind == "abort":
+        pass
     elif result != 0:
-        return (Status.Normal, False, 'crashed', count_runtime(), None,)
+        return (Status.Normal, False, f'crashed with non-zero return: {result}', count_runtime(), None,)
 
     if check_kind == 'ebreak':
         ebreak_dump = (os.path.splitext(test_program)[0] + '.ebreak')
@@ -563,13 +582,63 @@ def test_case(case_name, test_program, errors):
         if ebreak is None:
             return (Status.Normal, False, 'program did not emit ebreak', count_runtime(), None,)
 
-
         try:
             walk_ebreak_test(errors, ebreak_dump, ebreak)
         except (Missing_value, Unexpected_type, Unexpected_value,) as e:
             return (Status.Normal, False, e.to_string(), count_runtime(), None,)
         except Bad_ebreak_script as e:
             return (Status.Normal, False, f'bad ebreak script, error on line {e.args[0]}', count_runtime(), None,)
+    elif check_kind == 'abort':
+        abort_test = (os.path.splitext(test_program)[0] + ".abort")
+        with open(abort_test, 'r') as ifstream:
+            abort_test = ifstream.read().splitlines()
+
+        if not abort_test:
+            return (Status.Normal, False, 'empty abort file', count_runtime(), None,)
+
+        if abort_report is None:
+            return (Status.Normal, False, 'program did not abort', count_runtime(), None,)
+
+        if (want_value := abort_test[0]) != (live_value := abort_report["ip"]):
+            leader = f'    aborted IP'
+            errors.write('{} is {}\n'.format(
+                leader,
+                live_value,
+                colorise('red', live_value),
+            ))
+            errors.write('{} expected {}\n'.format(
+                (len(leader) * ' '),
+                want_value,
+                colorise('green', want_value),
+            ))
+            raise Unexpected_value()
+        if (want_value := abort_test[1]) != (live_value := abort_report["instruction"]):
+            leader = f'    aborted instruction'
+            errors.write('{} is {}\n'.format(
+                leader,
+                live_value,
+                colorise('red', live_value),
+            ))
+            errors.write('{} expected {}\n'.format(
+                (len(leader) * ' '),
+                want_value,
+                colorise('green', want_value),
+            ))
+            raise Unexpected_value()
+        if (want_value := abort_test[2]) != (live_value := abort_report["message"]):
+            leader = f'    abort message'
+            errors.write('{} is {}\n'.format(
+                leader,
+                live_value,
+                colorise('red', live_value),
+            ))
+            errors.write('{} expected {}\n'.format(
+                (len(leader) * ' '),
+                want_value,
+                colorise('green', want_value),
+            ))
+            raise Unexpected_value()
+
 
     if SKIP_DISASSEMBLER_TESTS:
         return (Status.Normal, True, None, count_runtime(), perf,)
@@ -593,12 +662,14 @@ def test_case(case_name, test_program, errors):
     if asm_return != 0:
         return (Status.Normal, False, 'failed to reassemble', count_runtime(), None,)
 
-    result, ebreak, _ = run_and_capture(
+    result, ebreak, abort_report, _ = run_and_capture(
         INTERPRETER,
         test_executable,
     )
 
-    if result != 0:
+    if result == -6 and check_kind == "abort":
+        pass
+    elif result != 0:
         return (Status.Normal, False, 'crashed after reassembly', count_runtime(), None,)
 
     if check_kind == 'ebreak':
@@ -618,6 +689,59 @@ def test_case(case_name, test_program, errors):
             return (Status.Normal, False, e.to_string(), count_runtime(), None,)
         except Bad_ebreak_script as e:
             return (Status.Normal, False, f'bad ebreak script, error on line {e.args[0]}', count_runtime(), None,)
+    elif check_kind == 'abort':
+        abort_test = (os.path.splitext(test_program)[0] + ".abort")
+        with open(abort_test, 'r') as ifstream:
+            abort_test = ifstream.read().splitlines()
+
+        if not abort_test:
+            return (Status.Normal, False, 'empty abort file', count_runtime(), None,)
+
+        if abort_report is None:
+            return (Status.Normal, False, 'program did not abort', count_runtime(), None,)
+
+        if (want_value := abort_test[0]) != (live_value := abort_report["ip"]):
+            leader = f'    aborted IP'
+            errors.write('{} is {}\n'.format(
+                leader,
+                live_value,
+                colorise('red', live_value),
+            ))
+            errors.write('{} expected {}\n'.format(
+                (len(leader) * ' '),
+                want_value,
+                colorise('green', want_value),
+            ))
+            raise Unexpected_value()
+        if (want_value := abort_test[1]) != (live_value := abort_report["instruction"]):
+            leader = f'    aborted instruction'
+            errors.write('{} is {}\n'.format(
+                leader,
+                live_value,
+                colorise('red', live_value),
+            ))
+            errors.write('{} expected {}\n'.format(
+                (len(leader) * ' '),
+                want_value,
+                colorise('green', want_value),
+            ))
+            raise Unexpected_value()
+        if (want_value := abort_test[2]) != (live_value := abort_report["message"]):
+            leader = f'    abort message'
+            errors.write('{} is {}\n'.format(
+                leader,
+                live_value,
+                colorise('red', live_value),
+            ))
+            errors.write('{} expected {}\n'.format(
+                (len(leader) * ' '),
+                want_value,
+                colorise('green', want_value),
+            ))
+            raise Unexpected_value()
+
+    if check_kind == "abort":
+        perf = None
 
     return (Status.Normal, True, None, count_runtime(), perf)
 
@@ -715,7 +839,7 @@ def main(args):
                 colorise(CASE_RUNTIME_COLOUR, '{:3}'.format(perf['ops'])),
                 colorise(CASE_RUNTIME_COLOUR, perf['run_time'].rjust(6)),
                 colorise(CASE_RUNTIME_COLOUR, perf['freq'].rjust(10)),
-            )) if result else ''),
+            )) if (result and perf) else ''),
         ))
 
         error_stream.seek(0)
