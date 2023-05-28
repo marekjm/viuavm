@@ -853,7 +853,7 @@ auto main(int argc, char* argv[]) -> int
 
         auto const physical_to_logical = cook::demangle_branches(cooked_text);
 
-        out << "    ; <binary>           <logical>:<physical>\n";
+        out << "    ; <binary>          <ip>               <logical>:<physical-span>\n";
         for (auto i = size_t{}; i < cooked_text.size(); ++i) {
             auto const& [index, op, ip, s] = cooked_text.at(i);
             out << "    ; ";
@@ -862,6 +862,10 @@ auto main(int argc, char* argv[]) -> int
             } else {
                 out << std::string(16, ' ');
             }
+
+            out << "  ";
+            out << std::setw(16) << std::setfill('0') << std::hex << (addr + (sizeof(viua::arch::instruction_type) * index.physical));
+
             out << "  " << std::dec << std::setw(2) << std::setfill(' ') << i
                 << ":" << index.physical;
             if (index.physical_span.has_value()) {
