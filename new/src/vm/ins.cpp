@@ -272,7 +272,7 @@ auto execute(viua::vm::Stack& stack,
     return (ip + 1);
 }
 
-auto save_proxy(Stack& stack, access_type const a) -> Save_proxy
+auto mutable_proxy(Stack& stack, access_type const a) -> Mutable_proxy
 {
     if (not a.direct) {
         throw abort_execution{stack, "dereferences are not implemented"};
@@ -293,7 +293,7 @@ auto save_proxy(Stack& stack, access_type const a) -> Save_proxy
             stack, "illegal write access to register " + a.to_string()};
     }
 }
-auto fetch_proxy(Stack& stack, access_type const a) -> Fetch_proxy
+auto immutable_proxy(Stack& stack, access_type const a) -> Immutable_proxy
 {
     if (not a.direct) {
         throw abort_execution{stack, "dereferences are not implemented"};
@@ -315,8 +315,8 @@ auto fetch_proxy(Stack& stack, access_type const a) -> Fetch_proxy
             stack, "illegal read access to register " + a.to_string()};
     }
 }
-auto fetch_proxy(Frame& frame, access_type const a, Stack const& stack)
-    -> Fetch_proxy
+auto immutable_proxy(Frame& frame, access_type const a, Stack const& stack)
+    -> Immutable_proxy
 {
     if (not a.direct) {
         throw abort_execution{stack, "dereferences are not implemented"};
@@ -397,9 +397,9 @@ auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
 
 auto execute(ADD const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
@@ -456,9 +456,9 @@ auto execute(ADD const op, Stack& stack, ip_type const) -> void
 }
 auto execute(SUB const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
@@ -489,9 +489,9 @@ auto execute(SUB const op, Stack& stack, ip_type const) -> void
 }
 auto execute(MUL const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
@@ -522,9 +522,9 @@ auto execute(MUL const op, Stack& stack, ip_type const) -> void
 }
 auto execute(DIV const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
@@ -555,9 +555,9 @@ auto execute(DIV const op, Stack& stack, ip_type const) -> void
 }
 auto execute(MOD const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
@@ -579,9 +579,9 @@ auto execute(MOD const op, Stack& stack, ip_type const) -> void
 
 auto execute(BITSHL const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
@@ -593,9 +593,9 @@ auto execute(BITSHL const op, Stack& stack, ip_type const) -> void
 }
 auto execute(BITSHR const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
@@ -607,9 +607,9 @@ auto execute(BITSHR const op, Stack& stack, ip_type const) -> void
 }
 auto execute(BITASHR const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
@@ -626,9 +626,9 @@ auto execute(BITROR const, Stack&, ip_type const) -> void
 {}
 auto execute(BITAND const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
@@ -640,9 +640,9 @@ auto execute(BITAND const op, Stack& stack, ip_type const) -> void
 }
 auto execute(BITOR const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
@@ -654,9 +654,9 @@ auto execute(BITOR const op, Stack& stack, ip_type const) -> void
 }
 auto execute(BITXOR const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
@@ -668,8 +668,8 @@ auto execute(BITXOR const op, Stack& stack, ip_type const) -> void
 }
 auto execute(BITNOT const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const in  = fetch_proxy(stack, op.instruction.in);
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const in  = immutable_proxy(stack, op.instruction.in);
     if (auto const v = in.get<uint64_t>(); v) {
         out = ~*v;
         return;
@@ -682,9 +682,9 @@ auto execute(EQ const op, Stack& stack, ip_type const) -> void
 {
     auto cmp_result = std::partial_ordering::unordered;
 
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     auto const lhs_i64  = lhs.holds<register_type::int_type>();
     auto const lhs_u64  = lhs.holds<register_type::uint_type>();
@@ -732,9 +732,9 @@ auto execute(LT const op, Stack& stack, ip_type const) -> void
 {
     auto cmp_result = std::partial_ordering::unordered;
 
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     if (lhs.holds<void>()) {
         throw abort_execution{stack, "invalid read from empty register"};
@@ -789,9 +789,9 @@ auto execute(GT const op, Stack& stack, ip_type const) -> void
 {
     auto cmp_result = std::partial_ordering::unordered;
 
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
@@ -839,9 +839,9 @@ auto execute(CMP const op, Stack& stack, ip_type const) -> void
 {
     auto cmp_result = std::partial_ordering::unordered;
 
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs);
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs);
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     auto const lhs_i64  = lhs.holds<register_type::int_type>();
     auto const lhs_u64  = lhs.holds<register_type::uint_type>();
@@ -891,9 +891,9 @@ auto execute(CMP const op, Stack& stack, ip_type const) -> void
 }
 auto execute(AND const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs).cast_to<bool>();
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs).cast_to<bool>();
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs).cast_to<bool>();
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs).cast_to<bool>();
 
     if (lhs.has_value() and rhs.has_value()) {
         out = static_cast<uint64_t>(*lhs and *rhs);
@@ -921,9 +921,9 @@ auto execute(AND const op, Stack& stack, ip_type const) -> void
 }
 auto execute(OR const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const lhs = fetch_proxy(stack, op.instruction.lhs).cast_to<bool>();
-    auto const rhs = fetch_proxy(stack, op.instruction.rhs).cast_to<bool>();
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs).cast_to<bool>();
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs).cast_to<bool>();
 
     if (lhs.has_value() and rhs.has_value()) {
         out = static_cast<uint64_t>(*lhs or *rhs);
@@ -934,8 +934,8 @@ auto execute(OR const op, Stack& stack, ip_type const) -> void
 }
 auto execute(NOT const op, Stack& stack, ip_type const) -> void
 {
-    auto const out = save_proxy(stack, op.instruction.out);
-    auto const in  = fetch_proxy(stack, op.instruction.in).cast_to<bool>();
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const in  = immutable_proxy(stack, op.instruction.in).cast_to<bool>();
     if (in.has_value()) {
         out = static_cast<uint64_t>(not *in);
         return;
@@ -946,29 +946,29 @@ auto execute(NOT const op, Stack& stack, ip_type const) -> void
 
 auto execute(COPY const op, Stack& stack, ip_type const) -> void
 {
-    auto const in = fetch_proxy(stack, op.instruction.in);
-    save_proxy(stack, op.instruction.out) = in;
+    auto const in = immutable_proxy(stack, op.instruction.in);
+    mutable_proxy(stack, op.instruction.out) = in;
 }
 auto execute(MOVE const op, Stack& stack, ip_type const) -> void
 {
-    auto in = save_proxy(stack, op.instruction.in);
+    auto in = mutable_proxy(stack, op.instruction.in);
     if (in.target->is_void()) {
         throw abort_execution{stack, "cannot move out of void"};
     }
 
-    save_proxy(stack, op.instruction.out) = std::move(*in.target);
+    mutable_proxy(stack, op.instruction.out) = std::move(*in.target);
     in.reset();
 }
 auto execute(SWAP const op, Stack& stack, ip_type const) -> void
 {
-    auto lhs = save_proxy(stack, op.instruction.in);
-    auto rhs = save_proxy(stack, op.instruction.out);
+    auto lhs = mutable_proxy(stack, op.instruction.in);
+    auto rhs = mutable_proxy(stack, op.instruction.out);
     std::swap(*lhs.target, *rhs.target);
 }
 
 auto execute(ATOM const op, Stack& stack, ip_type const) -> void
 {
-    auto target = save_proxy(stack, op.instruction.out);
+    auto target = mutable_proxy(stack, op.instruction.out);
 
     auto const& strtab     = *stack.proc->strtab;
     auto const data_offset = target.get<uint64_t>();
@@ -1019,7 +1019,7 @@ auto execute(FRAME const op, Stack& stack, ip_type const) -> void
     auto capacity = viua::arch::register_index_type{};
     switch (rs) {
     case viua::arch::RS::LOCAL:
-        if (auto v = fetch_proxy(stack, op.instruction.out).get<uint64_t>();
+        if (auto v = immutable_proxy(stack, op.instruction.out).get<uint64_t>();
             v) {
             capacity = *v;
         } else {
@@ -1043,7 +1043,7 @@ auto execute(CALL const op, Stack& stack, ip_type const) -> ip_type
     auto fn_name = std::string{};
     auto fn_addr = size_t{};
     {
-        if (auto fn = save_proxy(stack, op.instruction.in).get<uint64_t>();
+        if (auto fn = mutable_proxy(stack, op.instruction.in).get<uint64_t>();
             fn) {
             std::tie(fn_name, fn_addr) = stack.proc->module.function_at(*fn);
             fn.reset();
@@ -1100,13 +1100,13 @@ auto execute(RETURN const op, Stack& stack, ip_type const) -> ip_type
         //
         // It would be best if the static analysis phase during assembly caught
         // such errors and refused to produce the ELF output.
-        auto const ret = fetch_proxy(fr, op.instruction.out, stack);
+        auto const ret = immutable_proxy(fr, op.instruction.out, stack);
         if (ret.holds<void>()) {
             throw abort_execution{
                 stack, "return value requested from function returning void"};
         }
 
-        save_proxy(stack, rt) = ret;
+        mutable_proxy(stack, rt) = ret;
     }
 
     stack.proc->frame_pointer = stack.frames.back().saved.fp;
@@ -1118,18 +1118,18 @@ auto execute(RETURN const op, Stack& stack, ip_type const) -> ip_type
 
 auto execute(LUI const op, Stack& stack, ip_type const) -> void
 {
-    auto out = save_proxy(stack, op.instruction.out);
+    auto out = mutable_proxy(stack, op.instruction.out);
     out      = static_cast<int64_t>(op.instruction.immediate << 28);
 }
 auto execute(LUIU const op, Stack& stack, ip_type const) -> void
 {
-    auto out = save_proxy(stack, op.instruction.out);
+    auto out = mutable_proxy(stack, op.instruction.out);
     out      = static_cast<uint64_t>(op.instruction.immediate << 28);
 }
 
 auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
 {
-    auto target = save_proxy(stack, op.instruction.out);
+    auto target = mutable_proxy(stack, op.instruction.out);
 
     auto const& strtab = *stack.proc->strtab;
 
@@ -1156,7 +1156,7 @@ auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
 }
 auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
 {
-    auto target = save_proxy(stack, op.instruction.out);
+    auto target = mutable_proxy(stack, op.instruction.out);
 
     auto const& strtab = *stack.proc->strtab;
 
@@ -1186,8 +1186,8 @@ auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
 template<typename Op>
 auto execute_arithmetic_immediate_op(Op const op, Stack& stack) -> void
 {
-    auto out = save_proxy(stack, op.instruction.out);
-    auto in  = fetch_proxy(stack, op.instruction.in);
+    auto out = mutable_proxy(stack, op.instruction.out);
+    auto in  = immutable_proxy(stack, op.instruction.in);
 
     constexpr auto const signed_immediate =
         std::is_signed_v<typename Op::value_type>;
@@ -1289,8 +1289,8 @@ auto execute(REF const, Stack&, ip_type const) -> void
 
 auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
 {
-    auto const condition = fetch_proxy(stack, op.instruction.out);
-    auto tt              = save_proxy(stack, op.instruction.in);
+    auto const condition = immutable_proxy(stack, op.instruction.out);
+    auto tt              = mutable_proxy(stack, op.instruction.in);
 
     auto take_branch = (condition.holds<void>() or *condition.cast_to<bool>());
     auto const target =
@@ -1304,9 +1304,9 @@ auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
 auto execute(IO_SUBMIT const, Stack&, ip_type const) -> void
 {
 #if 0
-    auto dst = save_proxy(stack, op.instruction.out, ip);
-    auto port = fetch_proxy(stack, op.instruction.lhs, ip);
-    auto req = fetch_proxy(stack, op.instruction.rhs, ip);
+    auto dst = mutable_proxy(stack, op.instruction.out, ip);
+    auto port = immutable_proxy(stack, op.instruction.lhs, ip);
+    auto req = immutable_proxy(stack, op.instruction.rhs, ip);
                    .boxed_of<viua::vm::types::Struct>();
 
     if (not port.holds<int64_t>()) {
@@ -1393,10 +1393,10 @@ auto execute(ACTOR const op, Stack& stack, ip_type const) -> void
     auto fn_name = std::string{};
     auto fn_addr = size_t{};
     {
-        if (auto fn = fetch_proxy(stack, op.instruction.in).get<uint64_t>();
+        if (auto fn = immutable_proxy(stack, op.instruction.in).get<uint64_t>();
             fn) {
             std::tie(fn_name, fn_addr) = stack.proc->module.function_at(*fn);
-            save_proxy(stack, op.instruction.in).reset();
+            mutable_proxy(stack, op.instruction.in).reset();
         } else {
             throw abort_execution{stack,
                                   "invalid in operand to actor instruction"};
@@ -1410,12 +1410,12 @@ auto execute(ACTOR const op, Stack& stack, ip_type const) -> void
     auto const fr_entry = (fn_addr / sizeof(viua::arch::instruction_type));
 
     auto const pid = stack.proc->core->spawn("", fr_entry);
-    auto dst       = save_proxy(stack, op.instruction.out);
+    auto dst       = mutable_proxy(stack, op.instruction.out);
     dst            = pid.get();
 }
 auto execute(SELF const op, Stack& stack, ip_type const) -> void
 {
-    save_proxy(stack, op.instruction.out) = stack.proc->pid.get();
+    mutable_proxy(stack, op.instruction.out) = stack.proc->pid.get();
 }
 
 auto dump_registers(std::vector<register_type> const& registers,
@@ -1605,7 +1605,7 @@ auto execute(ECALL const, Stack&, ip_type const) -> void
 
 auto execute(SM const op, Stack& stack, ip_type const) -> void
 {
-    auto const base = fetch_proxy(stack, op.instruction.in)
+    auto const base = immutable_proxy(stack, op.instruction.in)
                           .get<register_type::pointer_type>();
 
     auto const unit      = op.instruction.spec;
@@ -1647,7 +1647,7 @@ auto execute(SM const op, Stack& stack, ip_type const) -> void
         throw abort_execution{stack, o.str()};
     }
 
-    auto const in = fetch_proxy(stack, op.instruction.out);
+    auto const in = immutable_proxy(stack, op.instruction.out);
     if (in.holds<void>()) {
         throw abort_execution{stack,
                               "invalid in operand for memory instruction"};
@@ -1657,7 +1657,7 @@ auto execute(SM const op, Stack& stack, ip_type const) -> void
 }
 auto execute(LM const op, Stack& stack, ip_type const) -> void
 {
-    auto const base = fetch_proxy(stack, op.instruction.in)
+    auto const base = immutable_proxy(stack, op.instruction.in)
                           .get<register_type::pointer_type>();
 
     auto const unit      = op.instruction.spec;
@@ -1699,7 +1699,7 @@ auto execute(LM const op, Stack& stack, ip_type const) -> void
         throw abort_execution{stack, o.str()};
     }
 
-    auto out = save_proxy(stack, op.instruction.out);
+    auto out = mutable_proxy(stack, op.instruction.out);
     auto raw = register_type::undefined_type{};
     memcpy(raw.data(), addr, copy_size);
     out = raw;

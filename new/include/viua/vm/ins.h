@@ -129,10 +129,10 @@ auto dump_registers(std::vector<register_type> const&,
                     std::string_view const) -> void;
 auto dump_memory(std::vector<Page> const&) -> void;
 
-struct Fetch_proxy {
+struct Immutable_proxy {
     register_type const& target;
 
-    Fetch_proxy(register_type const& t) : target{t}
+    Immutable_proxy(register_type const& t) : target{t}
     {}
 
     template<typename T> auto holds() const -> bool
@@ -152,7 +152,7 @@ struct Fetch_proxy {
         return target.type_name();
     }
 };
-struct Save_proxy {
+struct Mutable_proxy {
     register_type* const target;
 
     template<typename T> auto holds() const -> bool
@@ -184,14 +184,14 @@ struct Save_proxy {
         return target->type_name();
     }
 
-    auto operator=(Fetch_proxy const& fp) const -> Save_proxy const&
+    auto operator=(Immutable_proxy const& fp) const -> Mutable_proxy const&
     {
         if (target) {
             *target = fp.target;
         }
         return *this;
     }
-    template<typename T> auto operator=(T&& value) const -> Save_proxy const&
+    template<typename T> auto operator=(T&& value) const -> Mutable_proxy const&
     {
         /*
          * If the target is not set it means that the save proxy refers to the
@@ -210,10 +210,11 @@ struct Save_proxy {
         }
     }
 };
-auto save_proxy(viua::vm::Stack&, access_type const) -> Save_proxy;
-auto fetch_proxy(viua::vm::Stack&, access_type const) -> Fetch_proxy;
-auto fetch_proxy(viua::vm::Frame&, access_type const, viua::vm::Stack const&)
-    -> Fetch_proxy;
+auto mutable_proxy(viua::vm::Stack&, access_type const) -> Mutable_proxy;
+auto immutable_proxy(viua::vm::Stack&, access_type const) -> Immutable_proxy;
+auto immutable_proxy(viua::vm::Frame&,
+                     access_type const,
+                     viua::vm::Stack const&) -> Immutable_proxy;
 }  // namespace viua::vm::ins
 
 #endif
