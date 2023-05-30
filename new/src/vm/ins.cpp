@@ -1411,6 +1411,15 @@ auto dump_registers(std::vector<register_type> const& registers,
 
         if (each.is_void()) {
             /* do nothing */
+        } else if (auto const v = each.get<register_type::undefined_type>(); v) {
+            TRACE_STREAM
+                << "raw"
+                << std::hex
+                << std::setfill('0');
+            for (auto const each : *v) {
+                TRACE_STREAM << " " << std::setw(2) << static_cast<unsigned>(each);
+            }
+            TRACE_STREAM << '\n';
         } else if (auto const v = each.get<int64_t>(); v) {
             TRACE_STREAM << "is " << std::hex << std::setw(16)
                          << std::setfill('0') << *v
@@ -1621,35 +1630,12 @@ auto execute(SM const op, Stack& stack, ip_type const) -> void
         throw abort_execution{stack, o.str()};
     }
 
-    auto const in = fetch_proxy(stack, op.instruction.out).get<uint64_t>();
-    if (not in.has_value()) {
+    auto const in = fetch_proxy(stack, op.instruction.out);
+    if (in.holds<void>()) {
         throw abort_execution{stack, "invalid in operand for memory instruction"};
     }
-    switch (unit) {
-        case 0: {
-            auto const val = static_cast<uint8_t>(*in);
-            memcpy(addr, &val, copy_size);
-            break;
-        }
-        case 1: {
-            auto const val = htole16(static_cast<uint16_t>(*in));
-            memcpy(addr, &val, copy_size);
-            break;
-        }
-        case 2: {
-            auto const val = htole32(static_cast<uint32_t>(*in));
-            memcpy(addr, &val, copy_size);
-            break;
-        }
-        case 3: {
-            auto const val = htole64(static_cast<uint64_t>(*in));
-            memcpy(addr, &val, copy_size);
-            break;
-        }
-        case 4:
-        default:
-            throw abort_execution{stack, "invalid unit in memory instruction: " + std::to_string(unit)};
-    }
+    auto const buf = in.target.as_memory();
+    memcpy(addr, buf.data(), copy_size);
 }
 auto execute(LM const op, Stack& stack, ip_type const) -> void
 {
@@ -1696,35 +1682,9 @@ auto execute(LM const op, Stack& stack, ip_type const) -> void
     }
 
     auto out = save_proxy(stack, op.instruction.out);
-    switch (unit) {
-        case 0: {
-            auto val = uint8_t{};
-            memcpy(&val, addr, copy_size);
-            out = static_cast<uint64_t>(val);
-            break;
-        }
-        case 1: {
-            auto val = uint16_t{};
-            memcpy(&val, addr, copy_size);
-            out = static_cast<uint64_t>(le16toh(val));
-            break;
-        }
-        case 2: {
-            auto val = uint32_t{};
-            memcpy(&val, addr, copy_size);
-            out = static_cast<uint64_t>(le32toh(val));
-            break;
-        }
-        case 3: {
-            auto val = uint64_t{};
-            memcpy(&val, addr, copy_size);
-            out = le64toh(val);
-            break;
-        }
-        case 4:
-        default:
-            throw abort_execution{stack, "invalid unit in memory instruction: " + std::to_string(unit)};
-    }
+    auto raw = register_type::undefined_type{};
+    memcpy(raw.data(), addr, copy_size);
+    out = raw;
 }
 auto execute(AD const, Stack&, ip_type const) -> void
 {

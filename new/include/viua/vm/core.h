@@ -86,6 +86,8 @@ struct Module {
     }
 };
 
+template<typename> inline constexpr bool always_false_v = false;
+
 struct Register {
     using void_type = std::monostate;
     using int_type = int64_t;
@@ -99,17 +101,68 @@ struct Register {
         uint64_t key;
     };
     using pid_type = in6_addr;
+    using undefined_type = std::array<uint8_t, sizeof(pid_type)>;
 
     using value_type = std::variant<
         void_type,
-        int64_t,
-        uint64_t,
-        float,
-        double,
+        int_type,
+        uint_type,
+        float_type,
+        double_type,
         pointer_type,
         atom_type,
-        pid_type>;
+        pid_type,
+        undefined_type>;
     value_type value;
+
+    auto as_memory() const -> undefined_type;
+    template<typename T> auto convert_undefined_to() -> void
+    {
+        auto const raw = std::get<undefined_type>(value);
+        if constexpr (std::is_same_v<T, int_type> or std::is_same_v<T, uint_type>) {
+            auto v = typename std::conditional<
+                std::is_same_v<T, int_type>,
+                int_type,
+                uint_type>::type{};
+            memcpy(&v, raw.data(), sizeof(T));
+            value = static_cast<T>(le64toh(v));
+        } else if constexpr (std::is_same_v<T, float_type>) {
+            auto v = float_type{};
+            memcpy(&v, raw.data(), sizeof(v));
+            value = v;
+        } else if constexpr (std::is_same_v<T, double_type>) {
+            auto v = double_type{};
+            memcpy(&v, raw.data(), sizeof(v));
+            value = v;
+        } else if constexpr (std::is_same_v<T, pointer_type>) {
+            auto tmp = uint64_t{};
+            memcpy(&tmp, raw.data(), sizeof(T));
+            tmp = le64toh(tmp);
+
+            auto v = pointer_type{};
+            memcpy(&v.ptr, &tmp, sizeof(v.ptr));
+
+            value = v;
+        } else if constexpr (std::is_same_v<T, atom_type>) {
+            auto tmp = uint64_t{};
+            memcpy(&tmp, raw.data(), sizeof(T));
+            tmp = le64toh(tmp);
+
+            auto v = atom_type{};
+            memcpy(&v.key, &tmp, sizeof(v.key));
+
+            value = v;
+        } else if constexpr (std::is_same_v<T, pid_type>) {
+            auto v = pid_type{};
+            memcpy(&v, raw.data(), sizeof(v));
+
+            value = v;
+        } else if constexpr (std::is_same_v<T, undefined_type>) {
+            /* do nothing */
+        } else {
+            static_assert(always_false_v<T>, "invalid type convert to from undefined");
+        }
+    }
 
     template<typename T> auto holds() const -> bool
     {

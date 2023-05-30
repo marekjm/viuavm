@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021-2022 Marek Marecki
+ *  Copyright (C) 2021-2023 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -69,5 +69,42 @@ auto Core::spawn(std::string mod_name, uint64_t const entry) -> pid_type
     flock.insert({pid, std::move(proc)});
 
     return pid;
+}
+
+auto Register::as_memory() const -> undefined_type
+{
+    if (std::holds_alternative<undefined_type>(value)) {
+        return std::get<undefined_type>(value);
+    }
+
+    auto raw = undefined_type{};
+    if (std::holds_alternative<void_type>(value)) {
+        /* do nothing */
+    } else if (std::holds_alternative<int_type>(value)) {
+        auto v = std::get<int_type>(value);
+        v = static_cast<int_type>(htole64(v));
+        memcpy(raw.data(), &v, sizeof(v));
+    } else if (std::holds_alternative<uint_type>(value)) {
+        auto v = std::get<uint_type>(value);
+        v = htole64(v);
+        memcpy(raw.data(), &v, sizeof(v));
+    } else if (std::holds_alternative<float_type>(value)) {
+        auto const v = std::get<float_type>(value);
+        memcpy(raw.data(), &v, sizeof(v));
+    } else if (std::holds_alternative<double_type>(value)) {
+        auto const v = std::get<double_type>(value);
+        memcpy(raw.data(), &v, sizeof(v));
+    } else if (std::holds_alternative<pointer_type>(value)) {
+        auto const v = std::get<pointer_type>(value);
+        memcpy(raw.data(), &v.ptr, sizeof(v));
+    } else if (std::holds_alternative<atom_type>(value)) {
+        auto const v = std::get<atom_type>(value);
+        memcpy(raw.data(), &v.key, sizeof(v));
+    } else if (std::holds_alternative<pid_type>(value)) {
+        auto const v = std::get<pid_type>(value);
+        memcpy(raw.data(), &v, sizeof(v));
+    }
+
+    return raw;
 }
 }  // namespace viua::vm
