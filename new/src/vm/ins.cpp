@@ -937,7 +937,7 @@ auto execute(MOVE const op, Stack& stack, ip_type const) -> void
     }
 
     save_proxy(stack, op.instruction.out) = std::move(*in.target);
-    // FIXME save_proxy(stack, op.instruction.in, ip) = register_type::void_type{};
+    in.reset();
 }
 auto execute(SWAP const op, Stack& stack, ip_type const) -> void
 {
