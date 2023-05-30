@@ -418,52 +418,52 @@ auto demangle_memory(Cooked_text& text) -> void
         using viua::arch::ops::GREEDY;
         if (m(i, SM) or m(i, LM) or m(i, AA) or m(i, AD)) {
             using viua::arch::ops::M;
-            auto const op         = M::decode(ins_at(i));
+            auto const op = M::decode(ins_at(i));
 
             auto name = std::string{};
             switch (static_cast<viua::arch::ops::OPCODE>(op.opcode)) {
-                case SM:
-                    name = "s";
-                    break;
-                case LM:
-                    name = "l";
-                    break;
-                case AA:
-                case AD:
-                    name = "am";
-                    break;
-                default:
-                    abort();
+            case SM:
+                name = "s";
+                break;
+            case LM:
+                name = "l";
+                break;
+            case AA:
+            case AD:
+                name = "am";
+                break;
+            default:
+                abort();
             }
             switch (op.spec) {
-                case 0:
-                    name += "b";
-                    break;
-                case 1:
-                    name += "h";
-                    break;
-                case 2:
-                    name += "w";
-                    break;
-                case 3:
-                    name += "d";
-                    break;
-                case 4:
-                    name += "q";
-                    break;
-                default:
-                    abort();
-                    break;
+            case 0:
+                name += "b";
+                break;
+            case 1:
+                name += "h";
+                break;
+            case 2:
+                name += "w";
+                break;
+            case 3:
+                name += "d";
+                break;
+            case 4:
+                name += "q";
+                break;
+            default:
+                abort();
+                break;
             }
             switch (static_cast<viua::arch::ops::OPCODE>(op.opcode)) {
-                case AA:
-                    name += "a";
-                    break;
-                case AD:
-                    name += "d";
-                    break;
-                default:
-                    break;
+            case AA:
+                name += "a";
+                break;
+            case AD:
+                name += "d";
+                break;
+            default:
+                break;
             }
 
             auto idx          = text.at(i).index;
@@ -472,9 +472,8 @@ auto demangle_memory(Cooked_text& text) -> void
                 idx,
                 std::nullopt,
                 std::nullopt,
-                (name + " "
-                 + op.out.to_string() + ", " + op.in.to_string() + ", "
-                 + std::to_string(op.immediate)));
+                (name + " " + op.out.to_string() + ", " + op.in.to_string()
+                 + ", " + std::to_string(op.immediate)));
             continue;
         }
 
@@ -619,12 +618,8 @@ auto main(int argc, char* argv[]) -> int
     if (singles.size()) {
         std::cout << std::hex << std::setfill('0');
         for (auto const each : singles) {
-            std::cout << "0x"
-                << std::setw(16)
-                << each
-                << "  "
-                << ins_to_string(each)
-                << "\n";
+            std::cout << "0x" << std::setw(16) << each << "  "
+                      << ins_to_string(each) << "\n";
         }
         return 0;
     }
@@ -643,8 +638,7 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
     {
-        struct stat statbuf {
-        };
+        struct stat statbuf {};
         if (stat(elf_path.c_str(), &statbuf) == -1) {
             auto const saved_errno = errno;
             auto const errname     = strerrorname_np(saved_errno);
@@ -855,7 +849,8 @@ auto main(int argc, char* argv[]) -> int
 
         auto const physical_to_logical = cook::demangle_branches(cooked_text);
 
-        out << "    ; <binary>          <ip>               <logical>:<physical-span>\n";
+        out << "    ; <binary>          <ip>               "
+               "<logical>:<physical-span>\n";
         for (auto i = size_t{}; i < cooked_text.size(); ++i) {
             auto const& [index, op, ip, s] = cooked_text.at(i);
             out << "    ; ";
@@ -866,7 +861,9 @@ auto main(int argc, char* argv[]) -> int
             }
 
             out << "  ";
-            out << std::setw(16) << std::setfill('0') << std::hex << (addr + (sizeof(viua::arch::instruction_type) * index.physical));
+            out << std::setw(16) << std::setfill('0') << std::hex
+                << (addr
+                    + (sizeof(viua::arch::instruction_type) * index.physical));
 
             out << "  " << std::dec << std::setw(2) << std::setfill(' ') << i
                 << ":" << index.physical;

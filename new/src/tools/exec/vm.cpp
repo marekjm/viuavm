@@ -275,8 +275,7 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
     {
-        struct stat statbuf {
-        };
+        struct stat statbuf {};
         if (stat(elf_path.c_str(), &statbuf) == -1) {
             auto const saved_errno = errno;
             auto const errname     = strerrorname_np(saved_errno);
@@ -391,22 +390,13 @@ auto main(int argc, char* argv[]) -> int
         run(core);
     } catch (viua::vm::abort_execution const& e) {
         std::cerr << "Aborted: " << e.what() << "\n";
-        std::cerr << "Aborted IP: "
-            << std::hex
-            << std::setfill('0')
-            << "0x"
-            << std::setw(16)
-            << ((e.stack.ip - e.stack.proc->module.ip_base) * sizeof(viua::arch::instruction_type))
-            << std::dec
-            << "\n";
-        std::cerr << "Aborted instruction: "
-            << std::hex
-            << std::setfill('0')
-            << "0x"
-            << std::setw(16)
-            << *e.stack.ip
-            << std::dec
-            << "\n";
+        std::cerr << "Aborted IP: " << std::hex << std::setfill('0') << "0x"
+                  << std::setw(16)
+                  << ((e.stack.ip - e.stack.proc->module.ip_base)
+                      * sizeof(viua::arch::instruction_type))
+                  << std::dec << "\n";
+        std::cerr << "Aborted instruction: " << std::hex << std::setfill('0')
+                  << "0x" << std::setw(16) << *e.stack.ip << std::dec << "\n";
         viua::vm::ins::print_backtrace(e.stack);
         if constexpr (true) {
             throw;

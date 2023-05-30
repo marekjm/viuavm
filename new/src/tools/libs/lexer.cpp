@@ -276,8 +276,8 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
                 auto const shift_by = (extracted_string.size() + 2);
 
                 lexemes.emplace_back(Lexeme{std::move(extracted_string),
-                                     TOKEN::LITERAL_STRING,
-                                     Location{line, character, offset}});
+                                            TOKEN::LITERAL_STRING,
+                                            Location{line, character, offset}});
 
                 character += shift_by;
                 offset += shift_by;

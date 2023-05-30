@@ -48,7 +48,7 @@ struct Global_state {
     std::optional<size_t> selected_frame;
 
     std::string last_input;
-    bool crash_on_internal { false };
+    bool crash_on_internal{false};
 };
 
 
@@ -264,8 +264,7 @@ auto load_module(std::string_view const name, std::filesystem::path elf_path)
         return;
     }
     {
-        struct stat statbuf {
-        };
+        struct stat statbuf {};
         if (stat(elf_path.c_str(), &statbuf) == -1) {
             auto const saved_errno = errno;
             auto const errname     = strerrorname_np(saved_errno);

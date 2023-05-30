@@ -107,9 +107,7 @@ struct Lexeme {
 
     Lexeme() = default;
     inline Lexeme(std::string tx, TOKEN tk, Location ln)
-        : text{std::move(tx)}
-        , token{tk}
-        , location{ln}
+            : text{std::move(tx)}, token{tk}, location{ln}
     {}
 
     auto operator==(TOKEN const) const -> bool;

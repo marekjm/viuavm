@@ -302,8 +302,8 @@ auto display_error(std::filesystem::path source_path,
     if (not e.aside().empty()) {
         std::cerr << std::string(ERROR_MARKER.size(), ' ')
                   << std::string(LINE_NO_WIDTH, ' ') << esc(2, COLOR_FG_CYAN)
-                  << SEPARATOR_ASIDE << std::string(e.aside_character(), ' ') << '|'
-                  << esc(2, ATTR_RESET) << "\n";
+                  << SEPARATOR_ASIDE << std::string(e.aside_character(), ' ')
+                  << '|' << esc(2, ATTR_RESET) << "\n";
         std::cerr << std::string(ERROR_MARKER.size(), ' ')
                   << std::string(LINE_NO_WIDTH, ' ') << esc(2, COLOR_FG_CYAN)
                   << SEPARATOR_ASIDE << std::string(e.aside_character(), ' ')
@@ -414,7 +414,8 @@ auto save_string(std::vector<uint8_t>& strings, std::string_view const data)
 
             i += sizeof(data_size);
 
-            auto const existing = std::string_view{reinterpret_cast<char const*>(strings.data() + i), data_size};
+            auto const existing = std::string_view{
+                reinterpret_cast<char const*>(strings.data() + i), data_size};
             if (existing == data) {
                 return i;
             }
@@ -658,7 +659,8 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
     } catch (std::invalid_argument const&) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{raw_value, Cause::Invalid_operand, "expected integer"}.add(each.opcode);
+        throw Error{raw_value, Cause::Invalid_operand, "expected integer"}.add(
+            each.opcode);
     }
 
     using viua::libs::assembler::to_loading_parts_unsigned;
@@ -1011,22 +1013,22 @@ auto expand_if(std::vector<ast::Instruction>& cooked,
     cooked.push_back(std::move(each));
 }
 auto expand_memory_access(std::vector<ast::Instruction>& cooked,
-                   ast::Instruction const& raw) -> void
+                          ast::Instruction const& raw) -> void
 {
     using namespace std::string_literals;
-    auto synth        = ast::Instruction{};
-    synth.opcode      = raw.opcode;
+    auto synth           = ast::Instruction{};
+    synth.opcode         = raw.opcode;
     synth.opcode.text[1] = 'm';
     if (synth.opcode.text[0] == 'a') {
         switch (synth.opcode.text.back()) {
-            case 'a':
-                synth.opcode.text = "ama";
-                break;
-            case 'd':
-                synth.opcode.text = "amd";
-                break;
-            default:
-                abort();
+        case 'a':
+            synth.opcode.text = "ama";
+            break;
+        case 'd':
+            synth.opcode.text = "amd";
+            break;
+        default:
+            abort();
         }
     }
     synth.physical_index = raw.physical_index;
@@ -1036,27 +1038,26 @@ auto expand_memory_access(std::vector<ast::Instruction>& cooked,
     synth.operands.push_back(raw.operands.at(1));
     synth.operands.push_back(raw.operands.at(2));
 
-    auto const unit = raw.opcode.text[0] == 'a'
-        ? raw.opcode.text[2]
-        : raw.opcode.text[1];
+    auto const unit = raw.opcode.text[0] == 'a' ? raw.opcode.text[2]
+                                                : raw.opcode.text[1];
     switch (unit) {
-        case 'b':
-            synth.operands.front().ingredients.front().text = "0";
-            break;
-        case 'h':
-            synth.operands.front().ingredients.front().text = "1";
-            break;
-        case 'w':
-            synth.operands.front().ingredients.front().text = "2";
-            break;
-        case 'd':
-            synth.operands.front().ingredients.front().text = "3";
-            break;
-        case 'q':
-            synth.operands.front().ingredients.front().text = "4";
-            break;
-        default:
-            abort();
+    case 'b':
+        synth.operands.front().ingredients.front().text = "0";
+        break;
+    case 'h':
+        synth.operands.front().ingredients.front().text = "1";
+        break;
+    case 'w':
+        synth.operands.front().ingredients.front().text = "2";
+        break;
+    case 'd':
+        synth.operands.front().ingredients.front().text = "3";
+        break;
+    case 'q':
+        synth.operands.front().ingredients.front().text = "4";
+        break;
+    default:
+        abort();
     }
     synth.operands.front().ingredients.resize(1);
 
@@ -1077,31 +1078,9 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
         "g.divi",
     };
     auto const memory_access = std::set<std::string>{
-        "sb",
-        "lb",
-        "mb",
-        "sh",
-        "lh",
-        "mh",
-        "sw",
-        "lw",
-        "mw",
-        "sd",
-        "ld",
-        "md",
-        "sq",
-        "lq",
-        "mq",
-        "amba",
-        "amha",
-        "amwa",
-        "amda",
-        "amqa",
-        "ambd",
-        "amhd",
-        "amwd",
-        "amdd",
-        "amqd",
+        "sb",   "lb",   "mb",   "sh",   "lh",   "mh",   "sw",   "lw",   "mw",
+        "sd",   "ld",   "md",   "sq",   "lq",   "mq",   "amba", "amha", "amwa",
+        "amda", "amqa", "ambd", "amhd", "amwd", "amdd", "amqd",
     };
 
     /*
@@ -1459,14 +1438,13 @@ auto emit_instruction(viua::libs::parser::ast::Instruction const insn)
     case FORMAT::M:
     {
         auto const unit = insn.operands.front().ingredients.front();
-        auto const off = insn.operands.back().ingredients.front();
+        auto const off  = insn.operands.back().ingredients.front();
 
-        return viua::arch::ops::M{
-            opcode,
-            insn.operands.at(1).make_access(),
-            insn.operands.at(2).make_access(),
-            static_cast<uint16_t>(std::stoull(off.text)),
-            static_cast<uint8_t>(std::stoull(unit.text))}
+        return viua::arch::ops::M{opcode,
+                                  insn.operands.at(1).make_access(),
+                                  insn.operands.at(2).make_access(),
+                                  static_cast<uint16_t>(std::stoull(off.text)),
+                                  static_cast<uint8_t>(std::stoull(unit.text))}
             .encode();
     }
     default:

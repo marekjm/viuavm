@@ -65,7 +65,7 @@ Error::Error(viua::libs::lexer::Lexeme lx, Cause const ce, std::string m)
 
 auto Error::aside(std::string s, std::optional<Lexeme> l) -> Error&
 {
-    aside_note = std::move(s);
+    aside_note   = std::move(s);
     aside_lexeme = l;
     if (l.has_value()) {
         add(*l);

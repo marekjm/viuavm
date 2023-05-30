@@ -82,11 +82,11 @@ auto Register::as_memory() const -> undefined_type
         /* do nothing */
     } else if (std::holds_alternative<int_type>(value)) {
         auto v = std::get<int_type>(value);
-        v = static_cast<int_type>(htole64(v));
+        v      = static_cast<int_type>(htole64(v));
         memcpy(raw.data(), &v, sizeof(v));
     } else if (std::holds_alternative<uint_type>(value)) {
         auto v = std::get<uint_type>(value);
-        v = htole64(v);
+        v      = htole64(v);
         memcpy(raw.data(), &v, sizeof(v));
     } else if (std::holds_alternative<float_type>(value)) {
         auto const v = std::get<float_type>(value);

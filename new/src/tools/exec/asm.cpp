@@ -1032,8 +1032,7 @@ auto main(int argc, char* argv[]) -> int
             return 1;
         }
 
-        struct stat source_stat {
-        };
+        struct stat source_stat {};
         if (fstat(source_fd, &source_stat) == -1) {
             using viua::support::tty::ATTR_RESET;
             using viua::support::tty::COLOR_FG_RED;

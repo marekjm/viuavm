@@ -111,8 +111,8 @@ Work_instruction(PTR);
 
 constexpr auto VIUA_TRACE_CYCLES = true;
 
-using ip_type = viua::arch::instruction_type const*;
-using access_type = viua::arch::Register_access;
+using ip_type       = viua::arch::instruction_type const*;
+using access_type   = viua::arch::Register_access;
 using register_type = viua::vm::Register;
 
 auto execute(viua::vm::Stack&, ip_type const) -> ip_type;
@@ -124,13 +124,16 @@ auto execute(viua::vm::Stack&, ip_type const) -> ip_type;
  */
 auto print_backtrace(viua::vm::Stack const&,
                      std::optional<size_t> const = std::nullopt) -> void;
-auto dump_registers(std::vector<register_type> const&, Process::atoms_map_type const&, std::string_view const) -> void;
+auto dump_registers(std::vector<register_type> const&,
+                    Process::atoms_map_type const&,
+                    std::string_view const) -> void;
 auto dump_memory(std::vector<Page> const&) -> void;
 
 struct Fetch_proxy {
     register_type const& target;
 
-    Fetch_proxy(register_type const& t): target{t} {}
+    Fetch_proxy(register_type const& t) : target{t}
+    {}
 
     template<typename T> auto holds() const -> bool
     {
@@ -209,7 +212,8 @@ struct Save_proxy {
 };
 auto save_proxy(viua::vm::Stack&, access_type const) -> Save_proxy;
 auto fetch_proxy(viua::vm::Stack&, access_type const) -> Fetch_proxy;
-auto fetch_proxy(viua::vm::Frame&, access_type const, viua::vm::Stack const&) -> Fetch_proxy;
+auto fetch_proxy(viua::vm::Frame&, access_type const, viua::vm::Stack const&)
+    -> Fetch_proxy;
 }  // namespace viua::vm::ins
 
 #endif

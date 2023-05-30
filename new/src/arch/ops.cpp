@@ -255,16 +255,17 @@ auto M::encode() const -> instruction_type
     auto input_register  = uint64_t{in.encode()};
 
     auto const high_nibble = static_cast<uint64_t>(spec & 0xf0);
-    auto const low_nibble = static_cast<uint64_t>(spec & 0x0f);
-    auto const low_short   = static_cast<uint64_t>((immediate & 0x0000ffff) >> 0);
+    auto const low_nibble  = static_cast<uint64_t>(spec & 0x0f);
+    auto const low_short = static_cast<uint64_t>((immediate & 0x0000ffff) >> 0);
 
     return base | (output_register << 16) | (input_register << 32)
            | (low_short << 48) | (high_nibble << 28) | (low_nibble << 44);
 }
 auto M::to_string() const -> std::string
 {
-    return (viua::arch::ops::to_string(opcode) + " " + std::to_string(spec) + ", " + out.to_string() + ", "
-            + in.to_string() + ", " + std::to_string(immediate));
+    return (viua::arch::ops::to_string(opcode) + " " + std::to_string(spec)
+            + ", " + out.to_string() + ", " + in.to_string() + ", "
+            + std::to_string(immediate));
 }
 }  // namespace viua::arch::ops
 

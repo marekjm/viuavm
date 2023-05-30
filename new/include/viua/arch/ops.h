@@ -230,40 +230,40 @@ enum class OPCODE : opcode_type {
     EBREAK = (FORMAT_N | 0x0002),
     ECALL  = (FORMAT_N | 0x0003),
 
-    ADD = (FORMAT_T | 0x0001),
-    SUB = (FORMAT_T | 0x0002),
-    MUL = (FORMAT_T | 0x0003),
-    DIV = (FORMAT_T | 0x0004),
-    MOD = (FORMAT_T | 0x0005),
-    BITSHL  = (FORMAT_T | 0x0006),
-    BITSHR  = (FORMAT_T | 0x0007),
-    BITASHR = (FORMAT_T | 0x0008),
-    BITROL  = (FORMAT_T | 0x0009),
-    BITROR  = (FORMAT_T | 0x000a),
-    BITAND  = (FORMAT_T | 0x000b),
-    BITOR   = (FORMAT_T | 0x000c),
-    BITXOR  = (FORMAT_T | 0x000d),
-    EQ  = (FORMAT_T | 0x000e),
-    LT  = (FORMAT_T | 0x000f),
-    GT  = (FORMAT_T | 0x0010),
-    CMP = (FORMAT_T | 0x0011),
-    AND = (FORMAT_T | 0x0012),
-    OR  = (FORMAT_T | 0x0013),
+    ADD         = (FORMAT_T | 0x0001),
+    SUB         = (FORMAT_T | 0x0002),
+    MUL         = (FORMAT_T | 0x0003),
+    DIV         = (FORMAT_T | 0x0004),
+    MOD         = (FORMAT_T | 0x0005),
+    BITSHL      = (FORMAT_T | 0x0006),
+    BITSHR      = (FORMAT_T | 0x0007),
+    BITASHR     = (FORMAT_T | 0x0008),
+    BITROL      = (FORMAT_T | 0x0009),
+    BITROR      = (FORMAT_T | 0x000a),
+    BITAND      = (FORMAT_T | 0x000b),
+    BITOR       = (FORMAT_T | 0x000c),
+    BITXOR      = (FORMAT_T | 0x000d),
+    EQ          = (FORMAT_T | 0x000e),
+    LT          = (FORMAT_T | 0x000f),
+    GT          = (FORMAT_T | 0x0010),
+    CMP         = (FORMAT_T | 0x0011),
+    AND         = (FORMAT_T | 0x0012),
+    OR          = (FORMAT_T | 0x0013),
     IO_SUBMIT   = (FORMAT_T | 0x0014),
     IO_WAIT     = (FORMAT_T | 0x0015),
     IO_SHUTDOWN = (FORMAT_T | 0x0016),
     IO_CTL      = (FORMAT_T | 0x0017),
 
-    CALL   = (FORMAT_D | 0x0001),
-    BITNOT = (FORMAT_D | 0x0002),
-    NOT    = (FORMAT_D | 0x0003),
-    COPY = (FORMAT_D | 0x0004),
-    MOVE = (FORMAT_D | 0x0005),
-    SWAP = (FORMAT_D | 0x0006),
-    REF = (FORMAT_D | 0x0007),
-    IF = (FORMAT_D | 0x0008),
+    CALL    = (FORMAT_D | 0x0001),
+    BITNOT  = (FORMAT_D | 0x0002),
+    NOT     = (FORMAT_D | 0x0003),
+    COPY    = (FORMAT_D | 0x0004),
+    MOVE    = (FORMAT_D | 0x0005),
+    SWAP    = (FORMAT_D | 0x0006),
+    REF     = (FORMAT_D | 0x0007),
+    IF      = (FORMAT_D | 0x0008),
     IO_PEEK = (FORMAT_D | 0x0009),
-    ACTOR = (FORMAT_D | 0x000a),
+    ACTOR   = (FORMAT_D | 0x000a),
 
     FRAME  = (FORMAT_S | 0x0001),
     RETURN = (FORMAT_S | 0x0002),
@@ -271,7 +271,7 @@ enum class OPCODE : opcode_type {
     STRING = (FORMAT_S | 0x0004),
     FLOAT  = (FORMAT_S | 0x0005),
     DOUBLE = (FORMAT_S | 0x0006),
-    SELF = (FORMAT_S | 0x0007),
+    SELF   = (FORMAT_S | 0x0007),
 
     LUI  = (FORMAT_E | 0x0001),
     LUIU = (FORMAT_E | 0x0001 | UNSIGNED),
@@ -285,11 +285,11 @@ enum class OPCODE : opcode_type {
     DIVI  = (FORMAT_R | 0x0004),
     DIVIU = (FORMAT_R | 0x0004 | UNSIGNED),
 
-    SM = (FORMAT_M | 0x0001),   /* Store Memory */
-    LM = (FORMAT_M | 0x0002),   /* Load Memory */
-    AA = (FORMAT_M | 0x0003),   /* Allocate Automatic */
-    AD = (FORMAT_M | 0x0004),   /* Allocate Dynamic */
-    PTR = (FORMAT_M | 0x0005),  /* PoinTeR */
+    SM  = (FORMAT_M | 0x0001), /* Store Memory */
+    LM  = (FORMAT_M | 0x0002), /* Load Memory */
+    AA  = (FORMAT_M | 0x0003), /* Allocate Automatic */
+    AD  = (FORMAT_M | 0x0004), /* Allocate Dynamic */
+    PTR = (FORMAT_M | 0x0005), /* PoinTeR */
 };
 auto to_string(opcode_type const) -> std::string;
 auto parse_opcode(std::string_view) -> opcode_type;

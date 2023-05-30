@@ -30,11 +30,9 @@
 
 
 namespace viua::arch::ins {
-struct Instruction {
-};
+struct Instruction {};
 
-struct NOOP : Instruction {
-};
+struct NOOP : Instruction {};
 struct EBREAK : Instruction {
     viua::arch::ops::N instruction;
 

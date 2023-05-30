@@ -72,7 +72,7 @@ struct Module {
     inline Module(Module&& m) : Module{std::move(m.elf_path), std::move(m.elf)}
     {}
     auto operator=(Module const&) -> Module& = delete;
-    auto operator=(Module&&) -> Module& = delete;
+    auto operator=(Module&&) -> Module&      = delete;
 
     inline auto function_at(size_t const off) const
         -> std::pair<std::string, size_t>
@@ -89,10 +89,10 @@ struct Module {
 template<typename> inline constexpr bool always_false_v = false;
 
 struct Register {
-    using void_type = std::monostate;
-    using int_type = int64_t;
-    using uint_type = uint64_t;
-    using float_type = float;
+    using void_type   = std::monostate;
+    using int_type    = int64_t;
+    using uint_type   = uint64_t;
+    using float_type  = float;
     using double_type = double;
     struct pointer_type {
         uint64_t ptr;
@@ -100,30 +100,29 @@ struct Register {
     struct atom_type {
         uint64_t key;
     };
-    using pid_type = in6_addr;
+    using pid_type       = in6_addr;
     using undefined_type = std::array<uint8_t, sizeof(pid_type)>;
 
-    using value_type = std::variant<
-        void_type,
-        int_type,
-        uint_type,
-        float_type,
-        double_type,
-        pointer_type,
-        atom_type,
-        pid_type,
-        undefined_type>;
+    using value_type = std::variant<void_type,
+                                    int_type,
+                                    uint_type,
+                                    float_type,
+                                    double_type,
+                                    pointer_type,
+                                    atom_type,
+                                    pid_type,
+                                    undefined_type>;
     value_type value;
 
     auto as_memory() const -> undefined_type;
     template<typename T> auto convert_undefined_to() -> void
     {
         auto const raw = std::get<undefined_type>(value);
-        if constexpr (std::is_same_v<T, int_type> or std::is_same_v<T, uint_type>) {
-            auto v = typename std::conditional<
-                std::is_same_v<T, int_type>,
-                int_type,
-                uint_type>::type{};
+        if constexpr (std::is_same_v<T, int_type>
+                      or std::is_same_v<T, uint_type>) {
+            auto v = typename std::conditional<std::is_same_v<T, int_type>,
+                                               int_type,
+                                               uint_type>::type{};
             memcpy(&v, raw.data(), sizeof(T));
             value = static_cast<T>(le64toh(v));
         } else if constexpr (std::is_same_v<T, float_type>) {
@@ -160,7 +159,8 @@ struct Register {
         } else if constexpr (std::is_same_v<T, undefined_type>) {
             /* do nothing */
         } else {
-            static_assert(always_false_v<T>, "invalid type convert to from undefined");
+            static_assert(always_false_v<T>,
+                          "invalid type convert to from undefined");
         }
     }
 
@@ -218,9 +218,10 @@ struct Register {
     }
 
     Register() = default;
-    explicit Register(value_type v): value{v} {}
+    explicit Register(value_type v) : value{v}
+    {}
     Register(Register const&) = delete;
-    Register(Register&&) = default;
+    Register(Register&&)      = default;
     auto operator=(Register const& v) -> Register&
     {
         value = v.value;
@@ -294,8 +295,8 @@ struct Frame {
     viua::arch::Register_access result_to;
 
     struct {
-        uint64_t fp { MEM_FIRST_VALID_ADDRESS };
-        uint64_t sbrk { MEM_FIRST_VALID_ADDRESS };
+        uint64_t fp{MEM_FIRST_VALID_ADDRESS};
+        uint64_t sbrk{MEM_FIRST_VALID_ADDRESS};
     } saved;
 
     inline Frame(size_t const sz, addr_type const e, addr_type const r)
@@ -421,9 +422,9 @@ struct Stack {
     explicit inline Stack(Process& p) : proc{&p}
     {}
 
-    Stack(Stack const&) = delete;
-    Stack(Stack&&)      = default;
-    auto operator=(Stack const&) -> Stack& = delete;
+    Stack(Stack const&)                      = delete;
+    Stack(Stack&&)                           = default;
+    auto operator=(Stack const&) -> Stack&   = delete;
     inline auto operator=(Stack&&) -> Stack& = default;
 
     inline auto push(size_t const sz, addr_type const e, addr_type const r)
@@ -450,7 +451,7 @@ inline constexpr auto MEM_LINE_SIZE = size_t{16};
 inline constexpr auto MEM_PAGE_SIZE = MEM_LINE_SIZE * 16;
 
 struct Page {
-    using unit_type = uint8_t;
+    using unit_type    = uint8_t;
     using storage_type = std::array<unit_type, MEM_PAGE_SIZE>;
 
     alignas(uint64_t) storage_type storage;
@@ -485,13 +486,13 @@ struct Pointer {
      * process' stack and heap managed by the VM.
      * These are pointers to host OS structures, objects received from FFI, etc.
      */
-    bool foreign { false };
+    bool foreign{false};
 
     /*
      * For foreign pointers: host OS pointer.
      * For VM pointers: offset from stack break 0.
      */
-    uintptr_t ptr { 0 };
+    uintptr_t ptr{0};
 
     /*
      * The page() and offset() functions only make sense for VM pointers, where
@@ -511,7 +512,7 @@ struct Pointer {
      * For foreign pointers: 0.
      * For VM pointers: size of the area pointed to.
      */
-    size_t size { 0 };
+    size_t size{0};
 
     /*
      * This member is only non-zero for VM pointers which were created by
@@ -533,7 +534,7 @@ struct Pointer {
      * instruction to which the lhs operand was a pointer to the OBJECT. Its
      * parent field will be set to address of OBJECT.
      */
-    uintptr_t parent { 0 };
+    uintptr_t parent{0};
 
     using id_type = decltype(ptr);
     inline auto id() const -> id_type
@@ -573,8 +574,8 @@ struct Process {
 
     std::vector<Page> memory;
     std::map<Pointer::id_type, Pointer> pointers;
-    uint64_t frame_pointer { MEM_FIRST_VALID_ADDRESS };
-    uint64_t stack_break { MEM_FIRST_VALID_ADDRESS };
+    uint64_t frame_pointer{MEM_FIRST_VALID_ADDRESS};
+    uint64_t stack_break{MEM_FIRST_VALID_ADDRESS};
 
     inline auto memory_at(size_t const ptr) -> uint8_t*
     {
@@ -604,7 +605,7 @@ struct Process {
     inline auto prune_pointers() -> void
     {
         auto tmp = decltype(pointers){};
-        for (auto& [ k, v ] : pointers) {
+        for (auto& [k, v] : pointers) {
             /*
              * Forget all pointers whose base is greater than current stack
              * break. They are invalid because they point to deallocated memory.

@@ -37,8 +37,7 @@ namespace viua::support {
  *
  * The type makes it possible to use std::visit() in a semi-sane way.
  */
-template<typename T> struct always_false : std::false_type {
-};
+template<typename T> struct always_false : std::false_type {};
 
 template<typename T> constexpr auto non_exhaustive_visitor() -> void
 {
