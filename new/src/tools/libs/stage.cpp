@@ -1431,8 +1431,6 @@ auto emit_instruction(viua::libs::parser::ast::Instruction const insn)
         return viua::arch::ops::S{opcode,
                                   operand_or_throw(insn, 0).make_access()}
             .encode();
-    case FORMAT::F:
-        return uint64_t{0};  // FIXME
     case FORMAT::E:
         return viua::arch::ops::E{
             opcode,
