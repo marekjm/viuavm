@@ -290,6 +290,7 @@ auto parse_attr_list(
 
     return attrs;
 }
+
 auto parse_instruction(
     viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes)
     -> ast::Instruction
@@ -435,6 +436,12 @@ auto parse_instruction(
             }
             operand.ingredients.push_back(access);
             operand.ingredients.push_back(atom);
+        } else if (valid_cast()) {
+            auto const value =
+                consume_token_of({TOKEN::OPCODE, TOKEN::LITERAL_ATOM}, lexemes);
+            operand.ingredients.push_back(value);
+            auto& tt = operand.ingredients.front().text;
+            tt       = std::to_string(fundamental_type_names.at(tt));
         } else if (lexemes.front() == TOKEN::LITERAL_INTEGER) {
             auto const value =
                 consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
@@ -448,12 +455,6 @@ auto parse_instruction(
         } else if (lexemes.front() == TOKEN::LITERAL_ATOM) {
             auto const value = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
             operand.ingredients.push_back(value);
-        } else if (valid_cast()) {
-            auto const value =
-                consume_token_of({TOKEN::OPCODE, TOKEN::LITERAL_ATOM}, lexemes);
-            operand.ingredients.push_back(value);
-            auto& tt = operand.ingredients.back().text;
-            tt       = std::to_string(fundamental_type_names.at(tt));
         } else {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;

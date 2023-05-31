@@ -126,15 +126,28 @@ struct Register {
                                     undefined_type>;
     value_type value;
 
+    std::optional<uint8_t> loaded_size;
+
     auto as_memory() const -> undefined_type;
     template<typename T> auto convert_undefined_to() -> void
     {
         auto const raw = std::get<undefined_type>(value);
-        if constexpr (std::is_same_v<T, int_type>
-                      or std::is_same_v<T, uint_type>) {
-            auto v = typename std::conditional<std::is_same_v<T, int_type>,
-                                               int_type,
-                                               uint_type>::type{};
+        if constexpr (std::is_same_v<T, int_type>) {
+            auto v = int_type{};
+            memcpy(&v, raw.data(), sizeof(T));
+            v = static_cast<T>(le64toh(v));
+
+            /*
+             * Sign-extend signed integers shorter than a full register.
+             * Otherwise loading a signed byte, half-word, or word will produce
+             * an incorrect result as the high bits will be zero.
+             */
+            auto const off = (64 - (*loaded_size * 8));
+            v = ((v << off) >> off);
+
+            value = v;
+        } else if constexpr (std::is_same_v<T, uint_type>) {
+            auto v = uint_type{};
             memcpy(&v, raw.data(), sizeof(T));
             value = static_cast<T>(le64toh(v));
         } else if constexpr (std::is_same_v<T, float_type>) {
@@ -174,6 +187,8 @@ struct Register {
             static_assert(always_false_v<T>,
                           "invalid type convert to from undefined");
         }
+
+        loaded_size.reset();
     }
 
     template<typename T> auto holds() const -> bool

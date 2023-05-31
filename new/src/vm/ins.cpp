@@ -1744,6 +1744,7 @@ auto execute(LM const op, Stack& stack, ip_type const) -> void
     auto raw = register_type::undefined_type{};
     memcpy(raw.data(), addr, copy_size);
     out = raw;
+    out.to()->get().loaded_size = copy_size;
 }
 auto execute(AD const, Stack&, ip_type const) -> void
 {}
