@@ -33,6 +33,7 @@
 #include <viua/libs/assembler.h>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
+#include <viua/vm/core.h>
 #include <viua/vm/elf.h>
 
 
@@ -474,6 +475,50 @@ auto demangle_memory(Cooked_text& text) -> void
                 raw_op,
                 (name + " " + op.out.to_string() + ", " + op.in.to_string()
                  + ", " + std::to_string(op.immediate)));
+            continue;
+        }
+        if (m(i, CAST)) {
+            using viua::arch::ops::E;
+            auto const raw_op = ins_at(i);
+            auto const op     = E::decode(raw_op);
+
+            auto desired_type = std::string{"void"};
+            switch (static_cast<viua::vm::Register::Types>(op.immediate)) {
+                using enum viua::vm::Register::Types;
+            case INT:
+                desired_type = "int";
+                break;
+            case UINT:
+                desired_type = "uint";
+                break;
+            case FLOAT32:
+                desired_type = "float";
+                break;
+            case FLOAT64:
+                desired_type = "double";
+                break;
+            case POINTER:
+                desired_type = "pointer";
+                break;
+            case ATOM:
+                desired_type = "atom";
+                break;
+            case PID:
+                desired_type = "pid";
+                break;
+            case VOID:
+            case UNDEFINED:
+            default:
+                desired_type = "<invalid>";
+                break;
+            }
+
+            auto idx = text.at(i).index;
+            tmp.emplace_back(
+                idx,
+                op.opcode,
+                raw_op,
+                ("cast " + op.out.to_string() + ", " + desired_type));
             continue;
         }
 

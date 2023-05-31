@@ -103,6 +103,18 @@ struct Register {
     using pid_type       = in6_addr;
     using undefined_type = std::array<uint8_t, sizeof(pid_type)>;
 
+    enum class Types : uint8_t {
+        VOID,
+        INT,
+        UINT,
+        FLOAT32,
+        FLOAT64,
+        POINTER,
+        ATOM,
+        PID,
+        UNDEFINED,
+    };
+
     using value_type = std::variant<void_type,
                                     int_type,
                                     uint_type,

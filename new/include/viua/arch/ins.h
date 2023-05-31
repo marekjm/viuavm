@@ -271,6 +271,12 @@ struct LUIU : Instruction {
     LUIU(viua::arch::ops::E i) : instruction{i}
     {}
 };
+struct CAST : Instruction {
+    viua::arch::ops::E instruction;
+
+    CAST(viua::arch::ops::E i) : instruction{i}
+    {}
+};
 
 /*
  * ADDIU adds 24-bit immediate unsigned integer as right-hand operand, to a

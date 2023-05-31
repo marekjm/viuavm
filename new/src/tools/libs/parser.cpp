@@ -20,6 +20,7 @@
 #include <viua/libs/parser.h>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
+#include <viua/vm/core.h>
 
 
 namespace viua::libs::parser {
@@ -334,6 +335,33 @@ auto parse_instruction(
         return instruction;
     }
 
+    auto const fundamental_type_names = std::map<std::string, uint8_t>{
+        {"int", static_cast<uint8_t>(viua::vm::Register::Types::INT)},
+        {"uint", static_cast<uint8_t>(viua::vm::Register::Types::UINT)},
+        {"float", static_cast<uint8_t>(viua::vm::Register::Types::FLOAT32)},
+        {"double", static_cast<uint8_t>(viua::vm::Register::Types::FLOAT64)},
+        {"pointer", static_cast<uint8_t>(viua::vm::Register::Types::POINTER)},
+        {"atom", static_cast<uint8_t>(viua::vm::Register::Types::ATOM)},
+        {"pid", static_cast<uint8_t>(viua::vm::Register::Types::PID)},
+    };
+
+    auto valid_cast =
+        [&lexemes, &instruction, &fundamental_type_names]() -> bool {
+        if (instruction.opcode != "cast" and instruction.opcode != "g.cast") {
+            return false;
+        }
+
+        /*
+         * The type specifier (which in some cases looks like an instruction
+         * name) is only valid in the second position.
+         */
+        if (instruction.operands.size() != 1) {
+            return false;
+        }
+
+        return fundamental_type_names.count(lexemes.front().text);
+    };
+
     while ((not lexemes.empty()) and lexemes.front() != TOKEN::END) {
         if (lexemes.front().token == TOKEN::END) {
             break;
@@ -420,6 +448,12 @@ auto parse_instruction(
         } else if (lexemes.front() == TOKEN::LITERAL_ATOM) {
             auto const value = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
             operand.ingredients.push_back(value);
+        } else if (valid_cast()) {
+            auto const value =
+                consume_token_of({TOKEN::OPCODE, TOKEN::LITERAL_ATOM}, lexemes);
+            operand.ingredients.push_back(value);
+            auto& tt = operand.ingredients.back().text;
+            tt       = std::to_string(fundamental_type_names.at(tt));
         } else {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;

@@ -74,6 +74,7 @@ Flow_instruction(RETURN);
 
 Work_instruction(LUI);
 Work_instruction(LUIU);
+Work_instruction(CAST);
 
 Work_instruction(FLOAT);
 Work_instruction(DOUBLE);
@@ -151,6 +152,14 @@ struct Immutable_proxy {
     {
         return target.type_name();
     }
+    auto is_void() const
+    {
+        return target.is_void();
+    }
+    auto to() const -> register_type const&
+    {
+        return target;
+    }
 };
 struct Mutable_proxy {
     register_type* const target;
@@ -182,6 +191,17 @@ struct Mutable_proxy {
             return std::string_view{"void"};
         }
         return target->type_name();
+    }
+    auto is_void() const
+    {
+        return target ? target->is_void() : true;
+    }
+    auto to() const -> std::optional<std::reference_wrapper<register_type>>
+    {
+        if (target) {
+            return *target;
+        }
+        return std::nullopt;
     }
 
     auto operator=(Immutable_proxy const& fp) const -> Mutable_proxy const&

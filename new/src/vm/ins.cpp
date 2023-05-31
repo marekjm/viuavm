@@ -143,6 +143,7 @@ auto execute(viua::vm::Stack& stack,
         break
             Work(LUI);
             Work(LUIU);
+            Work(CAST);
 #undef Work
         }
         break;
@@ -1125,6 +1126,46 @@ auto execute(LUIU const op, Stack& stack, ip_type const) -> void
 {
     auto out = mutable_proxy(stack, op.instruction.out);
     out      = static_cast<uint64_t>(op.instruction.immediate << 28);
+}
+auto execute(CAST const op, Stack& stack, ip_type const) -> void
+{
+    auto target = mutable_proxy(stack, op.instruction.out);
+    auto const desired_type =
+        static_cast<Register::Types>(op.instruction.immediate);
+
+    if (target.is_void()) {
+        throw abort_execution{stack, "cannot cast void"};
+    }
+
+    auto& slot = target.to()->get();
+
+    switch (desired_type) {
+        using enum Register::Types;
+    case INT:
+        slot.convert_undefined_to<Register::int_type>();
+        break;
+    case UINT:
+        slot.convert_undefined_to<Register::uint_type>();
+        break;
+    case FLOAT32:
+        slot.convert_undefined_to<Register::float_type>();
+        break;
+    case FLOAT64:
+        slot.convert_undefined_to<Register::double_type>();
+        break;
+    case POINTER:
+        slot.convert_undefined_to<Register::pointer_type>();
+        break;
+    case ATOM:
+        slot.convert_undefined_to<Register::atom_type>();
+        break;
+    case PID:
+        slot.convert_undefined_to<Register::pid_type>();
+        break;
+    case VOID:
+    case UNDEFINED:
+        throw abort_execution{stack, "invalid cast"};
+    }
 }
 
 auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
