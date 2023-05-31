@@ -1016,10 +1016,18 @@ auto expand_memory_access(std::vector<ast::Instruction>& cooked,
                           ast::Instruction const& raw) -> void
 {
     using namespace std::string_literals;
-    auto synth           = ast::Instruction{};
+    auto synth = ast::Instruction{};
+
+    auto opcode_view = std::string_view{raw.opcode.text};
+    auto greedy      = opcode_view.starts_with("g.");
+    if (greedy) {
+        opcode_view.remove_prefix(2);
+    }
+
     synth.opcode         = raw.opcode;
+    synth.opcode.text    = opcode_view;
     synth.opcode.text[1] = 'm';
-    if (synth.opcode.text[0] == 'a') {
+    if (opcode_view[0] == 'a') {
         switch (synth.opcode.text.back()) {
         case 'a':
             synth.opcode.text = "ama";
@@ -1038,8 +1046,7 @@ auto expand_memory_access(std::vector<ast::Instruction>& cooked,
     synth.operands.push_back(raw.operands.at(1));
     synth.operands.push_back(raw.operands.at(2));
 
-    auto const unit = raw.opcode.text[0] == 'a' ? raw.opcode.text[2]
-                                                : raw.opcode.text[1];
+    auto const unit = opcode_view[0] == 'a' ? opcode_view[2] : opcode_view[1];
     switch (unit) {
     case 'b':
         synth.operands.front().ingredients.front().text = "0";
@@ -1061,6 +1068,10 @@ auto expand_memory_access(std::vector<ast::Instruction>& cooked,
     }
     synth.operands.front().ingredients.resize(1);
 
+    if (greedy) {
+        synth.opcode.text = ("g." + synth.opcode.text);
+    }
+
     cooked.push_back(synth);
 }
 auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
@@ -1078,9 +1089,44 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
         "g.divi",
     };
     auto const memory_access = std::set<std::string>{
-        "sb",   "lb",   "mb",   "sh",   "lh",   "mh",   "sw",   "lw",   "mw",
-        "sd",   "ld",   "md",   "sq",   "lq",   "mq",   "amba", "amha", "amwa",
-        "amda", "amqa", "ambd", "amhd", "amwd", "amdd", "amqd",
+        /*
+         * Access
+         */
+        "sb",
+        "lb",
+        "sh",
+        "lh",
+        "sw",
+        "lw",
+        "sd",
+        "ld",
+        "sq",
+        "lq",
+
+        "g.sb",
+        "g.lb",
+        "g.sh",
+        "g.lh",
+        "g.sw",
+        "g.lw",
+        "g.sd",
+        "g.ld",
+        "g.sq",
+        "g.lq",
+
+        /*
+         * Allocation
+         */
+        "amba",
+        "amha",
+        "amwa",
+        "amda",
+        "amqa",
+        "ambd",
+        "amhd",
+        "amwd",
+        "amdd",
+        "amqd",
     };
 
     /*
