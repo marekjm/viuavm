@@ -418,7 +418,8 @@ auto demangle_memory(Cooked_text& text) -> void
         using viua::arch::ops::GREEDY;
         if (m(i, SM) or m(i, LM) or m(i, AA) or m(i, AD)) {
             using viua::arch::ops::M;
-            auto const op = M::decode(ins_at(i));
+            auto const raw_op = ins_at(i);
+            auto const op     = M::decode(raw_op);
 
             auto name = std::string{};
             switch (static_cast<viua::arch::ops::OPCODE>(op.opcode)) {
@@ -466,12 +467,11 @@ auto demangle_memory(Cooked_text& text) -> void
                 break;
             }
 
-            auto idx          = text.at(i).index;
-            idx.physical_span = idx.physical;
+            auto idx = text.at(i).index;
             tmp.emplace_back(
                 idx,
-                std::nullopt,
-                std::nullopt,
+                op.opcode,
+                raw_op,
                 (name + " " + op.out.to_string() + ", " + op.in.to_string()
                  + ", " + std::to_string(op.immediate)));
             continue;
