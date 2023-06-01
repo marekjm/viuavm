@@ -78,7 +78,8 @@ test: dist
 clean:
 	find $(BUILD) -type f -delete
 	find $(BUILD) -mindepth 1 -type d -delete
-	find ./tests -type f -name '*.bin' -delete
+	find ./tests -type f -name '*.elf' -delete
+	find ./tests -type f -name '*.asm~' -delete
 
 install: all
 	mkdir -p $(VIUA_CORE_DIR)
