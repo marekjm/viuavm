@@ -95,11 +95,11 @@ auto Register::as_memory() const -> undefined_type
         auto const v = std::get<double_type>(value);
         memcpy(raw.data(), &v, sizeof(v));
     } else if (std::holds_alternative<pointer_type>(value)) {
-        auto const v = std::get<pointer_type>(value);
-        memcpy(raw.data(), &v.ptr, sizeof(v));
+        auto const v = htole64(std::get<pointer_type>(value).ptr);
+        memcpy(raw.data(), &v, sizeof(v));
     } else if (std::holds_alternative<atom_type>(value)) {
-        auto const v = std::get<atom_type>(value);
-        memcpy(raw.data(), &v.key, sizeof(v));
+        auto const v = htole64(std::get<atom_type>(value).key);
+        memcpy(raw.data(), &v, sizeof(v));
     } else if (std::holds_alternative<pid_type>(value)) {
         auto const v = std::get<pid_type>(value);
         memcpy(raw.data(), &v, sizeof(v));
