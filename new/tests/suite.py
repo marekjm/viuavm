@@ -27,11 +27,11 @@ MAX_COLOUR = 'red_1'
 
 def format_run_time_us(run_time):
     if run_time < 1e3:
-        return f'{run_time:.2f}us'
+        return f'{run_time:7.2f}us'
     if run_time < 1e6:
         ms = (run_time / 1e3)
-        return f'{ms:6.2f}ms'
-    return '{:.4}s'.format(run_time / 1e6)
+        return f'{ms:7.2f}ms'
+    return '{:9.4}s'.format(run_time / 1e6)
 
 def format_run_time(run_time):
     if not run_time.seconds:
@@ -45,7 +45,7 @@ def format_freq(hz):
     if 1e3 <= hz < 1e6:
         unit = 'kHz'
         hz = (hz / 1e3)
-    return '{:.2f} {}'.format(hz, unit)
+    return '{:7.2f} {}'.format(hz, unit)
 
 ENCODING = 'utf-8'
 INTERPRETER = './build/tools/exec/vm'
@@ -888,28 +888,44 @@ def main(args):
             seq[m] if (len(seq) % 2) else (seq[m] + seq[m])
         ))(len(seq) // 2)
     med = lambda seq: med_impl(seq) if seq else 0
-    print('\nperf counter     {}    / {}     ({} ~ {}):'.format(
+
+    perf_ops_avg = avg(perf_ops)
+    perf_ops_med = med(perf_ops)
+    perf_ops_min = min(perf_ops)
+    perf_ops_max = max(perf_ops)
+
+    perf_time_avg = avg(perf_time)
+    perf_time_med = med(perf_time)
+    perf_time_min = min(perf_time)
+    perf_time_max = max(perf_time)
+
+    perf_freq_avg = avg(perf_freq)
+    perf_freq_med = med(perf_freq)
+    perf_freq_min = min(perf_freq)
+    perf_freq_max = max(perf_freq)
+
+    print('\nperf counter     {}    /  {}     ({} ~ {}):'.format(
         colorise(AVG_COLOUR, 'average'),
         colorise(MED_COLOUR, 'median'),
-        colorise(MIN_COLOUR, 'min'),
+        colorise(MIN_COLOUR, 'min'.ljust(11)),
         colorise(MAX_COLOUR, 'max'),
     ))
-    print('  ops executed:  {}     / {}     ({} ~ {})'.format(
-        colorise(AVG_COLOUR, '{:.2f}'.format(avg(perf_ops)).rjust(6)),
-        colorise(MED_COLOUR, '{:.2f}'.format(med(perf_ops)).rjust(6)),
-        colorise('white', min(perf_ops)) if perf_ops else '--',
-        colorise('white', max(perf_ops)) if perf_ops else '--',
+    print('  ops executed: {}     / {}     ({} ~ {})'.format(
+        colorise(AVG_COLOUR, '{:7.2f}'.format(avg(perf_ops))),
+        colorise(MED_COLOUR, '{:7.2f}'.format(med(perf_ops))),
+        colorise('white', f"{min(perf_ops):7.2f}".ljust(11)) if perf_ops else '--',
+        colorise('white', f"{max(perf_ops):7.2f}") if perf_ops else '--',
     ))
-    print('  VM run time:   {}   / {}   ({} ~ {})'.format(
-        colorise(AVG_COLOUR, format_run_time_us(avg(perf_time)).rjust(8)),
-        colorise(MED_COLOUR, format_run_time_us(med(perf_time)).rjust(8)),
-        colorise('white', format_run_time_us(min(perf_time))) if perf_time else '--',
+    print('  VM run time:  {}   / {}   ({} ~ {})'.format(
+        colorise(AVG_COLOUR, format_run_time_us(avg(perf_time))),
+        colorise(MED_COLOUR, format_run_time_us(med(perf_time))),
+        colorise('white', format_run_time_us(min(perf_time)).ljust(11)) if perf_time else '--',
         colorise('white', format_run_time_us(max(perf_time))) if perf_time else '--',
     ))
-    print('  VM CPU freq:   {} / {} ({} ~ {})'.format(
+    print('  VM CPU freq:  {} / {} ({} ~ {})'.format(
         colorise(AVG_COLOUR, format_freq(avg(perf_freq))),
         colorise(MED_COLOUR, format_freq(med(perf_freq))),
-        colorise(MIN_COLOUR, format_freq(min(perf_freq))) if perf_time else '--',
+        colorise(MIN_COLOUR, format_freq(min(perf_freq)).ljust(11)) if perf_time else '--',
         colorise(MAX_COLOUR, format_freq(max(perf_freq))) if perf_time else '--',
     ))
 
