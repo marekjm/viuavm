@@ -143,7 +143,7 @@ struct Register {
              * an incorrect result as the high bits will be zero.
              */
             auto const off = (64 - (*loaded_size * 8));
-            v = ((v << off) >> off);
+            v              = ((v << off) >> off);
 
             value = v;
         } else if constexpr (std::is_same_v<T, uint_type>) {
