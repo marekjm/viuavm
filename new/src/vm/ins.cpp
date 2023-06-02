@@ -1612,10 +1612,10 @@ auto dump_globals(Stack const& stack) -> void
 {
     viua::TRACE_STREAM << "  globals:" << viua::TRACE_STREAM.endl;
 
-    auto const& atoms = stack.proc->atoms;
+    auto const& atoms   = stack.proc->atoms;
     auto const& globals = stack.proc->globals;
 
-    for (auto const& [ key, each ] : globals) {
+    for (auto const& [key, each] : globals) {
         viua::TRACE_STREAM << "    " << atoms.at(key) << " = ";
 
         if (each.is_void()) {
@@ -1704,7 +1704,8 @@ auto execute(ECALL const, Stack&, ip_type const) -> void
 
 auto execute(GTS const op, Stack& stack, ip_type const) -> void
 {
-    auto const key = immutable_proxy(stack, op.instruction.out).get<register_type::atom_type>();
+    auto const key = immutable_proxy(stack, op.instruction.out)
+                         .get<register_type::atom_type>();
     auto const value = immutable_proxy(stack, op.instruction.in);
 
     if (not key.has_value()) {
@@ -1719,8 +1720,9 @@ auto execute(GTS const op, Stack& stack, ip_type const) -> void
 }
 auto execute(GTL const op, Stack& stack, ip_type const) -> void
 {
-    auto value = mutable_proxy(stack, op.instruction.out);
-    auto const key = immutable_proxy(stack, op.instruction.in).get<register_type::atom_type>();
+    auto value     = mutable_proxy(stack, op.instruction.out);
+    auto const key = immutable_proxy(stack, op.instruction.in)
+                         .get<register_type::atom_type>();
 
     if (not key.has_value()) {
         throw abort_execution{stack, "invalid type used as global table key"};
@@ -1728,7 +1730,9 @@ auto execute(GTL const op, Stack& stack, ip_type const) -> void
 
     auto& gt = stack.proc->globals;
     if (not gt.contains(key->key)) {
-        throw abort_execution{stack, ("key not present in globals table: " + stack.proc->atoms[key->key])};
+        throw abort_execution{stack,
+                              ("key not present in globals table: "
+                               + stack.proc->atoms[key->key])};
     }
 
     value = gt[key->key];

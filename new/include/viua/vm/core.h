@@ -594,7 +594,7 @@ struct Process {
      * need to produce multiple copies of it. When comparing atoms we can also
      * do it by key and we do not need to compare their text contents.
      */
-    using atom_key_type = Register::atom_type::key_type;
+    using atom_key_type  = Register::atom_type::key_type;
     using atoms_map_type = std::map<atom_key_type, std::string>;
     atoms_map_type atoms;
 
