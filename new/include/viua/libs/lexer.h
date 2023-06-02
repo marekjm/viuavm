@@ -242,6 +242,11 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "self",
     "g.self",
 
+    "gts",
+    "g.gts",
+    "gtl",
+    "g.gtl",
+
     "cast",
     "g.cast",
 

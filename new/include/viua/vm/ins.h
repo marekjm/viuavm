@@ -104,6 +104,9 @@ Work_instruction(IO_PEEK);
 Work_instruction(ACTOR);
 Work_instruction(SELF);
 
+Work_instruction(GTS);
+Work_instruction(GTL);
+
 Work_instruction(SM);
 Work_instruction(LM);
 Work_instruction(AA);

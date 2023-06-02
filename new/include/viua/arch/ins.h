@@ -415,6 +415,19 @@ struct SELF : Instruction {
     {}
 };
 
+struct GTS : Instruction {
+    viua::arch::ops::D instruction;
+
+    GTS(viua::arch::ops::D i) : instruction{i}
+    {}
+};
+struct GTL : Instruction {
+    viua::arch::ops::D instruction;
+
+    GTL(viua::arch::ops::D i) : instruction{i}
+    {}
+};
+
 struct SM : Instruction {
     viua::arch::ops::M instruction;
 

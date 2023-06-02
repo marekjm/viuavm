@@ -1,0 +1,2 @@
+ebreak -1 in process [fe80::42]
+hello_world = is 000000000000002a 42

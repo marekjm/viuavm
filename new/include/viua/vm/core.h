@@ -98,7 +98,8 @@ struct Register {
         uint64_t ptr;
     };
     struct atom_type {
-        uint64_t key;
+        using key_type = uint64_t;
+        key_type key;
     };
     using pid_type       = in6_addr;
     using undefined_type = std::array<uint8_t, sizeof(pid_type)>;
@@ -593,8 +594,12 @@ struct Process {
      * need to produce multiple copies of it. When comparing atoms we can also
      * do it by key and we do not need to compare their text contents.
      */
-    using atoms_map_type = std::map<uint64_t, std::string>;
+    using atom_key_type = Register::atom_type::key_type;
+    using atoms_map_type = std::map<atom_key_type, std::string>;
     atoms_map_type atoms;
+
+    using globals_map_type = std::map<atom_key_type, Register>;
+    globals_map_type globals;
 
     using stack_type = Stack;
     stack_type stack;

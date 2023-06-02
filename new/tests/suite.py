@@ -60,6 +60,7 @@ EBREAK_LINE_BOXED = re.compile(r'\[(\d+)\.([lap])\] (\*?[a-zA-Z_][a-zA-Z_0-9]*) 
 EBREAK_LINE_PRIMITIVE = re.compile(r'\[(\d+)\.([lap])\] (is|iu|fl|db) (.*)')
 EBREAK_LINE_SPECIAL = re.compile(r'\[(fptr|sbrk)\] (is|iu|fl|db) (.*)')
 EBREAK_MEMORY_LINE = re.compile(r'([0-9a-f]{16})  ((?:[0-9a-f]{2} ){16}) \| (.{16})')
+EBREAK_GLOBALS_LINE = re.compile(r'([a-z_][a-zA-Z0-9_]*) = (is|iu|fl|db) (.*)')
 PERF_OPS_AND_RUNTIME = re.compile(r'\[vm:perf\] executed ops (\d+), run time (.+)')
 PERF_APPROX_FREQ = re.compile(r'\[vm:perf\] approximate frequency (.+ [kMG]?Hz)')
 
@@ -374,6 +375,15 @@ def consume_memory_contents(ebreak_lines):
 
     return contents
 
+def consume_globals_contents(ebreak_lines):
+    contents = {}
+
+    while ebreak_lines and (line := EBREAK_GLOBALS_LINE.match(ebreak_lines[0])):
+        ebreak_lines.pop(0)
+        contents[line.group(1)] = (line.group(2), line.group(3),)
+
+    return contents
+
 def consume_live_ebreak_lines(ebreak_lines):
     ebreak = {
         'pid': None,
@@ -414,6 +424,13 @@ def consume_live_ebreak_lines(ebreak_lines):
         ebreak['memory'] = consume_memory_contents(ebreak_lines)
     else:
         raise Exception('invalid ebreak snapshot (expected memory contents)')
+
+    if ebreak_lines[0] == 'globals:':
+        ebreak_lines.pop(0)
+
+        ebreak['globals'] = consume_globals_contents(ebreak_lines)
+    else:
+        raise Exception('invalid ebreak snapshot (expected gloabls)')
 
     if (pid := EBREAK_END.match(ebreak_lines[0])):
         ebreak_lines.pop(0)

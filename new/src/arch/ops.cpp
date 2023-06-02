@@ -409,6 +409,10 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "actor";
     case OPCODE::SELF:
         return greedy + "self";
+    case OPCODE::GTS:
+        return greedy + "gts";
+    case OPCODE::GTL:
+        return greedy + "gtl";
     case OPCODE::CAST:
         return greedy + "cast";
     case OPCODE::SM:
@@ -543,6 +547,10 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::ACTOR));
     } else if (sv == "self") {
         return (op | static_cast<opcode_type>(OPCODE::SELF));
+    } else if (sv == "gts") {
+        return (op | static_cast<opcode_type>(OPCODE::GTS));
+    } else if (sv == "gtl") {
+        return (op | static_cast<opcode_type>(OPCODE::GTL));
     } else if (sv == "cast") {
         return (op | static_cast<opcode_type>(OPCODE::CAST));
     } else if (sv == "sm") {
