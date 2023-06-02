@@ -317,6 +317,73 @@ def walk_ebreak_test(errors, want_ebreak, live_ebreak):
 
             continue
 
+        if global_slot := EBREAK_GLOBALS_LINE.fullmatch(line):
+            want_name, want_type, want_value = global_slot.groups()
+
+            if want_name not in live_ebreak[pid][ebreak_index]["globals"]:
+                leader = f"    global {want_name}"
+                errors.write(f"{leader} is void\n")
+                errors.write(
+                    "{} expected = {} {}\n".format(
+                        (len(leader) * " "),
+                        want_type,
+                        want_value,
+                    )
+                )
+                raise Missing_value()
+
+            live_type = live_ebreak[pid][ebreak_index]["globals"][want_name][0]
+            live_value = live_ebreak[pid][ebreak_index]["globals"][want_name][1]
+
+            if want_type != live_type:
+                leader = f"    global {want_name}"
+                errors.write(
+                    "{} contains {} = {}\n".format(
+                        leader,
+                        colorise(
+                            "red", live_type.ljust(max(len(want_type), len(live_type)))
+                        ),
+                        live_value,
+                    )
+                )
+                errors.write(
+                    "{} expected {} = {}\n".format(
+                        (len(leader) * " "),
+                        colorise(
+                            "green",
+                            want_type.ljust(max(len(want_type), len(live_type))),
+                        ),
+                        want_value,
+                    )
+                )
+                errors.write(
+                    "{}          {}\n".format(
+                        (len(leader) * " "),
+                        colorise("red", (max(len(want_type), len(live_type)) * "^")),
+                    )
+                )
+                raise Unexpected_type()
+
+            if want_value != live_value:
+                leader = f"    global {want_name}"
+                errors.write(
+                    "{} contains {} = {}\n".format(
+                        leader,
+                        live_type.ljust(max(len(want_type), len(live_type))),
+                        colorise("red", live_value),
+                    )
+                )
+                errors.write(
+                    "{} expected {} = {}\n".format(
+                        (len(leader) * " "),
+                        want_type.ljust(max(len(want_type), len(live_type))),
+                        colorise("green", want_value),
+                    )
+                )
+                raise Unexpected_value()
+
+            continue
+
         p = EBREAK_LINE_PRIMITIVE.fullmatch(line)
         if not p:
             continue  # FIXME suspicious - maybe an error?
