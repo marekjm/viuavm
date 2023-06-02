@@ -119,6 +119,7 @@ format:
 		find ./include -type f -name '*.h' ;\
 		find ./src -type f -name '*.cpp'\
 	) | xargs --max-args 1 --max-procs 0 clang-format -i
+	@black tests/suite.py
 
 
 ################################################################################
