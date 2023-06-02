@@ -61,8 +61,9 @@ DIS_EXTENSION = "~"
 
 SKIP_DISASSEMBLER_TESTS = False
 
-EBREAK_LINE_BOXED = re.compile(r"\[(\d+)\.([lap])\] (\*?[a-zA-Z_][a-zA-Z_0-9]*) = (.*)")
-EBREAK_LINE_PRIMITIVE = re.compile(r"\[(\d+)\.([lap])\] (is|iu|fl|db) (.*)")
+EBREAK_LINE_PRIMITIVE = re.compile(
+    r"\[(\d+)\.([lap])\] (is|iu|fl|db|atom|pid|raw) (.*)"
+)
 EBREAK_LINE_SPECIAL = re.compile(r"\[(fptr|sbrk)\] (is|iu|fl|db) (.*)")
 EBREAK_MEMORY_LINE = re.compile(r"([0-9a-f]{16})  ((?:[0-9a-f]{2} ){16}) \| (.{16})")
 EBREAK_GLOBALS_LINE = re.compile(r"([a-z_][a-zA-Z0-9_]*) = (is|iu|fl|db) (.*)")
@@ -238,7 +239,6 @@ EBREAK_BACKTRACE_ENTRY = re.compile(
 EBREAK_CONTENTS_OF = re.compile(r"^of #(\d+|last)")
 EBREAK_SELECT = re.compile(r"^ebreak (-?\d+) in proc(?:ess)? (\[[a-f0-9:]+\])")
 
-EBREAK_LINE_BOXED = re.compile(r"\[(\d+)\.([lap])\] (\*?[a-zA-Z_][a-zA-Z_0-9]*) = (.*)")
 EBREAK_LINE_PRIMITIVE = re.compile(
     r"\[(\d+)\.([lap])\] (is|iu|fl|db|ptr|atom|pid) (.*)"
 )
@@ -272,7 +272,7 @@ def walk_ebreak_test(errors, want_ebreak, live_ebreak):
     ebreak_index = 0
 
     for i, line in enumerate(want_ebreak):
-        if select := EBREAK_SELECT.match(line):
+        if select := EBREAK_SELECT.fullmatch(line):
             if (ebreak_index := select.group(1)) == "last":
                 ebreak_index = -1
             ebreak_index = int(ebreak_index)
@@ -286,13 +286,13 @@ def walk_ebreak_test(errors, want_ebreak, live_ebreak):
 
             continue
 
-        if frame_no := EBREAK_CONTENTS_OF.match(line):
+        if frame_no := EBREAK_CONTENTS_OF.fullmatch(line):
             if (frame := frame_no.group(1)) == "last":
                 frame = -1
             frame = int(frame)
             continue
 
-        if mem := EBREAK_MEMORY_LINE.match(line):
+        if mem := EBREAK_MEMORY_LINE.fullmatch(line):
             addr, want_bin, want_ascii = mem.groups()
 
             live_bin = live_ebreak[pid][ebreak_index]["memory"][addr][0]
@@ -317,12 +317,11 @@ def walk_ebreak_test(errors, want_ebreak, live_ebreak):
 
             continue
 
-        b = EBREAK_LINE_BOXED.match(line)
-        p = EBREAK_LINE_PRIMITIVE.match(line)
-        if not (b or p):
+        p = EBREAK_LINE_PRIMITIVE.fullmatch(line)
+        if not p:
             continue  # FIXME suspicious - maybe an error?
 
-        m = b or p
+        m = p
         index = int(m.group(1))
         register_set = m.group(2)
         want_type = m.group(3)
@@ -404,10 +403,10 @@ class Invalid_ebreak_line(Exception):
 def consume_register_contents(ebreak_lines):
     contents = {}
 
-    if ebreak_lines and not EBREAK_CONTENTS_OF.match(ebreak_lines[0]):
+    if ebreak_lines and not EBREAK_CONTENTS_OF.fullmatch(ebreak_lines[0]):
         raise Missing_frame_content_open()
 
-    while ebreak_lines and (frame := EBREAK_CONTENTS_OF.match(ebreak_lines[0])):
+    while ebreak_lines and (frame := EBREAK_CONTENTS_OF.fullmatch(ebreak_lines[0])):
         frame = frame.group(1)
         frame = -1 if frame == "last" else int(frame)
         ebreak_lines.pop(0)
@@ -419,10 +418,9 @@ def consume_register_contents(ebreak_lines):
         }
 
         while ebreak_lines:
-            b = EBREAK_LINE_BOXED.match(ebreak_lines[0])
-            p = EBREAK_LINE_PRIMITIVE.match(ebreak_lines[0])
+            p = EBREAK_LINE_PRIMITIVE.fullmatch(ebreak_lines[0])
 
-            if m := (b or p):
+            if m := p:
                 index = int(m.group(1))
                 register_set = m.group(2)
                 object_type = m.group(3)
@@ -434,7 +432,7 @@ def consume_register_contents(ebreak_lines):
 
                 ebreak_lines.pop(0)
                 continue
-            elif m := EBREAK_LINE_SPECIAL.match(ebreak_lines[0]):
+            elif m := EBREAK_LINE_SPECIAL.fullmatch(ebreak_lines[0]):
                 special_register = m.group(1)
                 object_type = m.group(2)
                 object_value = m.group(3)
@@ -456,7 +454,7 @@ def consume_register_contents(ebreak_lines):
 def consume_memory_contents(ebreak_lines):
     contents = {}
 
-    while ebreak_lines and (line := EBREAK_MEMORY_LINE.match(ebreak_lines[0])):
+    while ebreak_lines and (line := EBREAK_MEMORY_LINE.fullmatch(ebreak_lines[0])):
         ebreak_lines.pop(0)
         contents[line.group(1)] = (
             line.group(2),
@@ -469,7 +467,7 @@ def consume_memory_contents(ebreak_lines):
 def consume_globals_contents(ebreak_lines):
     contents = {}
 
-    while ebreak_lines and (line := EBREAK_GLOBALS_LINE.match(ebreak_lines[0])):
+    while ebreak_lines and (line := EBREAK_GLOBALS_LINE.fullmatch(ebreak_lines[0])):
         ebreak_lines.pop(0)
         contents[line.group(1)] = (
             line.group(2),
@@ -486,7 +484,7 @@ def consume_live_ebreak_lines(ebreak_lines):
         "memory": {},
     }
 
-    if pid := EBREAK_BEGIN.match(ebreak_lines[0]):
+    if pid := EBREAK_BEGIN.fullmatch(ebreak_lines[0]):
         ebreak["pid"] = pid.group(1)
         ebreak_lines.pop(0)
     else:
@@ -495,7 +493,7 @@ def consume_live_ebreak_lines(ebreak_lines):
     if ebreak_lines[0] == "backtrace:":
         ebreak_lines.pop(0)
 
-        while be := EBREAK_BACKTRACE_ENTRY.match(ebreak_lines[0]):
+        while be := EBREAK_BACKTRACE_ENTRY.fullmatch(ebreak_lines[0]):
             ret = be.group(2)
             ebreak["backtrace"].append(
                 {
@@ -529,7 +527,7 @@ def consume_live_ebreak_lines(ebreak_lines):
     else:
         raise Exception("invalid ebreak snapshot (expected gloabls)")
 
-    if pid := EBREAK_END.match(ebreak_lines[0]):
+    if pid := EBREAK_END.fullmatch(ebreak_lines[0]):
         ebreak_lines.pop(0)
     else:
         raise Exception("missing ebreak end")
@@ -573,13 +571,13 @@ def run_and_capture(interpreter, executable, args=()):
     abort = None
     i = 0
     while i < len(lines):
-        if EBREAK_BEGIN.match(lines[i]):
+        if EBREAK_BEGIN.fullmatch(lines[i]):
             ebreak_lines = []
             while i < len(lines):
                 ebreak_lines.append(lines[i])
                 i += 1
 
-                if EBREAK_END.match(lines[i - 1]):
+                if EBREAK_END.fullmatch(lines[i - 1]):
                     break
 
             ebreaks.append(consume_live_ebreak_lines(ebreak_lines))
@@ -606,10 +604,10 @@ def run_and_capture(interpreter, executable, args=()):
     }
 
     for each in lines[::-1]:
-        if m := PERF_OPS_AND_RUNTIME.match(each):
+        if m := PERF_OPS_AND_RUNTIME.fullmatch(each):
             perf["ops"] = int(m.group(1))
             perf["run_time"] = m.group(2)
-        elif m := PERF_APPROX_FREQ.match(each):
+        elif m := PERF_APPROX_FREQ.fullmatch(each):
             perf["freq"] = m.group(1)
         else:
             break
