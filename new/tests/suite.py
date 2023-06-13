@@ -1158,54 +1158,60 @@ def main(args):
         tag_color: str = None
         tag: str = None
 
-        if type(result := rc()) is tuple:
-            status, result, symptom, run_time, perf = result
-            if status == Status.Normal:
-                if run_time:
-                    run_times.append(run_time)
-                if perf:
+        internal_test_suite_failure: Exception = None
+        try:
+            if type(result := rc()) is tuple:
+                status, result, symptom, run_time, perf = result
+                if status == Status.Normal:
+                    if run_time:
+                        run_times.append(run_time)
+                    if perf:
 
-                    def make_vm_time(s):
-                        if s.endswith("us"):
-                            return int(s[:-2])
-                        elif s.endswith("ms"):
-                            return int(float(s[:-2]) * 1000)
-                        else:
-                            raise
+                        def make_vm_time(s):
+                            if s.endswith("us"):
+                                return int(s[:-2])
+                            elif s.endswith("ms"):
+                                return int(float(s[:-2]) * 1000)
+                            else:
+                                raise
 
-                    vm_time = make_vm_time(perf["run_time"])
+                        vm_time = make_vm_time(perf["run_time"])
 
-                    def make_hz(s):
-                        n, hz = s.split()
-                        return int(
-                            float(n)
-                            * {
-                                "kHz": 1e3,
-                                "MHz": 1e6,
-                            }[hz]
+                        def make_hz(s):
+                            n, hz = s.split()
+                            return int(
+                                float(n)
+                                * {
+                                    "kHz": 1e3,
+                                    "MHz": 1e6,
+                                }[hz]
+                            )
+
+                        freq = make_hz(perf["freq"])
+
+                        perf_stats.append(
+                            (
+                                perf["ops"],
+                                vm_time,
+                                freq,
+                            )
                         )
 
-                    freq = make_hz(perf["freq"])
-
-                    perf_stats.append(
-                        (
-                            perf["ops"],
-                            vm_time,
-                            freq,
-                        )
-                    )
-
-                if result:
-                    tag = " ok "
-                    tag_color = "green"
-                    success_cases += 1
-                else:
-                    tag = "fail"
-                    tag_color = "red"
-            elif status == Status.Skip:
-                tag = "skip"
-                tag_color = "yellow"
-                skip_cases += 1
+                    if result:
+                        tag = " ok "
+                        tag_color = "green"
+                        success_cases += 1
+                    else:
+                        tag = "fail"
+                        tag_color = "red"
+                elif status == Status.Skip:
+                    tag = "skip"
+                    tag_color = "yellow"
+                    skip_cases += 1
+        except Exception as e:
+            internal_test_suite_failure = e
+            tag = "fail"
+            tag_color = "red"
 
         print(
             "  case {}. of {}: [{}] {}  {}".format(
@@ -1236,6 +1242,9 @@ def main(args):
         if error_report := error_stream.read(None):
             sys.stderr.write(error_report)
             sys.stderr.write("\n")
+
+        if internal_test_suite_failure:
+            raise internal_test_suite_failure
 
     run_color: str = None
     if success_cases == len(cases):
