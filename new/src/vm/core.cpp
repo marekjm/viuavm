@@ -107,4 +107,48 @@ auto Register::as_memory() const -> undefined_type
 
     return raw;
 }
+
+auto Process::memory_at(size_t const ptr) -> uint8_t*
+{
+    if (ptr < stack_break) {
+        return nullptr;
+    }
+
+    auto const offset = (MEM_FIRST_STACK_BREAK - ptr);
+    if (offset >= (MEM_PAGE_SIZE * memory.size())) {
+        return nullptr;
+    }
+
+    return memory.front().data() + offset;
+}
+auto Process::record_pointer(Pointer ptr) -> void
+{
+    pointers[ptr.id()] = ptr;
+}
+auto Process::forget_pointer(Pointer ptr) -> void
+{
+    pointers.erase(ptr.id());
+}
+auto Process::get_pointer(uint64_t addr) const -> std::optional<Pointer>
+{
+    if (pointers.contains(addr)) {
+        return pointers.at(addr);
+    }
+    return std::nullopt;
+}
+auto Process::prune_pointers() -> void
+{
+    auto tmp = decltype(pointers){};
+    for (auto& [k, v] : pointers) {
+        /*
+         * Forget all pointers whose base is greater than current stack
+         * break. They are invalid because they point to deallocated memory.
+         */
+        if ((not v.foreign) and v.ptr < stack_break) {
+            continue;
+        }
+        tmp[k] = v;
+    }
+    pointers = std::move(tmp);
+}
 }  // namespace viua::vm

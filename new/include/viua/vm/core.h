@@ -309,7 +309,7 @@ struct Register {
  * distinguish origin pointers from subobjects of an area allocated at address
  * zero.
  */
-inline constexpr auto MEM_FIRST_VALID_ADDRESS = size_t{8};
+inline constexpr auto MEM_FIRST_STACK_BREAK = size_t{0xbfff'ffff'ffff'fff0};
 
 struct Frame {
     using addr_type = viua::arch::instruction_type const*;
@@ -323,8 +323,8 @@ struct Frame {
     viua::arch::Register_access result_to;
 
     struct {
-        uint64_t fp{MEM_FIRST_VALID_ADDRESS};
-        uint64_t sbrk{MEM_FIRST_VALID_ADDRESS};
+        uint64_t fp{MEM_FIRST_STACK_BREAK};
+        uint64_t sbrk{MEM_FIRST_STACK_BREAK};
     } saved;
 
     inline Frame(size_t const sz, addr_type const e, addr_type const r)
@@ -606,49 +606,14 @@ struct Process {
 
     std::vector<Page> memory;
     std::map<Pointer::id_type, Pointer> pointers;
-    uint64_t frame_pointer{MEM_FIRST_VALID_ADDRESS};
-    uint64_t stack_break{MEM_FIRST_VALID_ADDRESS};
+    uint64_t frame_pointer{MEM_FIRST_STACK_BREAK + 1};
+    uint64_t stack_break{MEM_FIRST_STACK_BREAK + 1};
 
-    inline auto memory_at(size_t const ptr) -> uint8_t*
-    {
-        if (ptr >= (MEM_PAGE_SIZE * memory.size())) {
-            return nullptr;
-        }
-        if (ptr >= stack_break) {
-            return nullptr;
-        }
-        return memory.front().data() + ptr;
-    }
-    inline auto record_pointer(Pointer ptr) -> void
-    {
-        pointers[ptr.id()] = ptr;
-    }
-    inline auto forget_pointer(Pointer ptr) -> void
-    {
-        pointers.erase(ptr.id());
-    }
-    inline auto get_pointer(uint64_t addr) const -> std::optional<Pointer>
-    {
-        if (pointers.contains(addr)) {
-            return pointers.at(addr);
-        }
-        return std::nullopt;
-    }
-    inline auto prune_pointers() -> void
-    {
-        auto tmp = decltype(pointers){};
-        for (auto& [k, v] : pointers) {
-            /*
-             * Forget all pointers whose base is greater than current stack
-             * break. They are invalid because they point to deallocated memory.
-             */
-            if ((not v.foreign) and v.ptr >= stack_break) {
-                continue;
-            }
-            tmp[k] = v;
-        }
-        pointers = std::move(tmp);
-    }
+    auto memory_at(size_t const ptr) -> uint8_t*;
+    auto record_pointer(Pointer ptr) -> void;
+    auto forget_pointer(Pointer ptr) -> void;
+    auto get_pointer(uint64_t addr) const -> std::optional<Pointer>;
+    auto prune_pointers() -> void;
 
     explicit inline Process(pid_type const p, Core* c, Module const& m)
             : pid{p}, core{c}, module{m}, strtab{&m.strings_table}, stack{*this}

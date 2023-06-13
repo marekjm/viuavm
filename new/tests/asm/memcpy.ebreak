@@ -1,5 +1,5 @@
 ebreak -1 in process [fe80::42]
-[4.l] ptr 0000000000000008 8
+[4.l] ptr bfffffffffffffe0 13835058055282163680
 
 0000000000000000  00 00 00 00 00 00 00 00 ff ff ff ff ff ff ff ff  | ................
 0000000000000010  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  | ................

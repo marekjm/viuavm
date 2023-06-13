@@ -55,9 +55,9 @@ auto execute(AA const op, Stack& stack, ip_type const) -> void
     // alignment request.
     auto size = (*base * alignment);
 
-    auto const pointer_address = stack.proc->stack_break;
-    stack.proc->stack_break += size;
+    stack.proc->stack_break -= size;
     stack.frames.back().saved.sbrk = stack.proc->stack_break;
+    auto const pointer_address     = stack.proc->stack_break;
 
     mutable_proxy(stack, op.instruction.out) =
         register_type::pointer_type{pointer_address};
