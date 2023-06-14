@@ -1593,7 +1593,9 @@ auto dump_memory(std::vector<Page> const& memory) -> void
     for (auto line = size_t{0}; line < (memory.front().size() / MEM_LINE_SIZE);
          ++line) {
         viua::TRACE_STREAM << "    ";
-        viua::TRACE_STREAM << std::setw(16) << (line * MEM_LINE_SIZE) << "  ";
+        viua::TRACE_STREAM << std::setw(16)
+                           << (MEM_FIRST_STACK_BREAK - (line * MEM_LINE_SIZE))
+                           << "  ";
         for (auto i = size_t{0}; i < MEM_LINE_SIZE; ++i) {
             viua::TRACE_STREAM
                 << std::setw(2)

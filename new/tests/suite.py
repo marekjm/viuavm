@@ -296,8 +296,19 @@ def walk_ebreak_test(errors, want_ebreak, live_ebreak):
         if mem := EBREAK_MEMORY_LINE.fullmatch(line):
             addr, want_bin, want_ascii = mem.groups()
 
-            live_bin = live_ebreak[pid][ebreak_index]["memory"][addr][0]
-            live_ascii = live_ebreak[pid][ebreak_index]["memory"][addr][1]
+            def get_bin_view(addr):
+                mem = live_ebreak[pid][ebreak_index]["memory"]
+                if addr not in mem:
+                    return ("00 " * 16)
+                return mem[addr][0]
+            def get_ascii_view(addr):
+                mem = live_ebreak[pid][ebreak_index]["memory"]
+                if addr not in mem:
+                    return ("." * 16)
+                return mem[addr][1]
+
+            live_bin = get_bin_view(addr)
+            live_ascii = get_ascii_view(addr)
             if want_bin != live_bin:
                 leader = f"    memory line {addr}"
                 errors.write(
