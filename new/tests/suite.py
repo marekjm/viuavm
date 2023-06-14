@@ -8,6 +8,7 @@ import os
 import re
 import subprocess
 import sys
+import traceback
 
 try:
     import colored
@@ -1210,8 +1211,9 @@ def main(args):
                     skip_cases += 1
         except Exception as e:
             internal_test_suite_failure = e
-            tag = "fail"
-            tag_color = "red"
+            tag = "bork"
+            tag_color = "purple_1b"
+            symptom = "internal test suite failure"
 
         print(
             "  case {}. of {}: [{}] {}  {}".format(
@@ -1244,7 +1246,9 @@ def main(args):
             sys.stderr.write("\n")
 
         if internal_test_suite_failure:
-            raise internal_test_suite_failure
+            traceback.print_exception(
+                internal_test_suite_failure, limit=None, chain=True
+            )
 
     run_color: str = None
     if success_cases == len(cases):
