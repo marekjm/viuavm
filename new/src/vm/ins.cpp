@@ -144,6 +144,7 @@ auto execute(viua::vm::Stack& stack,
             Work(LUI);
             Work(LUIU);
             Work(CAST);
+            Work(ARODP);
 #undef Work
         }
         break;
@@ -435,18 +436,20 @@ auto execute(ADD const op, Stack& stack, ip_type const) -> void
         auto const old_address = lhs.get<Pt>()->ptr;
         auto const new_address = (old_address + offset);
 
-        auto const old_ptr = stack.proc->get_pointer(old_address);
-        if (offset >= old_ptr->size) {
+        auto const old_ptr     = stack.proc->get_pointer(old_address);
+        auto const ffi_pointer = old_ptr->foreign;
+        if ((not ffi_pointer) and offset >= old_ptr->size) {
             auto o = std::ostringstream{};
             o << "illegal offset of " << offset << " bytes into a region of "
               << old_ptr->size << " byte(s)";
             throw abort_execution{stack, o.str()};
         }
 
-        auto new_ptr   = Pointer{};
-        new_ptr.ptr    = new_address;
-        new_ptr.size   = (old_ptr->size - offset);
-        new_ptr.parent = old_ptr->ptr;
+        auto new_ptr    = Pointer{};
+        new_ptr.ptr     = new_address;
+        new_ptr.size    = (old_ptr->size - offset);
+        new_ptr.foreign = old_ptr->foreign;
+        new_ptr.parent  = old_ptr->ptr;
         stack.proc->record_pointer(new_ptr);
 
         out = Pt{new_address};
@@ -1169,6 +1172,20 @@ auto execute(CAST const op, Stack& stack, ip_type const) -> void
         throw abort_execution{stack, "invalid cast"};
     }
 }
+auto execute(ARODP const op, Stack& stack, ip_type const) -> void
+{
+    auto const& strtab     = *stack.proc->strtab;
+    auto const data_offset = op.instruction.immediate;
+
+    auto const pointer_address = const_cast<uint8_t*>(&strtab[data_offset]);
+    mutable_proxy(stack, op.instruction.out) = register_type::pointer_type{
+        reinterpret_cast<uintptr_t>(pointer_address)};
+
+    auto pointer_info    = Pointer{};
+    pointer_info.ptr     = reinterpret_cast<uintptr_t>(pointer_address);
+    pointer_info.foreign = true;
+    stack.proc->record_pointer(pointer_info);
+}
 
 auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
 {
@@ -1821,13 +1838,14 @@ auto execute(LM const op, Stack& stack, ip_type const) -> void
         throw abort_execution{stack, o.str()};
     }
 
-    if (offset >= pointer_info->size) {
+    auto const ffi_pointer = pointer_info->foreign;
+    if ((not ffi_pointer) and offset >= pointer_info->size) {
         auto o = std::ostringstream{};
         o << "illegal offset of " << offset << " bytes into a region of "
           << pointer_info->size << " byte(s)";
         throw abort_execution{stack, o.str()};
     }
-    if ((offset + copy_size) > pointer_info->size) {
+    if ((not ffi_pointer) and (offset + copy_size) > pointer_info->size) {
         auto o = std::ostringstream{};
         o << "illegal load of " << copy_size << " bytes from a region of "
           << (pointer_info->size - offset) << " byte(s)";
@@ -1835,7 +1853,8 @@ auto execute(LM const op, Stack& stack, ip_type const) -> void
     }
 
     auto const user_addr = base->ptr + offset;
-    auto const addr      = stack.proc->memory_at(user_addr);
+    auto const addr      = ffi_pointer ? reinterpret_cast<uint8_t*>(base->ptr)
+                                       : stack.proc->memory_at(user_addr);
     if (addr == nullptr) {
         auto o = std::ostringstream{};
         o << "invalid load address: ";
