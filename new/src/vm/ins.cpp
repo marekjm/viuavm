@@ -341,64 +341,6 @@ auto immutable_proxy(Frame& frame, access_type const a, Stack const& stack)
     }
 }
 
-#if 0
-using viua::vm::types::Cell_view;
-template<typename Op, typename Lhs, typename Boxed_lhs>
-auto execute_arithmetic_op_impl(ip_type const ip,
-                                Proxy& out,
-                                Cell_view& lhs,
-                                Cell_view& rhs,
-                                std::string_view const tn) -> void
-{
-    /*
-     * Instead of casting the lhs operand we could just get it. However, by
-     * always casting we can use the same code for unboxed and boxed variants.
-     * The difference is not visible on the ISA level, but we have to deal with
-     * the hairy details on the implementation level.
-     */
-    auto r = typename Op::functor_type{}(cast_to<Lhs>(lhs), cast_to<Lhs>(rhs));
-    store_impl<Boxed_lhs>(ip, out, std::move(r), tn);
-}
-template<typename Op>
-auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
-{
-    auto out = get_proxy(stack, op.instruction.out, ip);
-    auto lhs = get_value(stack, op.instruction.lhs, ip);
-    auto rhs = get_value(stack, op.instruction.rhs, ip);
-
-    using viua::vm::types::Float_double;
-    using viua::vm::types::Float_single;
-    using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
-
-    auto const holds_i64 =
-        (lhs.template holds<int64_t>() or lhs.template holds<Signed_integer>());
-    auto const holds_u64 = (lhs.template holds<uint64_t>()
-                            or lhs.template holds<Unsigned_integer>());
-    auto const holds_f32 =
-        (lhs.template holds<float>() or lhs.template holds<Float_single>());
-    auto const holds_f64 =
-        (lhs.template holds<double>() or lhs.template holds<Float_double>());
-
-    if (holds_i64) {
-        execute_arithmetic_op_impl<Op, int64_t, Signed_integer>(
-            ip, out, lhs, rhs, "i64");
-    } else if (holds_u64) {
-        execute_arithmetic_op_impl<Op, uint64_t, Unsigned_integer>(
-            ip, out, lhs, rhs, "u64");
-    } else if (holds_f32) {
-        execute_arithmetic_op_impl<Op, float, Float_single>(
-            ip, out, lhs, rhs, "fl");
-    } else if (holds_f64) {
-        execute_arithmetic_op_impl<Op, double, Float_double>(
-            ip, out, lhs, rhs, "db");
-    } else {
-        throw abort_execution{
-            ip, "unsupported operand types for arithmetic operation"};
-    }
-}
-#endif
-
 auto execute(ADD const op, Stack& stack, ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
