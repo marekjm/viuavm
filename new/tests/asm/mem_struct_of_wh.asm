@@ -9,8 +9,8 @@
     ; What is sizeof(foo)? Three half-words ie, 6 bytes.
 
     ; Allocate space for a struct: three half-words.
-    li $1.l, 2u
-    amwa $1.l, $1.l, 0
+    li $1.l, 3u
+    amha $1.l, $1.l, 0
 
     ; Create the value for the first memer of the struct, a word, and store it
     ; in the memory area allocated for the struct.

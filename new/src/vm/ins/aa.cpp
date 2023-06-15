@@ -45,7 +45,7 @@ using ip_type = viua::arch::instruction_type const*;
 auto execute(AA const op, Stack& stack, ip_type const) -> void
 {
     auto const base = immutable_proxy(stack, op.instruction.in).get<uint64_t>();
-    auto const alignment [[maybe_unused]] = (1u << op.instruction.spec);
+    auto const alignment = (1u << op.instruction.spec);
 
     if (not base.has_value()) {
         throw abort_execution{stack, "invalid operand type for aa instruction"};

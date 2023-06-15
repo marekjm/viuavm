@@ -1,3 +1,2 @@
 ebreak -1 in process [fe80::42]
-memory:
-0000000000000000  00 00 00 00 00 00 00 00 fe ed be ef de ad 00 00
+bfffffffffffffe1--f0  00 00 00 00 00 00 00 00 de ad 00 00 fe ed be ef | ................

@@ -1593,18 +1593,25 @@ auto dump_memory(std::vector<Page> const& memory) -> void
     for (auto line = size_t{0}; line < (memory.front().size() / MEM_LINE_SIZE);
          ++line) {
         viua::TRACE_STREAM << "    ";
-        viua::TRACE_STREAM << std::setw(16)
-                           << (MEM_FIRST_STACK_BREAK - (line * MEM_LINE_SIZE))
-                           << "  ";
-        for (auto i = size_t{0}; i < MEM_LINE_SIZE; ++i) {
-            viua::TRACE_STREAM
-                << std::setw(2)
-                << static_cast<int>(memory.front().at(line * MEM_LINE_SIZE + i))
-                << ' ';
+        viua::TRACE_STREAM
+            << std::setw(16)
+            << (MEM_FIRST_STACK_BREAK - ((line + 1) * MEM_LINE_SIZE) + 1)
+            << "--" << std::setw(2)
+            << ((MEM_FIRST_STACK_BREAK - (line * MEM_LINE_SIZE))
+                & 0x00000000000000ff)
+            << "  ";
+
+        auto const& page = memory.front();
+        auto at          = [&page, line](size_t const n) -> uint8_t {
+            return *((page.data() + page.size()) - (line * MEM_LINE_SIZE + n));
+        };
+        for (auto i = MEM_LINE_SIZE; i; --i) {
+            viua::TRACE_STREAM << std::setw(2) << static_cast<int>(at(i - 1))
+                               << ' ';
         }
-        viua::TRACE_STREAM << " | ";
-        for (auto i = size_t{0}; i < MEM_LINE_SIZE; ++i) {
-            auto const c = memory.front().at(line * MEM_LINE_SIZE + i);
+        viua::TRACE_STREAM << "| ";
+        for (auto i = MEM_LINE_SIZE; i; --i) {
+            auto const c = at(i - 1);
             viua::TRACE_STREAM << (isprint(c) ? static_cast<char>(c) : '.');
         }
         viua::TRACE_STREAM << viua::TRACE_STREAM.endl;

@@ -66,7 +66,9 @@ EBREAK_LINE_PRIMITIVE = re.compile(
     r"\[(\d+)\.([lap])\] (is|iu|fl|db|atom|pid|raw) (.*)"
 )
 EBREAK_LINE_SPECIAL = re.compile(r"\[(fptr|sbrk)\] (is|iu|fl|db) (.*)")
-EBREAK_MEMORY_LINE = re.compile(r"([0-9a-f]{16})  ((?:[0-9a-f]{2} ){16}) \| (.{16})")
+EBREAK_MEMORY_LINE = re.compile(
+    r"([0-9a-f]{16}--[0-9a-f]{2})  ((?:[0-9a-f]{2} ){16})\| (.{16})"
+)
 EBREAK_GLOBALS_LINE = re.compile(r"([a-z_][a-zA-Z0-9_]*) = (is|iu|fl|db) (.*)")
 PERF_OPS_AND_RUNTIME = re.compile(r"\[vm:perf\] executed ops (\d+), run time (.+)")
 PERF_APPROX_FREQ = re.compile(r"\[vm:perf\] approximate frequency (.+ [kMG]?Hz)")
