@@ -133,6 +133,10 @@ class No_check_file_for(Suite_error):
     pass
 
 
+class Borked_ebreak(Suite_error):
+    pass
+
+
 class Status(enum.Enum):
     Normal = 0
     Skip = 1
@@ -275,6 +279,9 @@ def walk_ebreak_test(errors, want_ebreak, live_ebreak):
     ebreak_index = 0
 
     for i, line in enumerate(want_ebreak):
+        if not line.strip():
+            continue
+
         if select := EBREAK_SELECT.fullmatch(line):
             if (ebreak_index := select.group(1)) == "last":
                 ebreak_index = -1
@@ -401,7 +408,7 @@ def walk_ebreak_test(errors, want_ebreak, live_ebreak):
 
         p = EBREAK_LINE_PRIMITIVE.fullmatch(line)
         if not p:
-            continue  # FIXME suspicious - maybe an error?
+            raise Borked_ebreak(line)
 
         m = p
         index = int(m.group(1))
@@ -782,23 +789,12 @@ def test_case(case_name, test_program, errors):
             None,
         )
 
-    try:
-        result, ebreak, abort_report, perf = run_and_capture(
-            INTERPRETER,
-            test_executable,
-        )
-    except Exception as e:
-        result = e
+    result, ebreak, abort_report, perf = run_and_capture(
+        INTERPRETER,
+        test_executable,
+    )
 
-    if type(result) is Exception:
-        return (
-            Status.Normal,
-            False,
-            "crashed with Python exception",
-            count_runtime(),
-            None,
-        )
-    elif result == -6 and check_kind == "abort":
+    if result == -6 and check_kind == "abort":
         pass
     elif result != 0:
         return (
