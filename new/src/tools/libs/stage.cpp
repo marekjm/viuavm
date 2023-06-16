@@ -510,18 +510,18 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
 
         insn.operands.pop_back();
         cooked.push_back(std::move(insn));
-    } else if (insn.opcode == "string" or insn.opcode == "g.string") {
+    } else if (insn.opcode == "arodp" or insn.opcode == "g.arodp") {
         auto const lx = insn.operands.back().ingredients.front();
         auto saved_at = size_t{0};
         if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
             auto s   = lx.text;
             s        = s.substr(1, s.size() - 2);
             s        = viua::support::string::unescape(s);
-            saved_at = save_string(strings_table, s);
+            saved_at = (save_string(strings_table, s) - sizeof(uint64_t));
         } else if (lx.token == viua::libs::lexer::TOKEN::AT) {
             auto const label = insn.operands.back().ingredients.back();
             try {
-                saved_at = var_offsets.at(label.text);
+                saved_at = (var_offsets.at(label.text) - sizeof(uint64_t));
             } catch (std::out_of_range const&) {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
@@ -562,7 +562,6 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
 
         auto synth           = viua::libs::parser::ast::Instruction{};
         synth.opcode         = insn.opcode;
-        synth.opcode.text    = "g.li";
         synth.physical_index = insn.physical_index;
 
         synth.operands.push_back(insn.operands.front());
@@ -571,9 +570,6 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
             std::to_string(saved_at) + 'u';
 
         cooked.push_back(synth);
-
-        insn.operands.pop_back();
-        cooked.push_back(std::move(insn));
     } else if (insn.opcode == "float" or insn.opcode == "g.float") {
         constexpr auto SIZE_OF_SINGLE_PRECISION_FLOAT = size_t{4};
         auto f = std::stof(insn.operands.back().ingredients.front().text);

@@ -5,7 +5,7 @@
     ; string $1, "Hello, World!"
 
     ; Load size of the string.
-    arodp $2.l, 0
+    arodp $2.l, @some_string
     ld $3.l, $2.l, 0
     cast $3.l, uint
 

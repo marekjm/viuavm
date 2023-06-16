@@ -389,6 +389,50 @@ auto demangle_addiu(Cooked_text& text) -> void
     text = std::move(tmp);
 }
 
+auto demangle_arodp(Cooked_text& text, std::map<size_t, std::string> const& labels_table) -> void
+{
+    auto tmp = Cooked_text{};
+
+    auto const ins_at =
+        [&text](size_t const n) -> viua::arch::instruction_type {
+        return text.at(n).instruction.value_or(0);
+    };
+    auto const m = [ins_at](size_t const n,
+                            viua::arch::ops::OPCODE const op,
+                            viua::arch::opcode_type const flags = 0) -> bool {
+        return match_opcode(ins_at(n), op, flags);
+    };
+
+    using enum viua::arch::ops::OPCODE;
+    for (auto i = size_t{0}; i < text.size(); ++i) {
+        using viua::arch::ops::GREEDY;
+        if (m(i, ARODP) or m(i, ARODP, GREEDY)) {
+            using viua::arch::ops::E;
+            auto const arodp         = E::decode(ins_at(i));
+            auto const needs_greedy = (arodp.opcode & GREEDY);
+
+            auto const off = arodp.immediate;
+            auto const label = labels_table.count(off + sizeof(uint64_t))
+                ? labels_table.at(off + sizeof(uint64_t))
+                : ("_strat_" + std::to_string(off));
+
+            auto idx          = text.at(i).index;
+            idx.physical_span = idx.physical;
+            tmp.emplace_back(
+                idx,
+                std::nullopt,
+                std::nullopt,
+                ((needs_greedy ? "g." : "") + std::string{"arodp "}
+                 + arodp.out.to_string() + ", @" + label));
+            continue;
+        }
+
+        tmp.push_back(std::move(text.at(i)));
+    }
+
+    text = std::move(tmp);
+}
+
 auto demangle_memory(Cooked_text& text) -> void
 {
     auto tmp = Cooked_text{};
@@ -900,6 +944,7 @@ auto main(int argc, char* argv[]) -> int
                 cooked_text, rodata->get(), fntab->get());
         }
         cook::demangle_addiu(cooked_text);
+        cook::demangle_arodp(cooked_text, lt);
         cook::demangle_memory(cooked_text);
 
         auto const physical_to_logical = cook::demangle_branches(cooked_text);
