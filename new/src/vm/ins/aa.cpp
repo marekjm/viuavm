@@ -18,6 +18,7 @@
  */
 
 #include <endian.h>
+#include <string.h>
 
 #include <algorithm>
 #include <functional>
@@ -66,5 +67,7 @@ auto execute(AA const op, Stack& stack, ip_type const) -> void
     pointer_info.ptr  = pointer_address;
     pointer_info.size = size;
     stack.proc->record_pointer(pointer_info);
+
+    memset(stack.proc->memory_at(pointer_address), 0, size);
 }
 }  // namespace viua::vm::ins

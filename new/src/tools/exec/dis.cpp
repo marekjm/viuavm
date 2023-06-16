@@ -144,17 +144,6 @@ auto demangle_strtab_load(Cooked_text& raw,
     using enum viua::arch::ops::OPCODE;
     using viua::arch::ops::D;
     using viua::arch::ops::S;
-    if (m(i + 1, STRING) and S::decode(ins_at(i + 1)).out == out) {
-        auto ins = raw.at(i + 1);
-        auto tt  = ins.with_text(("string " + out.to_string() + ", @_strat_"
-                                 + std::to_string(immediate)));
-        tt.index = cooked.back().index;
-        cooked.pop_back();
-        tt.index.physical_span = tt.index.physical_span.value() + 1;
-        cooked.emplace_back(tt);
-        ++i;
-        return;
-    }
     if (m(i + 1, ATOM) and S::decode(ins_at(i + 1)).out == out) {
         auto ins = raw.at(i + 1);
         auto tt  = ins.with_text(("atom " + out.to_string() + ", @_strat_"

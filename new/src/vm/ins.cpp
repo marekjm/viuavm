@@ -118,7 +118,6 @@ auto execute(viua::vm::Stack& stack,
             Work(FRAME);
             Flow(RETURN);
             Work(ATOM);
-            Work(STRING);
             Work(FLOAT);
             Work(DOUBLE);
             Work(SELF);
@@ -936,27 +935,6 @@ auto execute(ATOM const op, Stack& stack, ip_type const) -> void
     auto value             = std::string{data_address, data_size};
     stack.proc->atoms[key] = std::move(value);
     target                 = register_type::atom_type{key};
-}
-auto execute(STRING const, Stack&, ip_type const) -> void
-{
-#if 0
-    auto target = get_proxy(stack, op.instruction.out, ip);
-
-    auto const& strtab     = *stack.proc->strtab;
-    auto const data_offset = cast_to<uint64_t>(target.view());
-    auto const data_size   = [&strtab, data_offset]() -> uint64_t {
-        auto const size_offset = (data_offset - sizeof(uint64_t));
-        auto tmp               = uint64_t{};
-        memcpy(&tmp, &strtab[size_offset], sizeof(uint64_t));
-        return le64toh(tmp);
-    }();
-
-    auto s     = std::make_unique<viua::vm::types::String>();
-    s->content = std::string{
-        reinterpret_cast<char const*>(&strtab[0] + data_offset), data_size};
-
-    target = std::move(s);
-#endif
 }
 
 auto execute(FRAME const op, Stack& stack, ip_type const) -> void
