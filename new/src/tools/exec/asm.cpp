@@ -62,8 +62,9 @@ constexpr auto DEBUG_EXPANSION = false;
 using viua::libs::stage::save_string;
 
 namespace {
-auto save_label_address(std::vector<uint8_t>& strings, std::string_view const label, size_t const address)
-    -> size_t
+auto save_label_address(std::vector<uint8_t>& strings,
+                        std::string_view const label,
+                        size_t const address) -> size_t
 {
     auto const label_size = htole64(static_cast<uint64_t>(label.size()));
     strings.resize(strings.size() + sizeof(label_size));
@@ -257,9 +258,10 @@ auto load_value_labels(std::filesystem::path const source_path,
     }
 }
 
-auto make_labels_table(std::vector<uint8_t>& labels_table, std::map<std::string, size_t> const& var_offsets) -> void
+auto make_labels_table(std::vector<uint8_t>& labels_table,
+                       std::map<std::string, size_t> const& var_offsets) -> void
 {
-    for (auto const& [ label, address ] : var_offsets) {
+    for (auto const& [label, address] : var_offsets) {
         save_label_address(labels_table, label, address);
     }
 }
@@ -295,7 +297,8 @@ auto cook_long_immediates(std::filesystem::path const source_path,
         auto cooked = std::vector<ast::Instruction>{};
         for (auto& insn : fn.instructions) {
             try {
-                auto c = viua::libs::stage::cook_long_immediates(insn, strings_table, var_offsets);
+                auto c = viua::libs::stage::cook_long_immediates(
+                    insn, strings_table, var_offsets);
                 std::copy(c.begin(), c.end(), std::back_inserter(cooked));
             } catch (viua::libs::errors::compile_time::Error const& e) {
                 viua::libs::stage::display_error_in_function(
@@ -1021,7 +1024,7 @@ auto main(int argc, char* argv[]) -> int
      * preparation so they need to be expanded.
      */
     auto strings_table = std::vector<uint8_t>{};
-    auto labels_table = std::vector<uint8_t>{};
+    auto labels_table  = std::vector<uint8_t>{};
     auto var_offsets   = std::map<std::string, size_t>{};
     auto fn_table      = std::vector<uint8_t>{};
     auto fn_offsets    = std::map<std::string, size_t>{};

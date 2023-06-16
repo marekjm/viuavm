@@ -155,8 +155,7 @@ auto Loaded_elf::function_table() const
 
     return ft;
 }
-auto Loaded_elf::labels_table() const
-    -> std::map<size_t, std::string>
+auto Loaded_elf::labels_table() const -> std::map<size_t, std::string>
 {
     auto lt         = std::map<size_t, std::string>{};
     auto const& raw = find_fragment(".viua.labels");
@@ -171,7 +170,8 @@ auto Loaded_elf::labels_table() const
         memcpy(&sz, (data.data() + i - sizeof(sz)), sizeof(sz));
         sz = le64toh(sz);
 
-        auto name = std::string{reinterpret_cast<char const*>(data.data() + i), sz};
+        auto name =
+            std::string{reinterpret_cast<char const*>(data.data() + i), sz};
         auto addr = uint64_t{};
         memcpy(&addr, (data.data() + i + sz), sizeof(addr));
         addr = le64toh(addr);

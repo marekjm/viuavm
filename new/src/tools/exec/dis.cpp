@@ -389,7 +389,8 @@ auto demangle_addiu(Cooked_text& text) -> void
     text = std::move(tmp);
 }
 
-auto demangle_arodp(Cooked_text& text, std::map<size_t, std::string> const& labels_table) -> void
+auto demangle_arodp(Cooked_text& text,
+                    std::map<size_t, std::string> const& labels_table) -> void
 {
     auto tmp = Cooked_text{};
 
@@ -408,22 +409,21 @@ auto demangle_arodp(Cooked_text& text, std::map<size_t, std::string> const& labe
         using viua::arch::ops::GREEDY;
         if (m(i, ARODP) or m(i, ARODP, GREEDY)) {
             using viua::arch::ops::E;
-            auto const arodp         = E::decode(ins_at(i));
+            auto const arodp        = E::decode(ins_at(i));
             auto const needs_greedy = (arodp.opcode & GREEDY);
 
-            auto const off = arodp.immediate;
+            auto const off   = arodp.immediate;
             auto const label = labels_table.count(off + sizeof(uint64_t))
-                ? labels_table.at(off + sizeof(uint64_t))
-                : ("_strat_" + std::to_string(off));
+                                   ? labels_table.at(off + sizeof(uint64_t))
+                                   : ("_strat_" + std::to_string(off));
 
             auto idx          = text.at(i).index;
             idx.physical_span = idx.physical;
-            tmp.emplace_back(
-                idx,
-                std::nullopt,
-                std::nullopt,
-                ((needs_greedy ? "g." : "") + std::string{"arodp "}
-                 + arodp.out.to_string() + ", @" + label));
+            tmp.emplace_back(idx,
+                             std::nullopt,
+                             std::nullopt,
+                             ((needs_greedy ? "g." : "") + std::string{"arodp "}
+                              + arodp.out.to_string() + ", @" + label));
             continue;
         }
 
@@ -775,38 +775,31 @@ auto main(int argc, char* argv[]) -> int
     }
     if (auto const f = main_module.find_fragment(".viua.fns");
         not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << ": "
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native() << ": "
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
                   << esc(2, ATTR_RESET)
                   << ": no function table fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << ": "
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native() << ": "
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
                   << esc(2, ATTR_RESET) << ": no .viua.fns section found\n";
         return 1;
     }
     if (auto const f = main_module.find_fragment(".viua.labels");
         not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << ": "
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native() << ": "
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "warning"
-                  << esc(2, ATTR_RESET)
-                  << ": no label table fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << ": "
+                  << esc(2, ATTR_RESET) << ": no label table fragment found\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native() << ": "
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
                   << esc(2, ATTR_RESET) << ": synthetic labels will be used\n";
     }
 
     auto text = std::vector<viua::arch::instruction_type>{};
     if (auto const f = main_module.find_fragment(".text"); not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << ": "
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native() << ": "
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
                   << esc(2, ATTR_RESET) << ": no text fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << ": "
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native() << ": "
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
                   << esc(2, ATTR_RESET) << ": no .text section found\n";
         return 1;
@@ -830,7 +823,7 @@ auto main(int argc, char* argv[]) -> int
     }
     auto& out = (preferred_output_path.has_value() ? to_file : std::cout);
 
-    auto const lt = main_module.labels_table();
+    auto const lt     = main_module.labels_table();
     auto const rodata = main_module.find_fragment(".rodata");
     if (rodata.has_value()) {
         auto const& strtab = rodata->get();
@@ -861,9 +854,8 @@ auto main(int argc, char* argv[]) -> int
                 continue;
             }
 
-            auto const label = lt.count(off)
-                ? lt.at(off)
-                : ("_strat_" + std::to_string(off));
+            auto const label =
+                lt.count(off) ? lt.at(off) : ("_strat_" + std::to_string(off));
 
             dumped = true;
             out << "; [.rodata+0x" << std::hex << std::setw(16)
