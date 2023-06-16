@@ -89,8 +89,6 @@ Work_instruction(MULIU);
 Work_instruction(DIVI);
 Work_instruction(DIVIU);
 
-Work_instruction(REF);
-
 Flow_instruction(IF);
 
 Work_instruction(EBREAK);

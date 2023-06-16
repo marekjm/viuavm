@@ -96,6 +96,9 @@ class atom:
         return "atom"
 
 
+# FIXME This may be useful for future pointers, where every pointer will have a
+# layout description assigned. Register dump will be able to show the address,
+# and pointed-to value.
 class ref:
     def __init__(self, value):
         self._value = value

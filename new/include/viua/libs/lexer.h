@@ -220,9 +220,6 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "swap",
     "g.swap",
 
-    "ref",
-    "g.ref",
-
     "if",
     "g.if",
 

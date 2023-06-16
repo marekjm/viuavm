@@ -363,13 +363,6 @@ struct DIVIU : Instruction {
     {}
 };
 
-struct REF : Instruction {
-    viua::arch::ops::D instruction;
-
-    REF(viua::arch::ops::D i) : instruction{i}
-    {}
-};
-
 struct IF : Instruction {
     viua::arch::ops::D instruction;
 

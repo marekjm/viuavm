@@ -250,7 +250,6 @@ auto execute(viua::vm::Stack& stack,
             Work(COPY);
             Work(MOVE);
             Work(SWAP);
-            Work(REF);
             /*
              * If is a special instruction. It transfers IP to a semi-random
              * location instead of just increasing it to the next unit. This is
@@ -1233,38 +1232,6 @@ auto execute(DIVI const op, Stack& stack, ip_type const) -> void
 auto execute(DIVIU const op, Stack& stack, ip_type const) -> void
 {
     execute_arithmetic_immediate_op(op, stack);
-}
-
-auto execute(REF const, Stack&, ip_type const) -> void
-{
-#if 0
-    auto dst = get_slot(op.instruction.out, stack, ip);
-    auto src = get_slot(op.instruction.in, stack, ip);
-
-    if (not src.has_value()) {
-        throw abort_execution{stack, "cannot take pointer to void"};
-    }
-
-    using viua::vm::types::Float_double;
-    using viua::vm::types::Float_single;
-    using viua::vm::types::Signed_integer;
-    using viua::vm::types::Unsigned_integer;
-    if (src.value()->holds<int64_t>()) {
-        src.value()->value =
-            std::make_unique<Signed_integer>(src.value()->value.get<int64_t>());
-    } else if (src.value()->holds<uint64_t>()) {
-        src.value()->value = std::make_unique<Unsigned_integer>(
-            src.value()->value.get<uint64_t>());
-    } else if (src.value()->holds<float>()) {
-        src.value()->value =
-            std::make_unique<Float_single>(src.value()->value.get<float>());
-    } else if (src.value()->holds<double>()) {
-        src.value()->value =
-            std::make_unique<Float_double>(src.value()->value.get<double>());
-    }
-
-    dst.value()->value = src.value()->boxed_value().reference_to();
-#endif
 }
 
 auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type

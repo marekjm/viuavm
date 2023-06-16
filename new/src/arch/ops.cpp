@@ -389,8 +389,6 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "move";
     case OPCODE::SWAP:
         return greedy + "swap";
-    case OPCODE::REF:
-        return greedy + "ref";
     case OPCODE::IF:
         return greedy + "if";
     case OPCODE::IO_SUBMIT:
@@ -527,8 +525,6 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::MOVE));
     } else if (sv == "swap") {
         return (op | static_cast<opcode_type>(OPCODE::SWAP));
-    } else if (sv == "ref") {
-        return (op | static_cast<opcode_type>(OPCODE::REF));
     } else if (sv == "if") {
         return (op | static_cast<opcode_type>(OPCODE::IF));
     } else if (sv == "io_submit") {
