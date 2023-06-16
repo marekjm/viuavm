@@ -740,6 +740,18 @@ auto main(int argc, char* argv[]) -> int
                   << esc(2, ATTR_RESET) << ": no .viua.fns section found\n";
         return 1;
     }
+    if (auto const f = main_module.find_fragment(".viua.labels");
+        not f.has_value()) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << ": "
+                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "warning"
+                  << esc(2, ATTR_RESET)
+                  << ": no label table fragment found\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << ": "
+                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
+                  << esc(2, ATTR_RESET) << ": synthetic labels will be used\n";
+    }
 
     auto text = std::vector<viua::arch::instruction_type>{};
     if (auto const f = main_module.find_fragment(".text"); not f.has_value()) {
@@ -770,6 +782,7 @@ auto main(int argc, char* argv[]) -> int
     }
     auto& out = (preferred_output_path.has_value() ? to_file : std::cout);
 
+    auto const lt = main_module.labels_table();
     auto const rodata = main_module.find_fragment(".rodata");
     if (rodata.has_value()) {
         auto const& strtab = rodata->get();
@@ -800,13 +813,17 @@ auto main(int argc, char* argv[]) -> int
                 continue;
             }
 
+            auto const label = lt.count(off)
+                ? lt.at(off)
+                : ("_strat_" + std::to_string(off));
+
             dumped = true;
             out << "; [.rodata+0x" << std::hex << std::setw(16)
                 << std::setfill('0') << off << "] to"
                 << " [.rodata+0x" << std::hex << std::setw(16)
                 << std::setfill('0') << (off + data_size) << "] (" << std::dec
                 << data_size << " byte" << (data_size == 1 ? "" : "s") << ")\n";
-            out << ".label: _strat_" << off << "\n";
+            out << ".label: " << label << "\n";
 
             out << ".value: string " << viua::support::string::quoted(sv)
                 << "\n\n";

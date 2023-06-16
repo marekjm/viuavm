@@ -155,6 +155,34 @@ auto Loaded_elf::function_table() const
 
     return ft;
 }
+auto Loaded_elf::labels_table() const
+    -> std::map<size_t, std::string>
+{
+    auto lt         = std::map<size_t, std::string>{};
+    auto const& raw = find_fragment(".viua.labels");
+    if (not raw.has_value()) {
+        return lt;
+    }
+
+    auto const data = raw->get().data;
+    for (auto i = size_t{sizeof(uint64_t)}; i < data.size();
+         i += (2 * sizeof(uint64_t))) {
+        auto sz = uint64_t{};
+        memcpy(&sz, (data.data() + i - sizeof(sz)), sizeof(sz));
+        sz = le64toh(sz);
+
+        auto name = std::string{reinterpret_cast<char const*>(data.data() + i), sz};
+        auto addr = uint64_t{};
+        memcpy(&addr, (data.data() + i + sz), sizeof(addr));
+        addr = le64toh(addr);
+
+        lt[addr] = std::move(name);
+
+        i += sz;
+    }
+
+    return lt;
+}
 
 auto Loaded_elf::make_text_from(Fragment::data_type const& data)
     -> std::vector<viua::arch::instruction_type>

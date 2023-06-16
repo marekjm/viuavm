@@ -62,6 +62,26 @@ constexpr auto DEBUG_EXPANSION = false;
 using viua::libs::stage::save_string;
 
 namespace {
+auto save_label_address(std::vector<uint8_t>& strings, std::string_view const label, size_t const address)
+    -> size_t
+{
+    auto const label_size = htole64(static_cast<uint64_t>(label.size()));
+    strings.resize(strings.size() + sizeof(label_size));
+    memcpy((strings.data() + strings.size() - sizeof(label_size)),
+           &label_size,
+           sizeof(label_size));
+
+    auto const saved_location = strings.size();
+    std::copy(label.begin(), label.end(), std::back_inserter(strings));
+
+    auto const label_addr = htole64(address);
+    strings.resize(strings.size() + sizeof(label_addr));
+    memcpy((strings.data() + strings.size() - sizeof(label_addr)),
+           &label_addr,
+           sizeof(label_addr));
+
+    return saved_location;
+}
 auto save_fn_address(std::vector<uint8_t>& strings, std::string_view const fn)
     -> size_t
 {
@@ -234,6 +254,13 @@ auto load_value_labels(std::filesystem::path const source_path,
             auto const s              = ct.value.front().text;
             var_offsets[ct.name.text] = save_string(strings_table, s);
         }
+    }
+}
+
+auto make_labels_table(std::vector<uint8_t>& labels_table, std::map<std::string, size_t> const& var_offsets) -> void
+{
+    for (auto const& [ label, address ] : var_offsets) {
+        save_label_address(labels_table, label, address);
     }
 }
 
@@ -422,7 +449,8 @@ auto emit_elf(std::filesystem::path const output_path,
               std::optional<uint64_t> const entry_point_fn,
               Text const& text,
               std::vector<uint8_t> const& strings_table,
-              std::vector<uint8_t> const& fn_table) -> void
+              std::vector<uint8_t> const& fn_table,
+              std::vector<uint8_t> const& labels_table) -> void
 {
     auto const a_out = open(output_path.c_str(),
                             O_CREAT | O_TRUNC | O_WRONLY,
@@ -611,6 +639,30 @@ auto emit_elf(std::filesystem::path const output_path,
             elf_headers.push_back({seg, sec});
         }
         {
+            Elf64_Phdr seg{};
+            seg.p_type    = PT_LOAD;
+            seg.p_offset  = 0;
+            auto const sz = labels_table.size();
+            seg.p_filesz = seg.p_memsz = sz;
+            seg.p_flags                = PF_R;
+            seg.p_align                = sizeof(viua::arch::instruction_type);
+
+            Elf64_Shdr sec{};
+            sec.sh_name = save_shstr_entry(".viua.labels");
+            /*
+             * This could be SHT_SYMTAB, but the SHT_SYMTAB type sections expect
+             * a certain format of the symbol table which Viua does not use. So
+             * let's just use SHT_PROGBITS because interpretation of
+             * SHT_PROGBITS is up to the program.
+             */
+            sec.sh_type   = SHT_PROGBITS;
+            sec.sh_offset = 0;
+            sec.sh_size   = seg.p_filesz;
+            sec.sh_flags  = SHF_ALLOC;
+
+            elf_headers.push_back({seg, sec});
+        }
+        {
             /*
              * ACHTUNG! ATTENTION! UWAGA! POZOR! TÄHELEPANU!
              *
@@ -734,6 +786,7 @@ auto emit_elf(std::filesystem::path const output_path,
               (text.size() * sizeof(std::decay_t<decltype(text)>::value_type)));
         write(a_out, strings_table.data(), strings_table.size());
         write(a_out, fn_table.data(), fn_table.size());
+        write(a_out, labels_table.data(), labels_table.size());
 
         write(a_out, shstr.data(), shstr.size());
     }
@@ -968,12 +1021,14 @@ auto main(int argc, char* argv[]) -> int
      * preparation so they need to be expanded.
      */
     auto strings_table = std::vector<uint8_t>{};
+    auto labels_table = std::vector<uint8_t>{};
     auto var_offsets   = std::map<std::string, size_t>{};
     auto fn_table      = std::vector<uint8_t>{};
     auto fn_offsets    = std::map<std::string, size_t>{};
 
     stage::load_value_labels(
         source_path, source_text, nodes, strings_table, var_offsets);
+    stage::make_labels_table(labels_table, var_offsets);
     stage::load_function_labels(nodes, fn_table, fn_offsets);
     stage::cook_long_immediates(
         source_path, source_text, nodes, strings_table, var_offsets);
@@ -1018,7 +1073,8 @@ auto main(int argc, char* argv[]) -> int
              : std::nullopt),
         text,
         strings_table,
-        fn_table);
+        fn_table,
+        labels_table);
 
     return 0;
 }

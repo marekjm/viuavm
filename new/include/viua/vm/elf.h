@@ -59,6 +59,9 @@ struct Loaded_elf {
     auto function_table() const
         -> std::map<size_t, std::pair<std::string, size_t>>;
 
+    auto labels_table() const
+        -> std::map<size_t, std::string>;
+
     static auto load(int const elf_fd) -> Loaded_elf;
     static auto make_text_from(Fragment::data_type const&)
         -> std::vector<viua::arch::instruction_type>;
