@@ -1248,50 +1248,57 @@ auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
     return target;
 }
 
-auto execute(IO_SUBMIT const, Stack&, ip_type const) -> void
+auto execute(IO_SUBMIT const op, Stack& stack, ip_type const) -> void
 {
-#if 0
-    auto dst = mutable_proxy(stack, op.instruction.out, ip);
-    auto port = immutable_proxy(stack, op.instruction.lhs, ip);
-    auto req = immutable_proxy(stack, op.instruction.rhs, ip);
-                   .boxed_of<viua::vm::types::Struct>();
+    /* auto const io_port = immutable_proxy(stack, op.instruction.out); */
+    auto const io_desc = immutable_proxy(stack, op.instruction.lhs);
+    /* auto const io_data = immutable_proxy(stack, op.instruction.rhs); */
 
-    if (not port.holds<int64_t>()) {
-        throw abort_execution{stack, "invalid I/O port"};
+    if (not io_desc.holds<register_type::pointer_type>()) {
+        throw abort_execution{stack, "invalid I/O request description"};
     }
 
-    auto& request = req.value().get();
-    switch (request.at("opcode").get<int64_t>()) {
+    auto const req_ptr =
+        stack.proc->memory_at(io_desc.get<register_type::pointer_type>()->ptr);
+
+    auto io_op = uint16_t{};
+    memcpy(&io_op, req_ptr, sizeof(io_op));
+    io_op = le16toh(io_op);
+
+    auto io_port = uint64_t{};
+    memcpy(&io_port, req_ptr + (sizeof(uint64_t) * 1), sizeof(io_port));
+    io_port = le64toh(io_port);
+
+    auto const size_ptr = req_ptr + (sizeof(uint64_t) * 2);
+    auto buffer_size    = uint64_t{0};
+    memcpy(&buffer_size, size_ptr, sizeof(buffer_size));
+    buffer_size = le64toh(buffer_size);
+
+    auto data_ptr_raw = uintptr_t{0};
+    memcpy(
+        &data_ptr_raw, req_ptr + (sizeof(uint64_t) * 3), sizeof(data_ptr_raw));
+    auto const data_ptr = stack.proc->memory_at(data_ptr_raw);
+
+    switch (io_op) {
     case 0:
     {
-        auto buf      = std::move(req.value()
-                                 .get()
-                                 .at("buf")
-                                 .view()
-                                 .boxed_of<viua::vm::types::String>()
-                                 ->get()
-                                 .content);
-        auto const rd = stack.proc->core->io.schedule(
-            port.get<int64_t>(), IORING_OP_READ, std::move(buf));
-        dst = rd;
+        auto buffer = std::string{};
+        buffer.resize(buffer_size);
+        auto const rd [[maybe_unused]] = stack.proc->core->io.schedule(
+            io_port, IORING_OP_READ, std::move(buffer));
+        /* FIXME Give back a handle to the scheduled I/O operation. */
         break;
     }
     case 1:
     {
-        auto buf      = std::move(req.value()
-                                 .get()
-                                 .at("buf")
-                                 .view()
-                                 .boxed_of<viua::vm::types::String>()
-                                 ->get()
-                                 .content);
-        auto const rd = stack.proc->core->io.schedule(
-            port.get<int64_t>(), IORING_OP_WRITE, std::move(buf));
-        dst = rd;
+        auto buffer =
+            std::string{reinterpret_cast<char*>(data_ptr), buffer_size};
+        auto const rd [[maybe_unused]] = stack.proc->core->io.schedule(
+            io_port, IORING_OP_WRITE, std::move(buffer));
+        /* FIXME Give back a handle to the scheduled I/O operation. */
         break;
     }
     }
-#endif
 }
 auto execute(IO_WAIT const, Stack&, ip_type const) -> void
 {
