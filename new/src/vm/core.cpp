@@ -32,16 +32,44 @@ auto IO_scheduler::schedule(int const fd,
                             buffer_type buffer) -> IO_request::id_type
 {
     auto const req_id = next_id.fetch_add(1);
-    auto req = std::make_unique<IO_request>(req_id, opcode, std::move(buffer));
+    auto req          = std::make_unique<IO_request>(
+        nullptr, req_id, opcode, std::move(buffer));
 
     io_uring_sqe* sqe{};
     sqe = io_uring_get_sqe(&ring);
 
     sqe->opcode = opcode;
     sqe->fd     = fd;
-    sqe->addr =
-        reinterpret_cast<decltype(io_uring_sqe::addr)>(req->buffer.data());
-    sqe->len       = req->buffer.size();
+
+    auto& buf      = std::get<decltype(buffer)>(req->buffer);
+    sqe->addr      = reinterpret_cast<decltype(io_uring_sqe::addr)>(buf.data());
+    sqe->len       = buf.size();
+    sqe->user_data = req_id;
+
+    io_uring_submit(&ring);
+
+    requests[req_id] = std::move(req);
+
+    return req_id;
+}
+auto IO_scheduler::schedule(uint8_t* const req_ptr,
+                            int const fd,
+                            opcode_type const opcode,
+                            io::buffer_view buffer) -> IO_request::id_type
+{
+    auto const req_id = next_id.fetch_add(1);
+    auto req          = std::make_unique<IO_request>(
+        req_ptr, req_id, opcode, std::move(buffer));
+
+    io_uring_sqe* sqe{};
+    sqe = io_uring_get_sqe(&ring);
+
+    sqe->opcode = opcode;
+    sqe->fd     = fd;
+
+    auto& buf      = std::get<decltype(buffer)>(req->buffer);
+    sqe->addr      = reinterpret_cast<decltype(io_uring_sqe::addr)>(buf.data());
+    sqe->len       = buf.size();
     sqe->user_data = req_id;
 
     io_uring_submit(&ring);

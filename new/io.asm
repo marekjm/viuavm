@@ -46,8 +46,7 @@
     sd $3.l, $5.l, 2
     sd $4.l, $5.l, 3
 
-    ; FIXME No handle for the I/O request is produced.
-    io_submit void, $5.l, void
+    io_submit $7.l, $5.l, void
 
     ebreak
     return void

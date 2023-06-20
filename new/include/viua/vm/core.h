@@ -332,6 +332,10 @@ struct Frame {
     {}
 };
 
+namespace io {
+using buffer_view = std::basic_string_view<uint8_t>;
+}
+
 struct IO_request {
     using id_type = uint64_t;
     id_type const id{};
@@ -340,7 +344,9 @@ struct IO_request {
     opcode_type const opcode{};
 
     using buffer_type = std::string;
-    buffer_type buffer{};
+    std::variant<io::buffer_view, buffer_type> buffer;
+
+    uint8_t* const req_ptr{nullptr};
 
     enum class Status {
         In_flight,
@@ -351,8 +357,17 @@ struct IO_request {
     };
     Status status{Status::In_flight};
 
-    inline IO_request(id_type const i, opcode_type const o, buffer_type b)
-            : id{i}, opcode{o}, buffer{b}
+    inline IO_request(uint8_t* const rp,
+                      id_type const i,
+                      opcode_type const o,
+                      buffer_type b)
+            : id{i}, opcode{o}, buffer{b}, req_ptr{rp}
+    {}
+    inline IO_request(uint8_t* const rp,
+                      id_type const i,
+                      opcode_type const o,
+                      io::buffer_view b)
+            : id{i}, opcode{o}, buffer{b}, req_ptr{rp}
     {}
 };
 
@@ -379,6 +394,8 @@ struct IO_scheduler {
     using opcode_type = decltype(io_uring_sqe::opcode);
     using buffer_type = IO_request::buffer_type;
     auto schedule(int const, opcode_type const, buffer_type)
+        -> IO_request::id_type;
+    auto schedule(uint8_t* const, int const, opcode_type const, io::buffer_view)
         -> IO_request::id_type;
 };
 

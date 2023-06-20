@@ -1250,16 +1250,15 @@ auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
 
 auto execute(IO_SUBMIT const op, Stack& stack, ip_type const) -> void
 {
-    /* auto const io_port = immutable_proxy(stack, op.instruction.out); */
+    auto const dst     = mutable_proxy(stack, op.instruction.out);
     auto const io_desc = immutable_proxy(stack, op.instruction.lhs);
-    /* auto const io_data = immutable_proxy(stack, op.instruction.rhs); */
 
     if (not io_desc.holds<register_type::pointer_type>()) {
         throw abort_execution{stack, "invalid I/O request description"};
     }
 
-    auto const req_ptr =
-        stack.proc->memory_at(io_desc.get<register_type::pointer_type>()->ptr);
+    auto const req_ptr_raw = io_desc.get<register_type::pointer_type>()->ptr;
+    auto const req_ptr     = stack.proc->memory_at(req_ptr_raw);
 
     auto io_op = uint16_t{};
     memcpy(&io_op, req_ptr, sizeof(io_op));
@@ -1282,32 +1281,37 @@ auto execute(IO_SUBMIT const op, Stack& stack, ip_type const) -> void
     switch (io_op) {
     case 0:
     {
-        auto buffer = std::string{};
-        buffer.resize(buffer_size);
-        auto const rd [[maybe_unused]] = stack.proc->core->io.schedule(
-            io_port, IORING_OP_READ, std::move(buffer));
-        /* FIXME Give back a handle to the scheduled I/O operation. */
+        auto buffer   = io::buffer_view{data_ptr, buffer_size};
+        auto const rd = stack.proc->core->io.schedule(
+            reinterpret_cast<uint8_t*>(req_ptr_raw),
+            io_port,
+            IORING_OP_READ,
+            std::move(buffer));
+        dst = rd;
         break;
     }
     case 1:
     {
         auto buffer =
             std::string{reinterpret_cast<char*>(data_ptr), buffer_size};
-        auto const rd [[maybe_unused]] = stack.proc->core->io.schedule(
+        auto const rd = stack.proc->core->io.schedule(
             io_port, IORING_OP_WRITE, std::move(buffer));
-        /* FIXME Give back a handle to the scheduled I/O operation. */
+        dst = rd;
         break;
     }
     }
 }
-auto execute(IO_WAIT const, Stack&, ip_type const) -> void
+auto execute(IO_WAIT const op, Stack& stack, ip_type const) -> void
 {
-#if 0
-    auto dst = get_proxy(stack, op.instruction.out, ip);
-    auto req = get_value(stack, op.instruction.lhs, ip);
+    auto dst = mutable_proxy(stack, op.instruction.out);
+    auto req = mutable_proxy(stack, op.instruction.lhs);
 
-    auto const want_id = req.get<uint64_t>();
-    if (not stack.proc->core->io.requests.contains(want_id)) {
+    if (not req.holds<uint64_t>()) {
+        throw abort_execution{stack, "invalid I/O request ID"};
+    }
+
+    auto const want_id = *req.get<uint64_t>();
+    if (stack.proc->core->io.requests.contains(want_id)) {
         io_uring_cqe* cqe{};
         do {
             io_uring_wait_cqe(&stack.proc->core->io.ring, &cqe);
@@ -1320,9 +1324,17 @@ auto execute(IO_WAIT const, Stack&, ip_type const) -> void
                 rd.status = IO_request::Status::Success;
 
                 if (rd.opcode == IORING_OP_READ) {
-                    rd.buffer.resize(cqe->res);
+                    auto const size_ptr =
+                        stack.proc->memory_at(
+                            reinterpret_cast<uint64_t>(rd.req_ptr))
+                        + (sizeof(uint64_t) * 2);
+                    auto const buffer_size = htole64(cqe->res);
+                    memcpy(size_ptr, &buffer_size, sizeof(buffer_size));
+
+                    dst = register_type::pointer_type{
+                        reinterpret_cast<uint64_t>(rd.req_ptr)};
                 } else if (rd.opcode == IORING_OP_WRITE) {
-                    rd.buffer = rd.buffer.substr(cqe->res);
+                    /* ignore */
                 }
             }
 
@@ -1330,10 +1342,7 @@ auto execute(IO_WAIT const, Stack&, ip_type const) -> void
         } while (cqe->user_data != want_id);
     }
 
-    dst = std::make_unique<types::String>(
-        std::move(stack.proc->core->io.requests[want_id]->buffer));
     stack.proc->core->io.requests.erase(want_id);
-#endif
 }
 auto execute(IO_SHUTDOWN const, Stack&, ip_type const) -> void
 {}
