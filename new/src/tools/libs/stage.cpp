@@ -1431,7 +1431,8 @@ auto emit_instruction(viua::libs::parser::ast::Instruction const insn)
         return viua::arch::ops::E{
             opcode,
             operand_or_throw(insn, 0).make_access(),
-            std::stoull(operand_or_throw(insn, 1).ingredients.front().text)}
+            std::stoull(
+                operand_or_throw(insn, 1).ingredients.front().text, nullptr, 0)}
             .encode();
     case FORMAT::R:
     {
