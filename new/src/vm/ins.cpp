@@ -1206,8 +1206,6 @@ auto execute_arithmetic_immediate_op(Op const op, Stack& stack) -> void
         out = typename Op::functor_type{}(*v, immediate);
     } else if (auto const v = in.template get<double>(); v) {
         out = typename Op::functor_type{}(*v, immediate);
-    } else if (auto const v = in.template get<double>(); v) {
-        out = typename Op::functor_type{}(*v, immediate);
     } else if (auto const v = in.template get<register_type::pointer_type>();
                v and not signed_immediate) {
         auto const r = typename Op::functor_type{}(v->ptr, immediate);
