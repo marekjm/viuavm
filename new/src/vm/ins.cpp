@@ -968,12 +968,9 @@ auto execute(CALL const op, Stack& stack, ip_type const) -> ip_type
 {
     auto fn_name = std::string{};
     auto fn_addr = size_t{};
-    {
-        if (auto fn = mutable_proxy(stack, op.instruction.in).get<uint64_t>();
-            fn) {
-            std::tie(fn_name, fn_addr) = stack.proc->module.function_at(*fn);
-            fn.reset();
-        }
+    if (auto fn = mutable_proxy(stack, op.instruction.in).get<uint64_t>(); fn) {
+        std::tie(fn_name, fn_addr) = stack.proc->module.function_at(*fn);
+        fn.reset();
     }
 
     if (fn_addr % sizeof(viua::arch::instruction_type)) {
