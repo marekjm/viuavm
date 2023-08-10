@@ -142,6 +142,7 @@ auto execute(viua::vm::Stack& stack,
         break
             Work(LUI);
             Work(LUIU);
+            Work(LLI);
             Work(CAST);
             Work(ARODP);
 #undef Work
@@ -1050,6 +1051,26 @@ auto execute(LUIU const op, Stack& stack, ip_type const) -> void
 {
     auto out = mutable_proxy(stack, op.instruction.out);
     out      = static_cast<uint64_t>(op.instruction.immediate << 28);
+}
+auto execute(LLI const op, Stack& stack, ip_type const) -> void
+{
+    auto out = mutable_proxy(stack, op.instruction.out);
+
+    if (auto const v = out.get<uint64_t>(); v) {
+        auto const high = (uint64_t{0xffffffff00000000} & *v);
+        auto const low =
+            (uint64_t{0x00000000ffffffff} & op.instruction.immediate);
+        out = (high | low);
+    } else if (auto const v = out.get<int64_t>(); v) {
+        auto const high = (uint64_t{0xffffffff00000000} & *v);
+        auto const low =
+            (uint64_t{0x00000000ffffffff} & op.instruction.immediate);
+        out = static_cast<int64_t>(high | low);
+    } else {
+        throw abort_execution{stack,
+                              "unsupported operand type for lli operation: "
+                                  + std::string{out.type_name()}};
+    }
 }
 auto execute(CAST const op, Stack& stack, ip_type const) -> void
 {

@@ -271,6 +271,12 @@ struct LUIU : Instruction {
     LUIU(viua::arch::ops::E i) : instruction{i}
     {}
 };
+struct LLI : Instruction {
+    viua::arch::ops::E instruction;
+
+    LLI(viua::arch::ops::E i) : instruction{i}
+    {}
+};
 struct CAST : Instruction {
     viua::arch::ops::E instruction;
 

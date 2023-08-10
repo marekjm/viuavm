@@ -275,8 +275,9 @@ enum class OPCODE : opcode_type {
 
     LUI   = (FORMAT_E | 0x0001),
     LUIU  = (FORMAT_E | 0x0001 | UNSIGNED),
-    CAST  = (FORMAT_E | 0x0002),
-    ARODP = (FORMAT_E | 0x0003),
+    LLI   = (FORMAT_E | 0x0002),
+    CAST  = (FORMAT_E | 0x0003),
+    ARODP = (FORMAT_E | 0x0004),
 
     ADDI  = (FORMAT_R | 0x0001),
     ADDIU = (FORMAT_R | 0x0001 | UNSIGNED),
@@ -350,6 +351,7 @@ enum class OPCODE_S : opcode_type {
 enum class OPCODE_E : opcode_type {
     Make_entry(LUI),
     Make_entry(LUIU),
+    Make_entry(LLI),
     Make_entry(CAST),
     Make_entry(ARODP),
 };

@@ -363,6 +363,8 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "lui";
     case OPCODE::LUIU:
         return greedy + "luiu";
+    case OPCODE::LLI:
+        return greedy + "lli";
     case OPCODE::ADDI:
         return greedy + "addi";
     case OPCODE::ADDIU:
@@ -499,6 +501,8 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::LUI));
     } else if (sv == "luiu") {
         return (op | static_cast<opcode_type>(OPCODE::LUIU));
+    } else if (sv == "lli") {
+        return (op | static_cast<opcode_type>(OPCODE::LLI));
     } else if (sv == "addi") {
         return (op | static_cast<opcode_type>(OPCODE::ADDI));
     } else if (sv == "addiu") {

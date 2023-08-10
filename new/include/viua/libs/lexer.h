@@ -195,6 +195,8 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "g.lui",
     "luiu",
     "g.luiu",
+    "lli",
+    "g.lli",
     "float",
     "g.float",
     "double",
