@@ -28,7 +28,7 @@
 
 namespace viua::libs::assembler {
 auto to_loading_parts_unsigned(uint64_t const value)
-    -> std::pair<uint64_t, std::pair<std::pair<uint32_t, uint32_t>, uint32_t>>;
+    -> std::pair<uint32_t, uint32_t>;
 auto li_cost(uint64_t const value) -> size_t;
 }  // namespace viua::libs::assembler
 

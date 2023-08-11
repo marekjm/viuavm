@@ -19,6 +19,8 @@
 
 #include <string.h>
 
+#include <array>
+#include <charconv>
 #include <iostream>
 
 #include <viua/libs/assembler.h>
@@ -660,239 +662,94 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
     }
 
     using viua::libs::assembler::to_loading_parts_unsigned;
-    auto parts            = to_loading_parts_unsigned(value);
-    auto const base       = parts.second.first.first;
-    auto const multiplier = parts.second.first.second;
-    auto const is_greedy  = (each.opcode.text.find("g.") == 0);
-    auto const full_form  = each.operands.at(1).has_attr("full");
+    auto const [hi, lo]  = to_loading_parts_unsigned(value);
+    auto const is_greedy = (each.opcode.text.find("g.") == 0);
+    auto const full_form = each.operands.at(1).has_attr("full");
 
     auto const is_unsigned = (raw_value.text.back() == 'u');
 
+    constexpr auto LOW_24   = uint32_t{0x00ffffff};
+    auto const fits_in_addi = ((lo & LOW_24) == lo);
+
+    auto const needs_leader = full_form or hi or (not fits_in_addi);
+
     /*
-     * Only use the luiu instruction of there's a reason to ie, if some
-     * of the highest 36 bits are set. Otherwise, the lui is just
-     * overhead.
+     * When loading immediates we have several cases to consider:
+     *
+     *  - the immediate is short ie, occupies only lower 24-bits and thus fits
+     *    fully in the immediate of an ADDI instruction
+     *  - the immediate is long ie, has any of the high 40 bits set
+     *
+     * In the first case we could be done with a single ADDI, and (if we are not
+     * loading addresses and need to take the pessimistic route to accommodate
+     * the linker) sometimes we can.
+     *
+     * However, in most cases the LI pseudoinstruction must be expanded into two
+     * real instructions:
+     *
+     *  - LUI to load the high word
+     *  - LLI to load the low word
+     *
+     * LUI is necessary even if the long immediate being loaded only has lower
+     * 32 bits set, because LLI needs a value to be already present in the
+     * output register to determine the signedness of its output.
+     *
+     * In any case, for long immediates the sequence of
+     *
+     *      g.lui $x, <high-word>
+     *      lli $x, <low-word>
+     *
+     * is emitted which is cheap and executed without releasing the virtual CPU.
      */
-    if (parts.first or full_form or multiplier) {
+    if (needs_leader) {
         using namespace std::string_literals;
-        auto synth = each;
-        synth.opcode.text =
-            ((multiplier or base or is_greedy) ? "g.lui" : "lui");
+        auto synth        = each;
+        synth.opcode.text = ((lo or is_greedy) ? "g.lui" : "lui");
         if (is_unsigned) {
-            // FIXME loading signed values is ridiculously expensive and always
-            // takes the most pessmisitic route - write a signed version of the
-            // algorithm
             synth.opcode.text += 'u';
         }
+
+        auto hi_literal = std::array<char, 2 + 8 + 1>{"0x"};
+        std::to_chars(hi_literal.begin() + 2, hi_literal.end(), hi, 16);
+
         synth.operands.at(1).ingredients.front().text =
-            std::to_string(parts.first);
+            std::string{hi_literal.data()};
         cooked.push_back(synth);
     }
 
-    if ((multiplier != 0) or full_form) {
+    /*
+     * In the second step we use LLI to load the lower word if we are dealing
+     * with a long immediate; or ADDI if we have a short immediate to deal with.
+     */
+    if (needs_leader) {
+        auto synth           = ast::Instruction{};
+        synth.opcode         = each.opcode;
+        synth.opcode.text    = "lli";
+        synth.physical_index = each.physical_index;
+
+        auto const& lx = each.operands.front().ingredients.at(1);
+
+        using viua::libs::lexer::TOKEN;
         {
-            auto synth           = ast::Instruction{};
-            synth.opcode         = each.opcode;
-            synth.opcode.text    = "g.addiu";
-            synth.physical_index = each.physical_index;
+            auto dst = ast::Operand{};
+            dst.ingredients.push_back(lx.make_synth("$", TOKEN::RA_DIRECT));
+            dst.ingredients.push_back(lx.make_synth(
+                std::to_string(std::stoull(lx.text)), TOKEN::LITERAL_INTEGER));
+            dst.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
+            dst.ingredients.push_back(lx.make_synth("l", TOKEN::LITERAL_ATOM));
 
-            auto const& lx = each.operands.front().ingredients.at(1);
-
-            using viua::libs::lexer::TOKEN;
-            {
-                auto dst = ast::Operand{};
-                dst.ingredients.push_back(lx.make_synth("$", TOKEN::RA_DIRECT));
-                dst.ingredients.push_back(
-                    lx.make_synth(std::to_string(std::stoull(lx.text) + 1),
-                                  TOKEN::LITERAL_INTEGER));
-                dst.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
-                dst.ingredients.push_back(
-                    lx.make_synth("l", TOKEN::LITERAL_ATOM));
-
-                synth.operands.push_back(dst);
-            }
-            {
-                auto src = ast::Operand{};
-                src.ingredients.push_back(
-                    lx.make_synth("void", TOKEN::RA_VOID));
-
-                synth.operands.push_back(src);
-            }
-            {
-                auto immediate = ast::Operand{};
-                immediate.ingredients.push_back(lx.make_synth(
-                    std::to_string(base), TOKEN::LITERAL_INTEGER));
-
-                synth.operands.push_back(immediate);
-            }
-
-            cooked.push_back(synth);
+            synth.operands.push_back(dst);
         }
         {
-            auto synth           = ast::Instruction{};
-            synth.opcode         = each.opcode;
-            synth.opcode.text    = "g.addiu";
-            synth.physical_index = each.physical_index;
+            auto immediate = ast::Operand{};
+            immediate.ingredients.push_back(
+                lx.make_synth(std::to_string(lo), TOKEN::LITERAL_INTEGER));
 
-            auto const& lx = each.operands.front().ingredients.at(1);
-
-            using viua::libs::lexer::TOKEN;
-            {
-                auto dst = ast::Operand{};
-                dst.ingredients.push_back(lx.make_synth("$", TOKEN::RA_DIRECT));
-                dst.ingredients.push_back(
-                    lx.make_synth(std::to_string(std::stoull(lx.text) + 2),
-                                  TOKEN::LITERAL_INTEGER));
-                dst.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
-                dst.ingredients.push_back(
-                    lx.make_synth("l", TOKEN::LITERAL_ATOM));
-
-                synth.operands.push_back(dst);
-            }
-            {
-                auto src = ast::Operand{};
-                src.ingredients.push_back(
-                    lx.make_synth("void", TOKEN::RA_VOID));
-
-                synth.operands.push_back(src);
-            }
-            {
-                /*
-                 * The multiplier may be zero if the full form of the expansion
-                 * is requested eg, for an address load. Without this additional
-                 * check the result of the expansion would be incorrect because
-                 * the multiplier would zero the low part of the integer.
-                 */
-                auto const imm_value = (multiplier != 0) ? multiplier : 1;
-                auto immediate       = ast::Operand{};
-                immediate.ingredients.push_back(lx.make_synth(
-                    std::to_string(imm_value), TOKEN::LITERAL_INTEGER));
-
-                synth.operands.push_back(immediate);
-            }
-
-            cooked.push_back(synth);
-        }
-        {
-            auto synth           = ast::Instruction{};
-            synth.opcode         = each.opcode;
-            synth.opcode.text    = "g.mul";
-            synth.physical_index = each.physical_index;
-
-            synth.operands.push_back(each.operands.front());
-            synth.operands.back().ingredients.at(1).text = std::to_string(
-                std::stoul(synth.operands.back().ingredients.at(1).text) + 1);
-
-            synth.operands.push_back(each.operands.front());
-            synth.operands.back().ingredients.at(1).text = std::to_string(
-                std::stoul(synth.operands.back().ingredients.at(1).text) + 1);
-
-            synth.operands.push_back(each.operands.front());
-            synth.operands.back().ingredients.at(1).text = std::to_string(
-                std::stoul(synth.operands.back().ingredients.at(1).text) + 2);
-
-            cooked.push_back(synth);
+            synth.operands.push_back(immediate);
         }
 
-        auto const remainder = parts.second.second;
-        {
-            auto synth           = ast::Instruction{};
-            synth.opcode         = each.opcode;
-            synth.opcode.text    = "g.addiu";
-            synth.physical_index = each.physical_index;
-
-            auto const& lx = each.operands.front().ingredients.at(1);
-
-            using viua::libs::lexer::TOKEN;
-            {
-                auto dst = ast::Operand{};
-                dst.ingredients.push_back(lx.make_synth("$", TOKEN::RA_DIRECT));
-                dst.ingredients.push_back(
-                    lx.make_synth(std::to_string(std::stoull(lx.text) + 2),
-                                  TOKEN::LITERAL_INTEGER));
-                dst.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
-                dst.ingredients.push_back(
-                    lx.make_synth("l", TOKEN::LITERAL_ATOM));
-
-                synth.operands.push_back(dst);
-            }
-            {
-                auto src = ast::Operand{};
-                src.ingredients.push_back(
-                    lx.make_synth("void", TOKEN::RA_VOID));
-
-                synth.operands.push_back(src);
-            }
-            {
-                auto immediate = ast::Operand{};
-                immediate.ingredients.push_back(lx.make_synth(
-                    std::to_string(remainder), TOKEN::LITERAL_INTEGER));
-
-                synth.operands.push_back(immediate);
-            }
-
-            cooked.push_back(synth);
-        }
-        {
-            auto synth           = ast::Instruction{};
-            synth.opcode         = each.opcode;
-            synth.opcode.text    = "g.add";
-            synth.physical_index = each.physical_index;
-
-            synth.operands.push_back(each.operands.front());
-            synth.operands.back().ingredients.at(1).text = std::to_string(
-                std::stoul(synth.operands.back().ingredients.at(1).text) + 1);
-
-            synth.operands.push_back(synth.operands.back());
-
-            synth.operands.push_back(each.operands.front());
-            synth.operands.back().ingredients.at(1).text = std::to_string(
-                std::stoul(synth.operands.back().ingredients.at(1).text) + 2);
-
-            cooked.push_back(synth);
-        }
-        {
-            auto synth           = ast::Instruction{};
-            synth.opcode         = each.opcode;
-            synth.opcode.text    = "g.add";
-            synth.physical_index = each.physical_index;
-
-            synth.operands.push_back(each.operands.front());
-            synth.operands.push_back(each.operands.front());
-
-            synth.operands.push_back(each.operands.front());
-            synth.operands.back().ingredients.at(1).text = std::to_string(
-                std::stoul(synth.operands.back().ingredients.at(1).text) + 1);
-
-            cooked.push_back(synth);
-        }
-
-        {
-            auto synth           = ast::Instruction{};
-            synth.opcode         = each.opcode;
-            synth.opcode.text    = "g.delete";
-            synth.physical_index = each.physical_index;
-
-            synth.operands.push_back(each.operands.front());
-            synth.operands.back().ingredients.at(1).text = std::to_string(
-                std::stoul(synth.operands.back().ingredients.at(1).text) + 1);
-
-            expand_delete(cooked, synth);
-        }
-        {
-            using namespace std::string_literals;
-            auto synth           = ast::Instruction{};
-            synth.opcode         = each.opcode;
-            synth.opcode.text    = (is_greedy ? "g." : "") + "delete"s;
-            synth.physical_index = each.physical_index;
-
-            synth.operands.push_back(each.operands.front());
-            synth.operands.back().ingredients.at(1).text = std::to_string(
-                std::stoul(synth.operands.back().ingredients.at(1).text) + 2);
-
-            expand_delete(cooked, synth);
-        }
-    } else if (base or (value == 0)) {
+        cooked.push_back(synth);
+    } else {
         using namespace std::string_literals;
         auto synth           = ast::Instruction{};
         synth.opcode         = each.opcode;
@@ -908,20 +765,13 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
          * If the first part of the load (the high 36 bits) was zero then it
          * means we don't have anything to add to so the source (left-hand side
          * operand) should be void ie, the default value.
-         *
-         * Otherwise, we should increase the value stored by the lui
-         * instruction.
          */
-        if (parts.first == 0) {
-            synth.operands.push_back(each.operands.front());
-            synth.operands.back().ingredients.front().text = "void";
-            synth.operands.back().ingredients.resize(1);
-        } else {
-            synth.operands.push_back(each.operands.front());
-        }
+        synth.operands.push_back(each.operands.front());
+        synth.operands.back().ingredients.front().text = "void";
+        synth.operands.back().ingredients.resize(1);
 
         synth.operands.push_back(each.operands.back());
-        synth.operands.back().ingredients.front().text = std::to_string(base);
+        synth.operands.back().ingredients.front().text = std::to_string(lo);
 
         cooked.push_back(synth);
     }
