@@ -126,6 +126,27 @@ auto execute(viua::vm::Stack& stack,
         }
         break;
     }
+    case F:
+    {
+        auto instruction = viua::arch::ops::F::decode(raw);
+        if constexpr (VIUA_TRACE_CYCLES) {
+            viua::TRACE_STREAM << "    " << instruction.to_string()
+                               << viua::TRACE_STREAM.endl;
+        }
+
+        using viua::arch::ops::OPCODE_F;
+        switch (static_cast<OPCODE_F>(opcode)) {
+#define Work(OP)                             \
+    case OPCODE_F::OP:                       \
+        execute(OP{instruction}, stack, ip); \
+        break
+            Work(LUI);
+            Work(LUIU);
+            Work(LLI);
+#undef Work
+        }
+        break;
+    }
     case E:
     {
         auto instruction = viua::arch::ops::E::decode(raw);
@@ -140,9 +161,6 @@ auto execute(viua::vm::Stack& stack,
     case OPCODE_E::OP:                       \
         execute(OP{instruction}, stack, ip); \
         break
-            Work(LUI);
-            Work(LUIU);
-            Work(LLI);
             Work(CAST);
             Work(ARODP);
 #undef Work
@@ -266,7 +284,7 @@ auto execute(viua::vm::Stack& stack,
         }
         break;
     }
-    case F:
+    default:
         std::cerr << "unimplemented instruction: "
                   << viua::arch::ops::to_string(opcode) << "\n";
         return nullptr;
@@ -1042,12 +1060,12 @@ auto execute(RETURN const op, Stack& stack, ip_type const) -> ip_type
 auto execute(LUI const op, Stack& stack, ip_type const) -> void
 {
     auto out = mutable_proxy(stack, op.instruction.out);
-    out      = static_cast<int64_t>(op.instruction.immediate << 32);
+    out      = static_cast<int64_t>(op.instruction.immediate) << 32;
 }
 auto execute(LUIU const op, Stack& stack, ip_type const) -> void
 {
     auto out = mutable_proxy(stack, op.instruction.out);
-    out      = static_cast<uint64_t>(op.instruction.immediate << 32);
+    out      = static_cast<uint64_t>(op.instruction.immediate) << 32;
 }
 auto execute(LLI const op, Stack& stack, ip_type const) -> void
 {

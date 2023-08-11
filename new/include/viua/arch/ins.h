@@ -260,23 +260,24 @@ struct DOUBLE : Instruction {
  * LUIU is the unsigned version of LUI and does not perform sign-extension.
  */
 struct LUI : Instruction {
-    viua::arch::ops::E instruction;
+    viua::arch::ops::F instruction;
 
-    LUI(viua::arch::ops::E i) : instruction{i}
+    LUI(viua::arch::ops::F i) : instruction{i}
     {}
 };
 struct LUIU : Instruction {
-    viua::arch::ops::E instruction;
+    viua::arch::ops::F instruction;
 
-    LUIU(viua::arch::ops::E i) : instruction{i}
+    LUIU(viua::arch::ops::F i) : instruction{i}
     {}
 };
 struct LLI : Instruction {
-    viua::arch::ops::E instruction;
+    viua::arch::ops::F instruction;
 
-    LLI(viua::arch::ops::E i) : instruction{i}
+    LLI(viua::arch::ops::F i) : instruction{i}
     {}
 };
+
 struct CAST : Instruction {
     viua::arch::ops::E instruction;
 

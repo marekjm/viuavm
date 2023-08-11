@@ -1277,6 +1277,15 @@ auto emit_instruction(viua::libs::parser::ast::Instruction const insn)
         return viua::arch::ops::S{opcode,
                                   operand_or_throw(insn, 0).make_access()}
             .encode();
+    case FORMAT::F:
+        return viua::arch::ops::F{
+            opcode,
+            operand_or_throw(insn, 0).make_access(),
+            static_cast<uint32_t>(
+                std::stoul(operand_or_throw(insn, 1).ingredients.front().text,
+                           nullptr,
+                           0))}
+            .encode();
     case FORMAT::E:
         return viua::arch::ops::E{
             opcode,
