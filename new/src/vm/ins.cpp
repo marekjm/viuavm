@@ -1033,6 +1033,10 @@ auto execute(RETURN const op, Stack& stack, ip_type const) -> ip_type
     auto fr = std::move(stack.frames.back());
     stack.frames.pop_back();
 
+    if (stack.frames.empty()) {
+        return fr.return_address;
+    }
+
     if (auto const rt = fr.result_to; not rt.is_void()) {
         // FIXME detect trying to return a dereference and throw an exception.
         // The following code is invalid and should be rejected:
