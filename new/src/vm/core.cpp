@@ -148,7 +148,7 @@ auto Process::memory_at(size_t const ptr) -> uint8_t*
     }
 
     auto& page = memory.front();
-    return (page.data() + page.size()) - offset;
+    return (page.data() + page.size() - 1) - offset;
 }
 auto Process::record_pointer(Pointer ptr) -> void
 {
