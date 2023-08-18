@@ -1667,8 +1667,6 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
                        << stack.proc->pid.to_string()
                        << viua::TRACE_STREAM.endl;
 }
-auto execute(ECALL const, Stack&, ip_type const) -> void
-{}
 
 auto execute(GTS const op, Stack& stack, ip_type const) -> void
 {

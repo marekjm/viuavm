@@ -197,7 +197,8 @@ $(BUILD)/tools/exec/asm: \
 	$(BUILD)/arch/ops.o
 
 VIUA_INSTRUCTION_IMPLS=\
-					   $(BUILD)/vm/ins/aa.o
+					   $(BUILD)/vm/ins/aa.o \
+					   $(BUILD)/vm/ins/ecall.o
 
 $(BUILD)/tools/exec/vm: \
 	$(BUILD)/support/tty.o \
