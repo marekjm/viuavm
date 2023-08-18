@@ -1562,7 +1562,8 @@ auto dump_memory(std::vector<Page> const& memory) -> void
 
         auto const& page = memory.front();
         auto at          = [&page, line](size_t const n) -> uint8_t {
-            return *((page.data() + page.size() - 1) - (line * MEM_LINE_SIZE + n));
+            return *((page.data() + page.size() - 1)
+                     - (line * MEM_LINE_SIZE + n));
         };
         for (auto i = MEM_LINE_SIZE; i; --i) {
             viua::TRACE_STREAM << std::setw(2) << static_cast<int>(at(i - 1))
