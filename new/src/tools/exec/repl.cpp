@@ -313,8 +313,9 @@ auto load_module(std::string_view const name, std::filesystem::path elf_path)
 
     if (auto const f = mod.find_fragment(".rodata"); not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET) << ": no strings fragment found\n";
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
+                  << ": no strings fragment found\n";
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
                   << esc(2, ATTR_RESET) << ": no .rodata section found\n";
@@ -322,8 +323,8 @@ auto load_module(std::string_view const name, std::filesystem::path elf_path)
     }
     if (auto const f = mod.find_fragment(".symtab"); not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET)
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
                   << ": no function table fragment found\n";
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
@@ -332,8 +333,9 @@ auto load_module(std::string_view const name, std::filesystem::path elf_path)
     }
     if (auto const f = mod.find_fragment(".text"); not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET) << ": no text fragment found\n";
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
+                  << ": no text fragment found\n";
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
                   << esc(2, ATTR_RESET) << ": no .text section found\n";

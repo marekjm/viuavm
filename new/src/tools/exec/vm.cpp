@@ -325,28 +325,31 @@ auto main(int argc, char* argv[]) -> int
     if (auto const f = main_module.find_fragment(".rodata");
         not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET) << ": no strings fragment found\n";
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
+                  << ": no strings fragment found\n";
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
                   << esc(2, ATTR_RESET) << ": no .rodata section found\n";
         return 1;
     }
-    if (auto const f = main_module.find_fragment(".viua.fns");
+    if (auto const f = main_module.find_fragment(".symtab");
         not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET)
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
                   << ": no function table fragment found\n";
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .viua.fns section found\n";
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
+                  << "note" << esc(2, ATTR_RESET)
+                  << ": no .symtab section found\n";
         return 1;
     }
     if (auto const f = main_module.find_fragment(".text"); not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET) << ": no text fragment found\n";
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
+                  << ": no text fragment found\n";
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
                   << esc(2, ATTR_RESET) << ": no .text section found\n";
@@ -358,8 +361,9 @@ auto main(int argc, char* argv[]) -> int
         entry_addr = (*ep / sizeof(viua::arch::instruction_type));
     } else {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET) << ": no entry point defined\n";
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
+                  << ": no entry point defined\n";
         return 1;
     }
 

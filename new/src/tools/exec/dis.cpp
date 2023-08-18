@@ -775,33 +775,38 @@ auto main(int argc, char* argv[]) -> int
     }
     if (auto const f = main_module.find_fragment(".symtab");
         not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native() << ": "
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET)
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
                   << ": no function table fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native() << ": "
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .symtab section found\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
+                  << "note" << esc(2, ATTR_RESET)
+                  << ": no .symtab section found\n";
         return 1;
     }
     if (auto const f = main_module.find_fragment(".viua.labels");
         not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native() << ": "
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "warning"
-                  << esc(2, ATTR_RESET) << ": no label table fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native() << ": "
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": synthetic labels will be used\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "warning" << esc(2, ATTR_RESET)
+                  << ": no label table fragment found\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
+                  << "note" << esc(2, ATTR_RESET)
+                  << ": synthetic labels will be used\n";
     }
 
     auto text = std::vector<viua::arch::instruction_type>{};
     if (auto const f = main_module.find_fragment(".text"); not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native() << ": "
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET) << ": no text fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native() << ": "
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .text section found\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
+                  << ": no text fragment found\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
+                  << "note" << esc(2, ATTR_RESET)
+                  << ": no .text section found\n";
         return 1;
     } else {
         text = main_module.make_text_from(f->get().data);
@@ -812,8 +817,9 @@ auto main(int argc, char* argv[]) -> int
         entry_addr = *ep;
     } else {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET) << ": no entry point defined\n";
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
+                  << ": no entry point defined\n";
         return 1;
     }
 
