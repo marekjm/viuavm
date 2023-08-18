@@ -465,6 +465,7 @@ auto emit_elf(std::filesystem::path const output_path,
 
     constexpr auto VIUA_MAGIC [[maybe_unused]] = "\x7fVIUA\x00\x00\x00";
     auto const VIUAVM_INTERP                   = std::string{"viua-vm"};
+    auto const VIUA_COMMENT = std::string{VIUAVM_VERSION_FULL};
 
     {
         // see elf(5)
@@ -605,6 +606,24 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_offset = 0;
             sec.sh_size   = seg.p_filesz;
             sec.sh_flags  = SHF_ALLOC;
+
+            elf_headers.push_back({seg, sec});
+        }
+        {
+            Elf64_Phdr seg{};
+            seg.p_type   = PT_LOAD;
+            seg.p_offset = 0;
+            auto const sz = VIUA_COMMENT.size() + 1;
+            seg.p_filesz = seg.p_memsz = sz;
+            seg.p_flags                = PF_R;
+            seg.p_align                = sizeof(viua::arch::instruction_type);
+
+            Elf64_Shdr sec{};
+            sec.sh_name   = save_shstr_entry(".comment");
+            sec.sh_type   = SHT_PROGBITS;
+            sec.sh_offset = 0;
+            sec.sh_size   = seg.p_filesz;
+            sec.sh_flags  = 0;
 
             elf_headers.push_back({seg, sec});
         }
@@ -788,6 +807,9 @@ auto emit_elf(std::filesystem::path const output_path,
               text.data(),
               (text.size() * sizeof(std::decay_t<decltype(text)>::value_type)));
         write(a_out, strings_table.data(), strings_table.size());
+
+        write(a_out, VIUA_COMMENT.c_str(), VIUA_COMMENT.size() + 1);
+
         write(a_out, fn_table.data(), fn_table.size());
         write(a_out, labels_table.data(), labels_table.size());
 
