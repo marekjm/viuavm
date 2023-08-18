@@ -1,5 +1,8 @@
+.label: hello_world
+.value: atom hello_world
+
 .function: [[entry_point]] main
-    atom $1, hello_world
+    atom $1, @hello_world
     ebreak
 
     frame $1.a

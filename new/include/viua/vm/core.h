@@ -64,7 +64,7 @@ struct Module {
             : elf_path{std::move(ep)}
             , elf{std::move(le)}
             , strings_table{elf.find_fragment(".rodata")->get().data}
-            , functions_table{elf.find_fragment(".viua.fns")->get().data}
+            , functions_table{elf.find_fragment(".symtab")->get().data}
             , text{elf.make_text_from(elf.find_fragment(".text")->get().data)}
             , ip_base{text.data()}
     {}

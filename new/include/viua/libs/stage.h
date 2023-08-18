@@ -20,6 +20,7 @@
 #ifndef VIUA_LIBS_STAGE_H
 #define VIUA_LIBS_STAGE_H
 
+#include <elf.h>
 #include <stdint.h>
 #include <sys/types.h>
 
@@ -54,10 +55,15 @@ auto display_error_in_function(std::filesystem::path const source_path,
                                viua::libs::errors::compile_time::Error const& e,
                                std::string_view const fn_name) -> void;
 
-auto save_string(std::vector<uint8_t>&, std::string_view const) -> size_t;
+auto save_string_to_strtab(std::vector<uint8_t>&, std::string_view const)
+    -> size_t;
+auto save_buffer_to_rodata(std::vector<uint8_t>&, std::string_view const)
+    -> size_t;
+
 auto cook_long_immediates(viua::libs::parser::ast::Instruction,
                           std::vector<uint8_t>&,
-                          std::map<std::string, size_t>&)
+                          std::vector<Elf64_Sym> const&,
+                          std::map<std::string, size_t> const&)
     -> std::vector<viua::libs::parser::ast::Instruction>;
 
 auto expand_delete(std::vector<viua::libs::parser::ast::Instruction>&,
@@ -69,7 +75,8 @@ auto expand_if(std::vector<viua::libs::parser::ast::Instruction>&,
                std::map<size_t, size_t>) -> void;
 auto expand_pseudoinstructions(
     std::vector<viua::libs::parser::ast::Instruction>,
-    std::map<std::string, size_t> const&)
+    std::vector<Elf64_Sym> const& symbol_table,
+    std::map<std::string, size_t> const& symbol_map)
     -> std::vector<viua::libs::parser::ast::Instruction>;
 
 auto emit_instruction(viua::libs::parser::ast::Instruction const)

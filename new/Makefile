@@ -65,7 +65,6 @@ CXXLIBS=\
 all: dist
 
 dist: \
-	$(BUILD)/tools/exec/repl \
 	$(BUILD)/tools/exec/readelf \
 	$(BUILD)/tools/exec/dis \
 	$(BUILD)/tools/exec/asm \

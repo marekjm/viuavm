@@ -320,14 +320,14 @@ auto load_module(std::string_view const name, std::filesystem::path elf_path)
                   << esc(2, ATTR_RESET) << ": no .rodata section found\n";
         return;
     }
-    if (auto const f = mod.find_fragment(".viua.fns"); not f.has_value()) {
+    if (auto const f = mod.find_fragment(".symtab"); not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
                   << esc(2, ATTR_RESET)
                   << ": no function table fragment found\n";
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .viua.fns section found\n";
+                  << esc(2, ATTR_RESET) << ": no .symtab section found\n";
         return;
     }
     if (auto const f = mod.find_fragment(".text"); not f.has_value()) {

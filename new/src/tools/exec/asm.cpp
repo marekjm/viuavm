@@ -59,71 +59,15 @@
 constexpr auto DEBUG_LEX       = false;
 constexpr auto DEBUG_EXPANSION = false;
 
-using viua::libs::stage::save_string;
-
-namespace {
-auto save_label_address(std::vector<uint8_t>& strings,
-                        std::string_view const label,
-                        size_t const address) -> size_t
-{
-    auto const label_size = htole64(static_cast<uint64_t>(label.size()));
-    strings.resize(strings.size() + sizeof(label_size));
-    memcpy((strings.data() + strings.size() - sizeof(label_size)),
-           &label_size,
-           sizeof(label_size));
-
-    auto const saved_location = strings.size();
-    std::copy(label.begin(), label.end(), std::back_inserter(strings));
-
-    auto const label_addr = htole64(address);
-    strings.resize(strings.size() + sizeof(label_addr));
-    memcpy((strings.data() + strings.size() - sizeof(label_addr)),
-           &label_addr,
-           sizeof(label_addr));
-
-    return saved_location;
-}
-auto save_fn_address(std::vector<uint8_t>& strings, std::string_view const fn)
-    -> size_t
-{
-    auto const fn_size = htole64(static_cast<uint64_t>(fn.size()));
-    strings.resize(strings.size() + sizeof(fn_size));
-    memcpy((strings.data() + strings.size() - sizeof(fn_size)),
-           &fn_size,
-           sizeof(fn_size));
-
-    auto const saved_location = strings.size();
-    std::copy(fn.begin(), fn.end(), std::back_inserter(strings));
-
-    auto const fn_addr = uint64_t{0};
-    strings.resize(strings.size() + sizeof(fn_addr));
-    memcpy((strings.data() + strings.size() - sizeof(fn_addr)),
-           &fn_addr,
-           sizeof(fn_addr));
-
-    return saved_location;
-}
-auto patch_fn_address(std::vector<uint8_t>& strings,
-                      size_t const fn_offset,
-                      uint64_t fn_addr) -> void
-{
-    auto fn_size = uint64_t{};
-    memcpy(&fn_size,
-           (strings.data() + fn_offset - sizeof(fn_size)),
-           sizeof(fn_size));
-    fn_size = le64toh(fn_size);
-
-    fn_addr = htole64(fn_addr);
-    memcpy((strings.data() + fn_offset + fn_size), &fn_addr, sizeof(fn_addr));
-}
-}  // anonymous namespace
+using viua::libs::stage::save_buffer_to_rodata;
+using viua::libs::stage::save_string_to_strtab;
 
 namespace {
 using namespace viua::libs::parser;
 auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes,
                    std::vector<viua::arch::instruction_type>& text,
-                   std::vector<uint8_t>& fn_table,
-                   std::map<std::string, size_t> const& fn_offsets)
+                   std::vector<Elf64_Sym>& symbol_table,
+                   std::map<std::string, size_t> const& symbol_map)
     -> std::map<std::string, uint64_t>
 {
     auto const ops_count =
@@ -173,8 +117,10 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes,
              */
             auto const fn_addr =
                 (ip - &text[0]) * sizeof(viua::arch::instruction_type);
-            fn_addresses[fn.name.text] = fn_addr;
-            patch_fn_address(fn_table, fn_offsets.at(fn.name.text), fn_addr);
+            auto& sym    = symbol_table.at(symbol_map.at(fn.name.text));
+            sym.st_value = fn_addr;
+            sym.st_size =
+                fn.instructions.size() * sizeof(viua::arch::instruction_type);
         }
 
         for (auto const& insn : fn.instructions) {
@@ -203,8 +149,10 @@ auto syntactical_analysis(std::filesystem::path const source_path,
 auto load_value_labels(std::filesystem::path const source_path,
                        std::string_view const source_text,
                        AST_nodes const& nodes,
-                       std::vector<uint8_t>& strings_table,
-                       std::map<std::string, size_t>& var_offsets) -> void
+                       std::vector<uint8_t>& rodata_buf,
+                       std::vector<uint8_t>& string_table,
+                       std::vector<Elf64_Sym>& symbol_table,
+                       std::map<std::string, size_t>& symbol_map) -> void
 {
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Label_def*>(each.get()) == nullptr) {
@@ -250,42 +198,107 @@ auto load_value_labels(std::filesystem::path const source_path,
                 }
             }
 
-            var_offsets[ct.name.text] = save_string(strings_table, s);
+            auto const value_off = save_buffer_to_rodata(rodata_buf, s);
+            auto const name_off =
+                save_string_to_strtab(string_table, ct.name.text);
+
+            auto symbol     = Elf64_Sym{};
+            symbol.st_name  = name_off;
+            symbol.st_info  = ELF64_ST_INFO(STB_GLOBAL, STT_OBJECT);
+            symbol.st_other = STV_DEFAULT;
+
+            symbol.st_value = value_off;
+            symbol.st_size  = s.size();
+
+            /*
+             * Section header table index (see elf(5) for st_shndx) is filled
+             * out later, since at this point we do not have this information.
+             *
+             * For variables it will be the index of .rodata.
+             * For functions it will be the index of .text.
+             */
+            symbol.st_shndx = 0;
+
+            symbol_table.push_back(symbol);
+            symbol_map[ct.name.text] = symbol_table.size();
         } else if (ct.type == "atom") {
-            auto const s              = ct.value.front().text;
-            var_offsets[ct.name.text] = save_string(strings_table, s);
+            auto const s = ct.value.front().text;
+
+            auto const value_off = save_buffer_to_rodata(rodata_buf, s);
+            auto const name_off =
+                save_string_to_strtab(string_table, ct.name.text);
+
+            auto symbol     = Elf64_Sym{};
+            symbol.st_name  = name_off;
+            symbol.st_info  = ELF64_ST_INFO(STB_GLOBAL, STT_OBJECT);
+            symbol.st_other = STV_DEFAULT;
+
+            symbol.st_value = value_off;
+            symbol.st_size  = s.size();
+
+            /*
+             * Section header table index (see elf(5) for st_shndx) is filled
+             * out later, since at this point we do not have this information.
+             *
+             * For variables it will be the index of .rodata.
+             * For functions it will be the index of .text.
+             */
+            symbol.st_shndx = 0;
+
+            symbol_table.push_back(symbol);
+            symbol_map[ct.name.text] = (symbol_table.size() - 1);
         }
     }
 }
 
-auto make_labels_table(std::vector<uint8_t>& labels_table,
-                       std::map<std::string, size_t> const& var_offsets) -> void
-{
-    for (auto const& [label, address] : var_offsets) {
-        save_label_address(labels_table, label, address);
-    }
-}
-
 auto load_function_labels(AST_nodes const& nodes,
-                          std::vector<uint8_t>& fn_table,
-                          std::map<std::string, size_t>& fn_offsets) -> void
+                          std::vector<uint8_t>& string_table,
+                          std::vector<Elf64_Sym>& symbol_table,
+                          std::map<std::string, size_t>& symbol_map) -> void
 {
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
             continue;
         }
 
-        auto& fn = static_cast<ast::Fn_def&>(*each);
-        fn_offsets.emplace(fn.name.text,
-                           save_fn_address(fn_table, fn.name.text));
+        auto const& fn = static_cast<ast::Fn_def&>(*each);
+
+        auto const name_off = save_string_to_strtab(string_table, fn.name.text);
+
+        auto symbol     = Elf64_Sym{};
+        symbol.st_name  = name_off;
+        symbol.st_info  = ELF64_ST_INFO(STB_GLOBAL, STT_FUNC);
+        symbol.st_other = STV_DEFAULT;
+
+        /*
+         * Leave size and offset of the function empty since we do not have this
+         * information yet. It will only be available after the bytecode is
+         * emitted.
+         */
+        symbol.st_size  = 0;
+        symbol.st_value = 0;
+
+        /*
+         * Section header table index (see elf(5) for st_shndx) is filled
+         * out later, since at this point we do not have this information.
+         *
+         * For variables it will be the index of .rodata.
+         * For functions it will be the index of .text.
+         */
+        symbol.st_shndx = 0;
+
+        symbol_table.push_back(symbol);
+        symbol_map[fn.name.text] = (symbol_table.size() - 1);
     }
 }
 
 auto cook_long_immediates(std::filesystem::path const source_path,
                           std::string_view const source_text,
                           AST_nodes const& nodes,
-                          std::vector<uint8_t>& strings_table,
-                          std::map<std::string, size_t>& var_offsets) -> void
+                          std::vector<uint8_t>& rodata_buf,
+                          std::vector<Elf64_Sym> const& symbol_table,
+                          std::map<std::string, size_t> const& symbol_map)
+    -> void
 {
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
@@ -298,7 +311,7 @@ auto cook_long_immediates(std::filesystem::path const source_path,
         for (auto& insn : fn.instructions) {
             try {
                 auto c = viua::libs::stage::cook_long_immediates(
-                    insn, strings_table, var_offsets);
+                    insn, rodata_buf, symbol_table, symbol_map);
                 std::copy(c.begin(), c.end(), std::back_inserter(cooked));
             } catch (viua::libs::errors::compile_time::Error const& e) {
                 viua::libs::stage::display_error_in_function(
@@ -314,7 +327,9 @@ auto cook_long_immediates(std::filesystem::path const source_path,
 auto cook_pseudoinstructions(std::filesystem::path const source_path,
                              std::string_view const source_text,
                              AST_nodes& nodes,
-                             std::map<std::string, size_t>& fn_offsets) -> void
+                             std::vector<Elf64_Sym> const& symbol_table,
+                             std::map<std::string, size_t> const& symbol_map)
+    -> void
 {
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
@@ -325,7 +340,7 @@ auto cook_pseudoinstructions(std::filesystem::path const source_path,
         auto const raw_ops_count = fn.instructions.size();
         try {
             fn.instructions = viua::libs::stage::expand_pseudoinstructions(
-                std::move(fn.instructions), fn_offsets);
+                std::move(fn.instructions), symbol_table, symbol_map);
         } catch (viua::libs::errors::compile_time::Error const& e) {
             viua::libs::stage::display_error_in_function(
                 source_path, e, fn.name.text);
@@ -399,9 +414,8 @@ using Fn_addresses = std::map<std::string, uint64_t>;
 auto emit_bytecode(std::filesystem::path const source_path,
                    std::string_view const source_text,
                    AST_nodes const& nodes,
-                   std::vector<uint8_t>& fn_table,
-                   std::map<std::string, size_t> const& fn_offsets)
-    -> std::pair<Text, Fn_addresses>
+                   std::vector<Elf64_Sym>& symbol_table,
+                   std::map<std::string, size_t> const& symbol_map) -> Text
 {
     /*
      * Calculate function spans in source code for error reporting. This way an
@@ -425,7 +439,7 @@ auto emit_bytecode(std::filesystem::path const source_path,
     auto text         = std::vector<viua::arch::instruction_type>{};
     auto fn_addresses = std::map<std::string, uint64_t>{};
     try {
-        fn_addresses = ::emit_bytecode(nodes, text, fn_table, fn_offsets);
+        fn_addresses = ::emit_bytecode(nodes, text, symbol_table, symbol_map);
     } catch (viua::libs::errors::compile_time::Error const& e) {
         auto fn_name = std::optional<std::string>{};
 
@@ -444,16 +458,16 @@ auto emit_bytecode(std::filesystem::path const source_path,
         viua::libs::stage::display_error_and_exit(source_path, source_text, e);
     }
 
-    return {text, fn_addresses};
+    return text;
 }
 
 auto emit_elf(std::filesystem::path const output_path,
               bool const as_executable,
               std::optional<uint64_t> const entry_point_fn,
               Text const& text,
-              std::vector<uint8_t> const& strings_table,
-              std::vector<uint8_t> const& fn_table,
-              std::vector<uint8_t> const& labels_table) -> void
+              std::vector<uint8_t> const& rodata_buf,
+              std::vector<uint8_t> const& string_table,
+              std::vector<Elf64_Sym>& symbol_table) -> void
 {
     auto const a_out = open(output_path.c_str(),
                             O_CREAT | O_TRUNC | O_WRONLY,
@@ -493,6 +507,11 @@ auto emit_elf(std::filesystem::path const output_path,
             return saved_at;
         };
 
+        auto text_section_ndx   = size_t{0};
+        auto rodata_section_ndx = size_t{0};
+        auto symtab_section_ndx = size_t{0};
+        auto strtab_section_ndx = size_t{0};
+
         using Header_pair = std::pair<std::optional<Elf64_Phdr>, Elf64_Shdr>;
         auto elf_headers  = std::vector<Header_pair>{};
 
@@ -504,13 +523,20 @@ auto emit_elf(std::filesystem::path const output_path,
              * We do not extend ELF in any way, so this section is SHT_NULL for
              * Viua VM.
              */
+            Elf64_Phdr seg{};
+            seg.p_type   = PT_NULL;
+            seg.p_offset = 0;
+            seg.p_filesz = 0;
+
             Elf64_Shdr void_section{};
             void_section.sh_type = SHT_NULL;
 
-            elf_headers.push_back({std::nullopt, void_section});
+            elf_headers.push_back({seg, void_section});
         }
         {
             /*
+             * .viua.magic
+             *
              * The second section (and the first fragment) is the magic number
              * Viua uses to detect the if the binary *really* is something it
              * can handle, and on Linux by the binfmt.d(5) to enable running
@@ -533,6 +559,8 @@ auto emit_elf(std::filesystem::path const output_path,
         }
         {
             /*
+             * .interp
+             *
              * What follows is the interpreter. This is mostly useful to get
              * better reporting out of readelf(1) and file(1). It also serves as
              * a second thing to check for if the file *really* is a Viua
@@ -556,6 +584,8 @@ auto emit_elf(std::filesystem::path const output_path,
         }
         {
             /*
+             * .text
+             *
              * The first segment and section pair that contains something users
              * of Viua can affect is the .text section ie, the executable
              * instructions representing user programs.
@@ -577,10 +607,13 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_size   = seg.p_filesz;
             sec.sh_flags  = SHF_ALLOC | SHF_EXECINSTR;
 
+            text_section_ndx = elf_headers.size();
             elf_headers.push_back({seg, sec});
         }
         {
             /*
+             * .rodata
+             *
              * Then, the .rodata section containing user data. Only constants
              * are allowed to be defined as data labels in Viua -- there are no
              * global variables.
@@ -595,7 +628,7 @@ auto emit_elf(std::filesystem::path const output_path,
             Elf64_Phdr seg{};
             seg.p_type    = PT_LOAD;
             seg.p_offset  = 0;
-            auto const sz = strings_table.size();
+            auto const sz = rodata_buf.size();
             seg.p_filesz = seg.p_memsz = sz;
             seg.p_flags                = PF_R;
             seg.p_align                = sizeof(viua::arch::instruction_type);
@@ -607,85 +640,67 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_size   = seg.p_filesz;
             sec.sh_flags  = SHF_ALLOC;
 
-            elf_headers.push_back({seg, sec});
-        }
-        {
-            Elf64_Phdr seg{};
-            seg.p_type   = PT_LOAD;
-            seg.p_offset = 0;
-            auto const sz = VIUA_COMMENT.size() + 1;
-            seg.p_filesz = seg.p_memsz = sz;
-            seg.p_flags                = PF_R;
-            seg.p_align                = sizeof(viua::arch::instruction_type);
-
-            Elf64_Shdr sec{};
-            sec.sh_name   = save_shstr_entry(".comment");
-            sec.sh_type   = SHT_PROGBITS;
-            sec.sh_offset = 0;
-            sec.sh_size   = seg.p_filesz;
-            sec.sh_flags  = 0;
-
+            rodata_section_ndx = elf_headers.size();
             elf_headers.push_back({seg, sec});
         }
         {
             /*
-             * Last, but not least, comes another LOAD segment. This one is
-             * mapped to a non-standard named section: .viua.fns It contains a
-             * symbol table with function addresses.
+             * .comment
+             */
+            Elf64_Shdr sec{};
+            sec.sh_name   = save_shstr_entry(".comment");
+            sec.sh_type   = SHT_PROGBITS;
+            sec.sh_offset = 0;
+            sec.sh_size   = VIUA_COMMENT.size() + 1;
+            sec.sh_flags  = 0;
+
+            elf_headers.push_back({std::nullopt, sec});
+        }
+        {
+            /*
+             * .symtab
+             *
+             * Last, but not least, comes another LOAD segment.
+             * It contains a symbol table with function addresses.
              *
              * Function calls use this table to determine the address to which
              * they should transfer control - there are no direct calls.
              * Inefficient, but flexible.
              */
-            Elf64_Phdr seg{};
-            seg.p_type    = PT_LOAD;
-            seg.p_offset  = 0;
-            auto const sz = fn_table.size();
-            seg.p_filesz = seg.p_memsz = sz;
-            seg.p_flags                = PF_R;
-            seg.p_align                = sizeof(viua::arch::instruction_type);
-
             Elf64_Shdr sec{};
-            sec.sh_name = save_shstr_entry(".viua.fns");
+            sec.sh_name = save_shstr_entry(".symtab");
             /*
              * This could be SHT_SYMTAB, but the SHT_SYMTAB type sections expect
              * a certain format of the symbol table which Viua does not use. So
              * let's just use SHT_PROGBITS because interpretation of
              * SHT_PROGBITS is up to the program.
              */
-            sec.sh_type   = SHT_PROGBITS;
+            sec.sh_type   = SHT_SYMTAB;
             sec.sh_offset = 0;
-            sec.sh_size   = seg.p_filesz;
-            sec.sh_flags  = SHF_ALLOC;
+            sec.sh_size   = (symbol_table.size() * sizeof(Elf64_Sym));
+            sec.sh_flags  = 0;
 
-            elf_headers.push_back({seg, sec});
+            symtab_section_ndx = elf_headers.size();
+            elf_headers.push_back({std::nullopt, sec});
         }
         {
-            Elf64_Phdr seg{};
-            seg.p_type    = PT_LOAD;
-            seg.p_offset  = 0;
-            auto const sz = labels_table.size();
-            seg.p_filesz = seg.p_memsz = sz;
-            seg.p_flags                = PF_R;
-            seg.p_align                = sizeof(viua::arch::instruction_type);
-
-            Elf64_Shdr sec{};
-            sec.sh_name = save_shstr_entry(".viua.labels");
             /*
-             * This could be SHT_SYMTAB, but the SHT_SYMTAB type sections expect
-             * a certain format of the symbol table which Viua does not use. So
-             * let's just use SHT_PROGBITS because interpretation of
-             * SHT_PROGBITS is up to the program.
+             * .strtab
              */
-            sec.sh_type   = SHT_PROGBITS;
+            Elf64_Shdr sec{};
+            sec.sh_name   = save_shstr_entry(".strtab");
+            sec.sh_type   = SHT_STRTAB;
             sec.sh_offset = 0;
-            sec.sh_size   = seg.p_filesz;
-            sec.sh_flags  = SHF_ALLOC;
+            sec.sh_size   = string_table.size();
+            sec.sh_flags  = 0;
 
-            elf_headers.push_back({seg, sec});
+            strtab_section_ndx = elf_headers.size();
+            elf_headers.push_back({std::nullopt, sec});
         }
         {
             /*
+             * .shstrtab
+             *
              * ACHTUNG! ATTENTION! UWAGA! POZOR! TÄHELEPANU!
              *
              * This section contains the strings table representing section
@@ -702,6 +717,12 @@ auto emit_elf(std::filesystem::path const output_path,
 
             elf_headers.push_back({std::nullopt, sec});
         }
+
+        /*
+         * Link the .symtab to its associated .strtab; otherwise you will
+         * get <corrupt> names when invoking readelf(1) to inspect the file.
+         */
+        elf_headers.at(symtab_section_ndx).second.sh_link = strtab_section_ndx;
 
         auto elf_pheaders = std::count_if(
             elf_headers.begin(),
@@ -768,8 +789,7 @@ auto emit_elf(std::filesystem::path const output_path,
                                  ? (*text_offset + *entry_point_fn + elf_size)
                                  : 0;
 
-        elf_header.e_phoff = sizeof(Elf64_Ehdr);
-        ;
+        elf_header.e_phoff     = sizeof(Elf64_Ehdr);
         elf_header.e_phentsize = sizeof(Elf64_Phdr);
         elf_header.e_phnum     = elf_pheaders;
 
@@ -803,15 +823,29 @@ auto emit_elf(std::filesystem::path const output_path,
 
         write(a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);
 
-        write(a_out,
-              text.data(),
-              (text.size() * sizeof(std::decay_t<decltype(text)>::value_type)));
-        write(a_out, strings_table.data(), strings_table.size());
+        auto const text_size =
+            (text.size() * sizeof(std::decay_t<decltype(text)>::value_type));
+        write(a_out, text.data(), text_size);
+
+        write(a_out, rodata_buf.data(), rodata_buf.size());
 
         write(a_out, VIUA_COMMENT.c_str(), VIUA_COMMENT.size() + 1);
 
-        write(a_out, fn_table.data(), fn_table.size());
-        write(a_out, labels_table.data(), labels_table.size());
+        for (auto& each : symbol_table) {
+            switch (ELF64_ST_TYPE(each.st_info)) {
+            case STT_FUNC:
+                each.st_shndx = text_section_ndx;
+                break;
+            case STT_OBJECT:
+                each.st_shndx = rodata_section_ndx;
+                break;
+            default:
+                break;
+            }
+            write(a_out, &each, sizeof(std::decay_t<decltype(symbol_table)>));
+        }
+
+        write(a_out, string_table.data(), string_table.size());
 
         write(a_out, shstr.data(), shstr.size());
     }
@@ -1045,18 +1079,71 @@ auto main(int argc, char* argv[]) -> int
      * expansion stage. li pseudoinstructions are emitted during strings table
      * preparation so they need to be expanded.
      */
-    auto strings_table = std::vector<uint8_t>{};
-    auto labels_table  = std::vector<uint8_t>{};
-    auto var_offsets   = std::map<std::string, size_t>{};
-    auto fn_table      = std::vector<uint8_t>{};
-    auto fn_offsets    = std::map<std::string, size_t>{};
+    auto rodata_contents = std::vector<uint8_t>{};
+    auto string_table    = std::vector<uint8_t>{};
+    auto symbol_table    = std::vector<Elf64_Sym>{};
+    auto symbol_map      = std::map<std::string, size_t>{};
+    auto fn_offsets      = std::map<std::string, size_t>{};
 
-    stage::load_value_labels(
-        source_path, source_text, nodes, strings_table, var_offsets);
-    stage::make_labels_table(labels_table, var_offsets);
-    stage::load_function_labels(nodes, fn_table, fn_offsets);
-    stage::cook_long_immediates(
-        source_path, source_text, nodes, strings_table, var_offsets);
+    /*
+     * ELF standard requires the first byte in the string table to be zero.
+     */
+    string_table.push_back('\0');
+
+    {
+        auto empty     = Elf64_Sym{};
+        empty.st_name  = STN_UNDEF;
+        empty.st_info  = ELF64_ST_INFO(STB_LOCAL, STT_NOTYPE);
+        empty.st_shndx = STN_UNDEF;
+        symbol_table.push_back(empty);
+    }
+
+    stage::load_function_labels(nodes, string_table, symbol_table, symbol_map);
+    stage::load_value_labels(source_path,
+                             source_text,
+                             nodes,
+                             rodata_contents,
+                             string_table,
+                             symbol_table,
+                             symbol_map);
+
+    {
+        for (auto const& [name, i] : symbol_map) {
+            auto const& sym = symbol_table.at(i);
+
+            std::cerr
+                << " " << std::setw(2) << i << ": " << name << " => "
+                << reinterpret_cast<char const*>(&string_table[sym.st_name])
+                << "\n";
+
+            if (ELF64_ST_TYPE(sym.st_info) == STT_OBJECT) {
+                std::cerr << "     object\n";
+                std::cerr
+                    << "     value = "
+                    << std::string_view{reinterpret_cast<char const*>(
+                                            &rodata_contents[sym.st_value]),
+                                        sym.st_size}
+                    << "\n";
+            } else if (ELF64_ST_TYPE(sym.st_info) == STT_FUNC) {
+                std::cerr << "     function\n";
+            } else {
+                std::cerr << "     unknown\n";
+            }
+            std::cerr << "     size = " << sym.st_size << "\n";
+        }
+    }
+
+    stage::cook_long_immediates(source_path,
+                                source_text,
+                                nodes,
+                                rodata_contents,
+                                symbol_table,
+                                symbol_map);
+
+    /*
+     * ELF standard requires the last byte in the string table to be zero.
+     */
+    string_table.push_back('\0');
 
     /*
      * Pseudoinstruction- and macro-expansion.
@@ -1064,7 +1151,8 @@ auto main(int argc, char* argv[]) -> int
      * Replace pseudoinstructions (eg, li) with sequences of real instructions
      * that will have the same effect. Ditto for macros.
      */
-    stage::cook_pseudoinstructions(source_path, source_text, nodes, fn_offsets);
+    stage::cook_pseudoinstructions(
+        source_path, source_text, nodes, symbol_table, symbol_map);
 
     /*
      * Detect entry point function.
@@ -1084,8 +1172,8 @@ auto main(int argc, char* argv[]) -> int
      * table mapping function names to the offsets inside the .text section, at
      * which their entry points reside.
      */
-    auto [text, fn_addresses] = stage::emit_bytecode(
-        source_path, source_text, nodes, fn_table, fn_offsets);
+    auto text = stage::emit_bytecode(
+        source_path, source_text, nodes, symbol_table, symbol_map);
 
     /*
      * ELF emission.
@@ -1094,12 +1182,14 @@ auto main(int argc, char* argv[]) -> int
         output_path,
         as_executable,
         (entry_point_fn.has_value()
-             ? std::optional{fn_addresses[entry_point_fn.value().text]}
+             ? std::optional{symbol_table
+                                 .at(symbol_map.at(entry_point_fn.value().text))
+                                 .st_value}
              : std::nullopt),
         text,
-        strings_table,
-        fn_table,
-        labels_table);
+        rodata_contents,
+        string_table,
+        symbol_table);
 
     return 0;
 }

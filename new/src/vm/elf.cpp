@@ -137,13 +137,13 @@ auto Loaded_elf::fn_at(std::vector<uint8_t> const& function_table,
 auto Loaded_elf::name_function_at(size_t const offset) const
     -> std::pair<std::string, size_t>
 {
-    auto const& functions_table = find_fragment(".viua.fns")->get();
+    auto const& functions_table = find_fragment(".symtab")->get();
     return fn_at(functions_table.data, offset);
 }
 auto Loaded_elf::function_table() const
     -> std::map<size_t, std::pair<std::string, size_t>>
 {
-    auto const& raw = find_fragment(".viua.fns")->get();
+    auto const& raw = find_fragment(".symtab")->get();
     auto ft         = std::map<size_t, std::pair<std::string, size_t>>{};
 
     for (auto i = size_t{sizeof(uint64_t)}; i < raw.data.size();

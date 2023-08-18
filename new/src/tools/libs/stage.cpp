@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <elf.h>
 #include <string.h>
 
 #include <array>
@@ -396,8 +397,39 @@ auto display_error_in_function(std::filesystem::path const source_path,
         << fn_name << esc(2, ATTR_RESET) << ":\n";
 }
 
-auto save_string(std::vector<uint8_t>& strings, std::string_view const data)
-    -> size_t
+auto save_string_to_strtab(std::vector<uint8_t>& tab,
+                           std::string_view const data) -> size_t
+{
+    {
+        /*
+         * Scan the strings table to see if the requested data is already there.
+         * There is no reason to store extra copies of the same value in .rodata
+         * so let's deduplicate.
+         *
+         * FIXME This is ridiculously slow. Maybe add some cache instead of
+         * linearly browsing through the whole table every time?
+         */
+        auto i = size_t{1};
+        while ((i + data.size()) < tab.size()) {
+            auto const existing = std::string_view{
+                reinterpret_cast<char const*>(tab.data() + i), data.size()};
+            if (existing == data) {
+                return i;
+            }
+
+            i += data.size();
+        }
+    }
+
+    auto const saved_location = tab.size();
+
+    std::copy(data.begin(), data.end(), std::back_inserter(tab));
+    tab.push_back('\0');
+
+    return saved_location;
+}
+auto save_buffer_to_rodata(std::vector<uint8_t>& strings,
+                           std::string_view const data) -> size_t
 {
     {
         /*
@@ -438,8 +470,9 @@ auto save_string(std::vector<uint8_t>& strings, std::string_view const data)
     return saved_location;
 }
 auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
-                          std::vector<uint8_t>& strings_table,
-                          std::map<std::string, size_t>& var_offsets)
+                          std::vector<uint8_t>& rodata_buf,
+                          std::vector<Elf64_Sym> const& symbol_table,
+                          std::map<std::string, size_t> const& symbol_map)
     -> std::vector<viua::libs::parser::ast::Instruction>
 {
     auto cooked = std::vector<viua::libs::parser::ast::Instruction>{};
@@ -451,14 +484,15 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
         if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
             s        = s.substr(1, s.size() - 2);
             s        = viua::support::string::unescape(s);
-            saved_at = save_string(strings_table, s);
+            saved_at = save_buffer_to_rodata(rodata_buf, s);
         } else if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
             auto s   = lx.text;
-            saved_at = save_string(strings_table, s);
+            saved_at = save_buffer_to_rodata(rodata_buf, s);
         } else if (lx.token == viua::libs::lexer::TOKEN::AT) {
             auto const label = insn.operands.back().ingredients.back();
             try {
-                saved_at = var_offsets.at(label.text);
+                saved_at = symbol_map.at(label.text);
+                saved_at = symbol_table.at(saved_at).st_value;
             } catch (std::out_of_range const&) {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
@@ -468,7 +502,7 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
 
                 using viua::support::string::levenshtein_filter;
                 auto misspell_candidates =
-                    levenshtein_filter(label.text, var_offsets);
+                    levenshtein_filter(label.text, symbol_map);
                 if (not misspell_candidates.empty()) {
                     using viua::support::string::levenshtein_best;
                     auto best_candidate =
@@ -516,14 +550,17 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
         auto const lx = insn.operands.back().ingredients.front();
         auto saved_at = size_t{0};
         if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
-            auto s   = lx.text;
-            s        = s.substr(1, s.size() - 2);
-            s        = viua::support::string::unescape(s);
-            saved_at = (save_string(strings_table, s) - sizeof(uint64_t));
+            auto s = lx.text;
+            s      = s.substr(1, s.size() - 2);
+            s      = viua::support::string::unescape(s);
+            saved_at =
+                (save_buffer_to_rodata(rodata_buf, s) - sizeof(uint64_t));
         } else if (lx.token == viua::libs::lexer::TOKEN::AT) {
             auto const label = insn.operands.back().ingredients.back();
             try {
-                saved_at = (var_offsets.at(label.text) - sizeof(uint64_t));
+                saved_at = symbol_map.at(label.text);
+                saved_at = symbol_table.at(saved_at).st_value;
+                saved_at = (saved_at - sizeof(uint64_t));
             } catch (std::out_of_range const&) {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
@@ -533,7 +570,7 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
 
                 using viua::support::string::levenshtein_filter;
                 auto misspell_candidates =
-                    levenshtein_filter(label.text, var_offsets);
+                    levenshtein_filter(label.text, symbol_map);
                 if (not misspell_candidates.empty()) {
                     using viua::support::string::levenshtein_best;
                     auto best_candidate =
@@ -577,7 +614,7 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
         auto f = std::stof(insn.operands.back().ingredients.front().text);
         auto s = std::string(SIZE_OF_SINGLE_PRECISION_FLOAT, '\0');
         memcpy(s.data(), &f, SIZE_OF_SINGLE_PRECISION_FLOAT);
-        auto const saved_at = save_string(strings_table, s);
+        auto const saved_at = save_buffer_to_rodata(rodata_buf, s);
 
         auto synth           = viua::libs::parser::ast::Instruction{};
         synth.opcode         = insn.opcode;
@@ -598,7 +635,7 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
         auto f = std::stod(insn.operands.back().ingredients.front().text);
         auto s = std::string(SIZE_OF_DOUBLE_PRECISION_FLOAT, '\0');
         memcpy(s.data(), &f, SIZE_OF_DOUBLE_PRECISION_FLOAT);
-        auto const saved_at = save_string(strings_table, s);
+        auto const saved_at = save_buffer_to_rodata(rodata_buf, s);
 
         auto synth           = viua::libs::parser::ast::Instruction{};
         synth.opcode         = insn.opcode;
@@ -921,7 +958,8 @@ auto expand_memory_access(std::vector<ast::Instruction>& cooked,
     cooked.push_back(synth);
 }
 auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
-                               std::map<std::string, size_t> const& fn_offsets)
+                               std::vector<Elf64_Sym> const& symbol_table,
+                               std::map<std::string, size_t> const& symbol_map)
     -> std::vector<ast::Instruction>
 {
     auto const immediate_signed_arithmetic = std::set<std::string>{
@@ -1083,13 +1121,14 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
                 li.operands.push_back(ast::Operand{});
 
                 auto const fn_name = each.operands.back().ingredients.front();
-                if (fn_offsets.count(fn_name.text) == 0) {
+                if (symbol_map.count(fn_name.text) == 0) {
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
                     throw Error{fn_name, Cause::Call_to_undefined_function};
                 }
 
-                auto const fn_off = fn_offsets.at(fn_name.text);
+                auto const fn_off =
+                    symbol_table.at(symbol_map.at(fn_name.text)).st_name;
                 li.operands.back().ingredients.push_back(fn_name.make_synth(
                     std::to_string(fn_off) + 'u',
                     viua::libs::lexer::TOKEN::LITERAL_INTEGER));

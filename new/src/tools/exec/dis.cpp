@@ -773,7 +773,7 @@ auto main(int argc, char* argv[]) -> int
                   << esc(2, ATTR_RESET) << ": no .rodata section found\n";
         return 1;
     }
-    if (auto const f = main_module.find_fragment(".viua.fns");
+    if (auto const f = main_module.find_fragment(".symtab");
         not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native() << ": "
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
@@ -781,7 +781,7 @@ auto main(int argc, char* argv[]) -> int
                   << ": no function table fragment found\n";
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native() << ": "
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .viua.fns section found\n";
+                  << esc(2, ATTR_RESET) << ": no .symtab section found\n";
         return 1;
     }
     if (auto const f = main_module.find_fragment(".viua.labels");
@@ -929,7 +929,7 @@ auto main(int argc, char* argv[]) -> int
         }
 
         if (demangle_li) {
-            auto const fntab = main_module.find_fragment(".viua.fns");
+            auto const fntab = main_module.find_fragment(".symtab");
             cook::demangle_canonical_li(
                 cooked_text, rodata->get(), fntab->get());
             cook::demangle_addi_to_void(

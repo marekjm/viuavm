@@ -54,15 +54,15 @@ auto levenshtein_filter(std::string const,
                         std::set<std::string> const&,
                         LevenshteinDistance const = LevenshteinDistance{
                             0xffffffffffffffff}) -> std::set<DistancePair>;
-template<typename T>
+template<typename K, typename V>
 auto levenshtein_filter(std::string const needle,
-                        std::map<std::string, T> const& haystack,
+                        std::map<K, V> const& haystack,
                         LevenshteinDistance const dist = LevenshteinDistance{
                             0xffffffffffffffff}) -> std::set<DistancePair>
 {
     auto candidates = std::set<std::string>{};
     for (auto const& each : haystack) {
-        candidates.insert(each.first);
+        candidates.emplace(each.first);
     }
     return levenshtein_filter(needle, candidates, dist);
 }
