@@ -17,6 +17,9 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iomanip>
+#include <iostream>
+
 #include <viua/vm/elf.h>
 
 
@@ -88,6 +91,9 @@ auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
             {section_names.at(fragment.index), std::move(fragment)});
     }
 
+    loaded.load_strtab();
+    loaded.load_symtab();
+
     return loaded;
 }
 auto Loaded_elf::entry_point() const -> std::optional<size_t>
@@ -109,6 +115,69 @@ auto Loaded_elf::find_fragment(std::string_view const sv) const
     return (frag == fragments.end()) ? std::nullopt
                                      : std::optional{std::ref(frag->second)};
 }
+auto Loaded_elf::load_strtab() -> void
+{
+    auto elf_strtab = find_fragment(".strtab");
+    if (not elf_strtab.has_value()) {
+        /*
+         * FIXME Without signalling failure LOUDLY here, there will be
+         * mysterious errors encountered later.
+         */
+        return;
+    }
+
+    auto const strtab_size = elf_strtab->get().section_header.sh_size;
+    auto const strtab_data =
+        reinterpret_cast<char const*>(elf_strtab->get().data.data());
+    for (auto i = size_t{0}; i < strtab_size; ++i) {
+        auto sv = std::string_view{strtab_data + i};
+        strtab.emplace(i, sv);
+        std::cerr << "strtab[" << i << "] of " << sv.size() << " chars = " << sv
+                  << "\n";
+        i += sv.size();
+    }
+}
+auto Loaded_elf::load_symtab() -> void
+{
+    auto elf_symtab = find_fragment(".symtab");
+    if (not elf_symtab.has_value()) {
+        /*
+         * FIXME Without signalling failure LOUDLY here, there will be
+         * mysterious errors encountered later.
+         */
+        return;
+    }
+
+    auto const symtab_data = elf_symtab->get().data.data();
+    auto const no_of_symtab_entries =
+        elf_symtab->get().section_header.sh_size / sizeof(Elf64_Sym);
+    for (auto i = size_t{0}; i < no_of_symtab_entries; ++i) {
+        auto sym = Elf64_Sym{};
+        memcpy(&sym, symtab_data + (i * sizeof(Elf64_Sym)), sizeof(Elf64_Sym));
+
+        auto const sym_is_fn = ELF64_ST_TYPE(sym.st_info) == STT_FUNC;
+
+        std::cerr << "symtab[" << i << "] = " << strtab.at(sym.st_name) << " @ "
+                  << "[." << (sym_is_fn ? "text" : "rodata") << "+0x"
+                  << std::hex << std::setfill('0') << std::setw(16)
+                  << sym.st_value << std::dec << "]\n";
+
+        if (sym_is_fn) {
+            fn_map.emplace(strtab.at(sym.st_name), symtab.size());
+            std::cerr << "    function\n";
+        } else if (ELF64_ST_TYPE(sym.st_info) == STT_OBJECT) {
+            std::cerr << "    object\n";
+        } else if (ELF64_ST_TYPE(sym.st_info) == STT_NOTYPE) {
+            std::cerr << "    none\n";
+        } else {
+            std::cerr << "    unknown\n";
+        }
+        std::cerr << "    size = " << sym.st_size << "\n";
+
+        symtab.push_back(sym);
+    }
+}
+
 auto Loaded_elf::fn_at(std::vector<uint8_t> const& function_table,
                        size_t const offset) -> std::pair<std::string, size_t>
 {
@@ -137,8 +206,18 @@ auto Loaded_elf::fn_at(std::vector<uint8_t> const& function_table,
 auto Loaded_elf::name_function_at(size_t const offset) const
     -> std::pair<std::string, size_t>
 {
-    auto const& functions_table = find_fragment(".symtab")->get();
-    return fn_at(functions_table.data, offset);
+    for (auto const& sym : symtab) {
+        if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
+            continue;
+        }
+
+        if (sym.st_value != offset) {
+            continue;
+        }
+
+        return {std::string{strtab.at(sym.st_name)}, 0};
+    }
+    return {"", 0};
 }
 auto Loaded_elf::function_table() const
     -> std::map<size_t, std::pair<std::string, size_t>>

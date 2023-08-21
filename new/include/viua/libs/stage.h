@@ -76,7 +76,6 @@ auto expand_if(std::vector<viua::libs::parser::ast::Instruction>&,
                std::map<size_t, size_t>) -> void;
 auto expand_pseudoinstructions(
     std::vector<viua::libs::parser::ast::Instruction>,
-    std::vector<Elf64_Sym> const& symbol_table,
     std::map<std::string, size_t> const& symbol_map)
     -> std::vector<viua::libs::parser::ast::Instruction>;
 

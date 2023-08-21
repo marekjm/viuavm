@@ -146,6 +146,17 @@ auto syntactical_analysis(std::filesystem::path const source_path,
     }
 }
 
+namespace {
+auto record_symbol(std::string name,
+                   Elf64_Sym const symbol,
+                   std::vector<Elf64_Sym>& symbol_table,
+                   std::map<std::string, size_t>& symbol_map) -> void
+{
+    symbol_map[std::move(name)] = symbol_table.size();
+    symbol_table.push_back(symbol);
+}
+}  // namespace
+
 auto load_value_labels(std::filesystem::path const source_path,
                        std::string_view const source_text,
                        AST_nodes const& nodes,
@@ -219,8 +230,7 @@ auto load_value_labels(std::filesystem::path const source_path,
              */
             symbol.st_shndx = 0;
 
-            symbol_table.push_back(symbol);
-            symbol_map[ct.name.text] = symbol_table.size();
+            record_symbol(ct.name.text, symbol, symbol_table, symbol_map);
         } else if (ct.type == "atom") {
             auto const s = ct.value.front().text;
 
@@ -245,8 +255,7 @@ auto load_value_labels(std::filesystem::path const source_path,
              */
             symbol.st_shndx = 0;
 
-            symbol_table.push_back(symbol);
-            symbol_map[ct.name.text] = (symbol_table.size() - 1);
+            record_symbol(ct.name.text, symbol, symbol_table, symbol_map);
         }
     }
 }
@@ -287,8 +296,7 @@ auto load_function_labels(AST_nodes const& nodes,
          */
         symbol.st_shndx = 0;
 
-        symbol_table.push_back(symbol);
-        symbol_map[fn.name.text] = (symbol_table.size() - 1);
+        record_symbol(fn.name.text, symbol, symbol_table, symbol_map);
     }
 }
 
@@ -327,7 +335,6 @@ auto cook_long_immediates(std::filesystem::path const source_path,
 auto cook_pseudoinstructions(std::filesystem::path const source_path,
                              std::string_view const source_text,
                              AST_nodes& nodes,
-                             std::vector<Elf64_Sym> const& symbol_table,
                              std::map<std::string, size_t> const& symbol_map)
     -> void
 {
@@ -340,7 +347,7 @@ auto cook_pseudoinstructions(std::filesystem::path const source_path,
         auto const raw_ops_count = fn.instructions.size();
         try {
             fn.instructions = viua::libs::stage::expand_pseudoinstructions(
-                std::move(fn.instructions), symbol_table, symbol_map);
+                std::move(fn.instructions), symbol_map);
         } catch (viua::libs::errors::compile_time::Error const& e) {
             viua::libs::stage::display_error_in_function(
                 source_path, e, fn.name.text);
@@ -1126,6 +1133,8 @@ auto main(int argc, char* argv[]) -> int
                     << "\n";
             } else if (ELF64_ST_TYPE(sym.st_info) == STT_FUNC) {
                 std::cerr << "     function\n";
+            } else if (ELF64_ST_TYPE(sym.st_info) == STT_NOTYPE) {
+                std::cerr << "     none\n";
             } else {
                 std::cerr << "     unknown\n";
             }
@@ -1151,8 +1160,7 @@ auto main(int argc, char* argv[]) -> int
      * Replace pseudoinstructions (eg, li) with sequences of real instructions
      * that will have the same effect. Ditto for macros.
      */
-    stage::cook_pseudoinstructions(
-        source_path, source_text, nodes, symbol_table, symbol_map);
+    stage::cook_pseudoinstructions(source_path, source_text, nodes, symbol_map);
 
     /*
      * Detect entry point function.

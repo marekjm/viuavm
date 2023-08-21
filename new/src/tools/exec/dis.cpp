@@ -116,13 +116,14 @@ struct Cooked_op {
 using Cooked_text = std::vector<Cooked_op>;
 
 namespace cook {
-auto demangle_strtab_load(Cooked_text& raw,
-                          viua::vm::elf::Fragment const& rodata,
-                          viua::vm::elf::Fragment const& fntab,
+auto demangle_symbol_load(Cooked_text& raw,
                           Cooked_text& cooked,
                           size_t& i,
                           viua::arch::Register_access const out,
-                          uint64_t const immediate) -> void
+                          uint64_t const immediate,
+                          std::vector<Elf64_Sym> const& symtab,
+                          std::map<size_t, std::string_view> const& strtab,
+                          std::vector<uint8_t> const& rodata) -> void
 {
     auto const ins_at = [&raw](size_t const n) -> viua::arch::instruction_type {
         return raw.at(n).instruction.value_or(0);
@@ -140,14 +141,50 @@ auto demangle_strtab_load(Cooked_text& raw,
         memcpy(&cooked, &data[size_offset], sizeof(uint64_t));
         return le64toh(cooked);
     };
+    auto const load_string = [read_size](std::vector<uint8_t> const& data,
+                                         size_t const off) -> std::string {
+        auto s = std::string{reinterpret_cast<char const*>(data.data() + off),
+                             read_size(data, off)};
+        auto const needs_quotes =
+            std::any_of(s.begin(), s.end(), [](auto const each) -> bool {
+                return not(std::isalnum(each) or (each == '_'));
+            });
+        if (needs_quotes) {
+            s = ('"' + s + '"');
+        }
+        return s;
+    };
+    auto const view_data = [read_size](std::vector<uint8_t> const& data,
+                                       size_t const off) -> std::string_view {
+        return std::string_view{
+            reinterpret_cast<char const*>(data.data() + off),
+            read_size(data, off)};
+    };
+    auto const make_label_ref =
+        [](std::map<size_t, std::string_view> const& strtab,
+           Elf64_Sym const& sym) -> std::string {
+        return ("@" + std::string{strtab.at(sym.st_name)});
+    };
 
     using enum viua::arch::ops::OPCODE;
     using viua::arch::ops::D;
     using viua::arch::ops::S;
     if (m(i + 1, ATOM) and S::decode(ins_at(i + 1)).out == out) {
         auto ins = raw.at(i + 1);
-        auto tt  = ins.with_text(("atom " + out.to_string() + ", @_strat_"
-                                 + std::to_string(immediate)));
+
+        auto const sym = std::find_if(
+            symtab.begin(),
+            symtab.end(),
+            [immediate](auto const& each) -> bool {
+                return (each.st_value == immediate)
+                       and (ELF64_ST_TYPE(each.st_info) == STT_OBJECT);
+            });
+        auto const label_or_value = (sym == symtab.end())
+                                        ? load_string(rodata, immediate)
+                                        : make_label_ref(strtab, *sym);
+
+        auto tt =
+            ins.with_text("atom " + out.to_string() + ", " + label_or_value);
         tt.index = cooked.back().index;
         cooked.pop_back();
         tt.index.physical_span = tt.index.physical_span.value() + 1;
@@ -159,11 +196,8 @@ auto demangle_strtab_load(Cooked_text& raw,
         auto ins = raw.at(i + 1);
         cooked.pop_back();
 
-        auto const off       = immediate;
-        auto const data_size = read_size(rodata.data, off);
-        auto const sv        = std::string_view{
-            reinterpret_cast<char const*>(&rodata.data[off]), data_size};
-        auto x = float{};
+        auto const sv = view_data(rodata, immediate);
+        auto x        = float{};
         memcpy(&x, sv.data(), sizeof(x));
 
         cooked.emplace_back(ins.with_text(
@@ -175,11 +209,8 @@ auto demangle_strtab_load(Cooked_text& raw,
         auto ins = raw.at(i + 1);
         cooked.pop_back();
 
-        auto const off       = immediate;
-        auto const data_size = read_size(rodata.data, off);
-        auto const sv        = std::string_view{
-            reinterpret_cast<char const*>(&rodata.data[off]), data_size};
-        auto x = double{};
+        auto const sv = view_data(rodata, immediate);
+        auto x        = double{};
         memcpy(&x, sv.data(), sizeof(x));
 
         auto ss = std::ostringstream{};
@@ -193,13 +224,10 @@ auto demangle_strtab_load(Cooked_text& raw,
     if (m(i + 1, CALL) and D::decode(ins_at(i + 1)).in == out) {
         auto ins = raw.at(i + 1);
 
-        auto const off       = immediate;
-        auto const data_size = read_size(fntab.data, off);
-        auto const name      = std::string{
-            reinterpret_cast<char const*>(&fntab.data[off]), data_size};
-
-        auto tt = ins.with_text(
-            "call " + D::decode(ins_at(i + 1)).out.to_string() + ", " + name);
+        auto const sym = symtab.at(immediate);
+        auto tt =
+            ins.with_text("call " + D::decode(ins_at(i + 1)).out.to_string()
+                          + ", " + std::string{strtab.at(sym.st_name)});
         tt.index = cooked.back().index;
         cooked.pop_back();
         tt.index.physical_span = tt.index.physical_span.value() + 1;
@@ -210,13 +238,10 @@ auto demangle_strtab_load(Cooked_text& raw,
     if (m(i + 1, ACTOR) and D::decode(ins_at(i + 1)).in == out) {
         auto ins = raw.at(i + 1);
 
-        auto const off       = immediate;
-        auto const data_size = read_size(fntab.data, off);
-        auto const name      = std::string{
-            reinterpret_cast<char const*>(&fntab.data[off]), data_size};
-
-        auto tt = ins.with_text(
-            "actor " + D::decode(ins_at(i + 1)).out.to_string() + ", " + name);
+        auto const sym = symtab.at(immediate);
+        auto tt =
+            ins.with_text("actor " + D::decode(ins_at(i + 1)).out.to_string()
+                          + ", " + std::string{strtab.at(sym.st_name)});
         tt.index = cooked.back().index;
         cooked.pop_back();
         tt.index.physical_span = tt.index.physical_span.value() + 1;
@@ -227,8 +252,9 @@ auto demangle_strtab_load(Cooked_text& raw,
 }
 
 auto demangle_canonical_li(Cooked_text& text,
-                           viua::vm::elf::Fragment const& rodata,
-                           viua::vm::elf::Fragment const& fntab) -> void
+                           std::vector<Elf64_Sym> const& symtab,
+                           std::map<size_t, std::string_view> const& strtab,
+                           std::vector<uint8_t> const& rodata) -> void
 {
     auto tmp = Cooked_text{};
 
@@ -245,49 +271,38 @@ auto demangle_canonical_li(Cooked_text& text,
                                   viua::arch::ops::OPCODE const lui) -> bool {
         using enum viua::arch::ops::OPCODE;
         using viua::arch::ops::GREEDY;
-        return m((n + 0), lui, GREEDY) and m((n + 1), ADDIU, GREEDY)
-               and m((n + 2), ADDIU, GREEDY) and m((n + 3), MUL, GREEDY)
-               and m((n + 4), ADDIU, GREEDY) and m((n + 5), ADD, GREEDY)
-               and m((n + 6), ADD, GREEDY) and m((n + 7), MOVE, GREEDY)
-               and (m((n + 8), MOVE) or m((n + 8), MOVE, GREEDY));
+        return m((n + 0), lui, GREEDY)
+               and (m((n + 1), LLI, GREEDY) or m((n + 1), LLI));
     };
 
     using enum viua::arch::ops::OPCODE;
     for (auto i = size_t{0}; i < text.size(); ++i) {
         if (match_canonical_li(i, LUI) or match_canonical_li(i, LUIU)) {
-            using viua::arch::ops::E;
-            using viua::arch::ops::R;
+            using viua::arch::ops::F;
 
-            auto const lui        = E::decode(ins_at(i));
-            auto const high_part  = (lui.immediate << 28);
-            auto const base       = R::decode(ins_at(i + 1)).immediate;
-            auto const multiplier = R::decode(ins_at(i + 2)).immediate;
-            auto const remainder  = R::decode(ins_at(i + 4)).immediate;
+            auto const lui       = F::decode(ins_at(i));
+            auto const high_part = (static_cast<uint64_t>(lui.immediate) << 32);
+            auto const lli       = F::decode(ins_at(i + 1));
+            auto const low_part  = lli.immediate;
 
-            auto const literal = high_part + (base * multiplier) + remainder;
+            auto const literal = (high_part | low_part);
 
             using viua::arch::ops::GREEDY;
-            using viua::libs::assembler::li_cost;
-            auto const needs_annotation =
-                (li_cost(literal)
-                 != li_cost(
-                     std::numeric_limits<viua::arch::register_type>::max()));
-            auto const needs_greedy   = m((i + 8), MOVE, GREEDY);
+            auto const needs_greedy   = m((i + 1), LLI, GREEDY);
             auto const needs_unsigned = m(i, LUIU, GREEDY);
 
             auto idx = text.at(i).index;
-            i += 8;
+            ++i;  // skip the LLI
             idx.physical_span = i;
             tmp.emplace_back(
                 idx,
                 std::nullopt,
                 std::nullopt,
                 ((needs_greedy ? "g." : "") + std::string{"li "}
-                 + lui.out.to_string() + ", "
-                 + (needs_annotation ? "[[full]] " : "")
+                 + lui.out.to_string() + ", " + "[[full]] "
                  + std::to_string(literal) + (needs_unsigned ? "u" : "")));
-
-            demangle_strtab_load(text, rodata, fntab, tmp, i, lui.out, literal);
+            demangle_symbol_load(
+                text, tmp, i, lui.out, literal, symtab, strtab, rodata);
         } else {
             tmp.push_back(std::move(text.at(i)));
         }
@@ -296,9 +311,7 @@ auto demangle_canonical_li(Cooked_text& text,
     text = std::move(tmp);
 }
 
-auto demangle_addi_to_void(Cooked_text& text,
-                           viua::vm::elf::Fragment const& rodata,
-                           viua::vm::elf::Fragment const& fntab) -> void
+auto demangle_short_li(Cooked_text& text) -> void
 {
     auto tmp = Cooked_text{};
 
@@ -334,9 +347,6 @@ auto demangle_addi_to_void(Cooked_text& text,
                                   + std::string{"li "} + addi.out.to_string()
                                   + ", " + std::to_string(addi.immediate)
                                   + (needs_unsigned ? "u" : "")));
-
-                demangle_strtab_load(
-                    text, rodata, fntab, tmp, i, addi.out, addi.immediate);
 
                 continue;
             }
@@ -390,10 +400,11 @@ auto demangle_addiu(Cooked_text& text) -> void
 }
 
 auto demangle_arodp(Cooked_text& text,
-                    std::map<size_t, std::string> const& labels_table) -> void
+                    std::vector<Elf64_Sym> const& symtab,
+                    std::map<size_t, std::string_view> const& strtab,
+                    std::vector<uint8_t> const& rodata) -> void
 {
     auto tmp = Cooked_text{};
-
     auto const ins_at =
         [&text](size_t const n) -> viua::arch::instruction_type {
         return text.at(n).instruction.value_or(0);
@@ -402,6 +413,39 @@ auto demangle_arodp(Cooked_text& text,
                             viua::arch::ops::OPCODE const op,
                             viua::arch::opcode_type const flags = 0) -> bool {
         return match_opcode(ins_at(n), op, flags);
+    };
+    auto const read_size = [](std::vector<uint8_t> const& data,
+                              size_t const off) -> uint64_t {
+        auto const size_offset = off;
+        auto cooked            = uint64_t{};
+        memcpy(&cooked, &data[size_offset], sizeof(uint64_t));
+        return le64toh(cooked);
+    };
+    auto const load_string = [read_size](std::vector<uint8_t> const& data,
+                                         size_t const off) -> std::string {
+        auto s = std::string{
+            reinterpret_cast<char const*>(data.data() + off + sizeof(uint64_t)),
+            read_size(data, off)};
+        auto const needs_quotes =
+            std::any_of(s.begin(), s.end(), [](auto const each) -> bool {
+                return not(std::isalnum(each) or (each == '_'));
+            });
+        if (needs_quotes) {
+            s = ('"' + s + '"');
+        }
+        return s;
+    };
+    auto const view_data
+        [[maybe_unused]] = [read_size](std::vector<uint8_t> const& data,
+                                       size_t const off) -> std::string_view {
+        return std::string_view{
+            reinterpret_cast<char const*>(data.data() + off + sizeof(uint64_t)),
+            read_size(data, off)};
+    };
+    auto const make_label_ref =
+        [](std::map<size_t, std::string_view> const& strtab,
+           Elf64_Sym const& sym) -> std::string {
+        return ("@" + std::string{strtab.at(sym.st_name)});
     };
 
     using enum viua::arch::ops::OPCODE;
@@ -412,10 +456,16 @@ auto demangle_arodp(Cooked_text& text,
             auto const arodp        = E::decode(ins_at(i));
             auto const needs_greedy = (arodp.opcode & GREEDY);
 
-            auto const off   = arodp.immediate;
-            auto const label = labels_table.count(off + sizeof(uint64_t))
-                                   ? labels_table.at(off + sizeof(uint64_t))
-                                   : ("_strat_" + std::to_string(off));
+            auto const off = arodp.immediate;
+
+            auto const sym = std::find_if(
+                symtab.begin(), symtab.end(), [off](auto const& each) -> bool {
+                    return (each.st_value == (off + sizeof(uint64_t)))
+                           and (ELF64_ST_TYPE(each.st_info) == STT_OBJECT);
+                });
+            auto const label_or_value = (sym == symtab.end())
+                                            ? load_string(rodata, off)
+                                            : make_label_ref(strtab, *sym);
 
             auto idx          = text.at(i).index;
             idx.physical_span = idx.physical;
@@ -423,7 +473,7 @@ auto demangle_arodp(Cooked_text& text,
                              std::nullopt,
                              std::nullopt,
                              ((needs_greedy ? "g." : "") + std::string{"arodp "}
-                              + arodp.out.to_string() + ", @" + label));
+                              + arodp.out.to_string() + ", " + label_or_value));
             continue;
         }
 
@@ -450,22 +500,26 @@ auto demangle_memory(Cooked_text& text) -> void
     using enum viua::arch::ops::OPCODE;
     for (auto i = size_t{0}; i < text.size(); ++i) {
         using viua::arch::ops::GREEDY;
-        if (m(i, SM) or m(i, LM) or m(i, AA) or m(i, AD)) {
+        auto const memory_op = (m(i, SM) or m(i, LM) or m(i, AA) or m(i, AD))
+                               or (m(i, SM, GREEDY) or m(i, LM, GREEDY)
+                                   or m(i, AA, GREEDY) or m(i, AD, GREEDY));
+        if (memory_op) {
             using viua::arch::ops::M;
-            auto const raw_op = ins_at(i);
-            auto const op     = M::decode(raw_op);
+            auto const raw_op       = ins_at(i);
+            auto const op           = M::decode(raw_op);
+            auto const needs_greedy = (op.opcode & GREEDY);
 
-            auto name = std::string{};
-            switch (static_cast<viua::arch::ops::OPCODE>(op.opcode)) {
+            auto name = std::string{needs_greedy ? "g." : ""};
+            switch (static_cast<viua::arch::ops::OPCODE>(op.opcode & ~GREEDY)) {
             case SM:
-                name = "s";
+                name += "s";
                 break;
             case LM:
-                name = "l";
+                name += "l";
                 break;
             case AA:
             case AD:
-                name = "am";
+                name += "am";
                 break;
             default:
                 abort();
@@ -490,7 +544,7 @@ auto demangle_memory(Cooked_text& text) -> void
                 abort();
                 break;
             }
-            switch (static_cast<viua::arch::ops::OPCODE>(op.opcode)) {
+            switch (static_cast<viua::arch::ops::OPCODE>(op.opcode & ~GREEDY)) {
             case AA:
                 name += "a";
                 break;
@@ -773,28 +827,29 @@ auto main(int argc, char* argv[]) -> int
                   << esc(2, ATTR_RESET) << ": no .rodata section found\n";
         return 1;
     }
+    if (auto const f = main_module.find_fragment(".strtab");
+        not f.has_value()) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
+                  << ": no string table fragment found\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
+                  << "note" << esc(2, ATTR_RESET)
+                  << ": no .strtab section found\n";
+        return 1;
+    }
     if (auto const f = main_module.find_fragment(".symtab");
         not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
                   << "error" << esc(2, ATTR_RESET)
-                  << ": no function table fragment found\n";
+                  << ": no symbol table fragment found\n";
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
                   << "note" << esc(2, ATTR_RESET)
                   << ": no .symtab section found\n";
         return 1;
-    }
-    if (auto const f = main_module.find_fragment(".viua.labels");
-        not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "warning" << esc(2, ATTR_RESET)
-                  << ": no label table fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
-                  << "note" << esc(2, ATTR_RESET)
-                  << ": synthetic labels will be used\n";
     }
 
     auto text = std::vector<viua::arch::instruction_type>{};
@@ -829,41 +884,36 @@ auto main(int argc, char* argv[]) -> int
     }
     auto& out = (preferred_output_path.has_value() ? to_file : std::cout);
 
-    auto const lt     = main_module.labels_table();
     auto const rodata = main_module.find_fragment(".rodata");
     if (rodata.has_value()) {
-        auto const& strtab = rodata->get();
-        auto dumped        = false;
+        auto const symtab = main_module.symtab;
+        for (auto i = size_t{1}; i < symtab.size(); ++i) {
+            auto const& sym = symtab.at(i);
 
-        for (auto off = size_t{8}; off < strtab.data.size();
-             off += sizeof(uint64_t)) {
-            auto const data_size = [&strtab, off]() -> uint64_t {
-                auto const size_offset = (off - sizeof(uint64_t));
-                auto tmp               = uint64_t{};
-                memcpy(&tmp, &strtab.data[size_offset], sizeof(uint64_t));
-                return le64toh(tmp);
-            }();
-            auto const sv = std::string_view{
-                reinterpret_cast<char const*>(&strtab.data[off]), data_size};
+            if (ELF64_ST_TYPE(sym.st_info) != STT_OBJECT) {
+                continue;
+            }
+
+            auto const buf =
+                reinterpret_cast<char const*>(rodata->get().data.data());
+            auto const sv = std::string_view{buf + sym.st_value, sym.st_size};
+
             auto const is_string =
                 std::all_of(sv.begin(), sv.end(), [](char const c) -> bool {
                     return (::isprint(c) or ::isspace(c));
                 });
-
             if (not is_string) {
-                /*
-                 * Do not dump non-string data. These are floats and doubles and
-                 * they will be merged with their pseudoinstructions during
-                 * demangling.
-                 */
-                off += sv.size();
                 continue;
             }
 
-            auto const label =
-                lt.count(off) ? lt.at(off) : ("_strat_" + std::to_string(off));
+            auto const off = sym.st_value;
 
-            dumped = true;
+            auto const label =
+                sym.st_name ? std::string{main_module.strtab.at(sym.st_name)}
+                            : ("_strat_" + std::to_string(off));
+
+            auto const data_size = sym.st_size;
+
             out << "; [.rodata+0x" << std::hex << std::setw(16)
                 << std::setfill('0') << off << "] to"
                 << " [.rodata+0x" << std::hex << std::setw(16)
@@ -873,61 +923,37 @@ auto main(int argc, char* argv[]) -> int
 
             out << ".value: string " << viua::support::string::quoted(sv)
                 << "\n\n";
-
-            off += sv.size();
         }
-
-        if (dumped) {
-            out << "\n";
-        }
-    }
-
-    auto const ft    = main_module.function_table();
-    auto ordered_fns = std::vector<std::tuple<std::string, size_t, size_t>>{};
-    {
-        for (auto const& each : ft) {
-            ordered_fns.push_back({each.second.first, each.second.second, 0});
-        }
-        std::sort(ordered_fns.begin(),
-                  ordered_fns.end(),
-                  [](auto const& a, auto const& b) {
-                      return (std::get<1>(a) < std::get<1>(b));
-                  });
-        for (auto i = size_t{1}; i < ordered_fns.size(); ++i) {
-            auto const& each  = ordered_fns.at(i);
-            auto& prev        = ordered_fns.at(i - 1);
-            std::get<2>(prev) = (std::get<1>(each) - std::get<1>(prev))
-                                / sizeof(viua::arch::instruction_type);
-        }
-        std::get<2>(ordered_fns.back()) =
-            ((text.size() * sizeof(viua::arch::instruction_type))
-             - std::get<1>(ordered_fns.back()))
-            / sizeof(viua::arch::instruction_type);
     }
 
     auto ef = main_module.name_function_at(entry_addr);
-    for (auto const& [name, addr, size] : ordered_fns) {
-        /*
-         * Let's emit a comment containing the span of the function. This is
-         * would be useful if you wanted to map the disassembled span to bytes
-         * inside the bytecode segment.
-         */
+    out << "; entry point: " << ef.first << "\n";
+    for (auto const& sym : main_module.symtab) {
+        if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
+            continue;
+        }
+
+        auto const addr      = sym.st_value;
+        auto const size      = sym.st_size;
+        auto const no_of_ops = (size / sizeof(viua::arch::instruction_type));
+
         out << "; [.text+0x" << std::setw(16) << std::setfill('0') << addr
             << "] to "
             << "[.text+0x" << std::setw(16) << std::setfill('0')
-            << (addr + (size * sizeof(viua::arch::instruction_type))) << "] ("
-            << size << " instruction" << ((size > 1) ? "s" : "") << ")\n";
+            << (addr + size) << "] (" << no_of_ops << " instruction"
+            << (no_of_ops ? "s" : "") << ")\n";
 
         /*
          * Then, the name. Marking the entry point is necessary to correctly
          * recreate the behaviour of the program.
          */
+        auto const name = main_module.strtab.at(sym.st_name);
         out << ".function: " << ((ef.first == name) ? "[[entry_point]] " : "")
             << name << "\n";
 
         auto cooked_text  = Cooked_text{};
         auto const offset = (addr / sizeof(viua::arch::instruction_type));
-        for (auto i = size_t{0}; i < size; ++i) {
+        for (auto i = size_t{0}; i < no_of_ops; ++i) {
             auto const ip     = text.at(offset + i);
             auto const opcode = static_cast<viua::arch::opcode_type>(
                 ip & viua::arch::ops::OPCODE_MASK);
@@ -935,14 +961,27 @@ auto main(int argc, char* argv[]) -> int
         }
 
         if (demangle_li) {
-            auto const fntab = main_module.find_fragment(".symtab");
-            cook::demangle_canonical_li(
-                cooked_text, rodata->get(), fntab->get());
-            cook::demangle_addi_to_void(
-                cooked_text, rodata->get(), fntab->get());
+            /*
+             * This demangles LI for long immediates; covering both integers for
+             * big values, and addresses (which are always stored using the long
+             * form).
+             */
+            cook::demangle_canonical_li(cooked_text,
+                                        main_module.symtab,
+                                        main_module.strtab,
+                                        rodata->get().data);
+
+            /*
+             * This demangles LI for short immediates.
+             */
+            cook::demangle_short_li(cooked_text);
         }
+
         cook::demangle_addiu(cooked_text);
-        cook::demangle_arodp(cooked_text, lt);
+        cook::demangle_arodp(cooked_text,
+                             main_module.symtab,
+                             main_module.strtab,
+                             rodata->get().data);
         cook::demangle_memory(cooked_text);
 
         auto const physical_to_logical = cook::demangle_branches(cooked_text);

@@ -48,6 +48,10 @@ struct Loaded_elf {
     Elf64_Ehdr header;
     std::vector<std::pair<std::string, Fragment>> fragments;
 
+    std::map<size_t, std::string_view> strtab;
+    std::vector<Elf64_Sym> symtab;
+    std::map<std::string_view, size_t> fn_map;
+
     auto find_fragment(std::string_view const) const
         -> std::optional<std::reference_wrapper<Fragment const>>;
     auto entry_point() const -> std::optional<size_t>;
@@ -60,6 +64,11 @@ struct Loaded_elf {
         -> std::map<size_t, std::pair<std::string, size_t>>;
 
     auto labels_table() const -> std::map<size_t, std::string>;
+
+    auto load_strtab() -> void;
+    auto load_symtab() -> void;
+
+    auto fn_at(size_t const) const -> std::pair<std::string_view, size_t>;
 
     static auto load(int const elf_fd) -> Loaded_elf;
     static auto make_text_from(Fragment::data_type const&)

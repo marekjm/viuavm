@@ -765,7 +765,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
     if (needs_leader) {
         auto synth           = ast::Instruction{};
         synth.opcode         = each.opcode;
-        synth.opcode.text    = "lli";
+        synth.opcode.text    = (is_greedy ? "g.lli" : "lli");
         synth.physical_index = each.physical_index;
 
         auto const& lx = each.operands.front().ingredients.at(1);
@@ -962,7 +962,6 @@ auto expand_memory_access(std::vector<ast::Instruction>& cooked,
     cooked.push_back(synth);
 }
 auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
-                               std::vector<Elf64_Sym> const& symbol_table,
                                std::map<std::string, size_t> const& symbol_map)
     -> std::vector<ast::Instruction>
 {
@@ -1131,8 +1130,7 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
                     throw Error{fn_name, Cause::Call_to_undefined_function};
                 }
 
-                auto const fn_off =
-                    symbol_table.at(symbol_map.at(fn_name.text)).st_name;
+                auto const fn_off = symbol_map.at(fn_name.text);
                 li.operands.back().ingredients.push_back(fn_name.make_synth(
                     std::to_string(fn_off) + 'u',
                     viua::libs::lexer::TOKEN::LITERAL_INTEGER));
