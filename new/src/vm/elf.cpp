@@ -132,8 +132,6 @@ auto Loaded_elf::load_strtab() -> void
     for (auto i = size_t{0}; i < strtab_size; ++i) {
         auto sv = std::string_view{strtab_data + i};
         strtab.emplace(i, sv);
-        std::cerr << "strtab[" << i << "] of " << sv.size() << " chars = " << sv
-                  << "\n";
         i += sv.size();
     }
 }
@@ -155,25 +153,9 @@ auto Loaded_elf::load_symtab() -> void
         auto sym = Elf64_Sym{};
         memcpy(&sym, symtab_data + (i * sizeof(Elf64_Sym)), sizeof(Elf64_Sym));
 
-        auto const sym_is_fn = ELF64_ST_TYPE(sym.st_info) == STT_FUNC;
-
-        std::cerr << "symtab[" << i << "] = " << strtab.at(sym.st_name) << " @ "
-                  << "[." << (sym_is_fn ? "text" : "rodata") << "+0x"
-                  << std::hex << std::setfill('0') << std::setw(16)
-                  << sym.st_value << std::dec << "]\n";
-
-        if (sym_is_fn) {
+        if (ELF64_ST_TYPE(sym.st_info) == STT_FUNC) {
             fn_map.emplace(strtab.at(sym.st_name), symtab.size());
-            std::cerr << "    function\n";
-        } else if (ELF64_ST_TYPE(sym.st_info) == STT_OBJECT) {
-            std::cerr << "    object\n";
-        } else if (ELF64_ST_TYPE(sym.st_info) == STT_NOTYPE) {
-            std::cerr << "    none\n";
-        } else {
-            std::cerr << "    unknown\n";
         }
-        std::cerr << "    size = " << sym.st_size << "\n";
-
         symtab.push_back(sym);
     }
 }
