@@ -345,6 +345,18 @@ auto main(int argc, char* argv[]) -> int
                   << ": no .symtab section found\n";
         return 1;
     }
+    if (auto const f = main_module.find_fragment(".strtab");
+        not f.has_value()) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
+                  << ": no function table fragment found\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
+                  << "note" << esc(2, ATTR_RESET)
+                  << ": no .strtab section found\n";
+        return 1;
+    }
     if (auto const f = main_module.find_fragment(".text"); not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
