@@ -532,17 +532,18 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
             throw e;
         }
 
-        auto synth           = viua::libs::parser::ast::Instruction{};
-        synth.opcode         = insn.opcode;
-        synth.opcode.text    = "g.li";
-        synth.physical_index = insn.physical_index;
+        auto synth = viua::libs::parser::ast::Instruction{};
+        {
+            synth.opcode         = insn.opcode;
+            synth.opcode.text    = "g.li";
+            synth.physical_index = insn.physical_index;
 
-        synth.operands.push_back(insn.operands.front());
-        synth.operands.push_back(insn.operands.back());
-        synth.operands.back().ingredients.front().text =
-            std::to_string(saved_at) + 'u';
-
-        cooked.push_back(synth);
+            synth.operands.push_back(insn.operands.front());
+            synth.operands.push_back(insn.operands.back());
+            synth.operands.back().ingredients.front().text =
+                std::to_string(saved_at) + 'u';
+        }
+        expand_li(cooked, synth, true);
 
         insn.operands.pop_back();
         cooked.push_back(std::move(insn));
@@ -616,17 +617,18 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
         memcpy(s.data(), &f, SIZE_OF_SINGLE_PRECISION_FLOAT);
         auto const saved_at = save_buffer_to_rodata(rodata_buf, s);
 
-        auto synth           = viua::libs::parser::ast::Instruction{};
-        synth.opcode         = insn.opcode;
-        synth.opcode.text    = "g.li";
-        synth.physical_index = insn.physical_index;
+        auto synth = viua::libs::parser::ast::Instruction{};
+        {
+            synth.opcode         = insn.opcode;
+            synth.opcode.text    = "g.li";
+            synth.physical_index = insn.physical_index;
 
-        synth.operands.push_back(insn.operands.front());
-        synth.operands.push_back(insn.operands.back());
-        synth.operands.back().ingredients.front().text =
-            std::to_string(saved_at) + 'u';
-
-        cooked.push_back(synth);
+            synth.operands.push_back(insn.operands.front());
+            synth.operands.push_back(insn.operands.back());
+            synth.operands.back().ingredients.front().text =
+                std::to_string(saved_at) + 'u';
+        }
+        expand_li(cooked, synth, true);
 
         insn.operands.pop_back();
         cooked.push_back(std::move(insn));
@@ -637,17 +639,18 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
         memcpy(s.data(), &f, SIZE_OF_DOUBLE_PRECISION_FLOAT);
         auto const saved_at = save_buffer_to_rodata(rodata_buf, s);
 
-        auto synth           = viua::libs::parser::ast::Instruction{};
-        synth.opcode         = insn.opcode;
-        synth.opcode.text    = "g.li";
-        synth.physical_index = insn.physical_index;
+        auto synth = viua::libs::parser::ast::Instruction{};
+        {
+            synth.opcode         = insn.opcode;
+            synth.opcode.text    = "g.li";
+            synth.physical_index = insn.physical_index;
 
-        synth.operands.push_back(insn.operands.front());
-        synth.operands.push_back(insn.operands.back());
-        synth.operands.back().ingredients.front().text =
-            std::to_string(saved_at) + 'u';
-
-        cooked.push_back(synth);
+            synth.operands.push_back(insn.operands.front());
+            synth.operands.push_back(insn.operands.back());
+            synth.operands.back().ingredients.front().text =
+                std::to_string(saved_at) + 'u';
+        }
+        expand_li(cooked, synth, true);
 
         insn.operands.pop_back();
         cooked.push_back(std::move(insn));
@@ -677,7 +680,8 @@ auto expand_delete(std::vector<ast::Instruction>& cooked,
     cooked.push_back(synth);
 }
 auto expand_li(std::vector<ast::Instruction>& cooked,
-               ast::Instruction const& each) -> void
+               ast::Instruction const& each,
+               bool const force_full) -> void
 {
     auto const& raw_value = each.operands.at(1).ingredients.front();
     auto value            = uint64_t{};
@@ -701,7 +705,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
     using viua::libs::assembler::to_loading_parts_unsigned;
     auto const [hi, lo]  = to_loading_parts_unsigned(value);
     auto const is_greedy = (each.opcode.text.find("g.") == 0);
-    auto const full_form = each.operands.at(1).has_attr("full");
+    auto const full_form = each.operands.at(1).has_attr("full") or force_full;
 
     auto const is_unsigned = (raw_value.text.back() == 'u');
 
@@ -1135,7 +1139,7 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
 
                 li.physical_index = each.physical_index;
             }
-            expand_li(cooked, li);
+            expand_li(cooked, li, true);
 
             /*
              * Then, synthesize the actual call instruction. This means

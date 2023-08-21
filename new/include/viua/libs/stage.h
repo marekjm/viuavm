@@ -69,7 +69,8 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction,
 auto expand_delete(std::vector<viua::libs::parser::ast::Instruction>&,
                    viua::libs::parser::ast::Instruction const&) -> void;
 auto expand_li(std::vector<viua::libs::parser::ast::Instruction>&,
-               viua::libs::parser::ast::Instruction const&) -> void;
+               viua::libs::parser::ast::Instruction const&,
+               bool const force_full = false) -> void;
 auto expand_if(std::vector<viua::libs::parser::ast::Instruction>&,
                viua::libs::parser::ast::Instruction&,
                std::map<size_t, size_t>) -> void;
