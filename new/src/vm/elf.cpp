@@ -185,10 +185,8 @@ auto Loaded_elf::fn_at(std::vector<uint8_t> const& function_table,
     memcpy(&sz, (function_table.data() + offset - sizeof(sz)), sizeof(sz));
     sz = le64toh(sz);
 
-
     auto name = std::string{
         reinterpret_cast<char const*>(function_table.data()) + offset, sz};
-
 
     auto addr = uint64_t{};
     memcpy(&addr, (function_table.data() + offset + sz), sizeof(addr));

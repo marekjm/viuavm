@@ -3,6 +3,8 @@
     call $1.l, dummy
     ebreak
 
+    ; This LB will crash the program, because it uses memory allocated by the
+    ; dummy() function as its local area.
     lb $2.l, $1.l, 0
     ebreak
 

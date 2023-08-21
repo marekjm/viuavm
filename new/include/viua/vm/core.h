@@ -55,7 +55,6 @@ struct Module {
     viua::vm::elf::Loaded_elf const elf;
 
     strtab_type const& strings_table;
-    fntab_type const& functions_table;
 
     text_type const text;
     text_type::value_type const* ip_base;
@@ -64,7 +63,6 @@ struct Module {
             : elf_path{std::move(ep)}
             , elf{std::move(le)}
             , strings_table{elf.find_fragment(".rodata")->get().data}
-            , functions_table{elf.find_fragment(".symtab")->get().data}
             , text{elf.make_text_from(elf.find_fragment(".text")->get().data)}
             , ip_base{text.data()}
     {}
@@ -77,7 +75,10 @@ struct Module {
     inline auto function_at(size_t const off) const
         -> std::pair<std::string, size_t>
     {
-        return elf.fn_at(functions_table, off);
+        auto const sym  = elf.symtab.at(off);
+        auto name       = std::string{elf.strtab.at(sym.st_name)};
+        auto const addr = sym.st_value;
+        return {name, addr};
     }
 
     inline auto ip_in_valid_range(text_type::value_type const* ip) const -> bool

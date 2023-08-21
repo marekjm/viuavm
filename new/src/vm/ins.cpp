@@ -1478,24 +1478,26 @@ auto dump_registers(std::vector<register_type> const& registers,
         }
     }
 }
-auto print_backtrace_line(
-    Stack const& stack,
-    size_t const frame_index,
-    std::map<Frame::addr_type, std::string> const& fn_entry_to_name) -> void
+auto print_backtrace_line(Stack const& stack, size_t const frame_index) -> void
 {
+    auto const& elf  = stack.proc->module.elf;
     auto const& each = stack.frames.at(frame_index);
+
+    auto entry_off =
+        static_cast<size_t>(each.entry_address - stack.proc->module.ip_base)
+        * sizeof(viua::arch::instruction_type);
+    auto const sym =
+        std::find_if(elf.symtab.begin(),
+                     elf.symtab.end(),
+                     [entry_off](auto const& each) -> bool {
+                         return (each.st_value == entry_off)
+                                and (ELF64_ST_TYPE(each.st_info) == STT_FUNC);
+                     });
+
     viua::TRACE_STREAM << "    #" << frame_index << "  ";
-
-    if (fn_entry_to_name.count(each.entry_address)) {
-        viua::TRACE_STREAM << fn_entry_to_name.at(each.entry_address);
-    } else {
-        viua::TRACE_STREAM << "??";
-    }
-    viua::TRACE_STREAM << (each.parameters.empty() ? " ()" : " (...)")
-                       << " at ";
-
-    viua::TRACE_STREAM << stack.proc->module.elf_path.native() << "[.text+0x"
-                       << std::hex << std::setw(8) << std::setfill('0');
+    viua::TRACE_STREAM
+        << ((sym == elf.symtab.end()) ? "??" : elf.strtab.at(sym->st_name));
+    viua::TRACE_STREAM << (each.parameters.empty() ? " ()" : " (...)");
 
     auto ip_offset = size_t{};
     if (frame_index < (stack.frames.size() - 1)) {
@@ -1504,6 +1506,9 @@ auto print_backtrace_line(
     } else {
         ip_offset = (stack.ip - stack.proc->module.ip_base);
     }
+    viua::TRACE_STREAM << " at " << stack.proc->module.elf_path.native()
+                       << "[.text+0x" << std::hex << std::setw(8)
+                       << std::setfill('0');
     viua::TRACE_STREAM << (ip_offset * sizeof(viua::arch::instruction_type));
     viua::TRACE_STREAM << std::dec << ']';
 
@@ -1524,23 +1529,11 @@ auto print_backtrace_line(
 auto print_backtrace(Stack const& stack, std::optional<size_t> const only_for)
     -> void
 {
-    auto fn_entry_to_name = std::map<Frame::addr_type, std::string>{};
-    {
-        for (auto const& [fn_off, fn] :
-             stack.proc->module.elf.function_table()) {
-            auto const [fn_name, fn_entry] = fn;
-            auto const entry_addr =
-                (stack.proc->module.ip_base
-                 + (fn_entry / sizeof(viua::arch::instruction_type)));
-            fn_entry_to_name.emplace(entry_addr, fn_name);
-        }
-    }
-
     if (only_for.has_value()) {
-        print_backtrace_line(stack, *only_for, fn_entry_to_name);
+        print_backtrace_line(stack, *only_for);
     } else {
         for (auto i = size_t{0}; i < stack.frames.size(); ++i) {
-            print_backtrace_line(stack, i, fn_entry_to_name);
+            print_backtrace_line(stack, i);
         }
     }
 }
