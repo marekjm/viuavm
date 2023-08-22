@@ -701,7 +701,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_type   = SHT_STRTAB;
             sec.sh_offset = 0;
             sec.sh_size   = string_table.size();
-            sec.sh_flags  = 0;
+            sec.sh_flags  = SHF_STRINGS;
 
             strtab_section_ndx = elf_headers.size();
             elf_headers.push_back({std::nullopt, sec});
@@ -723,6 +723,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_type   = SHT_STRTAB;
             sec.sh_offset = 0;
             sec.sh_size   = shstr.size();
+            sec.sh_flags = SHF_STRINGS;
 
             elf_headers.push_back({std::nullopt, sec});
         }
