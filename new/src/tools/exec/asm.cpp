@@ -682,10 +682,12 @@ auto emit_elf(std::filesystem::path const output_path,
              * let's just use SHT_PROGBITS because interpretation of
              * SHT_PROGBITS is up to the program.
              */
-            sec.sh_type   = SHT_SYMTAB;
-            sec.sh_offset = 0;
-            sec.sh_size   = (symbol_table.size() * sizeof(Elf64_Sym));
-            sec.sh_flags  = 0;
+            sec.sh_type    = SHT_SYMTAB;
+            sec.sh_offset  = 0;
+            sec.sh_size    = (symbol_table.size() * sizeof(Elf64_Sym));
+            sec.sh_flags   = 0;
+            sec.sh_entsize = sizeof(Elf64_Sym);
+            sec.sh_info    = 0;
 
             symtab_section_ndx = elf_headers.size();
             elf_headers.push_back({std::nullopt, sec});
@@ -1103,6 +1105,12 @@ auto main(int argc, char* argv[]) -> int
         empty.st_info  = ELF64_ST_INFO(STB_LOCAL, STT_NOTYPE);
         empty.st_shndx = SHN_UNDEF;
         symbol_table.push_back(empty);
+
+        auto file_sym = Elf64_Sym{};
+        file_sym.st_name = viua::libs::stage::save_string_to_strtab(string_table, source_path.native());
+        file_sym.st_info = ELF64_ST_INFO(STB_LOCAL, STT_FILE);
+        file_sym.st_shndx = SHN_ABS;
+        symbol_table.push_back(file_sym);
     }
 
     stage::load_function_labels(nodes, string_table, symbol_table, symbol_map);
