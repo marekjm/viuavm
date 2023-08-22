@@ -45,6 +45,7 @@
 #include <vector>
 
 #include <viua/arch/arch.h>
+#include <viua/arch/elf.h>
 #include <viua/arch/ops.h>
 #include <viua/libs/assembler.h>
 #include <viua/libs/errors/compile_time.h>
@@ -371,7 +372,6 @@ auto cook_pseudoinstructions(std::filesystem::path const source_path,
 
 auto find_entry_point(std::filesystem::path const source_path,
                       std::string_view const source_text,
-                      bool const as_executable,
                       AST_nodes const& nodes)
     -> std::optional<viua::libs::lexer::Lexeme>
 {
@@ -393,25 +393,6 @@ auto find_entry_point(std::filesystem::path const source_path,
             }
             entry_point_fn = static_cast<ast::Fn_def&>(*each).name;
         }
-    }
-    if (as_executable and not entry_point_fn.has_value()) {
-        using viua::support::tty::ATTR_RESET;
-        using viua::support::tty::COLOR_FG_CYAN;
-        using viua::support::tty::COLOR_FG_RED;
-        using viua::support::tty::COLOR_FG_WHITE;
-        using viua::support::tty::send_escape_seq;
-        constexpr auto esc = send_escape_seq;
-
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET) << ": "
-                  << "no entry point function defined\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
-                  << "note" << esc(2, ATTR_RESET) << ": "
-                  << "the entry function should have the [[entry_point]] "
-                     "attribute\n";
-        exit(1);
     }
     return entry_point_fn;
 }
@@ -468,10 +449,50 @@ auto emit_bytecode(std::filesystem::path const source_path,
     return text;
 }
 
+auto make_reloc_table(Text const& text) -> std::vector<Elf64_Rel>
+{
+    auto reloc_table = std::vector<Elf64_Rel>{};
+
+    for (auto i = size_t{0}; i < text.size(); ++i) {
+        using viua::arch::opcode_type;
+        using viua::arch::ops::OPCODE;
+
+        auto const each = text.at(i);
+
+        auto const op =
+            static_cast<OPCODE>(each & viua::arch::ops::OPCODE_MASK);
+        switch (op) {
+            using enum viua::arch::ops::OPCODE;
+            using enum viua::arch::elf::R_VIUA;
+        case CALL:
+        {
+            using viua::arch::ops::F;
+            auto const hi =
+                static_cast<uint64_t>(F::decode(text.at(i - 2)).immediate)
+                << 32;
+            auto const lo                 = F::decode(text.at(i - 1)).immediate;
+            auto const symtab_entry_index = static_cast<uint32_t>(hi | lo);
+
+            Elf64_Rel rel;
+            rel.r_offset = (i - 2) * sizeof(viua::arch::instruction_type);
+            rel.r_info   = ELF64_R_INFO(symtab_entry_index,
+                                      static_cast<uint8_t>(R_VIUA_JUMP_SLOT));
+            reloc_table.push_back(rel);
+            break;
+        }
+        default:
+            break;
+        }
+    }
+
+    return reloc_table;
+}
+
 auto emit_elf(std::filesystem::path const output_path,
               bool const as_executable,
               std::optional<uint64_t> const entry_point_fn,
               Text const& text,
+              std::optional<std::vector<Elf64_Rel>> relocs,
               std::vector<uint8_t> const& rodata_buf,
               std::vector<uint8_t> const& string_table,
               std::vector<Elf64_Sym>& symbol_table) -> void
@@ -515,6 +536,7 @@ auto emit_elf(std::filesystem::path const output_path,
         };
 
         auto text_section_ndx   = size_t{0};
+        auto rel_section_ndx    = size_t{0};
         auto rodata_section_ndx = size_t{0};
         auto symtab_section_ndx = size_t{0};
         auto strtab_section_ndx = size_t{0};
@@ -588,6 +610,38 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_flags  = 0;
 
             elf_headers.push_back({seg, sec});
+        }
+        if (relocs.has_value()) {
+            /*
+             * .rel
+             */
+            auto const relocation_table = *relocs;
+
+            Elf64_Shdr sec{};
+            sec.sh_name    = save_shstr_entry(".rel");
+            sec.sh_type    = SHT_REL;
+            sec.sh_offset  = 0;
+            sec.sh_entsize = sizeof(decltype(relocation_table)::value_type);
+            sec.sh_size    = (relocation_table.size() * sec.sh_entsize);
+            sec.sh_flags   = SHF_INFO_LINK;
+
+            /*
+             * This should point to .symtab section that is relevant for the
+             * relocations contained in this .rel section (in our case its the
+             * only .symtab section in the ELF), but we do not know that
+             * section's index yet.
+             */
+            sec.sh_link = 0;
+
+            /*
+             * This should point to .text section (or any other section) to
+             * which the relocations apply. We do not know that index yet, but
+             * it MUST be patched later.
+             */
+            sec.sh_info = 0;
+
+            rel_section_ndx = elf_headers.size();
+            elf_headers.push_back({std::nullopt, sec});
         }
         {
             /*
@@ -734,6 +788,14 @@ auto emit_elf(std::filesystem::path const output_path,
          */
         elf_headers.at(symtab_section_ndx).second.sh_link = strtab_section_ndx;
 
+        /*
+         * Patch the symbol table section index.
+         */
+        if (relocs.has_value()) {
+            elf_headers.at(rel_section_ndx).second.sh_link = symtab_section_ndx;
+            elf_headers.at(rel_section_ndx).second.sh_info = text_section_ndx;
+        }
+
         auto elf_pheaders = std::count_if(
             elf_headers.begin(),
             elf_headers.end(),
@@ -833,6 +895,12 @@ auto emit_elf(std::filesystem::path const output_path,
 
         write(a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);
 
+        if (relocs.has_value()) {
+            for (auto const& rel : *relocs) {
+                write(a_out, &rel, sizeof(std::decay_t<decltype(rel)>));
+            }
+        }
+
         auto const text_size =
             (text.size() * sizeof(std::decay_t<decltype(text)>::value_type));
         write(a_out, text.data(), text_size);
@@ -883,7 +951,6 @@ auto main(int argc, char* argv[]) -> int
     }
 
     auto preferred_output_path = std::optional<std::filesystem::path>{};
-    auto as_executable         = true;
     auto verbosity_level       = 0;
     auto show_version          = false;
     auto show_help             = false;
@@ -900,8 +967,6 @@ auto main(int argc, char* argv[]) -> int
          */
         else if (each == "-o") {
             preferred_output_path = std::filesystem::path{args.at(++i)};
-        } else if (each == "-c") {
-            as_executable = false;
         }
         /*
          * Common options.
@@ -1004,8 +1069,7 @@ auto main(int argc, char* argv[]) -> int
     }
 
     auto const output_path = preferred_output_path.value_or(
-        as_executable ? std::filesystem::path{"a.out"}
-                      : [source_path]() -> std::filesystem::path {
+        [source_path]() -> std::filesystem::path {
             auto o = source_path;
             o.replace_extension("o");
             return o;
@@ -1152,7 +1216,7 @@ auto main(int argc, char* argv[]) -> int
      * hidden behind a flag.
      */
     auto const entry_point_fn =
-        stage::find_entry_point(source_path, source_text, as_executable, nodes);
+        stage::find_entry_point(source_path, source_text, nodes);
 
     /*
      * Bytecode emission.
@@ -1161,21 +1225,23 @@ auto main(int argc, char* argv[]) -> int
      * table mapping function names to the offsets inside the .text section, at
      * which their entry points reside.
      */
-    auto text = stage::emit_bytecode(
+    auto const text = stage::emit_bytecode(
         source_path, source_text, nodes, symbol_table, symbol_map);
+    auto const reloc_table = stage::make_reloc_table(text);
 
     /*
      * ELF emission.
      */
     stage::emit_elf(
         output_path,
-        as_executable,
+        false,
         (entry_point_fn.has_value()
              ? std::optional{symbol_table
                                  .at(symbol_map.at(entry_point_fn.value().text))
                                  .st_value}
              : std::nullopt),
         text,
+        reloc_table,
         rodata_contents,
         string_table,
         symbol_table);

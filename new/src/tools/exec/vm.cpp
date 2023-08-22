@@ -322,6 +322,14 @@ auto main(int argc, char* argv[]) -> int
     using Module           = viua::vm::elf::Loaded_elf;
     auto const main_module = Module::load(elf_fd);
 
+    if (main_module.header.e_type != ET_EXEC) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
+                  << ": not an executable file\n";
+        return 1;
+    }
+
     if (auto const f = main_module.find_fragment(".rodata");
         not f.has_value()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
