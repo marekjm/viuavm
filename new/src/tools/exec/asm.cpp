@@ -1101,7 +1101,7 @@ auto main(int argc, char* argv[]) -> int
         auto empty     = Elf64_Sym{};
         empty.st_name  = STN_UNDEF;
         empty.st_info  = ELF64_ST_INFO(STB_LOCAL, STT_NOTYPE);
-        empty.st_shndx = STN_UNDEF;
+        empty.st_shndx = SHN_UNDEF;
         symbol_table.push_back(empty);
     }
 
