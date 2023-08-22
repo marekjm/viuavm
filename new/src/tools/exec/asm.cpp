@@ -1114,34 +1114,6 @@ auto main(int argc, char* argv[]) -> int
                              symbol_table,
                              symbol_map);
 
-    {
-        for (auto const& [name, i] : symbol_map) {
-            auto const& sym = symbol_table.at(i);
-
-            std::cerr
-                << " " << std::setw(2) << i << ": " << name << " => "
-                << reinterpret_cast<char const*>(&string_table[sym.st_name])
-                << "\n";
-
-            if (ELF64_ST_TYPE(sym.st_info) == STT_OBJECT) {
-                std::cerr << "     object\n";
-                std::cerr
-                    << "     value = "
-                    << std::string_view{reinterpret_cast<char const*>(
-                                            &rodata_contents[sym.st_value]),
-                                        sym.st_size}
-                    << "\n";
-            } else if (ELF64_ST_TYPE(sym.st_info) == STT_FUNC) {
-                std::cerr << "     function\n";
-            } else if (ELF64_ST_TYPE(sym.st_info) == STT_NOTYPE) {
-                std::cerr << "     none\n";
-            } else {
-                std::cerr << "     unknown\n";
-            }
-            std::cerr << "     size = " << sym.st_size << "\n";
-        }
-    }
-
     stage::cook_long_immediates(source_path,
                                 source_text,
                                 nodes,
