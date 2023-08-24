@@ -777,7 +777,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_type   = SHT_STRTAB;
             sec.sh_offset = 0;
             sec.sh_size   = shstr.size();
-            sec.sh_flags = SHF_STRINGS;
+            sec.sh_flags  = SHF_STRINGS;
 
             elf_headers.push_back({std::nullopt, sec});
         }
@@ -1171,9 +1171,10 @@ auto main(int argc, char* argv[]) -> int
         empty.st_shndx = SHN_UNDEF;
         symbol_table.push_back(empty);
 
-        auto file_sym = Elf64_Sym{};
-        file_sym.st_name = viua::libs::stage::save_string_to_strtab(string_table, source_path.native());
-        file_sym.st_info = ELF64_ST_INFO(STB_LOCAL, STT_FILE);
+        auto file_sym    = Elf64_Sym{};
+        file_sym.st_name = viua::libs::stage::save_string_to_strtab(
+            string_table, source_path.native());
+        file_sym.st_info  = ELF64_ST_INFO(STB_LOCAL, STT_FILE);
         file_sym.st_shndx = SHN_ABS;
         symbol_table.push_back(file_sym);
     }
