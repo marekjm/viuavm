@@ -56,6 +56,7 @@ def format_freq(hz):
 ENCODING = "utf-8"
 INTERPRETER = "./build/tools/exec/vm"
 ASSEMBLER = "./build/tools/exec/asm"
+LINKER = "./build/tools/exec/ld"
 DISASSEMBLER = "./build/tools/exec/dis"
 
 DIS_EXTENSION = "~"
@@ -768,18 +769,20 @@ def test_case(case_name, test_program, errors):
             None,
         )
 
+    test_relocatable = os.path.splitext(test_program)[0] + ".o"
     test_executable = os.path.splitext(test_program)[0] + ".elf"
 
     start_timepoint = datetime.datetime.now()
     count_runtime = lambda: (datetime.datetime.now() - start_timepoint)
 
+    asm_args = (
+        ASSEMBLER,
+        "-o",
+        test_relocatable,
+        test_program,
+    )
     asm_return = subprocess.call(
-        args=(
-            ASSEMBLER,
-            "-o",
-            test_executable,
-            test_program,
-        ),
+        args=asm_args,
         stderr=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
     )
@@ -787,7 +790,27 @@ def test_case(case_name, test_program, errors):
         return (
             Status.Normal,
             False,
-            "failed to assemble",
+            ("failed to assemble: " + " ".join(asm_args)),
+            count_runtime(),
+            None,
+        )
+
+    ld_args = (
+        LINKER,
+        "-o",
+        test_executable,
+        test_relocatable,
+    )
+    ld_return = subprocess.call(
+        args=ld_args,
+        stderr=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+    )
+    if ld_return != 0:
+        return (
+            Status.Normal,
+            False,
+            ("failed to link: " + " ".join(ld_args)),
             count_runtime(),
             None,
         )
@@ -957,13 +980,14 @@ def test_case(case_name, test_program, errors):
             None,
         )
 
+    asm_args = (
+        ASSEMBLER,
+        "-o",
+        test_relocatable,
+        test_disassembled_program,
+    )
     asm_return = subprocess.call(
-        args=(
-            ASSEMBLER,
-            "-o",
-            test_executable,
-            test_disassembled_program,
-        ),
+        args=asm_args,
         stderr=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
     )
@@ -971,7 +995,27 @@ def test_case(case_name, test_program, errors):
         return (
             Status.Normal,
             False,
-            "failed to reassemble",
+            ("failed to reassemble: " + " ".join(asm_args)),
+            count_runtime(),
+            None,
+        )
+
+    ld_args = (
+        LINKER,
+        "-o",
+        test_executable,
+        test_relocatable,
+    )
+    ld_return = subprocess.call(
+        args=ld_args,
+        stderr=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+    )
+    if ld_return != 0:
+        return (
+            Status.Normal,
+            False,
+            ("failed to relink: " + " ".join(ld_args)),
             count_runtime(),
             None,
         )

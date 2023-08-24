@@ -68,6 +68,7 @@ dist: \
 	$(BUILD)/tools/exec/readelf \
 	$(BUILD)/tools/exec/dis \
 	$(BUILD)/tools/exec/asm \
+	$(BUILD)/tools/exec/ld \
 	$(BUILD)/tools/exec/vm \
 	$(BUILD)/tools/exec/viua
 
@@ -195,6 +196,12 @@ $(BUILD)/tools/exec/asm: \
 	$(BUILD)/tools/libs/stage.o \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
+
+$(BUILD)/tools/exec/ld: \
+	$(BUILD)/arch/arch.o \
+	$(BUILD)/arch/ops.o \
+	$(BUILD)/vm/elf.o \
+	$(BUILD)/support/tty.o
 
 VIUA_INSTRUCTION_IMPLS=\
 					   $(BUILD)/vm/ins/aa.o \
