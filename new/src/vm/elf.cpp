@@ -27,9 +27,56 @@ namespace viua::vm::elf {
 auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
 {
     auto loaded = Loaded_elf{};
-    read(elf_fd, &loaded.header, sizeof(loaded.header));
+    if (read(elf_fd, &loaded.header, sizeof(loaded.header))
+        != sizeof(loaded.header)) {
+        throw std::runtime_error{"could not read program header"};
+    }
 
     auto const& ehdr = loaded.header;
+    {
+        /*
+         * Verify magic.
+         */
+        auto const magic_leader = (ehdr.e_ident[EI_MAG0] == '\x7f');
+        auto const magic_e      = (ehdr.e_ident[EI_MAG1] == 'E');
+        auto const magic_l      = (ehdr.e_ident[EI_MAG2] == 'L');
+        auto const magic_f      = (ehdr.e_ident[EI_MAG3] == 'F');
+        auto const magic_is_ok =
+            (magic_leader and magic_e and magic_l and magic_f);
+        if (not magic_is_ok) {
+            throw std::runtime_error{"invalid ELF magic"};
+        }
+    }
+    {
+        /*
+         * Verify other ELF attributes.
+         */
+        if (ehdr.e_ident[EI_CLASS] != ELFCLASS64) {
+            throw std::runtime_error{"invalid ELF class"};
+        }
+        if (ehdr.e_ident[EI_DATA] != ELFDATA2LSB) {
+            throw std::runtime_error{"invalid ELF endianness"};
+        }
+        if (ehdr.e_ident[EI_VERSION] != EV_CURRENT) {
+            throw std::runtime_error{
+                "invalid ELF version in identification array"};
+        }
+        if (ehdr.e_ident[EI_OSABI] != ELFOSABI_STANDALONE) {
+            throw std::runtime_error{"invalid ELF OS ABI"};
+        }
+        if (ehdr.e_ident[EI_ABIVERSION] != 0) {
+            throw std::runtime_error{"invalid ELF ABI version"};
+        }
+        if (ehdr.e_machine != ET_NONE) {
+            throw std::runtime_error{"invalid ELF machine"};
+        }
+        if (ehdr.e_version != EV_CURRENT) {
+            throw std::runtime_error{"invalid ELF version"};
+        }
+        if (ehdr.e_flags != 0) {
+            throw std::runtime_error{"invalid ELF flags"};
+        }
+    }
 
     auto pheaders = std::vector<Elf64_Phdr>{};
     {
