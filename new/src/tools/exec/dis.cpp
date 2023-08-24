@@ -75,7 +75,44 @@ auto match_opcode(viua::arch::instruction_type const ip,
     using viua::arch::opcode_type;
     return (static_cast<opcode_type>(ip)
             == (static_cast<opcode_type>(op) | flags));
-};
+}
+
+auto main_module_elf_type = ET_NONE;
+auto get_symbol_name_in_executable(
+    uint64_t const value,
+    std::vector<Elf64_Sym> const& symtab,
+    std::map<size_t, std::string_view> const& strtab) -> std::string
+{
+    auto sym = std::find_if(
+        symtab.begin(), symtab.end(), [value](Elf64_Sym const each) -> bool {
+            return (each.st_value == value);
+        });
+    if (sym == symtab.end()) {
+        abort();  // FIXME std::optional?
+    }
+    return std::string{strtab.at(sym->st_name)};
+}
+auto get_symbol_name_in_relocatable(
+    uint64_t const value,
+    std::vector<Elf64_Sym> const& symtab,
+    std::map<size_t, std::string_view> const& strtab) -> std::string
+{
+    return std::string{strtab.at(symtab.at(value).st_name)};
+}
+auto get_symbol_name(uint64_t const value,
+                     std::vector<Elf64_Sym> const& symtab,
+                     std::map<size_t, std::string_view> const& strtab)
+    -> std::string
+{
+    switch (main_module_elf_type) {
+    case ET_EXEC:
+        return get_symbol_name_in_executable(value, symtab, strtab);
+    case ET_REL:
+        return get_symbol_name_in_relocatable(value, symtab, strtab);
+    default:
+        abort();  // FIXME std::optional?
+    }
+}
 }  // namespace
 
 struct Cooked_op {
@@ -224,10 +261,9 @@ auto demangle_symbol_load(Cooked_text& raw,
     if (m(i + 1, CALL) and D::decode(ins_at(i + 1)).in == out) {
         auto ins = raw.at(i + 1);
 
-        auto const sym = symtab.at(immediate);
         auto tt =
             ins.with_text("call " + D::decode(ins_at(i + 1)).out.to_string()
-                          + ", " + std::string{strtab.at(sym.st_name)});
+                          + ", " + get_symbol_name(immediate, symtab, strtab));
         tt.index = cooked.back().index;
         cooked.pop_back();
         tt.index.physical_span = tt.index.physical_span.value() + 1;
@@ -816,6 +852,7 @@ auto main(int argc, char* argv[]) -> int
 
     using Module           = viua::vm::elf::Loaded_elf;
     auto const main_module = Module::load(elf_fd);
+    main_module_elf_type   = main_module.header.e_type;
 
     if (auto const f = main_module.find_fragment(".rodata");
         not f.has_value()) {
