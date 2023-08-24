@@ -413,7 +413,10 @@ auto save_string_to_strtab(std::vector<uint8_t>& tab,
         while ((i + data.size()) < tab.size()) {
             auto const existing = std::string_view{
                 reinterpret_cast<char const*>(tab.data() + i), data.size()};
-            if (existing == data) {
+
+            auto const content_matches = (existing == data);
+            auto const nul_matches = (*(tab.data() + i + data.size()) == '\0');
+            if (content_matches and nul_matches) {
                 return i;
             }
 

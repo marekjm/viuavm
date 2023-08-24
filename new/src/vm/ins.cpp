@@ -1496,7 +1496,7 @@ auto print_backtrace_line(Stack const& stack, size_t const frame_index) -> void
 
     viua::TRACE_STREAM << "    #" << frame_index << "  ";
     viua::TRACE_STREAM
-        << ((sym == elf.symtab.end()) ? "??" : elf.strtab.at(sym->st_name));
+        << ((sym == elf.symtab.end()) ? "??" : elf.str_at(sym->st_name));
     viua::TRACE_STREAM << (each.parameters.empty() ? " ()" : " (...)");
 
     auto ip_offset = size_t{};

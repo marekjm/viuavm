@@ -127,13 +127,31 @@ auto Loaded_elf::load_strtab() -> void
     }
 
     auto const strtab_size = elf_strtab->get().section_header.sh_size;
+    strtab                 = std::string_view{
+        reinterpret_cast<char const*>(elf_strtab->get().data.data()),
+        strtab_size};
     auto const strtab_data =
         reinterpret_cast<char const*>(elf_strtab->get().data.data());
     for (auto i = size_t{0}; i < strtab_size; ++i) {
         auto sv = std::string_view{strtab_data + i};
-        strtab.emplace(i, sv);
+        strtab_quick.emplace(i, sv);
         i += sv.size();
     }
+}
+auto Loaded_elf::str_at(size_t const off) const -> std::string_view
+{
+    auto name = std::string_view{};
+    if (strtab_quick.count(off)) {
+        name = strtab_quick.at(off);
+    } else {
+        name = strtab;
+        name.remove_prefix(off);
+        name = std::string_view{name.data()};
+    }
+    if (strtab.size() <= off) {
+        abort();
+    }
+    return name;
 }
 auto Loaded_elf::load_symtab() -> void
 {
@@ -154,7 +172,7 @@ auto Loaded_elf::load_symtab() -> void
         memcpy(&sym, symtab_data + (i * sizeof(Elf64_Sym)), sizeof(Elf64_Sym));
 
         if (ELF64_ST_TYPE(sym.st_info) == STT_FUNC) {
-            fn_map.emplace(strtab.at(sym.st_name), symtab.size());
+            fn_map.emplace(str_at(sym.st_name), symtab.size());
         }
         symtab.push_back(sym);
     }
@@ -183,8 +201,7 @@ auto Loaded_elf::fn_at(std::vector<uint8_t> const& function_table,
 
     return {name, addr};
 }
-auto Loaded_elf::name_function_at(size_t const offset) const
-    -> std::pair<std::string, size_t>
+auto Loaded_elf::name_function_at(size_t const offset) const -> std::string_view
 {
     for (auto const& sym : symtab) {
         if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
@@ -195,9 +212,9 @@ auto Loaded_elf::name_function_at(size_t const offset) const
             continue;
         }
 
-        return {std::string{strtab.at(sym.st_name)}, 0};
+        return str_at(sym.st_name);
     }
-    return {"", 0};
+    return "";
 }
 auto Loaded_elf::function_table() const
     -> std::map<size_t, std::pair<std::string, size_t>>

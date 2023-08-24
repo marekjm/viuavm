@@ -909,7 +909,7 @@ auto main(int argc, char* argv[]) -> int
             auto const off = sym.st_value;
 
             auto const label =
-                sym.st_name ? std::string{main_module.strtab.at(sym.st_name)}
+                sym.st_name ? std::string{main_module.str_at(sym.st_name)}
                             : ("_strat_" + std::to_string(off));
 
             auto const data_size = sym.st_size;
@@ -927,7 +927,7 @@ auto main(int argc, char* argv[]) -> int
     }
 
     auto ef = main_module.name_function_at(entry_addr);
-    out << "; entry point: " << ef.first << "\n";
+    out << "; entry point: " << ef << "\n";
     for (auto const& sym : main_module.symtab) {
         if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
             continue;
@@ -947,9 +947,9 @@ auto main(int argc, char* argv[]) -> int
          * Then, the name. Marking the entry point is necessary to correctly
          * recreate the behaviour of the program.
          */
-        auto const name = main_module.strtab.at(sym.st_name);
-        out << ".function: " << ((ef.first == name) ? "[[entry_point]] " : "")
-            << name << "\n";
+        auto const name = main_module.str_at(sym.st_name);
+        out << ".function: " << ((ef == name) ? "[[entry_point]] " : "") << name
+            << "\n";
 
         auto cooked_text  = Cooked_text{};
         auto const offset = (addr / sizeof(viua::arch::instruction_type));
@@ -968,7 +968,7 @@ auto main(int argc, char* argv[]) -> int
              */
             cook::demangle_canonical_li(cooked_text,
                                         main_module.symtab,
-                                        main_module.strtab,
+                                        main_module.strtab_quick,
                                         rodata->get().data);
 
             /*
@@ -980,7 +980,7 @@ auto main(int argc, char* argv[]) -> int
         cook::demangle_addiu(cooked_text);
         cook::demangle_arodp(cooked_text,
                              main_module.symtab,
-                             main_module.strtab,
+                             main_module.strtab_quick,
                              rodata->get().data);
         cook::demangle_memory(cooked_text);
 

@@ -204,7 +204,7 @@ auto main(int argc, char* argv[]) -> int
                   << elf.header.e_entry << "  [.text+0x" << std::hex << *ep
                   << "]";
         std::cout << std::dec;
-        std::cout << "  " << elf.name_function_at(*ep).first << "\n";
+        std::cout << "  " << elf.name_function_at(*ep) << "\n";
     } else {
         std::cout << "not found\n";
     }
