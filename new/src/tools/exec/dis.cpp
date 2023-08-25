@@ -113,6 +113,11 @@ auto get_symbol_name(uint64_t const value,
         abort();  // FIXME std::optional?
     }
 }
+
+auto is_extern(Elf64_Sym const sym) -> bool
+{
+    return sym.st_value == 0;
+}
 }  // namespace
 
 struct Cooked_op {
@@ -963,10 +968,34 @@ auto main(int argc, char* argv[]) -> int
         }
     }
 
-    auto ef = main_module.name_function_at(entry_addr);
-    out << "; entry point: " << ef << "\n";
+    auto extern_fn_definitions_present = false;
     for (auto const& sym : main_module.symtab) {
         if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
+            continue;
+        }
+
+        /*
+         * At this moment we just want to enumerate extern functions.
+         */
+        if (not is_extern(sym)) {
+            continue;
+        }
+
+        auto const name = main_module.str_at(sym.st_name);
+        out << ".function: [[extern]] " << name << "\n";
+        extern_fn_definitions_present = true;
+    }
+    if (extern_fn_definitions_present) {
+        out << "\n";
+    }
+
+    auto ef = main_module.name_function_at(entry_addr);
+    for (auto const& sym : main_module.symtab) {
+        if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
+            continue;
+        }
+
+        if (is_extern(sym)) {
             continue;
         }
 

@@ -119,10 +119,13 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes,
              */
             auto const fn_addr =
                 (ip - &text[0]) * sizeof(viua::arch::instruction_type);
-            auto& sym    = symbol_table.at(symbol_map.at(fn.name.text));
-            sym.st_value = fn_addr;
-            sym.st_size =
-                fn.instructions.size() * sizeof(viua::arch::instruction_type);
+            auto& sym = symbol_table.at(symbol_map.at(fn.name.text));
+
+            if (not fn.has_attr("extern")) {
+                sym.st_value = fn_addr;
+                sym.st_size  = fn.instructions.size()
+                              * sizeof(viua::arch::instruction_type);
+            }
         }
 
         for (auto const& insn : fn.instructions) {
@@ -285,6 +288,10 @@ auto load_function_labels(AST_nodes const& nodes,
          * Leave size and offset of the function empty since we do not have this
          * information yet. It will only be available after the bytecode is
          * emitted.
+         *
+         * For functions marked as [[extern]] st_value will be LEFT EMPTY after
+         * the assembler exits, as a signal to the linker that this symbol was
+         * defined in a different module and needs to be resolved.
          */
         symbol.st_size  = 0;
         symbol.st_value = 0;

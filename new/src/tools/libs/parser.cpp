@@ -500,7 +500,16 @@ auto parse_function_definition(
 
     auto fn_name =
         consume_token_of({TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING}, lexemes);
+    fn->name = std::move(fn_name);
     consume_token_of(TOKEN::TERMINATOR, lexemes);
+
+    /*
+     * This function is not defined in the current module, therefore we should
+     * not attempt to parse its instructions.
+     */
+    if (fn->has_attr("extern")) {
+        return fn;
+    }
 
     auto instructions       = std::vector<std::unique_ptr<ast::Node>>{};
     auto ins_physical_index = size_t{0};
@@ -512,9 +521,9 @@ auto parse_function_definition(
             fn->instructions.push_back(std::move(instruction));
             fn->instructions.back().physical_index = ins_physical_index++;
         } catch (Error& e) {
-            throw Error{fn_name,
+            throw Error{fn->name,
                         Cause::None,
-                        "in definition of function " + fn_name.text}
+                        "in definition of function " + fn->name.text}
                 .add(fn->start)
                 .chain(std::move(e));
         }
@@ -522,8 +531,6 @@ auto parse_function_definition(
 
     consume_token_of(TOKEN::END, lexemes);
     fn->end = consume_token_of(TOKEN::TERMINATOR, lexemes);
-
-    fn->name = std::move(fn_name);
 
     return fn;
 }
