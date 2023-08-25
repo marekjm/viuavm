@@ -372,6 +372,9 @@ auto display_error_and_exit
                   viua::libs::errors::compile_time::Error const& e) -> void
 {
     display_error(source_path, source_text, e);
+    for (auto const& each : e.fallout) {
+        display_error(source_path, source_text, each);
+    }
     exit(1);
 }
 

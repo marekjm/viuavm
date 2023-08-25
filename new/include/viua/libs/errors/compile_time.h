@@ -69,7 +69,7 @@ enum class Cause {
 };
 auto to_string(Cause const) -> std::string_view;
 
-class Error {
+struct Error {
     /*
      * Basic description of the error consists of an enumerated cause (to make
      * describing and looking for errors easier), and a custom-string message
@@ -161,8 +161,15 @@ class Error {
     std::string aside_note;
     std::optional<viua::libs::lexer::Lexeme> aside_lexeme;
 
-  public:
+    /*
+     * Sometimes errors must be chained, because error A causes error B, which
+     * in turns causes error C, and so on.
+     */
+    std::vector<Error> fallout;
+
     Error(viua::libs::lexer::Lexeme, Cause const, std::string = "");
+
+    auto chain(Error&&) -> Error&;
 
     auto aside(std::string, std::optional<Lexeme> = std::nullopt) -> Error&;
     auto aside() const -> std::string_view;

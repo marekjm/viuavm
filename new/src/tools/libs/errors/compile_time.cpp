@@ -63,6 +63,12 @@ Error::Error(viua::libs::lexer::Lexeme lx, Cause const ce, std::string m)
         : cause{ce}, message{std::move(m)}, main_lexeme{lx}
 {}
 
+auto Error::chain(Error&& e) -> Error&
+{
+    fallout.emplace_back(std::move(e));
+    return *this;
+}
+
 auto Error::aside(std::string s, std::optional<Lexeme> l) -> Error&
 {
     aside_note   = std::move(s);

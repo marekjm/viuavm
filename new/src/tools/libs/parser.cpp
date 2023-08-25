@@ -302,14 +302,18 @@ auto parse_instruction(
         instruction.opcode = consume_token_of(TOKEN::OPCODE, lexemes);
     } catch (viua::libs::lexer::Lexeme const& e) {
         if (e.token != viua::libs::lexer::TOKEN::LITERAL_ATOM) {
-            throw;
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+            throw Error{e, Cause::Unexpected_token, e.text};
         }
 
         using viua::libs::lexer::OPCODE_NAMES;
         using viua::support::string::levenshtein_filter;
         auto misspell_candidates = levenshtein_filter(e.text, OPCODE_NAMES);
         if (misspell_candidates.empty()) {
-            throw;
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+            throw Error{e, Cause::Unexpected_token, e.text};
         }
 
         using viua::support::string::levenshtein_best;
@@ -318,7 +322,7 @@ auto parse_instruction(
         if (best_candidate.second == e.text) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{e, Cause::Unknown_opcode, e.text};
+            throw Error{e, Cause::Unexpected_token, e.text};
         }
 
         using viua::libs::errors::compile_time::Cause;
@@ -501,9 +505,19 @@ auto parse_function_definition(
     auto instructions       = std::vector<std::unique_ptr<ast::Node>>{};
     auto ins_physical_index = size_t{0};
     while ((not lexemes.empty()) and lexemes.front() != TOKEN::END) {
-        auto instruction = parse_instruction(lexemes);
-        fn->instructions.push_back(std::move(instruction));
-        fn->instructions.back().physical_index = ins_physical_index++;
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        try {
+            auto instruction = parse_instruction(lexemes);
+            fn->instructions.push_back(std::move(instruction));
+            fn->instructions.back().physical_index = ins_physical_index++;
+        } catch (Error& e) {
+            throw Error{fn_name,
+                        Cause::None,
+                        "in definition of function " + fn_name.text}
+                .add(fn->start)
+                .chain(std::move(e));
+        }
     }
 
     consume_token_of(TOKEN::END, lexemes);
