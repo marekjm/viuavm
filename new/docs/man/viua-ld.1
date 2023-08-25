@@ -1,0 +1,84 @@
+'\" t
+.\"
+.TH "VIUA-LD" "1" "2023-08-24" "Viua VM 0.12.1" "Viua VM Manual"
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+viua-ld \- Viua VM linker
+.SH "SYNOPSIS"
+.SY "viua asm"
+.OP \-o output
+.OP \-\-type=\fItype\fR
+.OP \-\-
+.IR input \&.\|.\|.\&
+.YS
+.SH "DESCRIPTION"
+.sp
+\fBviua-ld\fR is a tool that converts relocatable ELF files into executables or
+libraries to be consumed by the virtual machine's kernel.
+.SH "OPTIONS"
+.SS General options
+.TP
+.BR \-o " " \fIoutput\fR
+Write produced ELF binary into \fIoutput\fR file, instead of the default a.out
+file.
+.TP
+.BR \-\-type = exec | object | shared
+Emit ELF of the desired type.
+See
+.B "OUTPUT TYPES"
+for more information.
+.SS Help and information
+.TP
+.BR \-v ", " \-\-verbose
+Show verbose output, where applicable.
+.TP
+.B \-\-version
+Show version information.
+.SH "OUTPUT TYPES"
+.TP
+.B exec
+Executable file that can be run by the virtual machine's kernel.
+.TP
+.B object
+Relocatable file.
+.TP
+.B shared
+Shared library that can be dynamically linked into running executables.
+.SH "EXIT STATUS"
+.TP
+.B 0
+Successful program execution.
+.TP
+.B 1
+Invalid input.
+.SH "FILES"
+.TP
+.I input
+The linker opens its input files read-only. They must contain valid Viua VM
+relocatable files.
+.TP
+.I output
+The assembler outputs ELF binaries. They can be inspected using the usual
+.BR readelf (1)
+program.
+.SH "SEE ALSO"
+.BR viua\-asm (1),
+.BR viua\-dis (1),
+.BR viua\-repl (1),
+.BR viua\-vm (1),
+.BR viua\-asm\-lang (7),
+.BR readelf (1),
+.BR elf (5)
+.SH "VIUA VM"
+Part of the \fBviua\fR(1) toolchain
+.SH NOTES
+.TP
+Web site
+.UR https://viuavm.org
+.UE
+.TP
+Source code repository
+.UR https://git.sr.ht/~maelkum/viuavm
+.UE
