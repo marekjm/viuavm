@@ -111,6 +111,7 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes,
              * really) in the functions table. This is needed not only for
              * debugging, but also because the functions' addresses are resolved
              * dynamically for call and similar instructions. Why dynamically?
+             * FIXME The above is no longer true.
              *
              * Because there is a strong distinction between calls to bytecode
              * and foreign functions. At compile time, we don't yet know,
