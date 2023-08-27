@@ -80,7 +80,7 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes,
             [](size_t const acc,
                std::unique_ptr<ast::Node> const& each) -> size_t {
                 if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
-                    return 0;
+                    return acc;
                 }
 
                 auto& fn = static_cast<ast::Fn_def&>(*each);
