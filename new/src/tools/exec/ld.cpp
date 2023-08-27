@@ -33,12 +33,16 @@
 
 #include <viua/arch/arch.h>
 #include <viua/arch/ops.h>
+#include <viua/libs/stage.h>
 #include <viua/support/tty.h>
 #include <viua/vm/elf.h>
 
+constexpr auto LEFT_QUOTE  = "‘";  // U+2018
+constexpr auto RIGHT_QUOTE = "’";  // U+2019
+
+using Text = std::vector<viua::arch::instruction_type>;
 
 namespace stage {
-using Text = std::vector<viua::arch::instruction_type>;
 auto emit_elf(std::filesystem::path const output_path,
               bool const as_executable,
               std::optional<uint64_t> const entry_point_fn,
@@ -512,6 +516,97 @@ auto make_symtab_from(std::vector<uint8_t> const data) -> std::vector<Elf64_Sym>
 }
 }  // namespace stage
 
+namespace {
+auto relocate(Text& text, Elf64_Rel const rel, uint64_t const value) -> void
+{
+    auto const text_ndx = (rel.r_offset / sizeof(viua::arch::instruction_type));
+
+    using viua::arch::ops::F;
+    auto hi_op        = F::decode(text.at(text_ndx));
+    auto const hi     = static_cast<uint32_t>(value >> 32);
+    text.at(text_ndx) = F{hi_op.opcode, hi_op.out, hi}.encode();
+
+    auto lo_op            = F::decode(text.at(text_ndx + 1));
+    auto const lo         = static_cast<uint32_t>(value);
+    text.at(text_ndx + 1) = F{lo_op.opcode, lo_op.out, lo}.encode();
+}
+
+auto is_usable_module(std::filesystem::path const path,
+                      viua::vm::elf::Loaded_elf const& module) -> bool
+{
+    using viua::support::tty::ATTR_RESET;
+    using viua::support::tty::COLOR_FG_CYAN;
+    using viua::support::tty::COLOR_FG_ORANGE_RED_1;
+    using viua::support::tty::COLOR_FG_RED;
+    using viua::support::tty::COLOR_FG_RED_1;
+    using viua::support::tty::COLOR_FG_WHITE;
+    using viua::support::tty::send_escape_seq;
+    constexpr auto esc = send_escape_seq;
+
+    if (module.header.e_type != ET_REL) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
+                  << ": not an relocatable file\n";
+        return false;
+    }
+
+    if (auto const f = module.find_fragment(".rodata"); not f.has_value()) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
+                  << ": no strings fragment found\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
+                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
+                  << esc(2, ATTR_RESET) << ": no .rodata section found\n";
+        return false;
+    }
+    if (auto const f = module.find_fragment(".symtab"); not f.has_value()) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
+                  << ": no function table fragment found\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
+                  << "note" << esc(2, ATTR_RESET)
+                  << ": no .symtab section found\n";
+        return false;
+    }
+    if (auto const f = module.find_fragment(".strtab"); not f.has_value()) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
+                  << ": no function table fragment found\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
+                  << "note" << esc(2, ATTR_RESET)
+                  << ": no .strtab section found\n";
+        return false;
+    }
+    if (auto const f = module.find_fragment(".text"); not f.has_value()) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
+                  << ": no text fragment found\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
+                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
+                  << esc(2, ATTR_RESET) << ": no .text section found\n";
+        return false;
+    }
+    if (auto const f = module.find_fragment(".rel"); not f.has_value()) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET)
+                  << ": no relocation fragment found\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
+                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
+                  << esc(2, ATTR_RESET) << ": no .rel section found\n";
+        return false;
+    }
+
+    return true;
+}
+}  // namespace
 
 auto main(int argc, char** argv) -> int
 {
@@ -542,6 +637,8 @@ auto main(int argc, char** argv) -> int
     auto show_help                      = false;
     auto input_files                    = std::vector<std::filesystem::path>{};
 
+    auto dump_strtab = false;
+
     for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
         auto const& each = args.at(i);
         if (each == "--") {
@@ -564,6 +661,8 @@ auto main(int argc, char** argv) -> int
             as_object_lib = true;
         } else if (each == "--static") {
             link_static = true;
+        } else if (each == "--dump-strtab" or each == "--dump=strtab") {
+            dump_strtab = true;
         }
         /*
          * Common options.
@@ -579,7 +678,9 @@ auto main(int argc, char** argv) -> int
                       << ": unknown option: " << each << "\n";
             return 1;
         } else {
-            // input files start here
+            /*
+             * Input files start here.
+             */
             std::copy(
                 args.begin() + i, args.end(), std::back_inserter(input_files));
             break;
@@ -618,110 +719,384 @@ auto main(int argc, char** argv) -> int
             return o;
         }());
 
+    auto entry_addr =
+        std::optional<std::pair<uint64_t, std::filesystem::path>>{};
+
     /*
-     * Even if the path exists and is a regular file we should check if it was
-     * opened correctly.
+     * Contents of .text, .rodata, .symtab, etc from all modules are glued
+     * together to produce the final ELF.
      */
-    auto const elf_fd = open(source_path.c_str(), O_RDONLY);
-    if (elf_fd == -1) {
-        auto const saved_errno = errno;
-        auto const errname     = strerrorname_np(saved_errno);
-        auto const errdesc     = strerrordesc_np(saved_errno);
+    auto text   = std::vector<viua::arch::instruction_type>{};
+    auto rodata = std::vector<uint8_t>{};
+    auto strtab = std::vector<uint8_t>{};
+    auto symtab = std::vector<Elf64_Sym>{};
 
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET);
-        if (errname) {
-            std::cerr << ": " << errname;
+    /*
+     * PREPARATIONS FOR .strtab
+     *
+     * Ensure that the glued-together .strtab begins with a nul character, as
+     * ELF mandates. This is needed to conform to the standard and expectations.
+     *
+     * Also, we HAVE TO allocate all the memory we will need for .strtab RIGHT
+     * NOW to avoid reallocations messing up the std::string_view objects that
+     * we will be using.
+     */
+    {
+        /*
+         * Need space for the beginning and ending nul characters.
+         */
+        auto needed_strtab_size = size_t{2};
+
+        for (auto const& lnk_path : input_files) {
+            auto const lnk_elf_fd = open(lnk_path.c_str(), O_RDONLY);
+            if (lnk_elf_fd == -1) {
+                auto const saved_errno = errno;
+                auto const errname     = strerrorname_np(saved_errno);
+                auto const errdesc     = strerrordesc_np(saved_errno);
+
+                std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
+                          << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED)
+                          << "error" << esc(2, ATTR_RESET);
+                if (errname) {
+                    std::cerr << ": " << errname;
+                }
+                std::cerr << ": " << (errdesc ? errdesc : "unknown error")
+                          << "\n";
+                return 1;
+            }
+
+            using Module    = viua::vm::elf::Loaded_elf;
+            auto lnk_module = Module::load(lnk_elf_fd);
+            close(lnk_elf_fd);
+
+            if (not is_usable_module(lnk_path, lnk_module)) {
+                return 1;
+            }
+
+            auto const lnk_strtab_size =
+                lnk_module.find_fragment(".strtab")->get().data.size();
+            needed_strtab_size += (lnk_strtab_size - 2);
         }
-        std::cerr << ": " << (errdesc ? errdesc : "unknown error") << "\n";
-        return 1;
+        strtab.reserve(needed_strtab_size);
+
+        if (dump_strtab) {
+            std::cerr << "[.strtab] reserved size: " << needed_strtab_size
+                      << " bytes\n";
+        }
+    }
+    strtab.push_back('\0');
+
+    /*
+     * Ensure that the glued-together .symtab begins with the special empty
+     * symbol.
+     */
+    {
+        auto empty     = Elf64_Sym{};
+        empty.st_name  = STN_UNDEF;
+        empty.st_info  = ELF64_ST_INFO(STB_LOCAL, STT_NOTYPE);
+        empty.st_shndx = SHN_UNDEF;
+        symtab.push_back(empty);
     }
 
-    using Module           = viua::vm::elf::Loaded_elf;
-    auto const main_module = [elf_fd, &source_path]() -> Module {
-        try {
-            return Module::load(elf_fd);
-        } catch (std::runtime_error const& e) {
-            std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                      << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                      << "error" << esc(2, ATTR_RESET) << ": " << e.what()
+    /*
+     * Map from symbol's name to where it is defined.
+     */
+    auto symtab_cache =
+        std::map<std::string_view, std::pair<size_t, std::filesystem::path>>{};
+
+    /*
+     * Map from symbol's name to its offset in .strtab to make adjusting st_name
+     * fields faster.
+     */
+    auto strtab_cache = std::map<std::string_view, size_t>{};
+
+    /*
+     * Map of relocation offsets (Elf64_Rel.r_offset) which were initially
+     * pointing to undefined symbols (ie, those which were not defined in the
+     * .symtab at the moment they were encountered).
+     *
+     * It is used to resolve relocations by-name during the global relocation
+     * phase. We need to resolve relocations of undefined symbols by-name
+     * instead of by-index because we simply DO NOT KNOW at what index they will
+     * appear in .symtab, but we DO KNOW their name.
+     */
+    auto rel_by_name = std::map<size_t, std::string_view>{};
+
+    /*
+     * Assume we want to produce an executable - then we need to resolve the
+     * relocations in each module.
+     */
+    auto relocations = std::vector<Elf64_Rel>{};
+
+    for (auto const& lnk_path : input_files) {
+        auto const lnk_elf_fd = open(lnk_path.c_str(), O_RDONLY);
+        if (lnk_elf_fd == -1) {
+            auto const saved_errno = errno;
+            auto const errname     = strerrorname_np(saved_errno);
+            auto const errdesc     = strerrordesc_np(saved_errno);
+
+            std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
+                      << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
+                      << esc(2, ATTR_RESET);
+            if (errname) {
+                std::cerr << ": " << errname;
+            }
+            std::cerr << ": " << (errdesc ? errdesc : "unknown error") << "\n";
+            return 1;
+        }
+
+        using Module    = viua::vm::elf::Loaded_elf;
+        auto lnk_module = Module::load(lnk_elf_fd);
+        close(lnk_elf_fd);
+
+        if (verbosity_level) {
+            std::cerr << "linking: " << lnk_path << "\n";
+        }
+
+        if (auto const ep = lnk_module.entry_point(); ep.has_value()) {
+            if (entry_addr.has_value()) {
+                std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
+                          << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                          << "error" << esc(2, ATTR_RESET)
+                          << ": entry point already defined by "
+                          << entry_addr->second.native() << "\n";
+                return 1;
+            }
+            entry_addr = {*ep, lnk_path};
+        }
+
+        auto lnk_text = lnk_module.make_text_from(
+            lnk_module.find_fragment(".text")->get().data);
+        auto lnk_rodata =
+            std::move(lnk_module.find_fragment(".rodata")->get().data);
+        auto lnk_symtab = stage::make_symtab_from(
+            std::move(lnk_module.find_fragment(".symtab")->get().data));
+        auto lnk_strtab =
+            std::move(lnk_module.find_fragment(".strtab")->get().data);
+        auto lnk_rel = stage::make_relocations_from(
+            std::move(lnk_module.find_fragment(".rel")->get().data));
+
+        /*
+         * Map from index in the module's table, to index in the glued-together
+         * table. The map is filled as the .symtab is processed, since it will
+         * give us the locations of all relevant strings in the .strtab section.
+         */
+        auto mapped_strtab_indexes = std::map<size_t, size_t>{};
+
+        auto const text_addend =
+            (text.size() * sizeof(viua::arch::instruction_type));
+        auto const rodata_addend = rodata.size();
+
+        /*
+         * This loop adjusts .symtab and .strtab sections.
+         * Why both at the same time?
+         *
+         * Because to adjust .symtab we need to modify values of st_name which
+         * is an offset into the .strtab section, and to get the right index we
+         * need to know what it will be in the glued-together string table.
+         *
+         * Se we just re-record the strings and use the new indexes. Simple.
+         */
+        using viua::libs::stage::save_buffer_to_rodata;
+        using viua::libs::stage::save_string_to_strtab;
+        auto sym_ndx = size_t{0};
+        for (auto& sym : lnk_symtab) {
+            auto const lnk_sym_name = std::string_view{
+                reinterpret_cast<char const*>(lnk_strtab.data()) + sym.st_name};
+            auto const sym_type = ELF64_ST_TYPE(sym.st_info);
+            if (verbosity_level) {
+                std::cerr << "  " << sym_ndx++ << ": symbol: ";
+                switch (sym_type) {
+                case STT_NOTYPE:
+                    std::cerr << "STT_NOTYPE";
+                    break;
+                case STT_FUNC:
+                    std::cerr << "STT_FUNC";
+                    break;
+                case STT_OBJECT:
+                    std::cerr << "STT_OBJECT";
+                    break;
+                case STT_FILE:
+                    std::cerr << "STT_FILE";
+                    break;
+                default:
+                    std::cerr << "<unknown type>";
+                    break;
+                }
+                std::cerr
+                    << ": "
+                    << (lnk_sym_name.size() ? lnk_sym_name : "<anonymous>")
+                    << "\n";
+            }
+
+            if (ELF64_ST_TYPE(sym.st_info) == STT_NOTYPE) {
+                continue;
+            }
+            if (not mapped_strtab_indexes.count(sym.st_name)) {
+                auto new_index = save_string_to_strtab(strtab, lnk_sym_name);
+                mapped_strtab_indexes.emplace(sym.st_name, new_index);
+            }
+
+            sym.st_name         = mapped_strtab_indexes.at(sym.st_name);
+            auto const sym_name = std::string_view{
+                reinterpret_cast<char const*>(strtab.data()) + sym.st_name};
+
+            strtab_cache.emplace(sym_name, sym.st_name);
+
+            /*
+             * Just put the name of the file in .symtab and continue. This is a
+             * special entry that will tell us from what file the following
+             * symbols came, but does not require any further processing.
+             */
+            if (sym_type == STT_FILE) {
+                symtab.push_back(sym);
+                continue;
+            }
+
+            /*
+             * Do not process undefined symbols, and do not put them in the
+             * symbol table. This would only pollute the symbol table and
+             * require weeding them out later, just complicating the code due to
+             * forcing the linker to adjust and patch .symtab indexes over and
+             * over again.
+             */
+            if (not sym.st_value) {
+                if (verbosity_level) {
+                    std::cerr << "    undefined in this module\n";
+                }
+                continue;
+            }
+
+            switch (ELF64_ST_TYPE(sym.st_info)) {
+            case STT_FUNC:
+                sym.st_value += text_addend;
+                break;
+            case STT_OBJECT:
+                sym.st_value += rodata_addend;
+                break;
+            }
+
+            if (verbosity_level) {
+                std::cerr << "    defined as symbol " << symtab.size() << "\n";
+            }
+            symtab_cache.emplace(sym_name, std::pair{symtab.size(), lnk_path});
+            symtab.push_back(sym);
+        }
+
+        for (auto& rel : lnk_rel) {
+            auto const sym_ndx  = ELF64_R_SYM(rel.r_info);
+            auto const sym      = lnk_symtab.at(sym_ndx);
+            auto const sym_name = std::string_view{
+                reinterpret_cast<char const*>(strtab.data()) + sym.st_name};
+
+            if (verbosity_level) {
+                std::cerr << "  rel at " << rel.r_offset
+                          << " for symbol: " << sym_name << "\n";
+            }
+
+            /*
+             * Increase the relocation offset to make the final relocation use
+             * the correct address. Without this the linker would try to adjust
+             * random instructions because the offset into the original .text
+             * will not match offset into the glued-together .text section.
+             */
+            rel.r_offset += text_addend;
+
+            if (symtab_cache.count(sym_name)) {
+                auto const patched_ndx = symtab_cache.at(sym_name).first;
+                if (verbosity_level) {
+                    std::cerr << "    defined\n";
+                    std::cerr << "    translate .symtab index: " << sym_ndx
+                              << " => " << patched_ndx << "\n";
+                }
+
+                rel.r_info =
+                    ELF64_R_INFO(patched_ndx, ELF64_R_TYPE(rel.r_info));
+
+                /*
+                 * Put in the new .symtab index, and leave the final relocation
+                 * for later.
+                 */
+                relocate(lnk_text, rel, patched_ndx);
+            } else {
+                if (verbosity_level) {
+                    std::cerr << "    undefined\n";
+                    std::cerr << "    record as by-name relocation at [.text+0x"
+                              << std::hex << std::setfill('0') << std::setw(16)
+                              << rel.r_offset << std::dec << std::setfill(' ')
+                              << "] for " << sym_name << "\n";
+                }
+                rel_by_name.emplace(rel.r_offset, sym_name);
+            }
+
+            relocations.push_back(rel);
+        }
+
+        std::copy(lnk_text.begin(), lnk_text.end(), std::back_inserter(text));
+
+        /*
+         * FIXME What about "extern" objects?
+         */
+        std::copy(
+            lnk_rodata.begin(), lnk_rodata.end(), std::back_inserter(rodata));
+    }
+
+    /*
+     * Ensure that the glued-together .strtab ends with the special case nul
+     * terminator, as mandated by ELF.
+     */
+    strtab.push_back('\0');
+
+    for (auto const& rel : relocations) {
+        if (verbosity_level) {
+            std::cerr << "  relocation at [.text+0x" << std::hex
+                      << std::setfill('0') << std::setw(16) << rel.r_offset
+                      << std::dec << std::setfill(' ') << "]"
                       << "\n";
-            exit(1);
         }
-    }();
+        if (rel_by_name.count(rel.r_offset)) {
+            auto const sym_name = rel_by_name.at(rel.r_offset);
+            if (not symtab_cache.count(sym_name)) {
+                std::cerr << esc(2, COLOR_FG_WHITE) << output_path.native()
+                          << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                          << "error" << esc(2, ATTR_RESET)
+                          << ": undefined reference to symbol " << LEFT_QUOTE
+                          << sym_name << RIGHT_QUOTE << "\n";
+                return 1;
+            }
+            auto const sym_ndx = symtab_cache.at(sym_name).first;
+            auto const sym     = symtab.at(sym_ndx);
 
-    if (main_module.header.e_type != ET_REL) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": not an relocatable file\n";
-        return 1;
-    }
+            if (verbosity_level) {
+                std::cerr << "    symbol: " << sym_name << "\n";
+                std::cerr << "    rel-kind: by-name\n";
+                std::cerr << "    .st_value: " << sym.st_value << "\n";
+            }
 
-    if (auto const f = main_module.find_fragment(".rodata");
-        not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no strings fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .rodata section found\n";
-        return 1;
-    }
-    if (auto const f = main_module.find_fragment(".symtab");
-        not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no function table fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
-                  << "note" << esc(2, ATTR_RESET)
-                  << ": no .symtab section found\n";
-        return 1;
-    }
-    if (auto const f = main_module.find_fragment(".strtab");
-        not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no function table fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
-                  << "note" << esc(2, ATTR_RESET)
-                  << ": no .strtab section found\n";
-        return 1;
-    }
-    if (auto const f = main_module.find_fragment(".text"); not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no text fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .text section found\n";
-        return 1;
-    }
-    if (auto const f = main_module.find_fragment(".rel"); not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no relocation fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .rel section found\n";
-        return 1;
+            relocate(text, rel, sym.st_value);
+        } else {
+            auto const sym_ndx  = ELF64_R_SYM(rel.r_info);
+            auto const sym      = symtab.at(sym_ndx);
+            auto const sym_name = std::string_view{
+                reinterpret_cast<char const*>(strtab.data()) + sym.st_name};
+
+            if (verbosity_level) {
+                std::cerr << "    symbol: " << sym_name << "\n";
+                std::cerr << "    rel-kind: by-index\n";
+                std::cerr << "    .st_value: " << sym.st_value << "\n";
+            }
+
+            // FIXME what about objects changing offsets?
+            if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
+                continue;
+            }
+
+            relocate(text, rel, sym.st_value);
+        }
     }
 
-    auto entry_addr = std::optional<uint64_t>{};
-    ;
-    if (auto const ep = main_module.entry_point(); ep.has_value()) {
-        entry_addr = *ep;
-    }
     if ((not entry_addr.has_value()) and as_executable) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
+        std::cerr << esc(2, COLOR_FG_WHITE) << output_path.native()
                   << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
                   << "error" << esc(2, ATTR_RESET)
                   << ": no entry point defined, but requested output is an "
@@ -730,73 +1105,31 @@ auto main(int argc, char** argv) -> int
     }
     if (entry_addr.has_value() and not as_executable) {
         std::cerr
-            << esc(2, COLOR_FG_WHITE) << source_path.native()
+            << esc(2, COLOR_FG_WHITE) << output_path.native()
             << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED) << "error"
             << esc(2, ATTR_RESET)
             << ": entry point defined, but requested output is a library\n";
         return 1;
     }
 
-    /*
-     * These variables are the foundations of our output.
-     *
-     * Contents of .text, .rodata, .symtab, etc from all modules are glued
-     * together to produce the final ELF.
-     */
-    auto text = main_module.make_text_from(
-        main_module.find_fragment(".text")->get().data);
-    auto rodata = std::move(main_module.find_fragment(".rodata")->get().data);
-    auto symtab = stage::make_symtab_from(
-        std::move(main_module.find_fragment(".symtab")->get().data));
-    auto strtab = std::move(main_module.find_fragment(".strtab")->get().data);
-
-    /*
-     * Assume we want to produce an executable - then we need to resolve the
-     * relocations in each module.
-     */
-    auto relocations = stage::make_relocations_from(
-        std::move(main_module.find_fragment(".rel")->get().data));
-    for (auto const& rel : relocations) {
-        auto const sym_ndx = ELF64_R_SYM(rel.r_info);
-        auto const sym     = symtab.at(sym_ndx);
-
-        auto const text_ndx =
-            (rel.r_offset / sizeof(viua::arch::instruction_type));
-        std::cerr << "relocation at " << rel.r_offset
-                  << " [index = " << text_ndx << "]"
-                  << " to " << sym_ndx << "\n";
-        switch (ELF64_ST_TYPE(sym.st_info)) {
-        case STT_FUNC:
-            std::cerr << "  function\n";
-            break;
-        case STT_OBJECT:
-            std::cerr << "  object\n";
-            break;
-        default:
-            std::cerr << "  not suitable for relocation\n";
-            break;
+    if (dump_strtab) {
+        std::cerr << "[.strtab] allocated size: " << strtab.size()
+                  << " bytes\n";
+        for (auto i = size_t{0}; i < strtab.size(); ++i) {
+            auto const sv = std::string_view{
+                reinterpret_cast<char const*>(strtab.data() + i)};
+            std::cout << "[.strtab+0x" << std::hex << std::setfill('0')
+                      << std::setw(8) << i << std::dec << std::setfill(' ')
+                      << "] = " << LEFT_QUOTE << sv << RIGHT_QUOTE << "\n";
+            i += sv.size();
         }
-        if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
-            continue;
-        }
-
-        std::cerr << "  name = " << &strtab.at(sym.st_name) << "\n";
-        std::cerr << "  addr = " << sym.st_value << "\n";
-
-        using viua::arch::ops::F;
-        auto hi_op        = F::decode(text.at(text_ndx));
-        auto const hi     = static_cast<uint32_t>(sym.st_value >> 32);
-        text.at(text_ndx) = F{hi_op.opcode, hi_op.out, hi}.encode();
-
-        auto lo_op            = F::decode(text.at(text_ndx + 1));
-        auto const lo         = static_cast<uint32_t>(sym.st_value);
-        text.at(text_ndx + 1) = F{lo_op.opcode, lo_op.out, lo}.encode();
     }
 
     stage::emit_elf(
         output_path,
         as_executable,
-        entry_addr,
+        (entry_addr.has_value() ? std::optional{entry_addr->first}
+                                : std::nullopt),
         text,
         (as_executable ? std::nullopt : std::optional{std::move(relocations)}),
         rodata,

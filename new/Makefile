@@ -201,6 +201,12 @@ $(BUILD)/tools/exec/ld: \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o \
 	$(BUILD)/vm/elf.o \
+	$(BUILD)/tools/libs/errors/compile_time.o \
+	$(BUILD)/tools/libs/lexer.o \
+	$(BUILD)/tools/libs/parser.o \
+	$(BUILD)/tools/libs/assembler.o \
+	$(BUILD)/tools/libs/stage.o \
+	$(BUILD)/support/string.o \
 	$(BUILD)/support/tty.o
 
 VIUA_INSTRUCTION_IMPLS=\

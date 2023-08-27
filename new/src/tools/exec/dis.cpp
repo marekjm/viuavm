@@ -914,10 +914,9 @@ auto main(int argc, char* argv[]) -> int
         entry_addr = *ep;
     } else {
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_ORANGE_RED_1)
+                  << "warning" << esc(2, ATTR_RESET)
                   << ": no entry point defined\n";
-        return 1;
     }
 
     auto to_file = std::ofstream{};
