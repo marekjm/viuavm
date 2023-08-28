@@ -960,6 +960,23 @@ auto main(int argc, char** argv) -> int
                 continue;
             }
 
+            if (symtab_cache.count(sym_name)) {
+                auto const [prev_sym_ndx, prev_sym_module] =
+                    symtab_cache.at(sym_name);
+                std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
+                          << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                          << "error" << esc(2, ATTR_RESET)
+                          << ": duplicate definition of symbol " << LEFT_QUOTE
+                          << sym_name << RIGHT_QUOTE << "\n";
+                std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
+                          << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
+                          << "note" << esc(2, ATTR_RESET)
+                          << ": previously defined in module "
+                          << esc(2, COLOR_FG_WHITE) << prev_sym_module.native()
+                          << esc(2, ATTR_RESET) << "\n";
+                return 1;
+            }
+
             switch (ELF64_ST_TYPE(sym.st_info)) {
             case STT_FUNC:
                 sym.st_value += text_addend;
