@@ -956,6 +956,31 @@ auto main(int argc, char** argv) -> int
             if (not sym.st_value) {
                 if (verbosity_level) {
                     std::cerr << "    undefined in this module\n";
+                    if (symtab_cache.count(sym_name)) {
+                        auto const [def_sym_ndx, def_sym_module] =
+                            symtab_cache.at(sym_name);
+                        std::cerr << "    defined as symbol " << def_sym_ndx
+                                  << " (by module " << def_sym_module.native()
+                                  << ")"
+                                  << "\n";
+
+                        auto const def_sym = symtab.at(def_sym_ndx);
+                        std::cerr << "    address: ";
+                        switch (ELF64_ST_TYPE(def_sym.st_info)) {
+                        case STT_FUNC:
+                            std::cerr << "[.text+0x";
+                            break;
+                        case STT_OBJECT:
+                            std::cerr << "[.rodata+0x";
+                            break;
+                        default:
+                            std::cerr << "[<invalid>+0x";
+                            break;
+                        }
+                        std::cout << std::hex << std::setfill('0')
+                                  << std::setw(8) << def_sym.st_value
+                                  << std::dec << std::setfill(' ') << "]\n";
+                    }
                 }
                 continue;
             }
@@ -988,6 +1013,21 @@ auto main(int argc, char** argv) -> int
 
             if (verbosity_level) {
                 std::cerr << "    defined as symbol " << symtab.size() << "\n";
+                std::cerr << "    address: ";
+                switch (ELF64_ST_TYPE(sym.st_info)) {
+                case STT_FUNC:
+                    std::cerr << "[.text+0x";
+                    break;
+                case STT_OBJECT:
+                    std::cerr << "[.rodata+0x";
+                    break;
+                default:
+                    std::cerr << "[<invalid>+0x";
+                    break;
+                }
+                std::cout << std::hex << std::setfill('0') << std::setw(8)
+                          << sym.st_value << std::dec << std::setfill(' ')
+                          << "]\n";
             }
             symtab_cache.emplace(sym_name, std::pair{symtab.size(), lnk_path});
             symtab.push_back(sym);
@@ -1082,7 +1122,22 @@ auto main(int argc, char** argv) -> int
             if (verbosity_level) {
                 std::cerr << "    symbol: " << sym_name << "\n";
                 std::cerr << "    rel-kind: by-name\n";
-                std::cerr << "    .st_value: " << sym.st_value << "\n";
+
+                std::cerr << "    .st_value: ";
+                switch (ELF64_ST_TYPE(sym.st_info)) {
+                case STT_FUNC:
+                    std::cerr << "[.text+0x";
+                    break;
+                case STT_OBJECT:
+                    std::cerr << "[.rodata+0x";
+                    break;
+                default:
+                    std::cerr << "[<invalid>+0x";
+                    break;
+                }
+                std::cout << std::hex << std::setfill('0') << std::setw(8)
+                          << sym.st_value << std::dec << std::setfill(' ')
+                          << "]\n";
             }
 
             relocate(text, rel, sym.st_value);
@@ -1095,7 +1150,22 @@ auto main(int argc, char** argv) -> int
             if (verbosity_level) {
                 std::cerr << "    symbol: " << sym_name << "\n";
                 std::cerr << "    rel-kind: by-index\n";
-                std::cerr << "    .st_value: " << sym.st_value << "\n";
+
+                std::cerr << "    .st_value: ";
+                switch (ELF64_ST_TYPE(sym.st_info)) {
+                case STT_FUNC:
+                    std::cerr << "[.text+0x";
+                    break;
+                case STT_OBJECT:
+                    std::cerr << "[.rodata+0x";
+                    break;
+                default:
+                    std::cerr << "[<invalid>+0x";
+                    break;
+                }
+                std::cout << std::hex << std::setfill('0') << std::setw(8)
+                          << sym.st_value << std::dec << std::setfill(' ')
+                          << "]\n";
             }
 
             relocate(text, rel, sym.st_value);
