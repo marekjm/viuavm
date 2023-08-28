@@ -903,18 +903,6 @@ auto main(int argc, char** argv) -> int
             std::cerr << "linking: " << lnk_path << "\n";
         }
 
-        if (auto const ep = lnk_module.entry_point(); ep.has_value()) {
-            if (entry_addr.has_value()) {
-                std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
-                          << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                          << "error" << esc(2, ATTR_RESET)
-                          << ": entry point already defined by "
-                          << entry_addr->second.native() << "\n";
-                return 1;
-            }
-            entry_addr = {*ep, lnk_path};
-        }
-
         auto lnk_text = lnk_module.make_text_from(
             lnk_module.find_fragment(".text")->get().data);
         auto lnk_rodata =
@@ -929,6 +917,18 @@ auto main(int argc, char** argv) -> int
         auto const text_addend =
             (text.size() * sizeof(viua::arch::instruction_type));
         auto const rodata_addend = rodata.size();
+
+        if (auto const ep = lnk_module.entry_point(); ep.has_value()) {
+            if (entry_addr.has_value()) {
+                std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
+                          << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                          << "error" << esc(2, ATTR_RESET)
+                          << ": entry point already defined by "
+                          << entry_addr->second.native() << "\n";
+                return 1;
+            }
+            entry_addr = {*ep + text_addend, lnk_path};
+        }
 
         /*
          * This loop adjusts .symtab and .strtab sections.
