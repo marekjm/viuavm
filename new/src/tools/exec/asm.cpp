@@ -1092,10 +1092,9 @@ auto main(int argc, char* argv[]) -> int
             constexpr auto esc = send_escape_seq;
 
             std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                      << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                      << "error" << esc(2, ATTR_RESET)
+                      << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_ORANGE_RED_1)
+                      << "warning" << esc(2, ATTR_RESET)
                       << ": empty source file\n";
-            return 1;
         }
 
         source_text.resize(source_stat.st_size);
