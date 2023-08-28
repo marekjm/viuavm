@@ -927,11 +927,36 @@ auto main(int argc, char* argv[]) -> int
 
     auto const rodata = main_module.find_fragment(".rodata");
     if (rodata.has_value()) {
-        auto const symtab = main_module.symtab;
+        auto const symtab                      = main_module.symtab;
+        auto extern_object_definitions_present = false;
+        for (auto const& sym : main_module.symtab) {
+            if (ELF64_ST_TYPE(sym.st_info) != STT_OBJECT) {
+                continue;
+            }
+
+            /*
+             * At this moment we just want to enumerate extern functions.
+             */
+            if (not is_extern(sym)) {
+                continue;
+            }
+
+            auto const name = main_module.str_at(sym.st_name);
+            out << ".label: [[extern]] " << name << "\n";
+            extern_object_definitions_present = true;
+        }
+        if (extern_object_definitions_present) {
+            out << "\n";
+        }
+
         for (auto i = size_t{1}; i < symtab.size(); ++i) {
             auto const& sym = symtab.at(i);
 
             if (ELF64_ST_TYPE(sym.st_info) != STT_OBJECT) {
+                continue;
+            }
+
+            if (is_extern(sym)) {
                 continue;
             }
 

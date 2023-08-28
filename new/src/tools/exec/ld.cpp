@@ -994,14 +994,6 @@ auto main(int argc, char** argv) -> int
                           << " for symbol: " << sym_name << "\n";
             }
 
-            /*
-             * Increase the relocation offset to make the final relocation use
-             * the correct address. Without this the linker would try to adjust
-             * random instructions because the offset into the original .text
-             * will not match offset into the glued-together .text section.
-             */
-            rel.r_offset += text_addend;
-
             if (symtab_cache.count(sym_name)) {
                 auto const patched_ndx = symtab_cache.at(sym_name).first;
                 if (verbosity_level) {
@@ -1028,6 +1020,14 @@ auto main(int argc, char** argv) -> int
                 }
                 rel_by_name.emplace(rel.r_offset, sym_name);
             }
+
+            /*
+             * Increase the relocation offset to make the final relocation use
+             * the correct address. Without this the linker would try to adjust
+             * random instructions because the offset into the original .text
+             * will not match offset into the glued-together .text section.
+             */
+            rel.r_offset += text_addend;
 
             relocations.push_back(rel);
         }
@@ -1084,11 +1084,6 @@ auto main(int argc, char** argv) -> int
                 std::cerr << "    symbol: " << sym_name << "\n";
                 std::cerr << "    rel-kind: by-index\n";
                 std::cerr << "    .st_value: " << sym.st_value << "\n";
-            }
-
-            // FIXME what about objects changing offsets?
-            if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
-                continue;
             }
 
             relocate(text, rel, sym.st_value);

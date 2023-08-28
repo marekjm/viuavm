@@ -483,6 +483,10 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
 {
     auto cooked = std::vector<viua::libs::parser::ast::Instruction>{};
 
+    // FIXME saved_at is the index into the symbol table. This means that even
+    // anonymous symbols must be saved into .symtab to be processed by the
+    // linker.
+
     if (insn.opcode == "atom" or insn.opcode == "g.atom") {
         auto const lx = insn.operands.back().ingredients.front();
         auto s        = lx.text;
@@ -498,7 +502,7 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
             auto const label = insn.operands.back().ingredients.back();
             try {
                 saved_at = symbol_map.at(label.text);
-                saved_at = symbol_table.at(saved_at).st_value;
+                /* saved_at = symbol_table.at(saved_at).st_value; */
             } catch (std::out_of_range const&) {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;

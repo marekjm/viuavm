@@ -176,6 +176,25 @@ auto load_value_labels(std::filesystem::path const source_path,
         }
 
         auto& ct = static_cast<ast::Label_def&>(*each);
+        if (ct.has_attr("extern")) {
+            auto const name_off =
+                save_string_to_strtab(string_table, ct.name.text);
+
+            auto symbol     = Elf64_Sym{};
+            symbol.st_name  = name_off;
+            symbol.st_info  = ELF64_ST_INFO(STB_GLOBAL, STT_OBJECT);
+            symbol.st_other = STV_DEFAULT;
+            record_symbol(ct.name.text, symbol, symbol_table, symbol_map);
+
+            /*
+             * Neither address nor size of the extern symbol is known, only its
+             * label.
+             */
+            symbol.st_value = 0;
+            symbol.st_size  = 0;
+            return;
+        }
+
         if (ct.type == "string") {
             auto s = std::string{};
             for (auto i = size_t{0}; i < ct.value.size(); ++i) {
@@ -485,6 +504,22 @@ auto make_reloc_table(Text const& text) -> std::vector<Elf64_Rel>
             rel.r_offset = (i - 2) * sizeof(viua::arch::instruction_type);
             rel.r_info   = ELF64_R_INFO(symtab_entry_index,
                                       static_cast<uint8_t>(R_VIUA_JUMP_SLOT));
+            reloc_table.push_back(rel);
+            break;
+        }
+        case ATOM:
+        {
+            using viua::arch::ops::F;
+            auto const hi =
+                static_cast<uint64_t>(F::decode(text.at(i - 2)).immediate)
+                << 32;
+            auto const lo                 = F::decode(text.at(i - 1)).immediate;
+            auto const symtab_entry_index = static_cast<uint32_t>(hi | lo);
+
+            Elf64_Rel rel;
+            rel.r_offset = (i - 2) * sizeof(viua::arch::instruction_type);
+            rel.r_info   = ELF64_R_INFO(symtab_entry_index,
+                                      static_cast<uint8_t>(R_VIUA_OBJECT));
             reloc_table.push_back(rel);
             break;
         }

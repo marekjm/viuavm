@@ -26,6 +26,7 @@ namespace viua::arch::elf {
 enum class R_VIUA : uint8_t {
     R_VIUA_NONE      = 0,
     R_VIUA_JUMP_SLOT = 1,
+    R_VIUA_OBJECT    = 2,
 };
 }  // namespace viua::arch::elf
 

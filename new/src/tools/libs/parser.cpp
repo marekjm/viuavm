@@ -550,7 +550,16 @@ auto parse_constant_definition(
 
     auto ct_name =
         consume_token_of({TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING}, lexemes);
+    ct->name = std::move(ct_name);
     consume_token_of(TOKEN::TERMINATOR, lexemes);
+
+    /*
+     * This object is not defined in the current module, therefore we should
+     * not attempt to parse its value.
+     */
+    if (ct->has_attr("extern")) {
+        return ct;
+    }
 
     {
         /*
@@ -621,8 +630,6 @@ auto parse_constant_definition(
         ct->type = std::move(value_type);
         consume_token_of(TOKEN::TERMINATOR, lexemes);
     }
-
-    ct->name = std::move(ct_name);
 
     return ct;
 }
