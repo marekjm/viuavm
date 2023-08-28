@@ -59,11 +59,15 @@ auto save_string_to_strtab(std::vector<uint8_t>&, std::string_view const)
     -> size_t;
 auto save_buffer_to_rodata(std::vector<uint8_t>&, std::string_view const)
     -> size_t;
+auto record_symbol(std::string,
+                   Elf64_Sym const,
+                   std::vector<Elf64_Sym>& table,
+                   std::map<std::string, size_t>& cache) -> size_t;
 
 auto cook_long_immediates(viua::libs::parser::ast::Instruction,
                           std::vector<uint8_t>&,
-                          std::vector<Elf64_Sym> const&,
-                          std::map<std::string, size_t> const&)
+                          std::vector<Elf64_Sym>&,
+                          std::map<std::string, size_t>&)
     -> std::vector<viua::libs::parser::ast::Instruction>;
 
 auto expand_delete(std::vector<viua::libs::parser::ast::Instruction>&,

@@ -606,6 +606,11 @@ auto is_usable_module(std::filesystem::path const path,
 
     return true;
 }
+
+auto show_or_anonymous(std::string_view const view) -> std::string_view
+{
+    return (view.empty() ? "<anonymous>" : view);
+}
 }  // namespace
 
 auto main(int argc, char** argv) -> int
@@ -755,7 +760,7 @@ auto main(int argc, char** argv) -> int
                 auto const errdesc     = strerrordesc_np(saved_errno);
 
                 std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
-                          << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED)
+                          << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
                           << "error" << esc(2, ATTR_RESET);
                 if (errname) {
                     std::cerr << ": " << errname;
@@ -805,6 +810,51 @@ auto main(int argc, char** argv) -> int
         std::map<std::string_view, std::pair<size_t, std::filesystem::path>>{};
 
     /*
+     * Map from symbol's location to where it is defined.
+     * Used for anonymous symbols.
+     */
+    auto anonymous_symtab_cache =
+        std::map<size_t, std::pair<size_t, std::filesystem::path>>{};
+
+    auto const record_symbol =
+        [&symtab, &symtab_cache, &anonymous_symtab_cache](
+            std::string_view const name,
+            Elf64_Sym const sym,
+            std::filesystem::path const path) -> size_t {
+        auto const sym_ndx = symtab.size();
+
+        /*
+         * Treat anonymous symbols differently. Since they do not have names
+         * the linker uses their addresses to differentiate them.
+         */
+        auto const sym_def = std::pair{symtab.size(), path};
+        if (name.empty()) {
+            anonymous_symtab_cache.emplace(sym.st_value, sym_def);
+        } else {
+            symtab_cache.emplace(name, sym_def);
+        }
+        symtab.push_back(sym);
+
+        return sym_ndx;
+    };
+    // FIXME also add is_defined(std::string_view) for checks by name
+    auto is_defined = [&strtab, &symtab_cache, &anonymous_symtab_cache](
+                          Elf64_Sym const sym) -> bool {
+        auto const sym_name = std::string_view{
+            reinterpret_cast<char const*>(strtab.data()) + sym.st_name};
+        return (sym.st_name ? symtab_cache.count(sym_name)
+                            : anonymous_symtab_cache.count(sym.st_value));
+    };
+    auto get_symtab_index = [&strtab, &symtab_cache, &anonymous_symtab_cache](
+                                Elf64_Sym const sym) -> size_t {
+        auto const sym_name = std::string_view{
+            reinterpret_cast<char const*>(strtab.data()) + sym.st_name};
+        return (sym_name.empty() ? anonymous_symtab_cache.at(sym.st_value)
+                                 : symtab_cache.at(sym_name))
+            .first;
+    };
+
+    /*
      * Map from symbol's name to its offset in .strtab to make adjusting st_name
      * fields faster.
      */
@@ -836,8 +886,8 @@ auto main(int argc, char** argv) -> int
             auto const errdesc     = strerrordesc_np(saved_errno);
 
             std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
-                      << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                      << esc(2, ATTR_RESET);
+                      << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                      << "error" << esc(2, ATTR_RESET);
             if (errname) {
                 std::cerr << ": " << errname;
             }
@@ -916,10 +966,7 @@ auto main(int argc, char** argv) -> int
                     std::cerr << "<unknown type>";
                     break;
                 }
-                std::cerr
-                    << ": "
-                    << (lnk_sym_name.size() ? lnk_sym_name : "<anonymous>")
-                    << "\n";
+                std::cerr << ": " << show_or_anonymous(lnk_sym_name) << "\n";
             }
 
             if (ELF64_ST_TYPE(sym.st_info) == STT_NOTYPE) {
@@ -929,7 +976,7 @@ auto main(int argc, char** argv) -> int
             sym.st_name         = save_string_to_strtab(strtab, lnk_sym_name);
             auto const sym_name = std::string_view{
                 reinterpret_cast<char const*>(strtab.data()) + sym.st_name};
-            if (verbosity_level) {
+            if (verbosity_level and sym.st_name) {
                 std::cerr << "    global sym name: " << sym_name << "\n";
                 std::cerr << "    global .st_name: " << sym.st_name << "\n";
             }
@@ -985,7 +1032,7 @@ auto main(int argc, char** argv) -> int
                 continue;
             }
 
-            if (symtab_cache.count(sym_name)) {
+            if ((not sym_name.empty()) and symtab_cache.count(sym_name)) {
                 auto const [prev_sym_ndx, prev_sym_module] =
                     symtab_cache.at(sym_name);
                 std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
@@ -1011,8 +1058,9 @@ auto main(int argc, char** argv) -> int
                 break;
             }
 
+            auto const sym_ndx = record_symbol(sym_name, sym, lnk_path);
             if (verbosity_level) {
-                std::cerr << "    defined as symbol " << symtab.size() << "\n";
+                std::cerr << "    defined as symbol " << sym_ndx << "\n";
                 std::cerr << "    address: ";
                 switch (ELF64_ST_TYPE(sym.st_info)) {
                 case STT_FUNC:
@@ -1029,8 +1077,6 @@ auto main(int argc, char** argv) -> int
                           << sym.st_value << std::dec << std::setfill(' ')
                           << "]\n";
             }
-            symtab_cache.emplace(sym_name, std::pair{symtab.size(), lnk_path});
-            symtab.push_back(sym);
         }
 
         for (auto& rel : lnk_rel) {
@@ -1041,13 +1087,14 @@ auto main(int argc, char** argv) -> int
 
             if (verbosity_level) {
                 std::cerr << "  rel at " << rel.r_offset
-                          << " for symbol: " << sym_ndx << ": " << sym_name
+                          << " for symbol: " << sym_ndx << ": "
+                          << show_or_anonymous(sym_name)
                           << " (.st_name = " << lnk_sym.st_name << ")"
                           << "\n";
             }
 
-            if (symtab_cache.count(sym_name)) {
-                auto const patched_ndx = symtab_cache.at(sym_name).first;
+            if (is_defined(lnk_sym)) {
+                auto const patched_ndx = get_symtab_index(lnk_sym);
                 if (verbosity_level) {
                     std::cerr << "    defined\n";
                     std::cerr << "    translate .symtab index: " << sym_ndx
@@ -1120,7 +1167,8 @@ auto main(int argc, char** argv) -> int
             auto const sym     = symtab.at(sym_ndx);
 
             if (verbosity_level) {
-                std::cerr << "    symbol: " << sym_name << "\n";
+                std::cerr << "    symbol: " << show_or_anonymous(sym_name)
+                          << "\n";
                 std::cerr << "    rel-kind: by-name\n";
 
                 std::cerr << "    .st_value: ";
@@ -1148,7 +1196,8 @@ auto main(int argc, char** argv) -> int
                 reinterpret_cast<char const*>(strtab.data()) + sym.st_name};
 
             if (verbosity_level) {
-                std::cerr << "    symbol: " << sym_name << "\n";
+                std::cerr << "    symbol: " << show_or_anonymous(sym_name)
+                          << "\n";
                 std::cerr << "    rel-kind: by-index\n";
 
                 std::cerr << "    .st_value: ";

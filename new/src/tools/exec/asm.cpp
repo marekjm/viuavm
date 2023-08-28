@@ -151,17 +151,6 @@ auto syntactical_analysis(std::filesystem::path const source_path,
     }
 }
 
-namespace {
-auto record_symbol(std::string name,
-                   Elf64_Sym const symbol,
-                   std::vector<Elf64_Sym>& symbol_table,
-                   std::map<std::string, size_t>& symbol_map) -> void
-{
-    symbol_map[std::move(name)] = symbol_table.size();
-    symbol_table.push_back(symbol);
-}
-}  // namespace
-
 auto load_value_labels(std::filesystem::path const source_path,
                        std::string_view const source_text,
                        AST_nodes const& nodes,
@@ -184,7 +173,8 @@ auto load_value_labels(std::filesystem::path const source_path,
             symbol.st_name  = name_off;
             symbol.st_info  = ELF64_ST_INFO(STB_GLOBAL, STT_OBJECT);
             symbol.st_other = STV_DEFAULT;
-            record_symbol(ct.name.text, symbol, symbol_table, symbol_map);
+            viua::libs::stage::record_symbol(
+                ct.name.text, symbol, symbol_table, symbol_map);
 
             /*
              * Neither address nor size of the extern symbol is known, only its
@@ -254,7 +244,8 @@ auto load_value_labels(std::filesystem::path const source_path,
              */
             symbol.st_shndx = 0;
 
-            record_symbol(ct.name.text, symbol, symbol_table, symbol_map);
+            viua::libs::stage::record_symbol(
+                ct.name.text, symbol, symbol_table, symbol_map);
         } else if (ct.type == "atom") {
             auto const s = ct.value.front().text;
 
@@ -279,7 +270,8 @@ auto load_value_labels(std::filesystem::path const source_path,
              */
             symbol.st_shndx = 0;
 
-            record_symbol(ct.name.text, symbol, symbol_table, symbol_map);
+            viua::libs::stage::record_symbol(
+                ct.name.text, symbol, symbol_table, symbol_map);
         }
     }
 }
@@ -324,7 +316,8 @@ auto load_function_labels(AST_nodes const& nodes,
          */
         symbol.st_shndx = 0;
 
-        record_symbol(fn.name.text, symbol, symbol_table, symbol_map);
+        viua::libs::stage::record_symbol(
+            fn.name.text, symbol, symbol_table, symbol_map);
     }
 }
 
@@ -332,9 +325,8 @@ auto cook_long_immediates(std::filesystem::path const source_path,
                           std::string_view const source_text,
                           AST_nodes const& nodes,
                           std::vector<uint8_t>& rodata_buf,
-                          std::vector<Elf64_Sym> const& symbol_table,
-                          std::map<std::string, size_t> const& symbol_map)
-    -> void
+                          std::vector<Elf64_Sym>& symbol_table,
+                          std::map<std::string, size_t>& symbol_map) -> void
 {
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {

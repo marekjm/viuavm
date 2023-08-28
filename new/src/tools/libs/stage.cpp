@@ -412,7 +412,7 @@ auto save_string_to_strtab(std::vector<uint8_t>& tab,
          * FIXME This is ridiculously slow. Maybe add some cache instead of
          * linearly browsing through the whole table every time?
          */
-        auto i = size_t{1};
+        auto i = size_t{0};
         while ((i + data.size()) < tab.size()) {
             auto const existing = std::string_view{
                 reinterpret_cast<char const*>(tab.data() + i), data.size()};
@@ -475,10 +475,20 @@ auto save_buffer_to_rodata(std::vector<uint8_t>& strings,
 
     return saved_location;
 }
+auto record_symbol(std::string name,
+                   Elf64_Sym const symbol,
+                   std::vector<Elf64_Sym>& symbol_table,
+                   std::map<std::string, size_t>& symbol_map) -> size_t
+{
+    auto const sym_ndx          = symbol_table.size();
+    symbol_map[std::move(name)] = sym_ndx;
+    symbol_table.push_back(symbol);
+    return sym_ndx;
+}
 auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
                           std::vector<uint8_t>& rodata_buf,
-                          std::vector<Elf64_Sym> const& symbol_table,
-                          std::map<std::string, size_t> const& symbol_map)
+                          std::vector<Elf64_Sym>& symbol_table,
+                          std::map<std::string, size_t>& symbol_map)
     -> std::vector<viua::libs::parser::ast::Instruction>
 {
     auto cooked = std::vector<viua::libs::parser::ast::Instruction>{};
@@ -492,12 +502,52 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
         auto s        = lx.text;
         auto saved_at = size_t{0};
         if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
-            s        = s.substr(1, s.size() - 2);
-            s        = viua::support::string::unescape(s);
-            saved_at = save_buffer_to_rodata(rodata_buf, s);
+            s = s.substr(1, s.size() - 2);
+            s = viua::support::string::unescape(s);
+
+            auto const value_off = save_buffer_to_rodata(rodata_buf, s);
+
+            auto symbol     = Elf64_Sym{};
+            symbol.st_name  = 0; /* anonymous symbol */
+            symbol.st_info  = ELF64_ST_INFO(STB_GLOBAL, STT_OBJECT);
+            symbol.st_other = STV_DEFAULT;
+
+            symbol.st_value = value_off;
+            symbol.st_size  = s.size();
+
+            /*
+             * Section header table index (see elf(5) for st_shndx) is filled
+             * out later, since at this point we do not have this information.
+             *
+             * For variables it will be the index of .rodata.
+             * For functions it will be the index of .text.
+             */
+            symbol.st_shndx = 0;
+
+            saved_at = record_symbol("", symbol, symbol_table, symbol_map);
         } else if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
-            auto s   = lx.text;
-            saved_at = save_buffer_to_rodata(rodata_buf, s);
+            auto s = lx.text;
+
+            auto const value_off = save_buffer_to_rodata(rodata_buf, s);
+
+            auto symbol     = Elf64_Sym{};
+            symbol.st_name  = 0; /* anonymous symbol */
+            symbol.st_info  = ELF64_ST_INFO(STB_GLOBAL, STT_OBJECT);
+            symbol.st_other = STV_DEFAULT;
+
+            symbol.st_value = value_off;
+            symbol.st_size  = s.size();
+
+            /*
+             * Section header table index (see elf(5) for st_shndx) is filled
+             * out later, since at this point we do not have this information.
+             *
+             * For variables it will be the index of .rodata.
+             * For functions it will be the index of .text.
+             */
+            symbol.st_shndx = 0;
+
+            saved_at = record_symbol("", symbol, symbol_table, symbol_map);
         } else if (lx.token == viua::libs::lexer::TOKEN::AT) {
             auto const label = insn.operands.back().ingredients.back();
             try {

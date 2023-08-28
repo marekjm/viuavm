@@ -221,9 +221,12 @@ auto demangle_symbol_load(Cooked_text& raw,
                 return (each.st_value == immediate)
                        and (ELF64_ST_TYPE(each.st_info) == STT_OBJECT);
             });
-        auto const label_or_value = (sym == symtab.end())
-                                        ? load_string(rodata, immediate)
-                                        : make_label_ref(strtab, *sym);
+        if (sym == symtab.end()) {
+            abort();  // FIXME symbol not found? should never happen here
+        }
+        auto const label_or_value = sym->st_name
+                                        ? make_label_ref(strtab, *sym)
+                                        : load_string(rodata, immediate);
 
         auto tt =
             ins.with_text("atom " + out.to_string() + ", " + label_or_value);
@@ -974,9 +977,14 @@ auto main(int argc, char* argv[]) -> int
 
             auto const off = sym.st_value;
 
-            auto const label =
-                sym.st_name ? std::string{main_module.str_at(sym.st_name)}
-                            : ("_strat_" + std::to_string(off));
+            /*
+             * Do not output anonymous symbols.
+             */
+            if (sym.st_name == 0) {
+                continue;
+            }
+
+            auto const label = main_module.str_at(sym.st_name);
 
             auto const data_size = sym.st_size;
 
