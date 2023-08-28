@@ -876,13 +876,6 @@ auto main(int argc, char** argv) -> int
         auto lnk_rel = stage::make_relocations_from(
             std::move(lnk_module.find_fragment(".rel")->get().data));
 
-        /*
-         * Map from index in the module's table, to index in the glued-together
-         * table. The map is filled as the .symtab is processed, since it will
-         * give us the locations of all relevant strings in the .strtab section.
-         */
-        auto mapped_strtab_indexes = std::map<size_t, size_t>{};
-
         auto const text_addend =
             (text.size() * sizeof(viua::arch::instruction_type));
         auto const rodata_addend = rodata.size();
@@ -932,14 +925,14 @@ auto main(int argc, char** argv) -> int
             if (ELF64_ST_TYPE(sym.st_info) == STT_NOTYPE) {
                 continue;
             }
-            if (not mapped_strtab_indexes.count(sym.st_name)) {
-                auto new_index = save_string_to_strtab(strtab, lnk_sym_name);
-                mapped_strtab_indexes.emplace(sym.st_name, new_index);
-            }
 
-            sym.st_name         = mapped_strtab_indexes.at(sym.st_name);
+            sym.st_name         = save_string_to_strtab(strtab, lnk_sym_name);
             auto const sym_name = std::string_view{
                 reinterpret_cast<char const*>(strtab.data()) + sym.st_name};
+            if (verbosity_level) {
+                std::cerr << "    global sym name: " << sym_name << "\n";
+                std::cerr << "    global .st_name: " << sym.st_name << "\n";
+            }
 
             strtab_cache.emplace(sym_name, sym.st_name);
 
@@ -985,13 +978,15 @@ auto main(int argc, char** argv) -> int
 
         for (auto& rel : lnk_rel) {
             auto const sym_ndx  = ELF64_R_SYM(rel.r_info);
-            auto const sym      = lnk_symtab.at(sym_ndx);
+            auto const lnk_sym  = lnk_symtab.at(sym_ndx);
             auto const sym_name = std::string_view{
-                reinterpret_cast<char const*>(strtab.data()) + sym.st_name};
+                reinterpret_cast<char const*>(strtab.data()) + lnk_sym.st_name};
 
             if (verbosity_level) {
                 std::cerr << "  rel at " << rel.r_offset
-                          << " for symbol: " << sym_name << "\n";
+                          << " for symbol: " << sym_ndx << ": " << sym_name
+                          << " (.st_name = " << lnk_sym.st_name << ")"
+                          << "\n";
             }
 
             if (symtab_cache.count(sym_name)) {
