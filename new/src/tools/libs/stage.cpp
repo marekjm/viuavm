@@ -423,7 +423,7 @@ auto save_string_to_strtab(std::vector<uint8_t>& tab,
                 return i;
             }
 
-            i += data.size();
+            ++i;
         }
     }
 
