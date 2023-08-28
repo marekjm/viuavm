@@ -769,11 +769,15 @@ def test_case(case_name, test_program, errors):
             None,
         )
 
-    test_relocatable = os.path.splitext(test_program)[0] + ".o"
-    test_executable = os.path.splitext(test_program)[0] + ".elf"
+    base_name = os.path.splitext(test_program)[0]
+
+    test_relocatable = f"{base_name}.o"
+    test_executable = f"{base_name}.elf"
 
     start_timepoint = datetime.datetime.now()
     count_runtime = lambda: (datetime.datetime.now() - start_timepoint)
+
+    extra_source_files = glob.glob(f"{base_name}.*.s")
 
     asm_args = (
         ASSEMBLER,
@@ -795,11 +799,38 @@ def test_case(case_name, test_program, errors):
             None,
         )
 
+    extra_relocatable_files = []
+    for extra_source in extra_source_files:
+        extra_base_name = os.path.splitext(extra_source)[0]
+        extra_relocatable = f"{extra_base_name}.o"
+        asm_args = (
+            ASSEMBLER,
+            "-o",
+            extra_relocatable,
+            extra_source,
+        )
+        asm_return = subprocess.call(
+            args=asm_args,
+            stderr=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+        )
+        if asm_return != 0:
+            return (
+                Status.Normal,
+                False,
+                ("failed to assemble: " + " ".join(asm_args)),
+                count_runtime(),
+                None,
+            )
+
+        extra_relocatable_files.append(extra_relocatable)
+
     ld_args = (
         LINKER,
         "-o",
         test_executable,
         test_relocatable,
+        *extra_relocatable_files,
     )
     ld_return = subprocess.call(
         args=ld_args,
