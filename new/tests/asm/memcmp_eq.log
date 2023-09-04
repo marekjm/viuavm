@@ -1,0 +1,2 @@
+./build/tools/exec/asm -o ./tests/asm/memcmp_eq.o ./tests/asm/memcmp_eq.asm
+./build/tools/exec/ld -o ./tests/asm/memcmp_eq.elf ./tests/asm/memcmp_eq.o
