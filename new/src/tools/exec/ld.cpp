@@ -1157,6 +1157,9 @@ auto main(int argc, char** argv) -> int
                       << std::dec << std::setfill(' ') << "]"
                       << "\n";
         }
+
+        auto invalid_relocation = false;
+
         if (rel_by_name.count(rel.r_offset)) {
             auto const sym_name = rel_by_name.at(rel.r_offset);
             if (not symtab_cache.count(sym_name)) {
@@ -1185,6 +1188,7 @@ auto main(int argc, char** argv) -> int
                     break;
                 default:
                     std::cerr << "[<invalid>+0x";
+                    invalid_relocation = true;
                     break;
                 }
                 std::cout << std::hex << std::setfill('0') << std::setw(16)
@@ -1192,6 +1196,9 @@ auto main(int argc, char** argv) -> int
                           << "]\n";
             }
 
+            if (invalid_relocation) {
+                abort();
+            }
             relocate(text, rel, sym.st_value);
         } else {
             auto const sym_ndx  = ELF64_R_SYM(rel.r_info);
@@ -1214,6 +1221,7 @@ auto main(int argc, char** argv) -> int
                     break;
                 default:
                     std::cerr << "[<invalid>+0x";
+                    invalid_relocation = true;
                     break;
                 }
                 std::cout << std::hex << std::setfill('0') << std::setw(16)
@@ -1221,6 +1229,9 @@ auto main(int argc, char** argv) -> int
                           << "]\n";
             }
 
+            if (invalid_relocation) {
+                abort();
+            }
             relocate(text, rel, sym.st_value);
         }
     }
