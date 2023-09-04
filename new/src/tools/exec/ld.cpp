@@ -35,12 +35,12 @@
 #include <viua/arch/ops.h>
 #include <viua/libs/stage.h>
 #include <viua/support/tty.h>
+#include <viua/support/string.h>
 #include <viua/vm/elf.h>
 
-constexpr auto LEFT_QUOTE  = "‘";  // U+2018
-constexpr auto RIGHT_QUOTE = "’";  // U+2019
-
 using Text = std::vector<viua::arch::instruction_type>;
+
+using viua::support::string::quote_fancy;
 
 namespace stage {
 auto emit_elf(std::filesystem::path const output_path,
@@ -1038,8 +1038,9 @@ auto main(int argc, char** argv) -> int
                 std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
                           << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
                           << "error" << esc(2, ATTR_RESET)
-                          << ": duplicate definition of symbol " << LEFT_QUOTE
-                          << sym_name << RIGHT_QUOTE << "\n";
+                          << ": duplicate definition of symbol "
+                          << quote_fancy(sym_name)
+                          << "\n";
                 std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
                           << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
                           << "note" << esc(2, ATTR_RESET)
@@ -1177,8 +1178,8 @@ auto main(int argc, char** argv) -> int
                 std::cerr << esc(2, COLOR_FG_WHITE) << output_path.native()
                           << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
                           << "error" << esc(2, ATTR_RESET)
-                          << ": undefined reference to symbol " << LEFT_QUOTE
-                          << sym_name << RIGHT_QUOTE << "\n";
+                          << ": undefined reference to symbol "
+                          << quote_fancy(sym_name) << "\n";
                 return 1;
             }
             auto const sym_ndx = symtab_cache.at(sym_name).first;
@@ -1272,7 +1273,7 @@ auto main(int argc, char** argv) -> int
                 reinterpret_cast<char const*>(strtab.data() + i)};
             std::cout << "[.strtab+0x" << std::hex << std::setfill('0')
                       << std::setw(16) << i << std::dec << std::setfill(' ')
-                      << "] = " << LEFT_QUOTE << sv << RIGHT_QUOTE << "\n";
+                      << "] = " << quote_fancy(sv) << "\n";
             i += sv.size();
         }
     }

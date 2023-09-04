@@ -43,7 +43,7 @@ auto quoted(std::string_view const) -> std::string;
 
 auto quote_squares(std::string_view const) -> std::string;
 auto quote_math_angle(std::string_view const) -> std::string;
-auto quote_single_marks(std::string_view const) -> std::string;
+auto quote_fancy(std::string_view const) -> std::string;
 
 auto unescape(std::string_view const) -> std::string;
 

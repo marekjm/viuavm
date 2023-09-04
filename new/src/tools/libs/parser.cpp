@@ -213,7 +213,7 @@ auto consume_token_of(
             }
 
             constexpr auto esc = viua::support::tty::send_escape_seq;
-            constexpr auto q   = viua::support::string::quote_single_marks;
+            constexpr auto q   = viua::support::string::quote_fancy;
             using viua::support::tty::ATTR_FONT_BOLD;
             using viua::support::tty::ATTR_FONT_NORMAL;
 

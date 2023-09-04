@@ -29,6 +29,9 @@
 #include <viua/libs/assembler.h>
 #include <viua/libs/stage.h>
 #include <viua/support/tty.h>
+#include <viua/support/string.h>
+
+using viua::support::string::quote_fancy;
 
 namespace viua::libs::stage {
 auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)

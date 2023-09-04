@@ -59,7 +59,7 @@ auto quote_math_angle(std::string_view const sv) -> std::string
         << MATHEMATICAL_ANGLE_BRACKET_RIGHT;
     return out.str();
 }
-auto quote_single_marks(std::string_view const sv) -> std::string
+auto quote_fancy(std::string_view const sv) -> std::string
 {
     auto out = std::ostringstream{};
     out << SINGLE_QUOTATION_MARK_LEFT << sv << SINGLE_QUOTATION_MARK_RIGHT;
