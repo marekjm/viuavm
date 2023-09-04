@@ -75,13 +75,17 @@ dist: \
 test: dist
 	@python3 ./tests/suite.py
 
-clean:
+clean-bin:
 	find $(BUILD) -type f -delete
 	find $(BUILD) -mindepth 1 -type d -delete
+
+clean-test:
 	find ./tests -type f -name '*.elf' -delete
 	find ./tests -type f -name '*.o' -delete
 	find ./tests -type f -name '*.asm~' -delete
 	find ./tests -type f -name '*.log' -delete
+
+clean: clean-test clean-bin
 
 install: all
 	mkdir -p $(VIUA_CORE_DIR)
