@@ -1025,7 +1025,7 @@ auto main(int argc, char** argv) -> int
                             break;
                         }
                         std::cout << std::hex << std::setfill('0')
-                                  << std::setw(8) << def_sym.st_value
+                                  << std::setw(16) << def_sym.st_value
                                   << std::dec << std::setfill(' ') << "]\n";
                     }
                 }
@@ -1073,7 +1073,7 @@ auto main(int argc, char** argv) -> int
                     std::cerr << "[<invalid>+0x";
                     break;
                 }
-                std::cout << std::hex << std::setfill('0') << std::setw(8)
+                std::cout << std::hex << std::setfill('0') << std::setw(16)
                           << sym.st_value << std::dec << std::setfill(' ')
                           << "]\n";
             }
@@ -1183,7 +1183,7 @@ auto main(int argc, char** argv) -> int
                     std::cerr << "[<invalid>+0x";
                     break;
                 }
-                std::cout << std::hex << std::setfill('0') << std::setw(8)
+                std::cout << std::hex << std::setfill('0') << std::setw(16)
                           << sym.st_value << std::dec << std::setfill(' ')
                           << "]\n";
             }
@@ -1212,7 +1212,7 @@ auto main(int argc, char** argv) -> int
                     std::cerr << "[<invalid>+0x";
                     break;
                 }
-                std::cout << std::hex << std::setfill('0') << std::setw(8)
+                std::cout << std::hex << std::setfill('0') << std::setw(16)
                           << sym.st_value << std::dec << std::setfill(' ')
                           << "]\n";
             }
@@ -1245,7 +1245,7 @@ auto main(int argc, char** argv) -> int
             auto const sv = std::string_view{
                 reinterpret_cast<char const*>(strtab.data() + i)};
             std::cout << "[.strtab+0x" << std::hex << std::setfill('0')
-                      << std::setw(8) << i << std::dec << std::setfill(' ')
+                      << std::setw(16) << i << std::dec << std::setfill(' ')
                       << "] = " << LEFT_QUOTE << sv << RIGHT_QUOTE << "\n";
             i += sv.size();
         }
