@@ -153,7 +153,7 @@ const auto COLON           = std::regex{"^:"};
 const auto ATTR_LIST_OPEN  = std::regex{"^\\[\\["};
 const auto ATTR_LIST_CLOSE = std::regex{"^\\]\\]"};
 
-const auto LITERAL_ATOM = std::regex{"^[A-Za-z_][A-Za-z0-9:_/()<>]+\\b"};
+const auto LITERAL_ATOM = std::regex{pattern::LITERAL_ATOM};
 const auto LITERAL_INTEGER =
     std::regex{"^-?(?:0x[a-f0-9]+|0o[0-7]+|0b[01]+|0|[1-9][0-9]*)u?\\b"};
 const auto LITERAL_FLOAT = std::regex{"^-?(?:0|[1-9][0-9]*)?\\.[0-9]+\\b"};

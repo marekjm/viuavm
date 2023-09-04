@@ -28,14 +28,15 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <regex>
 
 #include <viua/arch/ops.h>
 #include <viua/libs/assembler.h>
+#include <viua/libs/lexer.h>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
 #include <viua/vm/core.h>
 #include <viua/vm/elf.h>
-
 
 namespace {
 auto ins_to_string(viua::arch::instruction_type const ip) -> std::string
@@ -112,6 +113,13 @@ auto get_symbol_name(uint64_t const value,
     default:
         abort();  // FIXME std::optional?
     }
+}
+
+auto match_atom(std::string_view sv) -> bool
+{
+    std::regex re{viua::libs::lexer::pattern::LITERAL_ATOM};
+    std::cmatch m;
+    return std::regex_match(sv.data(), m, re);
 }
 
 auto is_extern(Elf64_Sym const sym) -> bool
@@ -269,9 +277,14 @@ auto demangle_symbol_load(Cooked_text& raw,
     if (m(i + 1, CALL) and D::decode(ins_at(i + 1)).in == out) {
         auto ins = raw.at(i + 1);
 
+        auto const sym_name = get_symbol_name(immediate, symtab, strtab);
+        auto const safe_sym_name = match_atom(sym_name)
+            ? sym_name
+            : ('"' + sym_name + '"');
+
         auto tt =
             ins.with_text("call " + D::decode(ins_at(i + 1)).out.to_string()
-                          + ", " + get_symbol_name(immediate, symtab, strtab));
+                          + ", " + safe_sym_name);
         tt.index = cooked.back().index;
         cooked.pop_back();
         tt.index.physical_span = tt.index.physical_span.value() + 1;
@@ -1013,8 +1026,11 @@ auto main(int argc, char* argv[]) -> int
             continue;
         }
 
-        auto const name = main_module.str_at(sym.st_name);
-        out << ".function: [[extern]] " << name << "\n";
+        auto const name = std::string{main_module.str_at(sym.st_name)};
+        auto const safe_name = match_atom(name)
+            ? name
+            : ('"' + name + '"');
+        out << ".function: [[extern]] " << safe_name << "\n";
         extern_fn_definitions_present = true;
     }
     if (extern_fn_definitions_present) {
@@ -1045,8 +1061,11 @@ auto main(int argc, char* argv[]) -> int
          * Then, the name. Marking the entry point is necessary to correctly
          * recreate the behaviour of the program.
          */
-        auto const name = main_module.str_at(sym.st_name);
-        out << ".function: " << ((ef == name) ? "[[entry_point]] " : "") << name
+        auto const name = std::string{main_module.str_at(sym.st_name)};
+        auto const safe_name = match_atom(name)
+            ? name
+            : ('"' + name + '"');
+        out << ".function: " << ((ef == name) ? "[[entry_point]] " : "") << safe_name
             << "\n";
 
         auto cooked_text  = Cooked_text{};

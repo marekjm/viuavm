@@ -1188,17 +1188,23 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
                 li.operands.push_back(fn_offset);
                 li.operands.push_back(ast::Operand{});
 
-                auto const fn_name = each.operands.back().ingredients.front();
-                if (symbol_map.count(fn_name.text) == 0) {
+                using viua::libs::lexer::TOKEN;
+
+                auto const fn_id = each.operands.back().ingredients.front();
+                auto const fn_name = (fn_id.token == TOKEN::LITERAL_STRING)
+                    ? fn_id.text.substr(1, fn_id.text.size() - 2)
+                    : fn_id.text;
+                if (symbol_map.count(fn_name) == 0) {
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
-                    throw Error{fn_name, Cause::Call_to_undefined_function};
+                    throw Error{fn_id, Cause::Call_to_undefined_function,
+                        quote_fancy(fn_name)};
                 }
 
-                auto const fn_off = symbol_map.at(fn_name.text);
-                li.operands.back().ingredients.push_back(fn_name.make_synth(
+                auto const fn_off = symbol_map.at(fn_name);
+                li.operands.back().ingredients.push_back(fn_id.make_synth(
                     std::to_string(fn_off) + 'u',
-                    viua::libs::lexer::TOKEN::LITERAL_INTEGER));
+                    TOKEN::LITERAL_INTEGER));
 
                 li.physical_index = each.physical_index;
             }

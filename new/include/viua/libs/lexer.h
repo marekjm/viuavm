@@ -316,6 +316,10 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "amqd",
 };
 
+namespace pattern {
+constexpr auto LITERAL_ATOM = "^[A-Za-z_][A-Za-z0-9_]*\\b";
+}
+
 auto lex(std::string_view) -> std::vector<Lexeme>;
 
 namespace stage {

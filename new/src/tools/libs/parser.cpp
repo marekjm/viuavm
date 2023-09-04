@@ -480,7 +480,12 @@ auto parse_instruction(
             consume_token_of(TOKEN::TERMINATOR, lexemes);
             break;
         }
-        throw lexemes.front();
+
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{lexemes.front(),
+                    Cause::Unexpected_token}
+        .note("expected a comma, or a newline");
     }
 
     return instruction;
@@ -501,7 +506,22 @@ auto parse_function_definition(
     auto fn_name =
         consume_token_of({TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING}, lexemes);
     fn->name = std::move(fn_name);
-    consume_token_of(TOKEN::TERMINATOR, lexemes);
+
+    try {
+        consume_token_of(TOKEN::TERMINATOR, lexemes);
+    } catch (viua::libs::lexer::Lexeme const& e) {
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{lexemes.front(),
+                    Cause::Unexpected_token,
+                    "in definition of a function"}
+            .add(fn->start);
+    }
+
+    if (fn->name.token == TOKEN::LITERAL_STRING) {
+        fn->name.token = TOKEN::LITERAL_ATOM;
+        fn->name.text = fn->name.text.substr(1, fn->name.text.substr().size() - 2);
+    }
 
     /*
      * This function is not defined in the current module, therefore we should
