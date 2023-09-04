@@ -743,6 +743,7 @@ def detect_check_kind(test_path):
 
     raise No_check_file_for(test_path)
 
+
 def test_case_impl(case_log, case_name, test_program, errors):
     check_kind = None
     try:
@@ -1184,6 +1185,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
         perf = None
 
     return (Status.Normal, True, None, count_runtime(), perf)
+
 
 def test_case(case_name, test_program, errors):
     case_path = os.path.splitext(test_program)[0]

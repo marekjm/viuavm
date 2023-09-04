@@ -1163,9 +1163,9 @@ auto main(int argc, char** argv) -> int
     auto rel_i = size_t{0};
     for (auto const& rel : relocations) {
         if (verbosity_level) {
-            std::cerr << "  " << rel_i++ << ": relocation at [.text+0x" << std::hex
-                      << std::setfill('0') << std::setw(16) << rel.r_offset
-                      << std::dec << std::setfill(' ') << "]"
+            std::cerr << "  " << rel_i++ << ": relocation at [.text+0x"
+                      << std::hex << std::setfill('0') << std::setw(16)
+                      << rel.r_offset << std::dec << std::setfill(' ') << "]"
                       << "\n";
         }
 
