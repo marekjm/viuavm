@@ -20,9 +20,11 @@
 #include <elf.h>
 #include <string.h>
 
+#include <algorithm>
 #include <array>
 #include <charconv>
 #include <iostream>
+#include <string_view>
 
 #include <viua/libs/assembler.h>
 #include <viua/libs/stage.h>
@@ -1269,8 +1271,21 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
          */
         using viua::libs::assembler::li_cost;
         if (each.opcode == "if" or each.opcode == "g.if") {
-            branch_ops_baggage +=
-                li_cost(std::stoull(each.operands.back().to_string()));
+            try {
+                branch_ops_baggage +=
+                    li_cost(std::stoull(each.operands.back().to_string()));
+            } catch (std::invalid_argument const&) {
+                using viua::libs::errors::compile_time::Cause;
+                using viua::libs::errors::compile_time::Error;
+
+                auto e = Error{each.operands.back().ingredients.front(),
+                               Cause::Invalid_operand};
+                std::for_each(each.operands.back().ingredients.begin() + 1,
+                              each.operands.back().ingredients.end(),
+                              [&e](auto const& ing) -> void { e.add(ing); });
+                e.aside("must be an offset into the function's body");
+                throw e;
+            }
         } else if (each.opcode == "jump" or each.opcode == "g.jump") {
             branch_ops_baggage +=
                 li_cost(std::stoull(each.operands.back().to_string()));
