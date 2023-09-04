@@ -1146,9 +1146,13 @@ auto main(int argc, char** argv) -> int
      */
     strtab.push_back('\0');
 
+    if (verbosity_level) {
+        std::cerr << "applying relocations (" << relocations.size() << ")\n";
+    }
+    auto rel_i = size_t{0};
     for (auto const& rel : relocations) {
         if (verbosity_level) {
-            std::cerr << "  relocation at [.text+0x" << std::hex
+            std::cerr << "  " << rel_i++ << ": relocation at [.text+0x" << std::hex
                       << std::setfill('0') << std::setw(16) << rel.r_offset
                       << std::dec << std::setfill(' ') << "]"
                       << "\n";
