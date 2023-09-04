@@ -6,6 +6,7 @@ import glob
 import io
 import os
 import re
+import random
 import subprocess
 import sys
 import traceback
@@ -831,6 +832,10 @@ def test_case_impl(case_log, case_name, test_program, errors):
                         None,
                         None,
                     )
+
+    # This should fuzz linker bugs related to bad offset calculations and
+    # dependent on the order of input files.
+    random.shuffle(extra_relocatable_files)
 
     ld_args = (
         LINKER,
