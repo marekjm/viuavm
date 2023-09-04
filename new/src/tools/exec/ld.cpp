@@ -1117,7 +1117,18 @@ auto main(int argc, char** argv) -> int
                               << rel.r_offset << std::dec << std::setfill(' ')
                               << "] for " << sym_name << "\n";
                 }
-                rel_by_name.emplace(rel.r_offset, sym_name);
+
+                /*
+                 * The offset we need to use as key is the one in the final
+                 * glued-together .text section. Otherwise there will be a
+                 * mismatch between what's in the map and what's in the memory
+                 * for all modules except the first one.
+                 *
+                 * This was caught by the test suite when it used a different
+                 * order of ELF modules on the command line, and the offsets got
+                 * messed up.
+                 */
+                rel_by_name.emplace(rel.r_offset + text_addend, sym_name);
             }
 
             /*
