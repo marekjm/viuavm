@@ -1,3 +1,6 @@
+.function: [[extern]] "std::memset"
+.function: [[extern]] "std::memcpy"
+
 .function: [[entry_point]] main
     ; size of buffer
     li $3, 16u
@@ -15,7 +18,7 @@
     copy $0.a, $1.l
     move $1.a, $2.l
     copy $2.a, $3.l
-    call $4.l, memset
+    call $4.l, "std::memset"
 
     ; allocate space for second copy
     li $2, 16u
@@ -27,46 +30,8 @@
     move $0.a, $2.l
     move $1.a, $1.l
     move $2.a, $3.l
-    call $5.l, memcpy
+    call $5.l, "std::memcpy"
 
     ebreak
     return
-.end
-
-.function: memset
-    li $1, 0u
-
-    eq $2.l, $1.l, $2.p
-    if $2.l, 7
-
-    add $3.l, $0.p, $1.l
-    sb $1.p, $3.l, 0
-    addi $1.l, $1.l, 1u
-    jump 1
-
-    move $4.l, $0.p
-    return $4.l
-.end
-
-.function: memcpy
-    li $1, 0u
-
-    g.lt $2.l, $1.l, $2.p
-    g.not $2.l, $2.l
-    if $2.l, 10
-
-    ; load from src
-    add $3.l, $1.p, $1.l
-    lb $2, $3, 0
-
-    ; store to dst
-    add $3, $0.p, $1.l
-    sb $2, $3, 0
-
-    ; increase counter and repeat
-    addi $1, $1, 1u
-    jump 1
-
-    move $2.l, $0.p
-    return $2.l
 .end

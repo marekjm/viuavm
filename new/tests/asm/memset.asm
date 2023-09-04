@@ -1,3 +1,5 @@
+.function: [[extern]] "std::memset"
+
 .function: [[entry_point]] main
     li $1, 16u
     amba $1.l, $1.l, 0
@@ -9,23 +11,8 @@
     move $0.a, $1.l
     move $1.a, $2.l
     move $2.a, $3.l
-    call $4.l, memset
+    call $4.l, "std::memset"
 
     ebreak
     return
-.end
-
-.function: memset
-    li $1, 0u
-
-    eq $2.l, $1.l, $2.p
-    if $2.l, 7
-
-    add $3.l, $0.p, $1.l
-    sb $1.p, $3.l, 0
-    addi $1.l, $1.l, 1u
-    jump 1
-
-    move $4.l, $0.p
-    return $4.l
 .end
