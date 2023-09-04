@@ -1,2 +1,0 @@
-./build/tools/exec/asm -o ./tests/asm/memcmp_lt.o ./tests/asm/memcmp_lt.asm
-./build/tools/exec/ld -o ./tests/asm/memcmp_lt.elf ./tests/asm/memcmp_lt.o
