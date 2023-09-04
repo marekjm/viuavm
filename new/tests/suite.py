@@ -817,6 +817,21 @@ def test_case_impl(case_log, case_name, test_program, errors):
 
         extra_relocatable_files.append(extra_relocatable)
 
+    if os.path.isfile(test_deps := f"{base_name}.deps"):
+        with open(test_deps, "r") as test_deps_fd:
+            for dep in test_deps_fd:
+                dep = dep.strip()
+                if os.path.isfile(dep_o := f"{dep}.o"):
+                    extra_relocatable_files.append(dep_o)
+                else:
+                    return (
+                        Status.Normal,
+                        False,
+                        f"could not locate dependency: {dep}",
+                        None,
+                        None,
+                    )
+
     ld_args = (
         LINKER,
         "-o",
@@ -1206,6 +1221,58 @@ def test_case(case_name, test_program, errors):
         return test_case_impl(case_log, case_name, test_program, errors)
 
 
+
+def prepare_dependencies(cases_dir):
+    dep_files = glob.glob(f"{cases_dir}/*.deps")
+
+    dep_sources = set()
+    for each in dep_files:
+        with open(each, "r") as dep_fd:
+            for dep in dep_fd:
+                dep = dep.strip()
+                dep_sources.add(f"{dep}.asm")
+
+    print(
+        "  preparing dependencies (found {})".format(
+            (len(dep_sources) or "none"),
+        )
+    )
+
+    failure = False
+    for dep_src in sorted(dep_sources):
+        base_name = os.path.splitext(dep_src)[0]
+        dep_relocatable = f"{base_name}.o"
+
+        asm_args = (
+            ASSEMBLER,
+            "-o",
+            dep_relocatable,
+            dep_src,
+        )
+        asm_return = subprocess.call(
+            args=asm_args,
+            stderr=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+        )
+
+        symptom = None
+        tag_color: str = None
+        tag: str = None
+        if asm_return != 0:
+            tag = "fail"
+            tag_color = "red"
+            symptom = " ".join(asm_args)
+        else:
+            tag = " ok "
+            tag_color = "green"
+        print(
+            "    dep {}: [{}]".format(
+                colorise("white", base_name),
+                colorise(tag_color, tag)
+                + ((" => " + colorise("light_red", symptom)) if symptom else ""),
+            )
+        )
+
 def main(args):
     CASES_DIR = os.environ.get("VIUA_VM_TEST_CASES_DIR", "./tests/asm")
     raw_cases = glob.glob(f"{CASES_DIR}/*.asm")
@@ -1224,6 +1291,8 @@ def main(args):
             ("s" if len(cases) != 1 else ""),
         )
     )
+
+    prepare_dependencies(CASES_DIR)
 
     # Set a known PID seed. This makes test checks much easier to write, as the
     # PID values can be statically determined. Without setting VIUA_VM_PID_SEED
@@ -1244,6 +1313,7 @@ def main(args):
     run_times = []
     perf_stats = []
 
+    print("  running cases")
     for case_no, (
         case_name,
         test_program,
@@ -1317,7 +1387,7 @@ def main(args):
             symptom = "internal test suite failure"
 
         print(
-            "  case {}. of {}: [{}] {}  {}".format(
+            "    case {}. of {}: [{}] {}  {}".format(
                 colorise("white", str(case_no).rjust(pad_case_no)),
                 colorise("white", case_name.ljust(pad_case_name)),
                 colorise(tag_color, tag)
