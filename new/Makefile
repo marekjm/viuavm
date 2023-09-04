@@ -81,6 +81,7 @@ clean:
 	find ./tests -type f -name '*.elf' -delete
 	find ./tests -type f -name '*.o' -delete
 	find ./tests -type f -name '*.asm~' -delete
+	find ./tests -type f -name '*.log' -delete
 
 install: all
 	mkdir -p $(VIUA_CORE_DIR)

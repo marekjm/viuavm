@@ -743,20 +743,7 @@ def detect_check_kind(test_path):
 
     raise No_check_file_for(test_path)
 
-
-def test_case(case_name, test_program, errors):
-    if os.path.isfile(skip_file := (os.path.splitext(test_program)[0] + ".skip")):
-        skip_reason: str = None
-        with open(skip_file, "r") as stream:
-            skip_reason = stream.read().strip() or "skipped"
-        return (
-            Status.Skip,
-            False,
-            skip_reason,
-            None,
-            None,
-        )
-
+def test_case_impl(case_log, case_name, test_program, errors):
     check_kind = None
     try:
         check_kind = detect_check_kind(test_program)
@@ -790,6 +777,8 @@ def test_case(case_name, test_program, errors):
         stderr=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
     )
+    case_log.write(" ".join(asm_args))
+    case_log.write("\n")
     if asm_return != 0:
         return (
             Status.Normal,
@@ -809,6 +798,8 @@ def test_case(case_name, test_program, errors):
             extra_relocatable,
             extra_source,
         )
+        case_log.write(" ".join(asm_args))
+        case_log.write("\n")
         asm_return = subprocess.call(
             args=asm_args,
             stderr=subprocess.DEVNULL,
@@ -832,6 +823,8 @@ def test_case(case_name, test_program, errors):
         test_relocatable,
         *extra_relocatable_files,
     )
+    case_log.write(" ".join(ld_args))
+    case_log.write("\n")
     ld_return = subprocess.call(
         args=ld_args,
         stderr=subprocess.DEVNULL,
@@ -1191,6 +1184,24 @@ def test_case(case_name, test_program, errors):
         perf = None
 
     return (Status.Normal, True, None, count_runtime(), perf)
+
+def test_case(case_name, test_program, errors):
+    case_path = os.path.splitext(test_program)[0]
+
+    if os.path.isfile(skip_file := f"{case_path}.skip"):
+        skip_reason: str = None
+        with open(skip_file, "r") as stream:
+            skip_reason = stream.read().strip() or "skipped"
+        return (
+            Status.Skip,
+            False,
+            skip_reason,
+            None,
+            None,
+        )
+
+    with open(f"{case_path}.log", "w") as case_log:
+        return test_case_impl(case_log, case_name, test_program, errors)
 
 
 def main(args):
