@@ -296,9 +296,14 @@ auto demangle_symbol_load(Cooked_text& raw,
         auto ins = raw.at(i + 1);
 
         auto const sym = symtab.at(immediate);
+        auto const sym_name = get_symbol_name(sym.st_value, symtab, strtab);
+        auto const safe_sym_name = match_atom(sym_name)
+            ? sym_name
+            : ('"' + sym_name + '"');
+
         auto tt =
             ins.with_text("actor " + D::decode(ins_at(i + 1)).out.to_string()
-                          + ", " + std::string{strtab.at(sym.st_name)});
+                          + ", " + safe_sym_name);
         tt.index = cooked.back().index;
         cooked.pop_back();
         tt.index.physical_span = tt.index.physical_span.value() + 1;
