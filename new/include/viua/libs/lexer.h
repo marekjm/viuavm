@@ -223,7 +223,6 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "g.swap",
 
     "if",
-    "g.if",
 
     "g.io_submit",
     "io_submit",
@@ -271,7 +270,6 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "delete",
     "g.delete",
     "jump",
-    "g.jump",
 
     "sb",
     "lb",

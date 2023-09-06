@@ -1259,27 +1259,8 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
 
         logical_ops += (cooked.size() - logical_ops);
 
-        /*
-         * I think this part of the code might break if the value crosses a
-         * threshold at which the alhorithm governing expansion of li chooses a
-         * different instruction sequence. This code is a potential FIXME.
-         *
-         * Maybe we should do a second pass in which the actual costs are
-         * calculated. After the whole sequence is analysed we know how many
-         * physical instructions are there. Then, we know that eg, Nth logical
-         * instruction will be converted into Mth physical instruction address.
-         * If they have different costs we would have to adjust the mappings for
-         * all instructions after that jump.
-         *
-         * But... this requires the target of the branch just analysed to have
-         * to be recalculated because the physical instrution's layout just
-         * changed. Damn, what a brain-dead design was chosen for the li
-         * expansion. Costant size would be much better.
-         * Another choice is to never REDUCE the cost, but insert a bunch of
-         * g.noop's as padding. Yeah, that could work, I guess.
-         */
         using viua::libs::assembler::li_cost;
-        if (each.opcode == "if" or each.opcode == "g.if") {
+        if (each.opcode == "if") {
             try {
                 branch_ops_baggage +=
                     li_cost(std::stoull(each.operands.back().to_string()));
@@ -1295,7 +1276,7 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
                 e.aside("must be an offset into the function's body");
                 throw e;
             }
-        } else if (each.opcode == "jump" or each.opcode == "g.jump") {
+        } else if (each.opcode == "jump") {
             branch_ops_baggage +=
                 li_cost(std::stoull(each.operands.back().to_string()));
         }
@@ -1303,9 +1284,9 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
 
     auto baked = std::vector<ast::Instruction>{};
     for (auto& each : cooked) {
-        if (each.opcode == "if" or each.opcode == "g.if") {
+        if (each.opcode == "if") {
             expand_if(baked, each, l2p);
-        } else if (each.opcode == "jump" or each.opcode == "g.jump") {
+        } else if (each.opcode == "jump") {
             /*
              * Jumps can be safely rewritten as ifs with a void condition
              * register. There is no reason not to do this, frankly, since
@@ -1316,7 +1297,7 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
              */
             auto as_if           = ast::Instruction{};
             as_if.opcode         = each.opcode;
-            as_if.opcode.text    = (each.opcode == "jump") ? "if" : "g.if";
+            as_if.opcode.text    = "if";
             as_if.physical_index = each.physical_index;
 
             {
