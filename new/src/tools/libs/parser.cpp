@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2022 Marek Marecki
+ *  Copyright (C) 2022-2023 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -60,13 +60,13 @@ auto Operand::make_access() const -> viua::arch::Register_access
 
     using viua::libs::lexer::TOKEN;
     auto const lx = ingredients.front();
-    if (lx != TOKEN::RA_DIRECT and lx != TOKEN::RA_PTR_DEREF) {
+    if (lx != TOKEN::DOLLAR) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
         throw Error{ingredients.front(), Cause::Invalid_register_access};
     }
 
-    auto const direct = (lx == TOKEN::RA_DIRECT);
+    auto const direct = (lx == TOKEN::DOLLAR);
     auto const index  = std::stoul(ingredients.at(1).text);
     if (ingredients.size() == 2) {
         return viua::arch::Register_access::make_local(index, direct);
@@ -135,40 +135,6 @@ auto Label_def::to_string() const -> std::string
            + std::to_string(name.location.character + 1) + '-'
            + std::to_string(name.location.character + name.text.size()) + ' '
            + name.text;
-}
-
-auto remove_noise(std::vector<viua::libs::lexer::Lexeme> raw)
-    -> std::vector<viua::libs::lexer::Lexeme>
-{
-    using viua::libs::lexer::TOKEN;
-    auto tmp = std::vector<viua::libs::lexer::Lexeme>{};
-    for (auto& each : raw) {
-        if (each.token == TOKEN::WHITESPACE or each.token == TOKEN::COMMENT) {
-            continue;
-        }
-
-        tmp.push_back(std::move(each));
-    }
-
-    while ((not tmp.empty()) and tmp.front().token == TOKEN::TERMINATOR) {
-        tmp.erase(tmp.begin());
-    }
-
-    auto cooked = std::vector<viua::libs::lexer::Lexeme>{};
-    for (auto& each : tmp) {
-        if (each.token != TOKEN::TERMINATOR or cooked.empty()) {
-            cooked.push_back(std::move(each));
-            continue;
-        }
-
-        if (cooked.back().token == TOKEN::TERMINATOR) {
-            continue;
-        }
-
-        cooked.push_back(std::move(each));
-    }
-
-    return cooked;
 }
 }  // namespace ast
 
@@ -483,9 +449,8 @@ auto parse_instruction(
 
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{lexemes.front(),
-                    Cause::Unexpected_token}
-        .note("expected a comma, or a newline");
+        throw Error{lexemes.front(), Cause::Unexpected_token}.note(
+            "expected a comma, or a newline");
     }
 
     return instruction;
@@ -520,7 +485,8 @@ auto parse_function_definition(
 
     if (fn->name.token == TOKEN::LITERAL_STRING) {
         fn->name.token = TOKEN::LITERAL_ATOM;
-        fn->name.text = fn->name.text.substr(1, fn->name.text.substr().size() - 2);
+        fn->name.text =
+            fn->name.text.substr(1, fn->name.text.substr().size() - 2);
     }
 
     /*

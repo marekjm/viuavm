@@ -36,20 +36,25 @@ enum class Cause {
     Unknown = 0,
 
     /*
-     * None is for errors which do not represent errors per-se.
+     * None is for errors which do not represent errors per-se, or for errors
+     * which require custom descriptions.
      */
     None,
 
     /*
-     * Encountered character does not form a legal token. This error is only
+     * Encountered character can not form a legal token. This error is only
      * thrown during lexical analysis.
      */
-    Illegal_token,
+    Illegal_character,
 
     /*
-     * Encountered token was not expected at current position. This error is
-     * reported during either lexical or syntactical analysis.
+     * Encountered token is either invalid (maybe malformed?), or just
+     * unexpected at its current position.
+     *
+     * Invalid tokens are NEVER valid.
+     * Unexpected ones are otherwise valid, just not at the current position.
      */
+    Invalid_token,
     Unexpected_token,
 
     Unknown_directive,
@@ -157,6 +162,9 @@ struct Error {
      *     43 |     addi $1, void, -1
      *
      * Its location is independent of the main lexeme.
+     *
+     * FIXME Only one aside note is possible.
+     * FIXME Aside notes can only be connected to the main lexeme.
      */
     std::string aside_note;
     std::optional<viua::libs::lexer::Lexeme> aside_lexeme;

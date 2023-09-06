@@ -1228,7 +1228,6 @@ def test_case(case_name, test_program, errors):
         return test_case_impl(case_log, case_name, test_program, errors)
 
 
-
 def prepare_dependencies(cases_dir):
     dep_files = glob.glob(f"{cases_dir}/*.deps")
 
@@ -1279,6 +1278,7 @@ def prepare_dependencies(cases_dir):
                 + ((" => " + colorise("light_red", symptom)) if symptom else ""),
             )
         )
+
 
 def main(args):
     CASES_DIR = os.environ.get("VIUA_VM_TEST_CASES_DIR", "./tests/asm")

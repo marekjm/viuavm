@@ -143,6 +143,18 @@ struct Register_access {
 
     auto to_string() const -> std::string;
 };
+
+enum class FUNDAMENTAL_TYPES : uint8_t {
+    VOID,
+    INT,
+    UINT,
+    FLOAT32,
+    FLOAT64,
+    POINTER,
+    ATOM,
+    PID,
+    UNDEFINED,
+};
 }  // namespace viua::arch
 
 #endif

@@ -39,62 +39,58 @@ struct Location {
 
 enum class TOKEN {
     /*
-     * Compiler and assembler directives, instructions.
+     * Used for synthetic errors during lexical analysis phase, when there are
+     * no tokens available yet.
      */
-    IMPORT,
-    EXPORT,
-    OPCODE,
+    INVALID,
 
     /*
-     * Control characters.
-     */
-    COMMA,
-    DOT,
-    EQ,
-    AT,
-    TERMINATOR,
-    ATTR_LIST_OPEN,
-    ATTR_LIST_CLOSE,
-    PAREN_OPEN,
-    PAREN_CLOSE,
-    BRACE_OPEN,
-    BRACE_CLOSE,
-
-    /*
-     * Register access sigils.
-     */
-    RA_VOID,
-    RA_DIRECT,
-    RA_PTR_DEREF,
-
-    /*
-     * Literals.
-     */
-    LITERAL_STRING,
-    LITERAL_INTEGER,
-    LITERAL_FLOAT,
-    LITERAL_ATOM,
-
-    /*
-     * Definitions.
-     */
-    DEF_FUNCTION,
-    DEF_BLOCK,
-    DEF_LABEL,
-    DEF_VALUE,
-    END,
-
-    /*
-     * Fluff.
+     * Fluff and noise.
      */
     WHITESPACE,
     COMMENT,
 
     /*
-     * Used for synthetic errors during lexical analysis phase, when there are
-     * no tokens available yet.
+     * Assembler directives.
      */
-    INVALID,
+    SWITCH_TO_TEXT,
+    SWITCH_TO_RODATA,
+    SWITCH_TO_SECTION,
+
+    DECLARE_SYMBOL,
+    DEFINE_LABEL,
+    BEGIN,
+    END,
+    ALLOCATE_OBJECT,
+
+    /*
+     * Instructions.
+     */
+    OPCODE,
+
+    REG_VOID,
+
+    /*
+     * Literals.
+     */
+    LITERAL_ATOM,
+    LITERAL_INTEGER,
+    LITERAL_FLOAT,
+    LITERAL_STRING,
+
+    /*
+     * Control characters.
+     */
+    COMMA,
+    ELLIPSIS,
+    DOT,
+    EQ,
+    AT,
+    DOLLAR,
+    STAR,
+    TERMINATOR,
+    ATTR_LIST_OPEN,
+    ATTR_LIST_CLOSE,
 };
 auto to_string(TOKEN const) -> std::string;
 
@@ -114,6 +110,10 @@ struct Lexeme {
     auto operator==(std::string_view const) const -> bool;
 
     auto make_synth(std::string, TOKEN const) const -> Lexeme;
+    inline auto make_synth() const -> Lexeme
+    {
+        return make_synth(text, token);
+    }
     auto is_synth() const -> bool;
     auto synthed_from() const -> Lexeme;
 };
@@ -188,8 +188,6 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
 
     "atom",
     "g.atom",
-    "string",
-    "g.string",
 
     "lui",
     "g.lui",
@@ -321,9 +319,11 @@ constexpr auto LITERAL_ATOM = "^[A-Za-z_][A-Za-z0-9_]*\\b";
 auto lex(std::string_view) -> std::vector<Lexeme>;
 
 namespace stage {
-auto lexical_analysis(std::filesystem::path const, std::string_view const)
+auto lex(std::filesystem::path const, std::string_view const)
     -> std::vector<Lexeme>;
-}
+
+auto remove_noise(std::vector<Lexeme>&&) -> std::vector<Lexeme>;
+}  // namespace stage
 }  // namespace viua::libs::lexer
 
 #endif

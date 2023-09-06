@@ -31,8 +31,10 @@ auto to_string(Cause const ce) -> std::string_view
         return "unknown error";
     case Cause::None:
         return "";
-    case Cause::Illegal_token:
-        return "illegal token";
+    case Cause::Illegal_character:
+        return "illegal character";
+    case Cause::Invalid_token:
+        return "invalid token";
     case Cause::Unexpected_token:
         return "unexpected token";
     case Cause::Unknown_directive:

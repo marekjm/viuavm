@@ -66,64 +66,61 @@ auto Lexeme::synthed_from() const -> Lexeme
 auto to_string(TOKEN const token) -> std::string
 {
     switch (token) {
-    case TOKEN::IMPORT:
-        return "IMPORT";
-    case TOKEN::EXPORT:
-        return "EXPORT";
-    case TOKEN::OPCODE:
-        return "OPCODE";
-    case TOKEN::COMMA:
-        return "COMMA";
-    case TOKEN::DOT:
-        return "DOT";
-    case TOKEN::EQ:
-        return "EQ";
-    case TOKEN::AT:
-        return "AT";
-    case TOKEN::TERMINATOR:
-        return "TERMINATOR";
-    case TOKEN::ATTR_LIST_OPEN:
-        return "ATTR_LIST_OPEN";
-    case TOKEN::ATTR_LIST_CLOSE:
-        return "ATTR_LIST_CLOSE";
-    case TOKEN::PAREN_OPEN:
-        return "PAREN_OPEN";
-    case TOKEN::PAREN_CLOSE:
-        return "PAREN_CLOSE";
-    case TOKEN::BRACE_OPEN:
-        return "BRACE_OPEN";
-    case TOKEN::BRACE_CLOSE:
-        return "BRACE_CLOSE";
-    case TOKEN::RA_VOID:
-        return "RA_VOID";
-    case TOKEN::RA_DIRECT:
-        return "RA_DIRECT";
-    case TOKEN::RA_PTR_DEREF:
-        return "RA_PTR_DEREF";
-    case TOKEN::LITERAL_STRING:
-        return "LITERAL_STRING";
-    case TOKEN::LITERAL_INTEGER:
-        return "LITERAL_INTEGER";
-    case TOKEN::LITERAL_FLOAT:
-        return "LITERAL_FLOAT";
-    case TOKEN::LITERAL_ATOM:
-        return "LITERAL_ATOM";
-    case TOKEN::DEF_FUNCTION:
-        return "DEF_FUNCTION";
-    case TOKEN::DEF_BLOCK:
-        return "DEF_BLOCK";
-    case TOKEN::DEF_LABEL:
-        return "DEF_LABEL";
-    case TOKEN::DEF_VALUE:
-        return "DEF_VALUE";
-    case TOKEN::END:
-        return "END";
-    case TOKEN::WHITESPACE:
-        return "WHITESPACE";
-    case TOKEN::COMMENT:
-        return "COMMENT";
-    case TOKEN::INVALID:
+        using enum TOKEN;
+    case INVALID:
         return "INVALID";
+    case WHITESPACE:
+        return "WHITESPACE";
+    case COMMENT:
+        return "COMMENT";
+    case SWITCH_TO_TEXT:
+        return "SWITCH_TO_TEXT";
+    case SWITCH_TO_RODATA:
+        return "SWITCH_TO_RODATA";
+    case SWITCH_TO_SECTION:
+        return "SWITCH_TO_SECTION";
+    case DECLARE_SYMBOL:
+        return "DECLARE_SYMBOL";
+    case DEFINE_LABEL:
+        return "DEFINE_LABEL";
+    case BEGIN:
+        return "BEGIN";
+    case END:
+        return "END";
+    case ALLOCATE_OBJECT:
+        return "ALLOCATE_OBJECT";
+    case OPCODE:
+        return "OPCODE";
+    case REG_VOID:
+        return "REG_VOID";
+    case LITERAL_ATOM:
+        return "LITERAL_ATOM";
+    case LITERAL_INTEGER:
+        return "LITERAL_INTEGER";
+    case LITERAL_FLOAT:
+        return "LITERAL_FLOAT";
+    case LITERAL_STRING:
+        return "LITERAL_STRING";
+    case COMMA:
+        return "COMMA";
+    case ELLIPSIS:
+        return "ELLIPSIS";
+    case DOT:
+        return "DOT";
+    case EQ:
+        return "EQ";
+    case AT:
+        return "AT";
+    case DOLLAR:
+        return "DOLLAR";
+    case STAR:
+        return "STAR";
+    case TERMINATOR:
+        return "TERMINATOR";
+    case ATTR_LIST_OPEN:
+        return "ATTR_LIST_OPEN";
+    case ATTR_LIST_CLOSE:
+        return "ATTR_LIST_CLOSE";
     }
 
     // impossible, because all cases are handled in the enumeration above
@@ -132,35 +129,50 @@ auto to_string(TOKEN const token) -> std::string
 
 const auto COMMENT = std::regex{"^[;#].*"};
 
-const auto DEF_FUNCTION = std::regex{"^\\.function:"};
-const auto END          = std::regex{"^\\.end"};
-const auto DEF_LABEL    = std::regex{"^\\.label:"};
-const auto DEF_VALUE    = std::regex{"^\\.value:"};
-
 const auto WHITESPACE = std::regex{"^[ \t]+"};
 
-const auto RA_DIRECT    = std::regex{"^\\$"};
-const auto RA_PTR_DEREF = std::regex{"^\\*"};
-const auto RA_VOID      = std::regex{"^\\bvoid\\b"};
+const auto DIR_TEXT    = std::regex{"^\\.text\\b"};
+const auto DIR_RODATA  = std::regex{"^\\.rodata\\b"};
+const auto DIR_SECTION = std::regex{"^\\.section\\b"};
 
-const auto OPCODE = std::regex{"^(?:g.)?[a-z][a-z0-9_]*(?:.[stw])?\\b"};
+const auto DIR_SYMBOL = std::regex{"^\\.symbol\\b"};
+const auto DIR_LABEL  = std::regex{"^\\.label\\b"};
+const auto DIR_BEGIN  = std::regex{"^\\.begin\\b"};
+const auto DIR_END    = std::regex{"^\\.end\\b"};
+const auto DIR_OBJECT = std::regex{"^\\.object\\b"};
 
-const auto COMMA           = std::regex{"^,"};
-const auto DOT             = std::regex{"^\\."};
-const auto EQ              = std::regex{"^="};
-const auto AT              = std::regex{"^@"};
-const auto COLON           = std::regex{"^:"};
-const auto ATTR_LIST_OPEN  = std::regex{"^\\[\\["};
-const auto ATTR_LIST_CLOSE = std::regex{"^\\]\\]"};
+const auto SECTION_NAME = std::regex{"^(\\.[A-Za-z][A-Za-z0-9_]+)+\\b"};
+
+/*
+ * The regex for register indexes will catch ANYTHING up until word boundary,
+ * not only valid index names. This is a better choice for error reporting since
+ * it allows the assembler to quickly see what's wrong; if the regex only
+ * accepted valid names the errors could get weird, and it would be much more
+ * difficult to provide sane diagnostics.
+ */
+const auto REG_VOID = std::regex{"^\\bvoid\\b"};
 
 const auto LITERAL_ATOM = std::regex{pattern::LITERAL_ATOM};
 const auto LITERAL_INTEGER =
-    std::regex{"^-?(?:0x[a-f0-9]+|0o[0-7]+|0b[01]+|0|[1-9][0-9]*)u?\\b"};
-const auto LITERAL_FLOAT = std::regex{"^-?(?:0|[1-9][0-9]*)?\\.[0-9]+\\b"};
+    std::regex{"^[-+]?(?:0x[a-f0-9]+|0o[0-7]+|0b[01]+|0|[1-9][0-9]*)u?"};
+const auto LITERAL_FLOAT = std::regex{"^-?(?:0|[1-9][0-9]*)?\\.[0-9]+"};
+
+const auto COMMA           = std::regex{"^,"};
+const auto ELLIPSIS        = std::regex{"^\\.\\.\\."};
+const auto DOT             = std::regex{"^\\."};
+const auto EQ              = std::regex{"^="};
+const auto AT              = std::regex{"^@"};
+const auto DOLLAR          = std::regex{"^\\$"};
+const auto STAR            = std::regex{"^\\*"};
+const auto ATTR_LIST_OPEN  = std::regex{"^\\[\\["};
+const auto ATTR_LIST_CLOSE = std::regex{"^\\]\\]"};
+
+const auto OPCODE = std::regex{"^(?:g.)?[a-z]+(?:.[stw])?\\b"};
 
 namespace {
-auto match_lookbehind(std::vector<Lexeme> const& lexemes,
-                      std::vector<TOKEN> const pattern) -> bool
+auto match_lookbehind [[maybe_unused]] (std::vector<Lexeme> const& lexemes,
+                                        std::vector<TOKEN> const pattern)
+-> bool
 {
     if (pattern.empty()) {
         return true;
@@ -181,8 +193,8 @@ auto match_lookbehind(std::vector<Lexeme> const& lexemes,
     return true;
 }
 
-auto synth_lookbehind(std::vector<Lexeme> const& lexemes, size_t const n)
-    -> Lexeme
+auto synth_lookbehind [[maybe_unused]] (std::vector<Lexeme> const& lexemes,
+                                        size_t const n) -> Lexeme
 {
     if (n > lexemes.size()) {
         std::cerr
@@ -238,7 +250,7 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
 
             line += 1;
             character = 0;
-            offset += 1;
+            offset += 2;
             source_text.remove_prefix(2);
 
             continue;
@@ -335,35 +347,47 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
         if (try_match(COMMENT, TOKEN::COMMENT)) {
             continue;
         }
-        if (try_match(DEF_FUNCTION, TOKEN::DEF_FUNCTION)) {
+        if (try_match(DIR_TEXT, TOKEN::SWITCH_TO_TEXT)) {
             continue;
         }
-        if (try_match(END, TOKEN::END)) {
+        if (try_match(DIR_RODATA, TOKEN::SWITCH_TO_RODATA)) {
             continue;
         }
-        if (try_match(DEF_LABEL, TOKEN::DEF_LABEL)) {
+        if (try_match(DIR_SECTION, TOKEN::SWITCH_TO_SECTION)) {
             continue;
         }
-        if (try_match(DEF_VALUE, TOKEN::DEF_VALUE)) {
+        if (try_match(DIR_SYMBOL, TOKEN::DECLARE_SYMBOL)) {
             continue;
         }
-        if (try_match(COMMA, TOKEN::COMMA)) {
+        if (try_match(DIR_LABEL, TOKEN::DEFINE_LABEL)) {
             continue;
         }
-        if (try_match(DOT, TOKEN::DOT)) {
+        if (try_match(DIR_BEGIN, TOKEN::BEGIN)) {
             continue;
         }
-        if (try_match(RA_VOID, TOKEN::RA_VOID)) {
+        if (try_match(DIR_END, TOKEN::END)) {
             continue;
         }
-        if (try_match(RA_DIRECT, TOKEN::RA_DIRECT)) {
+        if (try_match(DIR_OBJECT, TOKEN::ALLOCATE_OBJECT)) {
             continue;
         }
-        if (try_match(RA_PTR_DEREF, TOKEN::RA_PTR_DEREF)) {
+
+        if (try_match(LITERAL_INTEGER, TOKEN::LITERAL_INTEGER)) {
             continue;
         }
+
+        if (try_match(REG_VOID, TOKEN::REG_VOID)) {
+            continue;
+        }
+
         if (try_match(OPCODE, TOKEN::OPCODE)) {
-            if (OPCODE_NAMES.count(lexemes.back().text) == 0) {
+            auto const not_really_an_opcode =
+                (OPCODE_NAMES.count(lexemes.back().text) == 0);
+            auto const looks_atomish = [&lexemes]() -> bool {
+                std::smatch m;
+                return std::regex_match(lexemes.back().text, m, LITERAL_ATOM);
+            }();
+            if (not_really_an_opcode and looks_atomish) {
                 auto lx = std::move(lexemes.back());
                 lexemes.pop_back();
 
@@ -374,6 +398,34 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
         if (try_match(LITERAL_ATOM, TOKEN::LITERAL_ATOM)) {
             continue;
         }
+
+        if (try_match(ATTR_LIST_OPEN, TOKEN::ATTR_LIST_OPEN)) {
+            continue;
+        }
+        if (try_match(ATTR_LIST_CLOSE, TOKEN::ATTR_LIST_CLOSE)) {
+            continue;
+        }
+
+        if (try_match(COMMA, TOKEN::COMMA)) {
+            continue;
+        }
+        if (try_match(ELLIPSIS, TOKEN::ELLIPSIS)) {
+            continue;
+        }
+        if (try_match(EQ, TOKEN::EQ)) {
+            continue;
+        }
+        if (try_match(DOT, TOKEN::DOT)) {
+            continue;
+        }
+        if (try_match(DOLLAR, TOKEN::DOLLAR)) {
+            continue;
+        }
+        if (try_match(AT, TOKEN::AT)) {
+            continue;
+        }
+
+#if 0
         if (try_match(LITERAL_FLOAT, TOKEN::LITERAL_FLOAT)) {
             try {
                 std::stod(lexemes.back().text);
@@ -470,6 +522,7 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
             }
             continue;
         }
+#endif
 
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
@@ -478,21 +531,55 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
                                    TOKEN::INVALID,
                                    Location{line, character, offset}};
 
-        throw Error{lexeme, Cause::Illegal_token};
+        throw Error{lexeme, Cause::Illegal_character};
     }
 
     return lexemes;
 }
 
 namespace stage {
-auto lexical_analysis(std::filesystem::path const source_path,
-                      std::string_view const source_text) -> std::vector<Lexeme>
+auto lex(std::filesystem::path const source_path,
+         std::string_view const source_text) -> std::vector<Lexeme>
 {
     try {
         return viua::libs::lexer::lex(source_text);
     } catch (viua::libs::errors::compile_time::Error const& e) {
         viua::libs::stage::display_error_and_exit(source_path, source_text, e);
     }
+}
+
+auto remove_noise(std::vector<Lexeme>&& raw) -> std::vector<Lexeme>
+{
+    using viua::libs::lexer::TOKEN;
+
+    auto tmp = std::vector<viua::libs::lexer::Lexeme>{};
+    for (auto& each : raw) {
+        if (each.token == TOKEN::WHITESPACE or each.token == TOKEN::COMMENT) {
+            continue;
+        }
+
+        tmp.push_back(std::move(each));
+    }
+
+    while ((not tmp.empty()) and tmp.front().token == TOKEN::TERMINATOR) {
+        tmp.erase(tmp.begin());
+    }
+
+    auto cooked = std::vector<viua::libs::lexer::Lexeme>{};
+    for (auto& each : tmp) {
+        if (each.token != TOKEN::TERMINATOR or cooked.empty()) {
+            cooked.push_back(std::move(each));
+            continue;
+        }
+
+        if (cooked.back().token == TOKEN::TERMINATOR) {
+            continue;
+        }
+
+        cooked.push_back(std::move(each));
+    }
+
+    return cooked;
 }
 }  // namespace stage
 }  // namespace viua::libs::lexer

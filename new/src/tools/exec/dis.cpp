@@ -267,9 +267,8 @@ auto demangle_symbol_load(Cooked_text& raw,
         auto ins = raw.at(i + 1);
 
         auto const sym_name = get_symbol_name(immediate, symtab, strtab);
-        auto const safe_sym_name = match_atom(sym_name)
-            ? sym_name
-            : ('"' + sym_name + '"');
+        auto const safe_sym_name =
+            match_atom(sym_name) ? sym_name : ('"' + sym_name + '"');
 
         auto tt =
             ins.with_text("call " + D::decode(ins_at(i + 1)).out.to_string()
@@ -284,11 +283,10 @@ auto demangle_symbol_load(Cooked_text& raw,
     if (m(i + 1, ACTOR) and D::decode(ins_at(i + 1)).in == out) {
         auto ins = raw.at(i + 1);
 
-        auto const sym = symtab.at(immediate);
+        auto const sym      = symtab.at(immediate);
         auto const sym_name = get_symbol_name(sym.st_value, symtab, strtab);
-        auto const safe_sym_name = match_atom(sym_name)
-            ? sym_name
-            : ('"' + sym_name + '"');
+        auto const safe_sym_name =
+            match_atom(sym_name) ? sym_name : ('"' + sym_name + '"');
 
         auto tt =
             ins.with_text("actor " + D::decode(ins_at(i + 1)).out.to_string()
@@ -1016,10 +1014,8 @@ auto main(int argc, char* argv[]) -> int
             continue;
         }
 
-        auto const name = std::string{main_module.str_at(sym.st_name)};
-        auto const safe_name = match_atom(name)
-            ? name
-            : ('"' + name + '"');
+        auto const name      = std::string{main_module.str_at(sym.st_name)};
+        auto const safe_name = match_atom(name) ? name : ('"' + name + '"');
         out << ".function: [[extern]] " << safe_name << "\n";
         extern_fn_definitions_present = true;
     }
@@ -1051,12 +1047,10 @@ auto main(int argc, char* argv[]) -> int
          * Then, the name. Marking the entry point is necessary to correctly
          * recreate the behaviour of the program.
          */
-        auto const name = std::string{main_module.str_at(sym.st_name)};
-        auto const safe_name = match_atom(name)
-            ? name
-            : ('"' + name + '"');
-        out << ".function: " << ((ef == name) ? "[[entry_point]] " : "") << safe_name
-            << "\n";
+        auto const name      = std::string{main_module.str_at(sym.st_name)};
+        auto const safe_name = match_atom(name) ? name : ('"' + name + '"');
+        out << ".function: " << ((ef == name) ? "[[entry_point]] " : "")
+            << safe_name << "\n";
 
         auto cooked_text  = Cooked_text{};
         auto const offset = (addr / sizeof(viua::arch::instruction_type));

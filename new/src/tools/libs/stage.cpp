@@ -29,8 +29,8 @@
 
 #include <viua/libs/assembler.h>
 #include <viua/libs/stage.h>
-#include <viua/support/tty.h>
 #include <viua/support/string.h>
+#include <viua/support/tty.h>
 
 using viua::support::string::quote_fancy;
 
@@ -406,81 +406,6 @@ auto display_error_in_function(std::filesystem::path const source_path,
         << fn_name << esc(2, ATTR_RESET) << ":\n";
 }
 
-auto save_string_to_strtab(std::vector<uint8_t>& tab,
-                           std::string_view const data) -> size_t
-{
-    {
-        /*
-         * Scan the strings table to see if the requested data is already there.
-         * There is no reason to store extra copies of the same value in .rodata
-         * so let's deduplicate.
-         *
-         * FIXME This is ridiculously slow. Maybe add some cache instead of
-         * linearly browsing through the whole table every time?
-         */
-        auto i = size_t{0};
-        while ((i + data.size()) < tab.size()) {
-            auto const existing = std::string_view{
-                reinterpret_cast<char const*>(tab.data() + i), data.size()};
-
-            auto const content_matches = (existing == data);
-            auto const nul_matches = (*(tab.data() + i + data.size()) == '\0');
-            if (content_matches and nul_matches) {
-                return i;
-            }
-
-            ++i;
-        }
-    }
-
-    auto const saved_location = tab.size();
-
-    std::copy(data.begin(), data.end(), std::back_inserter(tab));
-    tab.push_back('\0');
-
-    return saved_location;
-}
-auto save_buffer_to_rodata(std::vector<uint8_t>& strings,
-                           std::string_view const data) -> size_t
-{
-    {
-        /*
-         * Scan the strings table to see if the requested data is already there.
-         * There is no reason to store extra copies of the same value in .rodata
-         * so let's deduplicate.
-         *
-         * FIXME This is ridiculously slow. Maybe add some cache instead of
-         * linearly browsing through the whole table every time?
-         */
-        auto i = size_t{0};
-        while (i < strings.size()) {
-            auto data_size = uint64_t{};
-            memcpy(&data_size, strings.data() + i, sizeof(data_size));
-            data_size = le64toh(data_size);
-
-            i += sizeof(data_size);
-
-            auto const existing = std::string_view{
-                reinterpret_cast<char const*>(strings.data() + i), data_size};
-            if (existing == data) {
-                return i;
-            }
-
-            i += data_size;
-        }
-    }
-
-    auto const data_size = htole64(static_cast<uint64_t>(data.size()));
-    strings.resize(strings.size() + sizeof(data_size));
-    memcpy((strings.data() + strings.size() - sizeof(data_size)),
-           &data_size,
-           sizeof(data_size));
-
-    auto const saved_location = strings.size();
-    std::copy(data.begin(), data.end(), std::back_inserter(strings));
-
-    return saved_location;
-}
 auto record_symbol(std::string name,
                    Elf64_Sym const symbol,
                    std::vector<Elf64_Sym>& symbol_table,
@@ -1170,20 +1095,21 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
                 using viua::libs::lexer::TOKEN;
 
                 auto const fn_id = each.operands.back().ingredients.front();
-                auto const fn_name = (fn_id.token == TOKEN::LITERAL_STRING)
-                    ? fn_id.text.substr(1, fn_id.text.size() - 2)
-                    : fn_id.text;
+                auto const fn_name =
+                    (fn_id.token == TOKEN::LITERAL_STRING)
+                        ? fn_id.text.substr(1, fn_id.text.size() - 2)
+                        : fn_id.text;
                 if (symbol_map.count(fn_name) == 0) {
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
-                    throw Error{fn_id, Cause::Call_to_undefined_function,
-                        quote_fancy(fn_name)};
+                    throw Error{fn_id,
+                                Cause::Call_to_undefined_function,
+                                quote_fancy(fn_name)};
                 }
 
                 auto const fn_off = symbol_map.at(fn_name);
                 li.operands.back().ingredients.push_back(fn_id.make_synth(
-                    std::to_string(fn_off) + 'u',
-                    TOKEN::LITERAL_INTEGER));
+                    std::to_string(fn_off) + 'u', TOKEN::LITERAL_INTEGER));
 
                 li.physical_index = each.physical_index;
             }

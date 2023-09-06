@@ -200,11 +200,20 @@ $(BUILD)/tools/exec/asm: \
 	$(BUILD)/support/tty.o \
 	$(BUILD)/tools/libs/errors/compile_time.o \
 	$(BUILD)/tools/libs/lexer.o \
-	$(BUILD)/tools/libs/parser.o \
-	$(BUILD)/tools/libs/assembler.o \
-	$(BUILD)/tools/libs/stage.o \
+	$(BUILD)/tools/libs/stage/error.o \
+	$(BUILD)/tools/libs/stage/save.o \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
+# $(BUILD)/tools/exec/asm: \
+# 	$(BUILD)/support/string.o \
+# 	$(BUILD)/support/tty.o \
+# 	$(BUILD)/tools/libs/errors/compile_time.o \
+# 	$(BUILD)/tools/libs/lexer.o \
+# 	$(BUILD)/tools/libs/parser.o \
+# 	$(BUILD)/tools/libs/assembler.o \
+# 	$(BUILD)/tools/libs/stage.o \
+# 	$(BUILD)/arch/arch.o \
+# 	$(BUILD)/arch/ops.o
 
 $(BUILD)/tools/exec/ld: \
 	$(BUILD)/arch/arch.o \

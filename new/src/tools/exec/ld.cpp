@@ -33,9 +33,9 @@
 #include <viua/arch/arch.h>
 #include <viua/arch/ops.h>
 #include <viua/libs/stage.h>
-#include <viua/support/tty.h>
 #include <viua/support/string.h>
 #include <viua/support/errno.h>
+#include <viua/support/tty.h>
 #include <viua/vm/elf.h>
 
 using Text = std::vector<viua::arch::instruction_type>;
@@ -1036,8 +1036,7 @@ auto main(int argc, char** argv) -> int
                           << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
                           << "error" << esc(2, ATTR_RESET)
                           << ": duplicate definition of symbol "
-                          << quote_fancy(sym_name)
-                          << "\n";
+                          << quote_fancy(sym_name) << "\n";
                 std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
                           << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
                           << "note" << esc(2, ATTR_RESET)
