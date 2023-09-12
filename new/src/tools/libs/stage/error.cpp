@@ -197,6 +197,7 @@ auto cook_spans(
 
 auto display_error(std::filesystem::path source_path,
                    std::string_view source_text,
+                   size_t const line_no_width,
                    viua::libs::errors::compile_time::Error const& e) -> void
 {
     using viua::support::tty::ATTR_RESET;
@@ -211,19 +212,53 @@ auto display_error(std::filesystem::path source_path,
     constexpr auto SEPARATOR_SOURCE = std::string_view{" | "};
     constexpr auto SEPARATOR_ASIDE  = std::string_view{" . "};
     constexpr auto ERROR_MARKER     = std::string_view{" => "};
-    auto const LINE_NO_WIDTH =
-        std::to_string(std::max(e.line(), e.line() + 1)).size();
+
+    if (auto const msg = e.str(); not msg.empty()) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
+                  << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
+                  << (e.line() + 1) << esc(2, ATTR_RESET) << ':'
+                  << esc(2, COLOR_FG_WHITE) << (e.character() + 1)
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                  << "error" << esc(2, ATTR_RESET) << ": " << e.str() << "\n";
+    }
+    for (auto const& each : e.notes()) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
+                  << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
+                  << (e.line() + 1) << esc(2, ATTR_RESET) << ':'
+                  << esc(2, COLOR_FG_WHITE) << (e.character() + 1)
+                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
+                  << "note" << esc(2, ATTR_RESET) << ": ";
+        if (each.find('\n') == std::string::npos) {
+            std::cerr << each << "\n";
+        } else {
+            auto const prefix_length =
+                source_path.string().size()
+                + std::to_string(e.line() + 1).size()
+                + std::to_string(e.character() + 1).size() + 6  // for ": note"
+                + 2  // for ":" after source path and line number
+                ;
+
+            auto sv = std::string_view{each};
+            std::cerr << sv.substr(0, sv.find('\n')) << '\n';
+
+            do {
+                sv.remove_prefix(sv.find('\n') + 1);
+                std::cerr << std::string(prefix_length, ' ') << "| "
+                          << sv.substr(0, sv.find('\n')) << '\n';
+            } while (sv.find('\n') != std::string::npos);
+        }
+    }
 
     /*
      * The separator to put some space between the command and the error
      * report.
      */
     std::cerr << std::string(ERROR_MARKER.size(), ' ')
-              << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR_SOURCE << "\n";
+              << std::string(line_no_width, ' ') << SEPARATOR_SOURCE << "\n";
 
     if (e.line()) {
         std::cerr << std::string(ERROR_MARKER.size(), ' ')
-                  << std::setw(LINE_NO_WIDTH) << e.line() << SEPARATOR_SOURCE
+                  << std::setw(line_no_width) << e.line() << SEPARATOR_SOURCE
                   << view_line_before(source_text, e.location()) << "\n";
     }
 
@@ -234,10 +269,10 @@ auto display_error(std::filesystem::path source_path,
         auto line = view_line_of(source_text, e.location());
 
         source_line << esc(2, COLOR_FG_RED) << ERROR_MARKER
-                    << std::setw(LINE_NO_WIDTH) << (e.line() + 1)
+                    << std::setw(line_no_width) << (e.line() + 1)
                     << esc(2, COLOR_FG_WHITE) << SEPARATOR_SOURCE;
         highlight_line << std::string(ERROR_MARKER.size(), ' ')
-                       << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR_SOURCE;
+                       << std::string(line_no_width, ' ') << SEPARATOR_SOURCE;
 
         source_line << std::string_view{line.data(), e.character()};
         highlight_line << std::string(e.character(), ' ');
@@ -273,10 +308,10 @@ auto display_error(std::filesystem::path source_path,
         auto line = view_line_of(source_text, e.location());
 
         source_line << esc(2, COLOR_FG_RED) << ERROR_MARKER
-                    << std::setw(LINE_NO_WIDTH) << (e.line() + 1)
+                    << std::setw(line_no_width) << (e.line() + 1)
                     << esc(2, COLOR_FG_WHITE) << SEPARATOR_SOURCE;
         highlight_line << std::string(ERROR_MARKER.size(), ' ')
-                       << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR_SOURCE;
+                       << std::string(line_no_width, ' ') << SEPARATOR_SOURCE;
 
         auto const spans = cook_spans(e.spans());
         for (auto const& each : spans) {
@@ -311,22 +346,22 @@ auto display_error(std::filesystem::path source_path,
 
     if (not e.aside().empty()) {
         std::cerr << std::string(ERROR_MARKER.size(), ' ')
-                  << std::string(LINE_NO_WIDTH, ' ') << esc(2, COLOR_FG_CYAN)
+                  << std::string(line_no_width, ' ') << esc(2, COLOR_FG_CYAN)
                   << SEPARATOR_ASIDE << std::string(e.aside_character(), ' ')
                   << '|' << esc(2, ATTR_RESET) << "\n";
         std::cerr << std::string(ERROR_MARKER.size(), ' ')
-                  << std::string(LINE_NO_WIDTH, ' ') << esc(2, COLOR_FG_CYAN)
+                  << std::string(line_no_width, ' ') << esc(2, COLOR_FG_CYAN)
                   << SEPARATOR_ASIDE << std::string(e.aside_character(), ' ')
                   << e.aside() << esc(2, ATTR_RESET) << "\n";
         std::cerr << esc(2, COLOR_FG_CYAN)
                   << std::string(ERROR_MARKER.size(), ' ')
-                  << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR_ASIDE
+                  << std::string(line_no_width, ' ') << SEPARATOR_ASIDE
                   << esc(2, ATTR_RESET) << "\n";
     }
 
     {
         std::cerr << std::string(ERROR_MARKER.size(), ' ')
-                  << std::setw(LINE_NO_WIDTH) << (e.line() + 2)
+                  << std::setw(line_no_width) << (e.line() + 2)
                   << SEPARATOR_SOURCE
                   << view_line_after(source_text, e.location()) << "\n";
     }
@@ -336,51 +371,23 @@ auto display_error(std::filesystem::path source_path,
      * highlight, etc and the error message.
      */
     std::cerr << std::string(ERROR_MARKER.size(), ' ')
-              << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR_SOURCE << "\n";
-
-    std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-              << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
-              << (e.line() + 1) << esc(2, ATTR_RESET) << ':'
-              << esc(2, COLOR_FG_WHITE) << (e.character() + 1)
-              << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED) << "error"
-              << esc(2, ATTR_RESET) << ": " << e.str() << "\n";
-
-    for (auto const& each : e.notes()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                  << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
-                  << (e.line() + 1) << esc(2, ATTR_RESET) << ':'
-                  << esc(2, COLOR_FG_WHITE) << (e.character() + 1)
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
-                  << "note" << esc(2, ATTR_RESET) << ": ";
-        if (each.find('\n') == std::string::npos) {
-            std::cerr << each << "\n";
-        } else {
-            auto const prefix_length =
-                source_path.string().size()
-                + std::to_string(e.line() + 1).size()
-                + std::to_string(e.character() + 1).size() + 6  // for ": note"
-                + 2  // for ":" after source path and line number
-                ;
-
-            auto sv = std::string_view{each};
-            std::cerr << sv.substr(0, sv.find('\n')) << '\n';
-
-            do {
-                sv.remove_prefix(sv.find('\n') + 1);
-                std::cerr << std::string(prefix_length, ' ') << "| "
-                          << sv.substr(0, sv.find('\n')) << '\n';
-            } while (sv.find('\n') != std::string::npos);
-        }
-    }
+              << std::string(line_no_width, ' ') << SEPARATOR_SOURCE << "\n";
 }
 auto display_error_and_exit
     [[noreturn]] (std::filesystem::path source_path,
                   std::string_view source_text,
                   viua::libs::errors::compile_time::Error const& e) -> void
 {
-    display_error(source_path, source_text, e);
+    auto line_no_width = std::max(e.line(), e.line() + 1);
     for (auto const& each : e.fallout) {
-        display_error(source_path, source_text, each);
+        line_no_width =
+            std::max(line_no_width, std::max(each.line(), each.line() + 1));
+    }
+    line_no_width = std::to_string(line_no_width).size();
+
+    display_error(source_path, source_text, line_no_width, e);
+    for (auto const& each : e.fallout) {
+        display_error(source_path, source_text, line_no_width, each);
     }
     exit(1);
 }

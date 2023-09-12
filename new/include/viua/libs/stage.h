@@ -45,6 +45,7 @@ auto cook_spans(
 
 auto display_error(std::filesystem::path,
                    std::string_view,
+                   size_t const,
                    viua::libs::errors::compile_time::Error const&) -> void;
 auto display_error_and_exit
     [[noreturn]] (std::filesystem::path,
