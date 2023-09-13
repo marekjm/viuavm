@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 VERSION=$(cat $(git rev-parse --show-toplevel)/VERSION)
-COMMITS_SINCE=$(git log --oneline v${VERSION}..HEAD | wc -l)
+TAG="v${VERSION}.0"
+COMMITS_SINCE=$(git log --oneline ${TAG}..HEAD | wc -l)
 
 GIT_HEAD=$(git rev-parse HEAD)
 GIT_DIRTY=''
@@ -25,7 +26,10 @@ case ${MODE} in
     fingerprint|fp)
         echo "${FINGERPRINT}"
         ;;
+    base)
+        echo "${VERSION}.0"
+        ;;
     *)
-        echo "${VERSION}"
+        echo "${VERSION}.${COMMITS_SINCE}"
         ;;
 esac
