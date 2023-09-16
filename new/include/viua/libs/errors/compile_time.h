@@ -99,7 +99,7 @@ struct Error {
      */
     using Lexeme = viua::libs::lexer::Lexeme;
     Lexeme const main_lexeme;
-    std::vector<Lexeme> detail_lexemes;
+    std::vector<std::pair<Lexeme, bool>> detail_lexemes;
 
     /*
      * Notes are little messages displayed below the main error message,
@@ -192,8 +192,9 @@ struct Error {
     auto note(std::string) -> Error&;
     auto notes() const -> std::vector<std::string> const&;
 
-    auto add(Lexeme) -> Error&;
-    using span_type = std::pair<std::string::size_type, std::string::size_type>;
+    auto add(Lexeme, bool const = false) -> Error&;
+    using span_type =
+        std::tuple<std::string::size_type, std::string::size_type, bool>;
     auto spans() const -> std::vector<span_type>;
 
     /*

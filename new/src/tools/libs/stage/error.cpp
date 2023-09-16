@@ -120,7 +120,7 @@ auto view_line_after(std::string_view sv, viua::libs::lexer::Location loc)
 
 auto cook_spans(
     std::vector<viua::libs::errors::compile_time::Error::span_type> raw)
-    -> std::vector<std::tuple<bool, size_t, size_t>>
+    -> std::vector<std::tuple<bool, size_t, size_t, bool>>
 {
     /*
      * In case of synthesised lexemes, there may be several of them that have
@@ -142,7 +142,7 @@ auto cook_spans(
      * This makes life easy for us later, when we can just std::string::substr()
      * to success, and switch on the highlight-or-not member of the tuple.
      */
-    auto cooked = std::vector<std::tuple<bool, size_t, size_t>>{};
+    auto cooked = std::vector<std::tuple<bool, size_t, size_t, bool>>{};
     if (raw.empty()) {
         return cooked;
     }
@@ -161,12 +161,13 @@ auto cook_spans(
      * vector MUST contain AT LEAST ONE cooked span.
      */
     if (std::get<0>(raw.front()) != 0) {
-        cooked.emplace_back(false, 0, raw.front().first);
+        cooked.emplace_back(false, 0, std::get<0>(raw.front()), false);
         seen_offsets.insert(0);
     } else {
-        auto const& each = raw.front();
-        cooked.emplace_back(true, each.first, each.second);
-        seen_offsets.insert(each.first);
+        auto const& each                         = raw.front();
+        auto const [character, offset, advisory] = each;
+        cooked.emplace_back(true, character, offset, advisory);
+        seen_offsets.insert(character);
     }
 
     for (auto const& each : raw) {
@@ -175,20 +176,25 @@ auto cook_spans(
          * In the final cooked span vector the MUST BE NO GAPS so we have to
          * fill any that are found. Of course, gaps should not be highlighted.
          */
-        auto const& [hl, offset, size] = cooked.back();
-        if (auto const want = (offset + size); want < each.first) {
-            if (not seen_offsets.contains(want)) {
-                cooked.emplace_back(false, want, (each.first - want));
-                seen_offsets.insert(want);
+        {
+            auto const& [ignored_hl, offset, size, ignored_advisory] =
+                cooked.back();
+            if (auto const want = (offset + size); want < std::get<0>(each)) {
+                if (not seen_offsets.contains(want)) {
+                    cooked.emplace_back(
+                        false, want, (std::get<0>(each) - want), false);
+                    seen_offsets.insert(want);
+                }
             }
         }
 
         /*
          * Last, but not least, cook the actual raw span.
          */
-        if (not seen_offsets.contains(each.first)) {
-            cooked.emplace_back(true, each.first, each.second);
-            seen_offsets.insert(each.first);
+        auto const& [offset, size, advisory] = each;
+        if (not seen_offsets.contains(offset)) {
+            cooked.emplace_back(true, offset, size, advisory);
+            seen_offsets.insert(offset);
         }
     }
 
@@ -212,6 +218,9 @@ auto display_error(std::filesystem::path source_path,
     constexpr auto SEPARATOR_SOURCE = std::string_view{" | "};
     constexpr auto SEPARATOR_ASIDE  = std::string_view{" . "};
     constexpr auto ERROR_MARKER     = std::string_view{" => "};
+    constexpr auto BOX_DRAWINGS_BLACK_RIGHT_POINTING_TRIANGLE
+        [[maybe_unused]]             = std::string_view{"▶"};  // u+25b6
+    constexpr auto ERROR_MARKER_SIZE = ERROR_MARKER.size();
 
     if (auto const msg = e.str(); not msg.empty()) {
         std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
@@ -253,11 +262,11 @@ auto display_error(std::filesystem::path source_path,
      * The separator to put some space between the command and the error
      * report.
      */
-    std::cerr << std::string(ERROR_MARKER.size(), ' ')
+    std::cerr << std::string(ERROR_MARKER_SIZE, ' ')
               << std::string(line_no_width, ' ') << SEPARATOR_SOURCE << "\n";
 
     if (e.line()) {
-        std::cerr << std::string(ERROR_MARKER.size(), ' ')
+        std::cerr << std::string(ERROR_MARKER_SIZE, ' ')
                   << std::setw(line_no_width) << e.line() << SEPARATOR_SOURCE
                   << view_line_before(source_text, e.location()) << "\n";
     }
@@ -271,7 +280,7 @@ auto display_error(std::filesystem::path source_path,
         source_line << esc(2, COLOR_FG_RED) << ERROR_MARKER
                     << std::setw(line_no_width) << (e.line() + 1)
                     << esc(2, COLOR_FG_WHITE) << SEPARATOR_SOURCE;
-        highlight_line << std::string(ERROR_MARKER.size(), ' ')
+        highlight_line << std::string(ERROR_MARKER_SIZE, ' ')
                        << std::string(line_no_width, ' ') << SEPARATOR_SOURCE;
 
         source_line << std::string_view{line.data(), e.character()};
@@ -310,21 +319,56 @@ auto display_error(std::filesystem::path source_path,
         source_line << esc(2, COLOR_FG_RED) << ERROR_MARKER
                     << std::setw(line_no_width) << (e.line() + 1)
                     << esc(2, COLOR_FG_WHITE) << SEPARATOR_SOURCE;
-        highlight_line << std::string(ERROR_MARKER.size(), ' ')
+        highlight_line << std::string(ERROR_MARKER_SIZE, ' ')
                        << std::string(line_no_width, ' ') << SEPARATOR_SOURCE;
 
         auto const spans = cook_spans(e.spans());
         for (auto const& each : spans) {
-            auto const& [hl, offset, size] = each;
+            auto const& [hl, offset, size, advisory] = each;
+
+            /*
+             * The error is composed of one MAIN lexeme, and zero or more EXTRA
+             * lexemes. The token that caused the error may have been composed
+             * of more than one lexeme; or the error may be a combination of
+             * several tokens.
+             *
+             * In both cases MAIN is the most important part, and EXTRA are the
+             * circumstances which contributed to the error.
+             */
+            constexpr auto COLOR_MAIN  = COLOR_FG_RED_1;
+            constexpr auto COLOR_EXTRA = COLOR_FG_RED;
+
+            /*
+             * ADVISORY highlights are used to call attention to other parts of
+             * the line, which did not directly contributed to the error, but
+             * which are important anyway.
+             *
+             * For example: function "foo" is declared as both "local" and the
+             * entry point of the program. This is an error.
+             *
+             * The "local" tag is the MAIN token, because it is the direct cause
+             * of the error.
+             *
+             * The "entry_point" tag is an EXTRA token, because it contributed
+             * to the error happening - without it the "local" tag would be OK.
+             *
+             * The name of the function is an ADVISORY token. It does not really
+             * matter *what* the value of the token is, just that it is this
+             * particular one.
+             */
+            constexpr auto COLOR_ADVISORY = std::string_view{"\x1b[38;5;26m"};
+
             if (hl and offset == e.character()) {
-                source_line << esc(2, COLOR_FG_RED_1);
-                highlight_line << esc(2, COLOR_FG_RED_1) << '^'
-                               << esc(2, COLOR_FG_RED)
+                source_line << esc(2, COLOR_MAIN);
+                highlight_line << esc(2, COLOR_MAIN) << '^'
+                               << esc(2, COLOR_EXTRA)
                                << std::string(size - 1, '~');
-            } else if (hl) {
-                source_line << esc(2, COLOR_FG_RED);
-                highlight_line << esc(2, COLOR_FG_RED)
-                               << std::string(size, '~');
+            } else if (hl and not advisory) {
+                source_line << esc(2, COLOR_EXTRA);
+                highlight_line << esc(2, COLOR_EXTRA) << std::string(size, '~');
+            } else if (hl and advisory) {
+                source_line << esc(2, COLOR_ADVISORY);
+                highlight_line << esc(2, COLOR_EXTRA) << std::string(size, '~');
             } else {
                 source_line << esc(2, COLOR_FG_WHITE);
                 highlight_line << std::string(size, ' ');
@@ -344,23 +388,32 @@ auto display_error(std::filesystem::path source_path,
     std::cerr << source_line.str() << "\n";
     std::cerr << highlight_line.str() << "\n";
 
+    constexpr auto BOX_DRAWINGS_LIGHT_VERTICAL
+        [[maybe_unused]] = std::string_view{"│"};  // u+2502
+    constexpr auto BOX_DRAWINGS_LIGHT_UP_AND_RIGHT
+        [[maybe_unused]] = std::string_view{"└"};  // u+2514
+    constexpr auto BOX_DRAWINGS_LIGHT_ARC_UP_AND_RIGHT
+        [[maybe_unused]] = std::string_view{"╰"};  // u+2570
+    constexpr auto BOX_DRAWINGS_LIGHT_LEFT
+        [[maybe_unused]] = std::string_view{"╴"};  // u+2574
+
     if (not e.aside().empty()) {
-        std::cerr << std::string(ERROR_MARKER.size(), ' ')
+        std::cerr << std::string(ERROR_MARKER_SIZE, ' ')
                   << std::string(line_no_width, ' ') << esc(2, COLOR_FG_CYAN)
                   << SEPARATOR_ASIDE << std::string(e.aside_character(), ' ')
                   << '|' << esc(2, ATTR_RESET) << "\n";
-        std::cerr << std::string(ERROR_MARKER.size(), ' ')
+        std::cerr << std::string(ERROR_MARKER_SIZE, ' ')
                   << std::string(line_no_width, ' ') << esc(2, COLOR_FG_CYAN)
                   << SEPARATOR_ASIDE << std::string(e.aside_character(), ' ')
                   << e.aside() << esc(2, ATTR_RESET) << "\n";
         std::cerr << esc(2, COLOR_FG_CYAN)
-                  << std::string(ERROR_MARKER.size(), ' ')
+                  << std::string(ERROR_MARKER_SIZE, ' ')
                   << std::string(line_no_width, ' ') << SEPARATOR_ASIDE
                   << esc(2, ATTR_RESET) << "\n";
     }
 
     {
-        std::cerr << std::string(ERROR_MARKER.size(), ' ')
+        std::cerr << std::string(ERROR_MARKER_SIZE, ' ')
                   << std::setw(line_no_width) << (e.line() + 2)
                   << SEPARATOR_SOURCE
                   << view_line_after(source_text, e.location()) << "\n";
@@ -370,7 +423,7 @@ auto display_error(std::filesystem::path source_path,
      * The separator to put some space between the source code dump,
      * highlight, etc and the error message.
      */
-    std::cerr << std::string(ERROR_MARKER.size(), ' ')
+    std::cerr << std::string(ERROR_MARKER_SIZE, ' ')
               << std::string(line_no_width, ' ') << SEPARATOR_SOURCE << "\n";
 }
 auto display_error_and_exit

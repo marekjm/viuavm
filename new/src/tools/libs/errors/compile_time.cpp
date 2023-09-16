@@ -95,17 +95,19 @@ auto Error::notes() const -> std::vector<std::string> const&
     return attached_notes;
 }
 
-auto Error::add(Lexeme lx) -> Error&
+auto Error::add(Lexeme lx, bool const advisory) -> Error&
 {
-    detail_lexemes.push_back(lx);
+    detail_lexemes.emplace_back(lx, advisory);
     return *this;
 }
 auto Error::spans() const -> std::vector<span_type>
 {
     auto ss = std::vector<span_type>{};
-    ss.emplace_back(main_lexeme.location.character, main_lexeme.text.size());
+    ss.emplace_back(
+        main_lexeme.location.character, main_lexeme.text.size(), false);
     for (auto const& each : detail_lexemes) {
-        ss.emplace_back(each.location.character, each.text.size());
+        ss.emplace_back(
+            each.first.location.character, each.first.text.size(), each.second);
     }
     std::sort(ss.begin(), ss.end());
     return ss;
