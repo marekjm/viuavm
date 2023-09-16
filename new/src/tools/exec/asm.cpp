@@ -1778,8 +1778,10 @@ auto find_entry_point(std::vector<std::unique_ptr<ast::Node>> const& nodes,
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
 
-            throw Error{each->leader, Cause::None, "only .symbol can be tagged as entry point"}
-                    .add(*each->attr("entry_point"));
+            throw Error{each->leader,
+                        Cause::None,
+                        "only .symbol can be tagged as entry point"}
+                .add(*each->attr("entry_point"));
         }
 
         if (is_entry_point) {
@@ -1789,40 +1791,49 @@ auto find_entry_point(std::vector<std::unique_ptr<ast::Node>> const& nodes,
 
                 auto const dup = static_cast<ast::Symbol const&>(*each);
                 throw Error{
-                        dup.name, Cause::Duplicated_entry_point, dup.name.text}
-                        .add(dup.attr("entry_point").value())
-                        .note("first entry point was: " + entry_point_fn->text);
+                    dup.name, Cause::Duplicated_entry_point, dup.name.text}
+                    .add(dup.attr("entry_point").value())
+                    .note("first entry point was: " + entry_point_fn->text);
             }
             entry_point_fn = static_cast<ast::Symbol const&>(*each).name;
 
-            auto const sym = symbol_table.at(symbol_map.at(entry_point_fn->text));
-            auto const not_global = (ELF64_ST_BIND(sym.st_info) != STB_GLOBAL);
+            auto const sym =
+                symbol_table.at(symbol_map.at(entry_point_fn->text));
+            auto const not_global  = (ELF64_ST_BIND(sym.st_info) != STB_GLOBAL);
             auto const not_visible = (sym.st_other != STV_DEFAULT);
             auto const not_function = (ELF64_ST_TYPE(sym.st_info) != STT_FUNC);
             if (not_function) {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
 
-                throw Error{*entry_point_fn, Cause::None, "entry point must be a function"}
+                throw Error{*entry_point_fn,
+                            Cause::None,
+                            "entry point must be a function"}
                     .add(*each->attr("entry_point"));
             }
             if (not_global) {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
 
-                auto e = Error{*each->attr("local"), Cause::None, "entry point must be global"};
+                auto e = Error{*each->attr("local"),
+                               Cause::None,
+                               "entry point must be global"};
                 e.add(*each->attr("entry_point"));
-                e.add(*entry_point_fn);
-                e.aside("remove the " + quote_fancy("local") + " tag, or change it to explicit " + quote_fancy("global"));
+                e.add(*entry_point_fn, true);
+                e.aside("remove the " + quote_fancy("local")
+                        + " tag, or change it to explicit "
+                        + quote_fancy("global"));
                 throw e;
             }
             if (not_visible) {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
 
-                auto e = Error{*each->attr("hidden"), Cause::None, "entry point must not be hidden"};
+                auto e = Error{*each->attr("hidden"),
+                               Cause::None,
+                               "entry point must not be hidden"};
                 e.add(*each->attr("entry_point"));
-                e.add(*entry_point_fn);
+                e.add(*entry_point_fn, true);
                 e.aside("remove the " + quote_fancy("hidden") + " tag");
                 throw e;
             }
@@ -2599,11 +2610,10 @@ auto main(int argc, char* argv[]) -> int
     }
     if (entry_point_fn.has_value()) {
         auto const sym = symbol_table.at(symbol_map.at(entry_point_fn->text));
-        std::cerr
-            << "entry point is " << entry_point_fn->text << " at [.text+0x"
-            << std::hex << std::setfill('0')
-            << std::setw(16) << sym.st_value
-            << std::dec << std::setfill(' ') << "]\n";
+        std::cerr << "entry point is " << entry_point_fn->text
+                  << " at [.text+0x" << std::hex << std::setfill('0')
+                  << std::setw(16) << sym.st_value << std::dec
+                  << std::setfill(' ') << "]\n";
     }
 
 #if 0
