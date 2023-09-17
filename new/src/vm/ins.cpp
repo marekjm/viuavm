@@ -118,7 +118,6 @@ auto execute(viua::vm::Stack& stack,
             Work(FRAME);
             Flow(RETURN);
             Work(ATOM);
-            Work(FLOAT);
             Work(DOUBLE);
             Work(SELF);
 #undef Work
@@ -143,6 +142,7 @@ auto execute(viua::vm::Stack& stack,
             Work(LUI);
             Work(LUIU);
             Work(LLI);
+            Work(FLOAT);
 #undef Work
         }
         break;
@@ -1148,30 +1148,15 @@ auto execute(ARODP const op, Stack& stack, ip_type const) -> void
 
 auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
 {
-    auto target = mutable_proxy(stack, op.instruction.out);
-
-    auto const& strtab = *stack.proc->strtab;
-
-    auto const data_offset = target.get<uint64_t>();
-    if (not data_offset.has_value()) {
-        throw abort_execution{stack, "invalid operand"};
-    }
-
-    auto const data_size = [&strtab, data_offset]() -> uint64_t {
-        auto const size_offset = (*data_offset - sizeof(uint64_t));
-        auto tmp               = uint64_t{};
-        memcpy(&tmp, &strtab[size_offset], sizeof(uint64_t));
-        return le64toh(tmp);
-    }();
+    auto out = mutable_proxy(stack, op.instruction.out);
 
     auto tmp = uint32_t{};
-    memcpy(&tmp, (&strtab[0] + *data_offset), data_size);
-    tmp = le32toh(tmp);
+    memcpy(&tmp, &op.instruction.immediate, sizeof(tmp));
 
     auto v = float{};
-    memcpy(&v, &tmp, data_size);
+    memcpy(&v, &tmp, sizeof(v));
 
-    target = v;
+    out = v;
 }
 auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
 {

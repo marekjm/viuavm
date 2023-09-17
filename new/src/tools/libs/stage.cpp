@@ -675,28 +675,6 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
             std::to_string(saved_at) + 'u';
 
         cooked.push_back(synth);
-    } else if (insn.opcode == "float" or insn.opcode == "g.float") {
-        constexpr auto SIZE_OF_SINGLE_PRECISION_FLOAT = size_t{4};
-        auto f = std::stof(insn.operands.back().ingredients.front().text);
-        auto s = std::string(SIZE_OF_SINGLE_PRECISION_FLOAT, '\0');
-        memcpy(s.data(), &f, SIZE_OF_SINGLE_PRECISION_FLOAT);
-        auto const saved_at = save_buffer_to_rodata(rodata_buf, s);
-
-        auto synth = viua::libs::parser::ast::Instruction{};
-        {
-            synth.opcode         = insn.opcode;
-            synth.opcode.text    = "g.li";
-            synth.physical_index = insn.physical_index;
-
-            synth.operands.push_back(insn.operands.front());
-            synth.operands.push_back(insn.operands.back());
-            synth.operands.back().ingredients.front().text =
-                std::to_string(saved_at) + 'u';
-        }
-        expand_li(cooked, synth, true);
-
-        insn.operands.pop_back();
-        cooked.push_back(std::move(insn));
     } else if (insn.opcode == "double" or insn.opcode == "g.double") {
         constexpr auto SIZE_OF_DOUBLE_PRECISION_FLOAT = size_t{8};
         auto f = std::stod(insn.operands.back().ingredients.front().text);
@@ -1352,6 +1330,7 @@ auto emit_instruction(viua::libs::parser::ast::Instruction const insn)
 {
     using viua::arch::opcode_type;
     using viua::arch::ops::FORMAT;
+    using viua::arch::ops::OPCODE;
     using viua::arch::ops::FORMAT_MASK;
 
     auto opcode = opcode_type{};
@@ -1384,14 +1363,17 @@ auto emit_instruction(viua::libs::parser::ast::Instruction const insn)
                                   operand_or_throw(insn, 0).make_access()}
             .encode();
     case FORMAT::F:
+    {
+        auto const raw = operand_or_throw(insn, 1).ingredients.front().text;
+        auto val       = static_cast<uint32_t>(std::stoul(raw, nullptr, 0));
+        if (static_cast<OPCODE>(opcode) == OPCODE::FLOAT) {
+            auto tmp = std::stof(raw);
+            memcpy(&val, &tmp, sizeof(val));
+        }
         return viua::arch::ops::F{
-            opcode,
-            operand_or_throw(insn, 0).make_access(),
-            static_cast<uint32_t>(
-                std::stoul(operand_or_throw(insn, 1).ingredients.front().text,
-                           nullptr,
-                           0))}
+            opcode, operand_or_throw(insn, 0).make_access(), val}
             .encode();
+    }
     case FORMAT::E:
         return viua::arch::ops::E{
             opcode,

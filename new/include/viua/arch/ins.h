@@ -240,12 +240,6 @@ struct STRING : Instruction {
     STRING(viua::arch::ops::S i) : instruction{i}
     {}
 };
-struct FLOAT : Instruction {
-    viua::arch::ops::S instruction;
-
-    FLOAT(viua::arch::ops::S i) : instruction{i}
-    {}
-};
 struct DOUBLE : Instruction {
     viua::arch::ops::S instruction;
 
@@ -275,6 +269,12 @@ struct LLI : Instruction {
     viua::arch::ops::F instruction;
 
     LLI(viua::arch::ops::F i) : instruction{i}
+    {}
+};
+struct FLOAT : Instruction {
+    viua::arch::ops::F instruction;
+
+    FLOAT(viua::arch::ops::F i) : instruction{i}
     {}
 };
 

@@ -17,6 +17,8 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
+
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -116,20 +118,27 @@ auto F::decode(instruction_type const raw) -> F
     auto opcode =
         static_cast<viua::arch::opcode_type>(raw & 0x000000000000ffff);
     auto out   = Register_access::decode((raw & 0x00000000ffff0000) >> 16);
-    auto value = static_cast<uint32_t>(raw >> 32);
+    auto value = le32toh(static_cast<uint32_t>(raw >> 32));
     return F{opcode, out, value};
 }
 auto F::encode() const -> instruction_type
 {
     auto base            = uint64_t{opcode};
     auto output_register = uint64_t{out.encode()};
-    auto value           = uint64_t{immediate};
+    auto value           = uint64_t{htole32(immediate)};
     return base | (output_register << 16) | (value << 32);
 }
 auto F::to_string() const -> std::string
 {
+    auto imm_str = std::to_string(immediate);
+    using viua::arch::ops::OPCODE;
+    if (static_cast<OPCODE>(opcode) == OPCODE::FLOAT) {
+        auto tmp = float{};
+        memcpy(&tmp, &immediate, sizeof(immediate));
+        imm_str = std::to_string(tmp);
+    }
     return (viua::arch::ops::to_string(opcode) + " " + out.to_string() + ", "
-            + std::to_string(immediate));
+            + imm_str);
 }
 }  // namespace viua::arch::ops
 namespace viua::arch::ops {

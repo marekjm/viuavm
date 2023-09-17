@@ -245,19 +245,6 @@ auto demangle_symbol_load(Cooked_text& raw,
         ++i;
         return;
     }
-    if (m(i + 1, FLOAT) and S::decode(ins_at(i + 1)).out == out) {
-        auto ins = raw.at(i + 1);
-        cooked.pop_back();
-
-        auto const sv = view_data(rodata, immediate);
-        auto x        = float{};
-        memcpy(&x, sv.data(), sizeof(x));
-
-        cooked.emplace_back(ins.with_text(
-            ("float " + out.to_string() + ", " + std::to_string(x))));
-        ++i;
-        return;
-    }
     if (m(i + 1, DOUBLE) and S::decode(ins_at(i + 1)).out == out) {
         auto ins = raw.at(i + 1);
         cooked.pop_back();

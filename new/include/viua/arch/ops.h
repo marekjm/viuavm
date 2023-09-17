@@ -269,13 +269,13 @@ enum class OPCODE : opcode_type {
     FRAME  = (FORMAT_S | 0x0001),
     RETURN = (FORMAT_S | 0x0002),
     ATOM   = (FORMAT_S | 0x0003),
-    FLOAT  = (FORMAT_S | 0x0004),
-    DOUBLE = (FORMAT_S | 0x0005),
-    SELF   = (FORMAT_S | 0x0006),
+    DOUBLE = (FORMAT_S | 0x0004),
+    SELF   = (FORMAT_S | 0x0005),
 
-    LUI  = (FORMAT_F | 0x0001),
-    LUIU = (FORMAT_F | 0x0001 | UNSIGNED),
-    LLI  = (FORMAT_F | 0x0002),
+    LUI   = (FORMAT_F | 0x0001),
+    LUIU  = (FORMAT_F | 0x0001 | UNSIGNED),
+    LLI   = (FORMAT_F | 0x0002),
+    FLOAT = (FORMAT_F | 0x0003),
 
     CAST  = (FORMAT_E | 0x0001),
     ARODP = (FORMAT_E | 0x0002),
@@ -345,7 +345,6 @@ enum class OPCODE_S : opcode_type {
     Make_entry(FRAME),
     Make_entry(RETURN),
     Make_entry(ATOM),
-    Make_entry(FLOAT),
     Make_entry(DOUBLE),
     Make_entry(SELF),
 };
@@ -353,6 +352,7 @@ enum class OPCODE_F : opcode_type {
     Make_entry(LUI),
     Make_entry(LUIU),
     Make_entry(LLI),
+    Make_entry(FLOAT),
 };
 enum class OPCODE_E : opcode_type {
     Make_entry(CAST),
