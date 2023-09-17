@@ -1257,8 +1257,8 @@ auto emit_instruction(viua::libs::parser::ast::Instruction const insn)
 {
     using viua::arch::opcode_type;
     using viua::arch::ops::FORMAT;
-    using viua::arch::ops::OPCODE;
     using viua::arch::ops::FORMAT_MASK;
+    using viua::arch::ops::OPCODE;
 
     auto opcode = opcode_type{};
     try {

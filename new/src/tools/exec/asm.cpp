@@ -1390,7 +1390,7 @@ auto save_declared_symbols(std::vector<std::unique_ptr<ast::Node>> const& nodes,
     }
 }
 
-auto save_objects(std::vector<std::unique_ptr<ast::Node>> const& nodes,
+auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                   std::vector<uint8_t>& rodata_buf,
                   std::vector<uint8_t>& string_table,
                   std::vector<Elf64_Sym>& symbol_table,
@@ -1409,7 +1409,7 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>> const& nodes,
 
     auto active_symbol = std::experimental::observer_ptr<Elf64_Sym>{};
 
-    for (auto const& each : nodes) {
+    for (auto& each : nodes) {
         using viua::libs::lexer::TOKEN;
 
         if (each->leader.token == TOKEN::SWITCH_TO_SECTION) {
@@ -1432,7 +1432,8 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>> const& nodes,
 
         auto const is_label = (each->leader.token == TOKEN::DEFINE_LABEL);
         auto const is_alloc = (each->leader.token == TOKEN::ALLOCATE_OBJECT);
-        if (auto const is_interesting = is_label or is_alloc;
+        auto const is_instr = (each->leader.token == TOKEN::OPCODE);
+        if (auto const is_interesting = is_label or is_alloc or is_instr;
             not is_interesting) {
             continue;
         }
@@ -1442,11 +1443,8 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>> const& nodes,
             using viua::libs::errors::compile_time::Error;
             throw Error{each->leader, Cause::None, "no active section"};
         }
-        if (active_section == SECTION::TEXT) {
-            continue;
-        }
 
-        if (is_label) {
+        if (is_label and (active_section == SECTION::RODATA)) {
             auto const& lab = static_cast<ast::Label&>(*each);
             labeller.reset(&lab);
             active_label = lab.name.text;
@@ -1527,6 +1525,244 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>> const& nodes,
                           << std::setw(16) << active_symbol->st_value
                           << std::dec << std::setfill(' ') << "]\n";
                 active_symbol.reset();
+            }
+        }
+
+        if (is_instr) {
+            /*
+             * Some instructions may carry "long immediates" ie, values which do
+             * not fit into the instruction itself and must be recovered from
+             * .rodata at runtime.
+             *
+             * These long immediates must be put into .rodata and converted into
+             * loads.
+             */
+
+            auto& instr = static_cast<ast::Instruction&>(*each);
+            if (instr.leader == "atom" or instr.leader == "g.atom") {
+                auto const lx = instr.operands.back().ingredients.front();
+                auto saved_at = size_t{0};
+                using enum viua::libs::lexer::TOKEN;
+                if (lx.token == LITERAL_STRING or lx.token == LITERAL_ATOM) {
+                    auto s = lx.text;
+                    if (lx.token == LITERAL_STRING) {
+                        s = s.substr(1, s.size() - 2);
+                        s = viua::support::string::unescape(s);
+                    }
+
+                    auto const value_off = save_buffer_to_rodata(rodata_buf, s);
+
+                    auto symbol     = Elf64_Sym{};
+                    symbol.st_name  = 0; /* anonymous symbol */
+                    symbol.st_info  = ELF64_ST_INFO(STB_LOCAL, STT_OBJECT);
+                    symbol.st_other = STV_DEFAULT;
+
+                    symbol.st_value = value_off;
+                    symbol.st_size  = s.size();
+
+                    /*
+                     * Section header table index (see elf(5) for st_shndx) is
+                     * filled out later, since at this point we do not have this
+                     * information.
+                     *
+                     * For variables it will be the index of .rodata.
+                     * For functions it will be the index of .text.
+                     */
+                    symbol.st_shndx = 0;
+
+                    std::cerr << "allocated " << symbol.st_size
+                              << " byte(s) of string anonymous at "
+                              << "[.rodata+0x" << std::hex << std::setfill('0')
+                              << std::setw(16) << symbol.st_value << std::dec
+                              << std::setfill(' ') << "]\n";
+
+                    saved_at = viua::libs::stage::record_symbol(
+                        "", symbol, symbol_table, symbol_map);
+                } else if (lx.token == viua::libs::lexer::TOKEN::AT) {
+                    auto const label = instr.operands.back().ingredients.back();
+                    try {
+                        saved_at = symbol_map.at(label.text);
+                    } catch (std::out_of_range const&) {
+                        using viua::libs::errors::compile_time::Cause;
+                        using viua::libs::errors::compile_time::Error;
+
+                        auto e = Error{label,
+                                       Cause::Unknown_label,
+                                       quote_fancy(label.text)};
+                        e.add(lx);
+
+                        using viua::support::string::levenshtein_filter;
+                        auto misspell_candidates =
+                            levenshtein_filter(label.text, symbol_map);
+                        if (not misspell_candidates.empty()) {
+                            using viua::support::string::levenshtein_best;
+                            auto best_candidate =
+                                levenshtein_best(label.text,
+                                                 misspell_candidates,
+                                                 (label.text.size() / 2));
+                            if (best_candidate.second != label.text) {
+                                did_you_mean(e, best_candidate.second);
+                            }
+                        }
+
+                        throw e;
+                    }
+                } else {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+
+                    auto e = Error{lx, Cause::Invalid_operand}.aside(
+                        "expected string literal, atom literal, or a label "
+                        "reference");
+
+                    if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
+                        did_you_mean(e, '@' + lx.text);
+                    }
+
+                    throw e;
+                }
+
+                auto synth_op  = instr.operands.back().ingredients.front();
+                synth_op.token = TOKEN::LITERAL_INTEGER;
+                synth_op.text  = std::to_string(saved_at);
+
+                instr.operands.back().ingredients.clear();
+                instr.operands.back().ingredients.push_back(synth_op);
+            } else if (instr.leader == "arodp" or instr.leader == "g.arodp") {
+                auto const lx = instr.operands.back().ingredients.front();
+                auto saved_at = size_t{0};
+                using enum viua::libs::lexer::TOKEN;
+                if (lx.token == viua::libs::lexer::TOKEN::AT) {
+                    auto const label = instr.operands.back().ingredients.back();
+                    try {
+                        saved_at = symbol_map.at(label.text);
+                    } catch (std::out_of_range const&) {
+                        using viua::libs::errors::compile_time::Cause;
+                        using viua::libs::errors::compile_time::Error;
+
+                        auto e = Error{label, Cause::Unknown_label, label.text};
+                        e.add(lx);
+
+                        using viua::support::string::levenshtein_filter;
+                        auto misspell_candidates =
+                            levenshtein_filter(label.text, symbol_map);
+                        if (not misspell_candidates.empty()) {
+                            using viua::support::string::levenshtein_best;
+                            auto best_candidate =
+                                levenshtein_best(label.text,
+                                                 misspell_candidates,
+                                                 (label.text.size() / 2));
+                            if (best_candidate.second != label.text) {
+                                did_you_mean(e, best_candidate.second);
+                            }
+                        }
+
+                        throw e;
+                    }
+                } else {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+
+                    auto e = Error{lx,
+                                   Cause::Invalid_operand,
+                                   "expected a label reference"};
+                    if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
+                        did_you_mean(e, '@' + lx.text);
+                    }
+                    throw e;
+                }
+
+                auto synth_op  = instr.operands.back().ingredients.front();
+                synth_op.token = TOKEN::LITERAL_INTEGER;
+                synth_op.text  = std::to_string(saved_at);
+
+                instr.operands.back().ingredients.clear();
+                instr.operands.back().ingredients.push_back(synth_op);
+            } else if (instr.leader == "double" or instr.leader == "g.double") {
+                auto const lx = instr.operands.back().ingredients.front();
+                auto saved_at = size_t{0};
+                using enum viua::libs::lexer::TOKEN;
+                if (lx.token == LITERAL_FLOAT) {
+                    constexpr auto SIZE_OF_DOUBLE_PRECISION_FLOAT = size_t{8};
+                    auto f                                        = std::stod(
+                        instr.operands.back().ingredients.front().text);
+                    auto s = std::string(SIZE_OF_DOUBLE_PRECISION_FLOAT, '\0');
+                    memcpy(s.data(), &f, SIZE_OF_DOUBLE_PRECISION_FLOAT);
+                    auto const value_off = save_buffer_to_rodata(rodata_buf, s);
+
+                    auto symbol     = Elf64_Sym{};
+                    symbol.st_name  = 0; /* anonymous symbol */
+                    symbol.st_info  = ELF64_ST_INFO(STB_LOCAL, STT_OBJECT);
+                    symbol.st_other = STV_DEFAULT;
+
+                    symbol.st_value = value_off;
+                    symbol.st_size  = s.size();
+
+                    /*
+                     * Section header table index (see elf(5) for st_shndx) is
+                     * filled out later, since at this point we do not have this
+                     * information.
+                     *
+                     * For variables it will be the index of .rodata.
+                     * For functions it will be the index of .text.
+                     */
+                    symbol.st_shndx = 0;
+
+                    std::cerr << "allocated " << symbol.st_size
+                              << " byte(s) of double anonymous at "
+                              << "[.rodata+0x" << std::hex << std::setfill('0')
+                              << std::setw(16) << symbol.st_value << std::dec
+                              << std::setfill(' ') << "]\n";
+
+                    saved_at = viua::libs::stage::record_symbol(
+                        "", symbol, symbol_table, symbol_map);
+                } else if (lx.token == viua::libs::lexer::TOKEN::AT) {
+                    auto const label = instr.operands.back().ingredients.back();
+                    try {
+                        saved_at = symbol_map.at(label.text);
+                    } catch (std::out_of_range const&) {
+                        using viua::libs::errors::compile_time::Cause;
+                        using viua::libs::errors::compile_time::Error;
+
+                        auto e = Error{label, Cause::Unknown_label, label.text};
+                        e.add(lx);
+
+                        using viua::support::string::levenshtein_filter;
+                        auto misspell_candidates =
+                            levenshtein_filter(label.text, symbol_map);
+                        if (not misspell_candidates.empty()) {
+                            using viua::support::string::levenshtein_best;
+                            auto best_candidate =
+                                levenshtein_best(label.text,
+                                                 misspell_candidates,
+                                                 (label.text.size() / 2));
+                            if (best_candidate.second != label.text) {
+                                did_you_mean(e, best_candidate.second);
+                            }
+                        }
+
+                        throw e;
+                    }
+                } else {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+
+                    auto e = Error{lx, Cause::Invalid_operand}.aside(
+                        "expected double literal, or a label reference");
+
+                    if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
+                        did_you_mean(e, '@' + lx.text);
+                    }
+
+                    throw e;
+                }
+
+                auto synth_op  = instr.operands.back().ingredients.front();
+                synth_op.token = TOKEN::LITERAL_INTEGER;
+                synth_op.text  = std::to_string(saved_at);
+
+                instr.operands.back().ingredients.clear();
+                instr.operands.back().ingredients.push_back(synth_op);
             }
         }
     }

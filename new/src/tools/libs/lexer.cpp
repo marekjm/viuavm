@@ -372,6 +372,9 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
             continue;
         }
 
+        if (try_match(LITERAL_FLOAT, TOKEN::LITERAL_FLOAT)) {
+            continue;
+        }
         if (try_match(LITERAL_INTEGER, TOKEN::LITERAL_INTEGER)) {
             continue;
         }
