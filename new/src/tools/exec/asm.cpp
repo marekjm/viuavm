@@ -765,7 +765,7 @@ auto dump_nodes(std::vector<std::unique_ptr<ast::Node>> const& nodes) -> void
 auto did_you_mean(viua::libs::errors::compile_time::Error& e, std::string what)
     -> viua::libs::errors::compile_time::Error&
 {
-    return e.aside("did you mean \"" + what + "\"?");
+    return e.aside("did you mean " + quote_fancy(what) + "?");
 }
 auto did_you_mean(viua::libs::errors::compile_time::Error&& e, std::string what)
     -> viua::libs::errors::compile_time::Error
