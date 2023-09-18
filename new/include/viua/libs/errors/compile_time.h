@@ -189,10 +189,12 @@ struct Error {
         return character();
     }
 
-    auto note(std::string) -> Error&;
+    auto note(std::string) & -> Error&;
+    auto note(std::string) && -> Error;
     auto notes() const -> std::vector<std::string> const&;
 
-    auto add(Lexeme, bool const = false) -> Error&;
+    auto add(Lexeme, bool const = false) & -> Error&;
+    auto add(Lexeme, bool const = false) && -> Error;
     using span_type =
         std::tuple<std::string::size_type, std::string::size_type, bool>;
     auto spans() const -> std::vector<span_type>;

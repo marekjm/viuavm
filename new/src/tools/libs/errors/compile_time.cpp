@@ -85,21 +85,32 @@ auto Error::aside() const -> std::string_view
     return aside_note;
 }
 
-auto Error::note(std::string s) -> Error&
+auto Error::note(std::string s) & -> Error&
 {
     attached_notes.emplace_back(std::move(s));
     return *this;
+}
+auto Error::note(std::string s) && -> Error
+{
+    attached_notes.emplace_back(std::move(s));
+    return std::move(*this);
 }
 auto Error::notes() const -> std::vector<std::string> const&
 {
     return attached_notes;
 }
 
-auto Error::add(Lexeme lx, bool const advisory) -> Error&
+auto Error::add(Lexeme lx, bool const advisory) & -> Error&
 {
     detail_lexemes.emplace_back(lx, advisory);
     return *this;
 }
+auto Error::add(Lexeme lx, bool const advisory) && -> Error
+{
+    detail_lexemes.emplace_back(lx, advisory);
+    return std::move(*this);
+}
+
 auto Error::spans() const -> std::vector<span_type>
 {
     auto ss = std::vector<span_type>{};
