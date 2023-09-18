@@ -79,6 +79,9 @@ auto expand_li(std::vector<viua::libs::parser::ast::Instruction>&,
 auto expand_if(std::vector<viua::libs::parser::ast::Instruction>&,
                viua::libs::parser::ast::Instruction&,
                std::map<size_t, size_t>) -> void;
+auto expand_memory_access(std::vector<viua::libs::parser::ast::Instruction>&,
+                          viua::libs::parser::ast::Instruction const&) -> void;
+
 auto expand_pseudoinstructions(
     std::vector<viua::libs::parser::ast::Instruction>,
     std::map<std::string, size_t> const& symbol_map)

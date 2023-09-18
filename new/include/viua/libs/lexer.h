@@ -68,7 +68,7 @@ enum class TOKEN {
      */
     OPCODE,
 
-    REG_VOID,
+    VOID,
 
     /*
      * Literals.

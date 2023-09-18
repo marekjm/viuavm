@@ -91,8 +91,8 @@ auto to_string(TOKEN const token) -> std::string
         return "ALLOCATE_OBJECT";
     case OPCODE:
         return "OPCODE";
-    case REG_VOID:
-        return "REG_VOID";
+    case VOID:
+        return "VOID";
     case LITERAL_ATOM:
         return "LITERAL_ATOM";
     case LITERAL_INTEGER:
@@ -150,7 +150,7 @@ const auto SECTION_NAME = std::regex{"^(\\.[A-Za-z][A-Za-z0-9_]+)+\\b"};
  * accepted valid names the errors could get weird, and it would be much more
  * difficult to provide sane diagnostics.
  */
-const auto REG_VOID = std::regex{"^\\bvoid\\b"};
+const auto VOID = std::regex{"^\\bvoid\\b"};
 
 const auto LITERAL_ATOM = std::regex{pattern::LITERAL_ATOM};
 const auto LITERAL_INTEGER =
@@ -379,7 +379,7 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
             continue;
         }
 
-        if (try_match(REG_VOID, TOKEN::REG_VOID)) {
+        if (try_match(VOID, TOKEN::VOID)) {
             continue;
         }
 

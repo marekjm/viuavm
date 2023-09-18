@@ -55,10 +55,10 @@
 #include <viua/libs/errors/compile_time.h>
 #include <viua/libs/lexer.h>
 #include <viua/libs/stage.h>
+#include <viua/support/errno.h>
 #include <viua/support/number.h>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
-#include <viua/support/errno.h>
 #include <viua/support/vector.h>
 
 
@@ -70,391 +70,14 @@ using viua::libs::stage::save_buffer_to_rodata;
 using viua::libs::stage::save_string_to_strtab;
 using viua::support::string::quote_fancy;
 
-#if 0
-namespace {
-using namespace viua::libs::parser;
-auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes,
-                   std::vector<viua::arch::instruction_type>& text,
-                   std::vector<Elf64_Sym>& symbol_table,
-                   std::map<std::string, size_t> const& symbol_map)
-    -> std::map<std::string, uint64_t>
-{
-    auto const ops_count =
-        1
-        + std::accumulate(
-            nodes.begin(),
-            nodes.end(),
-            size_t{0},
-            [](size_t const acc,
-               std::unique_ptr<ast::Node> const& each) -> size_t {
-                if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
-                    return acc;
-                }
-
-                auto& fn = static_cast<ast::Fn_def&>(*each);
-                return (acc + fn.instructions.size());
-            });
-
-    {
-        text.reserve(ops_count);
-        text.resize(ops_count);
-
-        using viua::arch::instruction_type;
-        using viua::arch::ops::N;
-        using viua::arch::ops::OPCODE;
-        text.at(0) = N{static_cast<instruction_type>(OPCODE::HALT)}.encode();
-    }
-
-    auto fn_addresses = std::map<std::string, uint64_t>{};
-    auto ip           = (text.data() + 1);
-    for (auto const& each : nodes) {
-        if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
-            continue;
-        }
-
-        auto& fn = static_cast<ast::Fn_def&>(*each);
-        {
-            /*
-             * Save the function's address (offset into the .text section,
-             * really) in the functions table. This is needed not only for
-             * debugging, but also because the functions' addresses are resolved
-             * dynamically for call and similar instructions. Why dynamically?
-             * FIXME The above is no longer true.
-             *
-             * Because there is a strong distinction between calls to bytecode
-             * and foreign functions. At compile time, we don't yet know,
-             * though, which function is foreign and which is bytecode.
-             */
-            auto const fn_addr =
-                (ip - &text[0]) * sizeof(viua::arch::instruction_type);
-            auto& sym = symbol_table.at(symbol_map.at(fn.name.text));
-
-            if (not fn.has_attr("extern")) {
-                sym.st_value = fn_addr;
-                sym.st_size  = fn.instructions.size()
-                              * sizeof(viua::arch::instruction_type);
-            }
-        }
-
-        for (auto const& insn : fn.instructions) {
-            *ip++ = viua::libs::stage::emit_instruction(insn);
-        }
-    }
-
-    return fn_addresses;
-}
-}  // namespace
-
-namespace stage {
-using Lexemes   = std::vector<viua::libs::lexer::Lexeme>;
-using AST_nodes = std::vector<std::unique_ptr<ast::Node>>;
-auto syntactical_analysis(std::filesystem::path const source_path,
-                          std::string_view const source_text,
-                          Lexemes const& lexemes) -> AST_nodes
-{
-    try {
-        return parse(lexemes);
-    } catch (viua::libs::errors::compile_time::Error const& e) {
-        viua::libs::stage::display_error_and_exit(source_path, source_text, e);
-    }
-}
-
-auto load_value_labels(std::filesystem::path const source_path,
-                       std::string_view const source_text,
-                       AST_nodes const& nodes,
-                       std::vector<uint8_t>& rodata_buf,
-                       std::vector<uint8_t>& string_table,
-                       std::vector<Elf64_Sym>& symbol_table,
-                       std::map<std::string, size_t>& symbol_map) -> void
-{
-    for (auto const& each : nodes) {
-        if (dynamic_cast<ast::Label_def*>(each.get()) == nullptr) {
-            continue;
-        }
-
-        auto& ct = static_cast<ast::Label_def&>(*each);
-        if (ct.has_attr("extern")) {
-            auto const name_off =
-                save_string_to_strtab(string_table, ct.name.text);
-
-            auto symbol     = Elf64_Sym{};
-            symbol.st_name  = name_off;
-            symbol.st_info  = ELF64_ST_INFO(STB_GLOBAL, STT_OBJECT);
-            symbol.st_other = STV_DEFAULT;
-            viua::libs::stage::record_symbol(
-                ct.name.text, symbol, symbol_table, symbol_map);
-
-            /*
-             * Neither address nor size of the extern symbol is known, only its
-             * label.
-             */
-            symbol.st_value = 0;
-            symbol.st_size  = 0;
-            return;
-        }
-
-        if (ct.type == "string") {
-            auto s = std::string{};
-            for (auto i = size_t{0}; i < ct.value.size(); ++i) {
-                auto& each = ct.value.at(i);
-
-                using enum viua::libs::lexer::TOKEN;
-                if (each.token == LITERAL_STRING) {
-                    auto tmp = each.text;
-                    tmp      = tmp.substr(1, tmp.size() - 2);
-                    tmp      = viua::support::string::unescape(tmp);
-                    s += tmp;
-                } else if (each.token == STAR) {
-                    auto& next = ct.value.at(++i);
-                    if (next.token != LITERAL_INTEGER) {
-                        using viua::libs::errors::compile_time::Cause;
-                        using viua::libs::errors::compile_time::Error;
-
-                        auto const e = Error{each,
-                                             Cause::Invalid_operand,
-                                             "cannot multiply string constant "
-                                             "by non-integer"}
-                                           .add(next)
-                                           .add(ct.value.at(i - 2))
-                                           .aside("right-hand side must be an "
-                                                  "positive integer");
-                        viua::libs::stage::display_error_and_exit(
-                            source_path, source_text, e);
-                    }
-
-                    auto x = ston<size_t>(next.text);
-                    auto o = std::ostringstream{};
-                    for (auto i = size_t{0}; i < x; ++i) {
-                        o << s;
-                    }
-                    s = o.str();
-                }
-            }
-
-            auto const value_off = save_buffer_to_rodata(rodata_buf, s);
-            auto const name_off =
-                save_string_to_strtab(string_table, ct.name.text);
-
-            auto symbol     = Elf64_Sym{};
-            symbol.st_name  = name_off;
-            symbol.st_info  = ELF64_ST_INFO(STB_GLOBAL, STT_OBJECT);
-            symbol.st_other = STV_DEFAULT;
-
-            symbol.st_value = value_off;
-            symbol.st_size  = s.size();
-
-            /*
-             * Section header table index (see elf(5) for st_shndx) is filled
-             * out later, since at this point we do not have this information.
-             *
-             * For variables it will be the index of .rodata.
-             * For functions it will be the index of .text.
-             */
-            symbol.st_shndx = 0;
-
-            viua::libs::stage::record_symbol(
-                ct.name.text, symbol, symbol_table, symbol_map);
-        } else if (ct.type == "atom") {
-            auto const s = ct.value.front().text;
-
-            auto const value_off = save_buffer_to_rodata(rodata_buf, s);
-            auto const name_off =
-                save_string_to_strtab(string_table, ct.name.text);
-
-            auto symbol     = Elf64_Sym{};
-            symbol.st_name  = name_off;
-            symbol.st_info  = ELF64_ST_INFO(STB_GLOBAL, STT_OBJECT);
-            symbol.st_other = STV_DEFAULT;
-
-            symbol.st_value = value_off;
-            symbol.st_size  = s.size();
-
-            /*
-             * Section header table index (see elf(5) for st_shndx) is filled
-             * out later, since at this point we do not have this information.
-             *
-             * For variables it will be the index of .rodata.
-             * For functions it will be the index of .text.
-             */
-            symbol.st_shndx = 0;
-
-            viua::libs::stage::record_symbol(
-                ct.name.text, symbol, symbol_table, symbol_map);
-        }
-    }
-}
-
-auto load_function_labels(AST_nodes const& nodes,
-                          std::vector<uint8_t>& string_table,
-                          std::vector<Elf64_Sym>& symbol_table,
-                          std::map<std::string, size_t>& symbol_map) -> void
-{
-    for (auto const& each : nodes) {
-        if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
-            continue;
-        }
-
-        auto const& fn = static_cast<ast::Fn_def&>(*each);
-
-        auto const name_off = save_string_to_strtab(string_table, fn.name.text);
-
-        auto symbol     = Elf64_Sym{};
-        symbol.st_name  = name_off;
-        symbol.st_info  = ELF64_ST_INFO(STB_GLOBAL, STT_FUNC);
-        symbol.st_other = STV_DEFAULT;
-
-        /*
-         * Leave size and offset of the function empty since we do not have this
-         * information yet. It will only be available after the bytecode is
-         * emitted.
-         *
-         * For functions marked as [[extern]] st_value will be LEFT EMPTY after
-         * the assembler exits, as a signal to the linker that this symbol was
-         * defined in a different module and needs to be resolved.
-         */
-        symbol.st_size  = 0;
-        symbol.st_value = 0;
-
-        /*
-         * Section header table index (see elf(5) for st_shndx) is filled
-         * out later, since at this point we do not have this information.
-         *
-         * For variables it will be the index of .rodata.
-         * For functions it will be the index of .text.
-         */
-        symbol.st_shndx = 0;
-
-        viua::libs::stage::record_symbol(
-            fn.name.text, symbol, symbol_table, symbol_map);
-    }
-}
-
-auto cook_long_immediates(std::filesystem::path const source_path,
-                          std::string_view const source_text,
-                          AST_nodes const& nodes,
-                          std::vector<uint8_t>& rodata_buf,
-                          std::vector<Elf64_Sym>& symbol_table,
-                          std::map<std::string, size_t>& symbol_map) -> void
-{
-    for (auto const& each : nodes) {
-        if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
-            continue;
-        }
-
-        auto& fn = static_cast<ast::Fn_def&>(*each);
-
-        auto cooked = std::vector<ast::Instruction>{};
-        for (auto& insn : fn.instructions) {
-            try {
-                auto c = viua::libs::stage::cook_long_immediates(
-                    insn, rodata_buf, symbol_table, symbol_map);
-                std::copy(c.begin(), c.end(), std::back_inserter(cooked));
-            } catch (viua::libs::errors::compile_time::Error const& e) {
-                viua::libs::stage::display_error_in_function(
-                    source_path, e, fn.name.text);
-                viua::libs::stage::display_error_and_exit(
-                    source_path, source_text, e);
-            }
-        }
-        fn.instructions = std::move(cooked);
-    }
-}
-
-auto cook_pseudoinstructions(std::filesystem::path const source_path,
-                             std::string_view const source_text,
-                             AST_nodes& nodes,
-                             std::map<std::string, size_t> const& symbol_map)
-    -> void
-{
-    for (auto const& each : nodes) {
-        if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
-            continue;
-        }
-
-        auto& fn                 = static_cast<ast::Fn_def&>(*each);
-        auto const raw_ops_count = fn.instructions.size();
-        try {
-            fn.instructions = viua::libs::stage::expand_pseudoinstructions(
-                std::move(fn.instructions), symbol_map);
-        } catch (viua::libs::errors::compile_time::Error const& e) {
-            viua::libs::stage::display_error_in_function(
-                source_path, e, fn.name.text);
-            viua::libs::stage::display_error_and_exit(
-                source_path, source_text, e);
-        }
-
-        if constexpr (DEBUG_EXPANSION) {
-            std::cerr << "FN " << fn.to_string() << " with " << raw_ops_count
-                      << " raw, " << fn.instructions.size() << " baked op(s)\n";
-            auto physical_index = size_t{0};
-            for (auto const& op : fn.instructions) {
-                std::cerr << "  " << std::setw(4) << std::setfill('0')
-                          << std::hex << physical_index++ << " " << std::setw(4)
-                          << std::setfill('0') << std::hex << op.physical_index
-                          << "  " << op.to_string() << "\n";
-            }
-        }
-    }
-}
-
-using Text         = std::vector<viua::arch::instruction_type>;
-using Fn_addresses = std::map<std::string, uint64_t>;
-auto emit_bytecode(std::filesystem::path const source_path,
-                   std::string_view const source_text,
-                   AST_nodes const& nodes,
-                   std::vector<Elf64_Sym>& symbol_table,
-                   std::map<std::string, size_t> const& symbol_map) -> Text
-{
-    /*
-     * Calculate function spans in source code for error reporting. This way an
-     * error offset can be matched to a function without the error having to
-     * carry the function name.
-     */
-    auto fn_spans =
-        std::vector<std::pair<std::string, std::pair<size_t, size_t>>>{};
-    for (auto const& each : nodes) {
-        if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
-            continue;
-        }
-
-        auto& fn = static_cast<ast::Fn_def&>(*each);
-        fn_spans.emplace_back(
-            fn.name.text,
-            std::pair<size_t, size_t>{fn.start.location.offset,
-                                      fn.end.location.offset});
-    }
-
-    auto text         = std::vector<viua::arch::instruction_type>{};
-    auto fn_addresses = std::map<std::string, uint64_t>{};
-    try {
-        fn_addresses = ::emit_bytecode(nodes, text, symbol_table, symbol_map);
-    } catch (viua::libs::errors::compile_time::Error const& e) {
-        auto fn_name = std::optional<std::string>{};
-
-        for (auto const& [name, offs] : fn_spans) {
-            auto const [low, high] = offs;
-            auto const off         = e.location().offset;
-            if ((off >= low) and (off <= high)) {
-                fn_name = name;
-            }
-        }
-
-        if (fn_name.has_value()) {
-            viua::libs::stage::display_error_in_function(
-                source_path, e, *fn_name);
-        }
-        viua::libs::stage::display_error_and_exit(source_path, source_text, e);
-    }
-
-    return text;
-}
-}  // namespace stage
-#endif
-
 namespace {
 using viua::libs::lexer::Lexeme;
 auto dump_lexemes(std::vector<Lexeme> const& lexemes) -> void
 {
+    if (lexemes.empty()) {
+        return;
+    }
+
     auto const max_line = lexemes.back().location.line;
     auto const pad_line = std::to_string(max_line).size();
 
@@ -602,6 +225,89 @@ auto any_find_mistake(std::vector<Lexeme> const& lexemes)
 
     return std::nullopt;
 }
+
+template<typename T>
+auto ston_int_impl(std::string const& n, int const base)
+    -> std::conditional_t<std::is_signed_v<T>, int64_t, uint64_t>
+{
+    if constexpr (std::is_signed_v<T>) {
+        return std::stoll(n, nullptr, base);
+    } else {
+        return std::stoull(n, nullptr, base);
+    }
+}
+
+template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+auto ston(std::string n) -> T
+{
+    if constexpr (std::is_floating_point_v<T>) {
+        if constexpr (sizeof(T) == sizeof(float)) {
+            return std::stof(n);
+        } else {
+            return std::stod(n);
+        }
+    } else {
+        auto base = 10;
+        {
+            auto view = std::string_view{n};
+            auto const is_negative =
+                std::is_signed_v<T> and view.starts_with("-");
+            if (is_negative) {
+                view.remove_prefix(1);
+            }
+            if (view.starts_with("0x")) {
+                base = 16;
+            } else if (view.starts_with("0o")) {
+                base = 8;
+
+                /*
+                 * Octal literals in Viua assembly begin with "0o", but C++
+                 * converters take octals beginning with "0". We need to drop
+                 * the "o".
+                 */
+                n.erase(1 + static_cast<size_t>(is_negative), 1);
+            } else if (view.starts_with("0b")) {
+                base = 2;
+            }
+        }
+
+        auto const full   = ston_int_impl<T>(n, base);
+        auto const wanted = static_cast<T>(full);
+
+        if (wanted != full) {
+            throw std::out_of_range{"ston"};
+        }
+        return wanted;
+    }
+}
+
+auto fits_in_unsigned_r_immediate(uint32_t const n) -> bool
+{
+    constexpr auto LOW_24 = uint32_t{0x00ffffff};
+    return ((n & LOW_24) == n);
+}
+auto fits_in_signed_r_immediate(uint32_t const n) -> bool
+{
+    constexpr auto LOW_24 = uint32_t{0x00ffffff};
+    auto const just_low   = (n & LOW_24);
+    return (static_cast<int32_t>(n)
+            == (static_cast<int32_t>(just_low << 8) >> 8));
+}
+
+auto make_name_from_lexeme(viua::libs::lexer::Lexeme const& r) -> std::string
+{
+    switch (r.token) {
+        using enum viua::libs::lexer::TOKEN;
+    case LITERAL_ATOM:
+        return r.text;
+    case LITERAL_STRING:
+        return r.text.substr(1, r.text.size() - 2);
+    default:
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{r, Cause::None, "token cannot be used as name"};
+    }
+}
 }  // namespace
 
 namespace {
@@ -679,7 +385,49 @@ struct Object : Node {
 };
 struct Operand : Node {
     std::vector<Lexeme> ingredients;
+
+    auto make_access() const -> viua::arch::Register_access;
 };
+auto Operand::make_access() const -> viua::arch::Register_access
+{
+    if (ingredients.front() == "void") {
+        return viua::arch::Register_access{};
+    }
+
+    using viua::libs::lexer::TOKEN;
+    auto const lx = ingredients.front();
+    if (lx != TOKEN::DOLLAR) {
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{lx, Cause::Invalid_register_access};
+    }
+
+    auto const direct = (lx == TOKEN::DOLLAR);
+    auto const index  = std::stoul(ingredients.at(1).text);
+    if (ingredients.size() == 2) {
+        return viua::arch::Register_access::make_local(index, direct);
+    }
+
+    auto const rs = ingredients.back();
+    if (rs == "l") {
+        return viua::arch::Register_access::make_local(index, direct);
+    } else if (rs == "a") {
+        return viua::arch::Register_access::make_argument(index, direct);
+    } else if (rs == "p") {
+        return viua::arch::Register_access::make_parameter(index, direct);
+    } else {
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{ingredients.back(), Cause::Invalid_register_access}
+            .add(ingredients.at(0))
+            .add(ingredients.at(1))
+            .add(ingredients.at(2))
+            .aside("invalid register set specifier: "
+                   + viua::support::string::quote_squares(rs.text))
+            .note("valid register set specifiers are " + quote_fancy("l") + ", "
+                  + quote_fancy("a") + ", and " + quote_fancy("p"));
+    }
+}
 struct Instruction : Node {
     std::vector<Operand> operands;
 };
@@ -688,6 +436,10 @@ struct End : Node {};
 }  // namespace ast
 auto dump_nodes(std::vector<std::unique_ptr<ast::Node>> const& nodes) -> void
 {
+    if (nodes.empty()) {
+        return;
+    }
+
     auto const max_line = nodes.back()->leader.location.line;
     auto const pad_line = std::to_string(max_line).size();
 
@@ -960,8 +712,29 @@ auto consume_symbol(viua::support::vector_view<Lexeme>& lexemes)
     if (look_ahead(TOKEN::ATTR_LIST_OPEN, lexemes)) {
         ss->attributes = consume_attrs(lexemes);
     }
-    ss->name =
-        consume_token_of({TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING}, lexemes);
+
+    using viua::libs::errors::compile_time::Cause;
+    using viua::libs::errors::compile_time::Error;
+    try {
+        ss->name = consume_token_of(
+            {TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING}, lexemes);
+    } catch (Error& e) {
+        if (lexemes.size() < 3) {
+            throw e;
+        }
+        if (lexemes.at(1) != TOKEN::DEFINE_LABEL) {
+            throw e;
+        }
+
+        auto const& label = lexemes.at(2);
+        if (label != TOKEN::LITERAL_ATOM and label != TOKEN::LITERAL_STRING) {
+            throw e;
+        }
+
+        throw e.chain(Error{label, Cause::None}.note(
+            ("did you mean " + quote_fancy(make_name_from_lexeme(label))
+             + "?")));
+    }
     consume_token_of(TOKEN::TERMINATOR, lexemes);
     return ss;
 }
@@ -1081,9 +854,9 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
          * of if-else should handle valid operands - and ONLY operands, not
          * their separators.
          */
-        if (lexemes.front() == TOKEN::REG_VOID) {
+        if (lexemes.front() == TOKEN::VOID) {
             operand.ingredients.push_back(
-                consume_token_of(TOKEN::REG_VOID, lexemes));
+                consume_token_of(TOKEN::VOID, lexemes));
         } else if (look_ahead(TOKEN::DOLLAR, lexemes)) {
             auto const leader = consume_token_of(TOKEN::DOLLAR, lexemes);
             auto index        = Lexeme{};
@@ -1108,6 +881,8 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
                     "register index range is 0-"
                     + std::to_string(viua::arch::MAX_REGISTER_INDEX));
             }
+
+            operand.ingredients.push_back(leader);
             operand.ingredients.push_back(index);
 
             if (look_ahead(TOKEN::DOT, lexemes)) {
@@ -1203,6 +978,8 @@ auto parse(viua::support::vector_view<Lexeme> lexemes)
 {
     auto nodes = std::vector<std::unique_ptr<ast::Node>>{};
 
+    auto attributes = std::vector<ast::Node::attribute_type>{};
+
     while (not lexemes.empty()) {
         auto const& each = lexemes.front();
 
@@ -1232,8 +1009,12 @@ auto parse(viua::support::vector_view<Lexeme> lexemes)
         case TOKEN::END:
             nodes.emplace_back(consume_end(lexemes));
             break;
+        case TOKEN::ATTR_LIST_OPEN:
+            attributes = consume_attrs(lexemes);
+            [[fallthrough]];
         case TOKEN::OPCODE:
             nodes.emplace_back(consume_instruction(lexemes));
+            nodes.back()->attributes = std::move(attributes);
             break;
         default:
             using viua::libs::errors::compile_time::Cause;
@@ -1256,12 +1037,28 @@ auto make_symbol(std::string_view const name,
     sym.st_name = name_off;
     return sym;
 }
+auto make_symbol(viua::libs::lexer::Lexeme const& name,
+                 std::vector<uint8_t>& string_table) -> Elf64_Sym
+{
+    auto const& unquoted_name = make_name_from_lexeme(name);
+    auto const name_off =
+        unquoted_name.empty()
+            ? 0
+            : save_string_to_strtab(string_table, unquoted_name);
+
+    auto sym    = Elf64_Sym{};
+    sym.st_name = name_off;
+    return sym;
+}
+
+using Decl_map =
+    std::vector<std::pair<ast::Symbol const&, ast::Section const&>>;
 
 auto save_declared_symbols(std::vector<std::unique_ptr<ast::Node>> const& nodes,
                            std::vector<uint8_t>& string_table,
                            std::vector<Elf64_Sym>& symbol_table,
                            std::map<std::string, size_t>& symbol_map,
-                           std::vector<ast::Symbol>& declarations) -> void
+                           Decl_map& declarations) -> void
 {
     enum class SECTION {
         NONE,
@@ -1300,10 +1097,7 @@ auto save_declared_symbols(std::vector<std::unique_ptr<ast::Node>> const& nodes,
             throw Error{each->leader, Cause::None, "no active section"};
         }
 
-        auto const& sym = static_cast<ast::Symbol&>(*each);
-
-        auto const name_off =
-            save_string_to_strtab(string_table, sym.name.text);
+        auto const& sym = static_cast<ast::Symbol const&>(*each);
 
         auto type = (active_section == SECTION::TEXT) ? STT_FUNC : STT_OBJECT;
         auto binding    = (active_section == SECTION::TEXT) ? STB_GLOBAL
@@ -1346,8 +1140,8 @@ auto save_declared_symbols(std::vector<std::unique_ptr<ast::Node>> const& nodes,
                                .first,
                            Cause::None,
                            "object symbols cannot be globally visible"};
-            e.chain(std::move(Error{activator->leader, Cause::None}.note(
-                "section activated here")));
+            e.chain(Error{activator->leader, Cause::None}.note(
+                "section activated here"));
 
             if (auto const g = sym.has_attr("global"); g) {
                 e.add(each->leader);
@@ -1358,8 +1152,7 @@ auto save_declared_symbols(std::vector<std::unique_ptr<ast::Node>> const& nodes,
             throw e;
         }
 
-        auto symbol     = Elf64_Sym{};
-        symbol.st_name  = name_off;
+        auto symbol     = make_symbol(sym.name, string_table);
         symbol.st_info  = ELF64_ST_INFO(binding, type);
         symbol.st_other = visibility;
 
@@ -1385,8 +1178,8 @@ auto save_declared_symbols(std::vector<std::unique_ptr<ast::Node>> const& nodes,
         symbol.st_shndx = 0;
 
         viua::libs::stage::record_symbol(
-            sym.name.text, symbol, symbol_table, symbol_map);
-        declarations.emplace_back(sym);
+            make_name_from_lexeme(sym.name), symbol, symbol_table, symbol_map);
+        declarations.emplace_back(sym, *activator);
     }
 }
 
@@ -1394,7 +1187,8 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                   std::vector<uint8_t>& rodata_buf,
                   std::vector<uint8_t>& string_table,
                   std::vector<Elf64_Sym>& symbol_table,
-                  std::map<std::string, size_t>& symbol_map) -> void
+                  std::map<std::string, size_t>& symbol_map,
+                  Decl_map const& declared_symbols) -> void
 {
     enum class SECTION {
         NONE,
@@ -1447,7 +1241,12 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
         if (is_label and (active_section == SECTION::RODATA)) {
             auto const& lab = static_cast<ast::Label&>(*each);
             labeller.reset(&lab);
-            active_label = lab.name.text;
+
+            // FIXME add proper unquote
+            active_label =
+                (lab.name.token == viua::libs::lexer::TOKEN::LITERAL_STRING)
+                    ? lab.name.text.substr(1, lab.name.text.size() - 2)
+                    : lab.name.text;
 
             if (not symbol_map.contains(active_label)) {
                 auto local_sym     = make_symbol(active_label, string_table);
@@ -1457,8 +1256,39 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                     active_label, local_sym, symbol_table, symbol_map);
                 active_symbol.reset(&symbol_table.at(sym_ndx));
             } else {
-                active_symbol.reset(
-                    &symbol_table.at(symbol_map.at(active_label)));
+                auto& sym = symbol_table.at(symbol_map.at(active_label));
+                if (ELF64_ST_TYPE(sym.st_info) != STT_OBJECT) {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+
+                    auto const& sym_name = labeller->name;
+
+                    auto e = Error{each->leader,
+                                   Cause::None,
+                                   "invalid definition of symbol "
+                                       + quote_fancy(sym_name.text) + "..."};
+                    e.add(sym_name, true);
+                    e.chain(Error{activator->leader,
+                                  Cause::None,
+                                  ("...in section " + activator->name.text)});
+
+                    auto const& [decl_sym, decl_sec] = *std::ranges::find_if(
+                        declared_symbols,
+                        [&name = labeller->name.text](auto const& dl) -> bool {
+                            return (dl.first.name.text == name);
+                        });
+                    e.chain(Error{decl_sym.leader,
+                                  Cause::None,
+                                  "previously declared here..."}
+                                .add(decl_sym.name, true));
+                    e.chain(Error{decl_sec.leader,
+                                  Cause::None,
+                                  ("...in section " + decl_sec.name.text)});
+
+                    throw e;
+                }
+
+                active_symbol.reset(&sym);
             }
 
             std::cerr << "recording object label " << active_label << " at "
@@ -1470,7 +1300,12 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
             continue;
         }
 
-        if (is_alloc) {
+        if (is_alloc and (active_section != SECTION::RODATA)) {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+
+            throw Error{each->leader, Cause::None, "FUCKUP"};
+        } else if (is_alloc) {
             auto const& alc = static_cast<ast::Object&>(*each);
             std::cerr << "allocating " << alc.type.text << " under label "
                       << active_label << "\n";
@@ -1624,7 +1459,7 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
 
                 auto synth_op  = instr.operands.back().ingredients.front();
                 synth_op.token = TOKEN::LITERAL_INTEGER;
-                synth_op.text  = std::to_string(saved_at);
+                synth_op.text  = std::to_string(saved_at) + 'u';
 
                 instr.operands.back().ingredients.clear();
                 instr.operands.back().ingredients.push_back(synth_op);
@@ -1824,7 +1659,7 @@ auto cache_function_labels(std::vector<std::unique_ptr<ast::Node>> const& nodes,
         if (is_label) {
             auto const& lab = static_cast<ast::Label&>(*each);
             labeller.reset(&lab);
-            active_label = lab.name.text;
+            active_label = make_name_from_lexeme(lab.name);
 
             if (not symbol_map.contains(active_label)) {
                 auto local_sym     = make_symbol(active_label, string_table);
@@ -1918,7 +1753,7 @@ auto emit_instruction(ast::Instruction const insn)
             .encode();
     case FORMAT::R:
     {
-        auto const imm = insn.operands.back().ingredients.front();
+        auto const imm = insn.operands.at(2).ingredients.front();
         auto const is_unsigned =
             (static_cast<opcode_type>(opcode) & viua::arch::ops::UNSIGNED);
         if (is_unsigned and imm.text.at(0) == '-'
@@ -1943,10 +1778,20 @@ auto emit_instruction(ast::Instruction const insn)
         try {
             auto val = uint32_t{};
             if (is_unsigned) {
-                val = std::stoul(imm.text);
+                val = ston<uint32_t>(imm.text);
             } else {
-                auto tmp = static_cast<int32_t>(std::stoi(imm.text));
+                auto const tmp = ston<int32_t>(imm.text);
                 memcpy(&val, &tmp, sizeof(tmp));
+            }
+
+            auto const fits = is_unsigned ? fits_in_unsigned_r_immediate(val)
+                                          : fits_in_signed_r_immediate(val);
+            if (not fits) {
+                using viua::libs::errors::compile_time::Cause;
+                using viua::libs::errors::compile_time::Error;
+                throw Error{imm,
+                            Cause::Value_out_of_range,
+                            "value does not fit into 24-bit wide immediate"};
             }
 
             return viua::arch::ops::R{opcode,
@@ -1985,11 +1830,565 @@ auto emit_instruction(ast::Instruction const insn)
 }
 
 using Text = std::vector<viua::arch::instruction_type>;
+auto expand_li(ast::Instruction const& raw, bool const force_full = false)
+    -> Text
+{
+    auto const& raw_value  = raw.operands.at(1).ingredients.front();
+    auto const is_unsigned = (raw_value.text.back() == 'u');
+    if (is_unsigned and raw_value.text.starts_with('-')
+        and raw_value.text != "-1u") {
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{raw_value, Cause::Value_out_of_range, "negative unsigned"}
+            .note("the only signed value allowed in this context "
+                  "is -1, and\n"
+                  "it is used a symbol for maximum unsigned "
+                  "value");
+    }
+
+    auto value = uint64_t{};
+    try {
+        if (is_unsigned) {
+            value = ston<uint64_t>(raw_value.text);
+        } else {
+            auto const tmp = ston<int64_t>(raw_value.text);
+            memcpy(&value, &tmp, sizeof(tmp));
+        }
+    } catch (std::out_of_range const&) {
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{raw_value, Cause::Invalid_operand, "value out of range"}
+            .add(raw.leader);
+    } catch (std::invalid_argument const&) {
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{raw_value, Cause::Invalid_operand, "expected integer"}.add(
+            raw.leader);
+    }
+
+    using viua::libs::assembler::to_loading_parts_unsigned;
+    auto const [hi, lo]  = to_loading_parts_unsigned(value);
+    auto const is_greedy = (raw.leader.text.find("g.") == 0);
+    auto const full_form = raw.has_attr("full") or force_full;
+
+    std::cerr << "EXPANDING" << (is_unsigned ? " UNSIGNED" : "") << " LI OF "
+              << raw_value.text << " => " << std::hex << std::setfill('0')
+              << std::setw(16) << value << std::dec << std::setfill(' ')
+              << " (";
+    if (is_unsigned) {
+        std::cerr << value;
+    } else {
+        std::cerr << static_cast<int64_t>(value);
+    }
+    std::cerr << ")"
+              << "\n";
+    std::cerr << "  HI " << std::hex << std::setfill('0') << std::setw(8) << hi
+              << "\n";
+    std::cerr << "  LO " << std::setw(8) << lo << "\n";
+    std::cerr << std::setfill(' ') << std::dec;
+
+    auto const important_hi = is_unsigned ? hi
+                                          : (hi != static_cast<uint32_t>(-1));
+
+    auto const fits_in_addi = is_unsigned ? fits_in_unsigned_r_immediate(lo)
+                                          : fits_in_signed_r_immediate(lo);
+
+    auto const needs_leader = full_form or important_hi or (not fits_in_addi);
+
+    /*
+     * When loading immediates we have several cases to consider:
+     *
+     *  - the immediate is short ie, occupies only lower 24-bits and thus fits
+     *    fully in the immediate of an ADDI instruction
+     *  - the immediate is long ie, has any of the high 40 bits set
+     *
+     * In the first case we could be done with a single ADDI, and (if we are not
+     * loading addresses and need to take the pessimistic route to accommodate
+     * the linker) sometimes we can.
+     *
+     * However, in most cases the LI pseudoinstruction must be expanded into two
+     * real instructions:
+     *
+     *  - LUI to load the high word
+     *  - LLI to load the low word
+     *
+     * LUI is necessary even if the long immediate being loaded only has lower
+     * 32 bits set, because LLI needs a value to be already present in the
+     * output register to determine the signedness of its output.
+     *
+     * In any case, for long immediates the sequence of
+     *
+     *      g.lui $x, <high-word>
+     *      lli $x, <low-word>
+     *
+     * is emitted which is cheap and executed without releasing the virtual CPU.
+     */
+    auto cooked = Text{};
+
+    if (needs_leader) {
+        using namespace std::string_literals;
+        auto synth        = raw;
+        synth.leader.text = ((lo or is_greedy) ? "g.lui" : "lui");
+        if (is_unsigned) {
+            synth.leader.text += 'u';
+        }
+
+        auto hi_literal = std::array<char, 2 + 8 + 1>{"0x"};
+        std::to_chars(hi_literal.begin() + 2, hi_literal.end(), hi, 16);
+
+        synth.operands.at(1).ingredients.front().text =
+            std::string{hi_literal.data()};
+        cooked.push_back(emit_instruction(synth));
+    }
+
+    /*
+     * In the second step we use LLI to load the lower word if we are dealing
+     * with a long immediate; or ADDI if we have a short immediate to deal with.
+     */
+    if (needs_leader) {
+        auto synth        = raw;
+        synth.leader.text = (is_greedy ? "g.lli" : "lli");
+
+        auto const& lx = raw.operands.front().ingredients.at(1);
+
+        using viua::libs::lexer::TOKEN;
+        {
+            auto dst = ast::Operand{};
+            dst.ingredients.push_back(lx.make_synth("$", TOKEN::DOLLAR));
+            dst.ingredients.push_back(lx.make_synth(
+                std::to_string(std::stoull(lx.text)), TOKEN::LITERAL_INTEGER));
+            dst.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
+            dst.ingredients.push_back(lx.make_synth("l", TOKEN::LITERAL_ATOM));
+
+            synth.operands.push_back(dst);
+        }
+        {
+            auto immediate = ast::Operand{};
+            immediate.ingredients.push_back(
+                lx.make_synth(std::to_string(lo), TOKEN::LITERAL_INTEGER));
+
+            synth.operands.push_back(immediate);
+        }
+
+        cooked.push_back(emit_instruction(synth));
+    } else {
+        using namespace std::string_literals;
+        auto synth        = raw;
+        synth.leader.text = (is_greedy ? "g." : "") + "addi"s;
+        if (is_unsigned) {
+            synth.leader.text += 'u';
+        }
+
+        /*
+         * Copy the last element (ie, the immediate operand) to easily reuse it.
+         */
+        synth.operands.push_back(synth.operands.back());
+
+        /*
+         * If the first part of the load (the high 36 bits) was zero then it
+         * means we don't have anything to add to so the source (left-hand side
+         * operand) should be void ie, the default value.
+         */
+        synth.operands.at(1).ingredients.front().text = "void";
+        synth.operands.at(1).ingredients.front().token =
+            viua::libs::lexer::TOKEN::VOID;
+
+        cooked.push_back(emit_instruction(synth));
+    }
+
+    std::cerr << "        cooked into " << cooked.size() << " op(s)\n";
+
+    return cooked;
+}
+auto expand_delete(ast::Instruction const& raw) -> Text
+{
+    using namespace std::string_literals;
+    auto synth        = raw;
+    synth.leader      = raw.leader;
+    synth.leader.text = (raw.leader.text.find("g.") == 0 ? "g." : "") + "move"s;
+
+    // FIXME comment this to get a good example of borked-because-synth error
+    // report
+    synth.operands.push_back(synth.operands.front());
+
+    synth.operands.front().ingredients.front().text = "void";
+    synth.operands.front().ingredients.resize(1);
+
+    return {emit_instruction(synth)};
+}
+auto expand_flow_control(ast::Instruction const& raw,
+                         std::vector<Elf64_Sym>& symbol_table,
+                         std::map<std::string, size_t> const& symbol_map,
+                         Decl_map const& decl_map) -> Text
+{
+    auto cooked = Text{};
+
+    /*
+     * Call instructions expansion is simple.
+     *
+     * First, a li pseudoinstruction containing the offset of the
+     * function in the function table is synthesized and expanded. The
+     * call pseudoinstruction is then replaced by a real call
+     * instruction in D format - first register tells it where to put
+     * the return value, and the second tells it from which register to
+     * take the function table offset value.
+     *
+     * If the return register is not void, it is used by the li
+     * pseudoinstruction as base. If it is void, the li
+     * pseudoinstruction has a base register allocated from a free
+     * range.
+     *
+     * In effect, the following pseudoinstruction:
+     *
+     *      call $1, foo
+     *
+     * ...is expanded into this sequence:
+     *
+     *      li $_, fn_tbl_offset(foo)
+     *      call $1, $_
+     */
+    auto const ret = raw.operands.front();
+    auto fn_offset = ret;
+    if (ret.ingredients.front() == "void") {
+        /*
+         * If the return register is void we need a completely synthetic
+         * register to store the function offset. The li
+         * pseudoinstruction uses at most three registers to do its job
+         * so we can use register 253 as the base to avoid disturbing
+         * user code.
+         */
+        fn_offset = ast::Operand{};
+
+        using viua::libs::lexer::TOKEN;
+        auto const& lx = ret.ingredients.front();
+        fn_offset.ingredients.push_back(lx.make_synth("$", TOKEN::DOLLAR));
+        fn_offset.ingredients.push_back(
+            lx.make_synth("253", TOKEN::LITERAL_INTEGER));
+        fn_offset.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
+        fn_offset.ingredients.push_back(
+            lx.make_synth("l", TOKEN::LITERAL_ATOM));
+    }
+
+    /*
+     * Synthesize loading the function offset first. It will emit a
+     * sequence of instructions that will load the offset of the
+     * function, which will then be used by the call instruction to
+     * invoke the function.
+     */
+    auto li = ast::Instruction{};
+    {
+        li.leader      = raw.leader;
+        li.leader.text = "g.li";
+
+        li.operands.push_back(fn_offset);
+        li.operands.push_back(fn_offset);
+
+        using viua::libs::lexer::TOKEN;
+
+        auto const sym_id   = raw.operands.back().ingredients.front();
+        auto const sym_name = make_name_from_lexeme(sym_id);
+        if (symbol_map.count(sym_name) == 0) {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+
+            auto const cause = (raw.leader == "if")
+                                   ? Cause::Jump_to_undefined_label
+                                   : Cause::Call_to_undefined_function;
+
+            throw Error{sym_id, cause, quote_fancy(sym_name)}.add(raw.leader);
+        }
+
+        auto const sym_off = symbol_map.at(sym_name);
+        auto const sym     = symbol_table.at(sym_off);
+        if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+
+            throw Error{sym_id, Cause::Invalid_reference, quote_fancy(sym_name)}
+                .aside("label " + quote_fancy(sym_name)
+                       + " does not point into .text section")
+                .add(raw.leader);
+        }
+
+        auto const is_jump_label = (ELF64_ST_BIND(sym.st_info) == STB_LOCAL)
+                                   and (sym.st_other == STV_HIDDEN);
+        if (is_jump_label and raw.leader != "if") {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+
+            throw Error{sym_id,
+                        Cause::Invalid_reference,
+                        quote_fancy(sym_name) + " cannot be used as a callable"}
+                .aside("label " + quote_fancy(sym_name)
+                       + " defined as a jump target")
+                .add(raw.leader);
+        }
+        if ((not is_jump_label) and raw.leader == "if") {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+
+            auto const& [decl_sym, decl_sec] = *std::ranges::find_if(
+                decl_map, [&name = sym_name](auto const& dl) -> bool {
+                    return (dl.first.name.text == name);
+                });
+
+            throw Error{
+                sym_id,
+                Cause::Invalid_reference,
+                quote_fancy(sym_name) + " cannot be used as a jump target"}
+                .aside("label " + quote_fancy(sym_name)
+                       + " defined as callable")
+                .add(raw.leader)
+                .chain(Error{decl_sym.name, Cause::None}
+                           .note("declared here")
+                           .add(decl_sym.leader));
+        }
+
+        li.operands.back().ingredients.front().text =
+            (std::to_string(sym_off) + 'u');
+        li.operands.back().ingredients.front().token = TOKEN::LITERAL_INTEGER;
+    }
+    std::ranges::copy(expand_li(li, true), std::back_inserter(cooked));
+
+    /*
+     * Then, synthesize the actual call instruction. This means
+     * simply replacing the function name with the register
+     * containing its loaded offset, ie, changing this code:
+     *
+     *      call $42, foo
+     *
+     * to this:
+     *
+     *      call $42, $42
+     */
+    auto call = ast::Instruction{};
+    {
+        call.leader = raw.leader;
+        call.operands.push_back(ret);
+        call.operands.push_back(fn_offset);
+    }
+    cooked.push_back(emit_instruction(call));
+
+    std::cerr << "        cooked into " << cooked.size() << " ops\n";
+
+    return cooked;
+}
+auto expand_atom(ast::Instruction const& raw) -> Text
+{
+    auto cooked = Text{};
+
+    /*
+     * Synthesize loading the atom offset first. It will emit a
+     * sequence of instructions that will load the offset of the
+     * data, which will then be used by the ATOM instruction to create the
+     * object.
+     */
+    auto li = raw;
+    {
+        li.leader      = raw.leader;
+        li.leader.text = "g.li";
+    }
+    std::ranges::copy(expand_li(li, true), std::back_inserter(cooked));
+
+    /*
+     * Then, synthesize the actual ATOM instruction. This means
+     * simply replacing the literal atom (or a reference to one) with the
+     * register containing its loaded offset ie, changing this code:
+     *
+     *      atom $42, foo
+     *
+     * to this:
+     *
+     *      li $42, rodata_offset_of(foo)
+     *      atom $42
+     */
+    auto synth = raw;
+    synth.operands.pop_back();
+    cooked.push_back(emit_instruction(synth));
+
+    std::cerr << "        cooked into " << cooked.size() << " ops\n";
+
+    return cooked;
+}
+auto expand_return(ast::Instruction const& raw) -> Text
+{
+    if (not raw.operands.empty()) {
+        return {emit_instruction(raw)};
+    }
+
+    using namespace std::string_literals;
+    auto synth = raw;
+
+    /*
+     * Return instruction takes a single register operand, but this operand can
+     * be omitted. As in C, if omitted it defaults to void.
+     */
+    auto operand = ast::Operand{};
+    operand.ingredients.push_back(raw.leader);
+    operand.ingredients.back().text  = "void";
+    operand.ingredients.back().token = viua::libs::lexer::TOKEN::VOID;
+    synth.operands.push_back(operand);
+
+    return {emit_instruction(synth)};
+}
+auto expand_memory_access(ast::Instruction const& raw) -> Text
+{
+    using namespace std::string_literals;
+    auto synth = ast::Instruction{};
+
+    auto opcode_view = std::string_view{raw.leader.text};
+    auto greedy      = opcode_view.starts_with("g.");
+    if (greedy) {
+        opcode_view.remove_prefix(2);
+    }
+
+    synth.leader         = raw.leader;
+    synth.leader.text    = opcode_view;
+    synth.leader.text[1] = 'm';
+    if (opcode_view[0] == 'a') {
+        switch (synth.leader.text.back()) {
+        case 'a':
+            synth.leader.text = "ama";
+            break;
+        case 'd':
+            synth.leader.text = "amd";
+            break;
+        default:
+            abort();
+        }
+    }
+
+    synth.operands.push_back(raw.operands.at(0));
+    synth.operands.push_back(raw.operands.at(0));
+    synth.operands.push_back(raw.operands.at(1));
+    synth.operands.push_back(raw.operands.at(2));
+
+    auto const unit = opcode_view[0] == 'a' ? opcode_view[2] : opcode_view[1];
+    switch (unit) {
+    case 'b':
+        synth.operands.front().ingredients.front().text = "0";
+        break;
+    case 'h':
+        synth.operands.front().ingredients.front().text = "1";
+        break;
+    case 'w':
+        synth.operands.front().ingredients.front().text = "2";
+        break;
+    case 'd':
+        synth.operands.front().ingredients.front().text = "3";
+        break;
+    case 'q':
+        synth.operands.front().ingredients.front().text = "4";
+        break;
+    default:
+        abort();
+    }
+    synth.operands.front().ingredients.resize(1);
+
+    if (greedy) {
+        synth.leader.text = ("g." + synth.leader.text);
+    }
+
+    return {emit_instruction(synth)};
+}
+auto expand_immediate_arithmetic(ast::Instruction const& raw) -> Text
+{
+    auto synth = raw;
+    if (synth.operands.back().ingredients.back().text.back() == 'u') {
+        synth.leader.text += 'u';
+    }
+    return {emit_instruction(synth)};
+}
+
+auto expand_instruction(ast::Instruction const& raw,
+                        std::vector<Elf64_Sym>& symbol_table,
+                        std::map<std::string, size_t> const& symbol_map,
+                        Decl_map const& decl_map) -> Text
+{
+    auto const memory_access = std::set<std::string_view>{
+        /*
+         * Access
+         */
+        "sb",
+        "lb",
+        "sh",
+        "lh",
+        "sw",
+        "lw",
+        "sd",
+        "ld",
+        "sq",
+        "lq",
+
+        "g.sb",
+        "g.lb",
+        "g.sh",
+        "g.lh",
+        "g.sw",
+        "g.lw",
+        "g.sd",
+        "g.ld",
+        "g.sq",
+        "g.lq",
+
+        /*
+         * Allocation
+         */
+        "amba",
+        "amha",
+        "amwa",
+        "amda",
+        "amqa",
+        "ambd",
+        "amhd",
+        "amwd",
+        "amdd",
+        "amqd",
+    };
+    auto const immediate_signed_arithmetic = std::set<std::string_view>{
+        "addi",
+        "g.addi",
+        "subi",
+        "g.subi",
+        "muli",
+        "g.muli",
+        "divi",
+        "g.divi",
+    };
+
+    auto const strip_greedy = [](std::string_view op) -> std::string_view {
+        if (op.starts_with("g.")) {
+            op.remove_prefix(2);
+        }
+        return op;
+    };
+    auto const opcode = strip_greedy(raw.leader.text);
+
+    if (opcode == "li") {
+        return expand_li(raw);
+    } else if (opcode == "delete") {
+        return expand_delete(raw);
+    } else if (opcode == "call" or opcode == "actor" or opcode == "if") {
+        return expand_flow_control(raw, symbol_table, symbol_map, decl_map);
+    } else if (opcode == "return") {
+        return expand_return(raw);
+    } else if (opcode == "atom") {
+        return expand_atom(raw);
+    } else if (memory_access.contains(opcode)) {
+        return expand_memory_access(raw);
+    } else if (immediate_signed_arithmetic.contains(opcode)) {
+        return expand_immediate_arithmetic(raw);
+    } else {
+        return {emit_instruction(raw)};
+    }
+}
+
 auto cook_instructions(std::vector<std::unique_ptr<ast::Node>> const& nodes,
-                       std::vector<uint8_t>& rodata_buf,
-                       std::vector<uint8_t>& string_table,
+                       std::vector<uint8_t> const& rodata_buf,
+                       std::vector<uint8_t> const& string_table,
                        std::vector<Elf64_Sym>& symbol_table,
-                       std::map<std::string, size_t>& symbol_map) -> Text
+                       std::map<std::string, size_t> const& symbol_map,
+                       Decl_map const& decl_map) -> Text
 {
     enum class SECTION {
         NONE,
@@ -2076,7 +2475,7 @@ auto cook_instructions(std::vector<std::unique_ptr<ast::Node>> const& nodes,
         if (is_label) {
             auto const& lab = static_cast<ast::Label&>(*each);
             labeller.reset(&lab);
-            active_label = lab.name.text;
+            active_label = make_name_from_lexeme(lab.name);
 
             auto labelled_symbol = std::experimental::observer_ptr<Elf64_Sym>{};
             if (symbol_map.contains(active_label)) {
@@ -2090,6 +2489,12 @@ auto cook_instructions(std::vector<std::unique_ptr<ast::Node>> const& nodes,
                             "text label without attached symbol"};
             }
 
+            /*
+             * The st_value can be set now, because we know for sure that it
+             * will contain the right physical address since all the
+             * instructions that preceded it were already expanded to their full
+             * form.
+             */
             labelled_symbol->st_value =
                 (text.size() * sizeof(viua::arch::instruction_type));
 
@@ -2110,6 +2515,7 @@ auto cook_instructions(std::vector<std::unique_ptr<ast::Node>> const& nodes,
                       << std::setw(16)
                       << (text.size() * sizeof(viua::arch::instruction_type))
                       << std::dec << std::setfill(' ') << "]\n";
+            std::cerr << "      .text has " << text.size() << " op(s)\n";
 
             active_symbol = labelled_symbol;
 
@@ -2117,10 +2523,27 @@ auto cook_instructions(std::vector<std::unique_ptr<ast::Node>> const& nodes,
         }
 
         if (is_instruction) {
-            auto const& instr = static_cast<ast::Instruction&>(*each);
-            std::cerr << "    cooking " << instr.leader.text << "\n";
+            auto const& raw_instr = static_cast<ast::Instruction&>(*each);
+            std::cerr << "    cooking " << raw_instr.leader.text << "\n";
 
-            text.push_back(0);
+            // 1. expand the raw instruction
+            // 2. append the resulting sequence to text
+            //
+            // The trick is that we do not have to care about physical addresses
+            // right now, and thus can expand as we go and disregard the
+            // difference between physical and logical index of each individual
+            // instruction.
+            //
+            // Since IF branches are mandaded to point to labels there is no
+            // risk of accidentally inserting a physical address at this stage.
+            // Just insert the index pointing to the symbol table, and fill it
+            // in in the next step.
+
+            std::ranges::copy(
+                expand_instruction(
+                    raw_instr, symbol_table, symbol_map, decl_map),
+                std::back_inserter(text));
+            std::cerr << "      .text has " << text.size() << " op(s)\n";
         }
     }
     save_size_of_active_function();
@@ -2883,12 +3306,18 @@ auto main(int argc, char* argv[]) -> int
         dump_nodes(nodes);
     }
 
-    auto declared_symbols = std::vector<ast::Symbol>{};
+    auto declared_symbols = Decl_map{};
     auto rodata_contents  = std::vector<uint8_t>{};
     auto string_table     = std::vector<uint8_t>{};
     auto symbol_table     = std::vector<Elf64_Sym>{};
     auto symbol_map       = std::map<std::string, size_t>{};
     auto fn_offsets       = std::map<std::string, size_t>{};
+
+    /*
+     * Allocate the first 64 bits of .rodata to prevent any local values from
+     * having address of 0.
+     */
+    rodata_contents.resize(8);
 
     /*
      * ELF standard requires the first byte in the string table to be zero.
@@ -2902,9 +3331,9 @@ auto main(int argc, char* argv[]) -> int
         empty.st_shndx = SHN_UNDEF;
         symbol_table.push_back(empty);
 
-        auto file_sym    = Elf64_Sym{};
-        file_sym.st_name = viua::libs::stage::save_string_to_strtab(
-            string_table, source_path.native());
+        auto file_sym = Elf64_Sym{};
+        file_sym.st_name =
+            save_string_to_strtab(string_table, source_path.native());
         file_sym.st_info  = ELF64_ST_INFO(STB_LOCAL, STT_FILE);
         file_sym.st_shndx = SHN_ABS;
         symbol_table.push_back(file_sym);
@@ -2919,53 +3348,32 @@ auto main(int argc, char* argv[]) -> int
     }
 
     try {
-        save_objects(
-            nodes, rodata_contents, string_table, symbol_table, symbol_map);
+        save_objects(nodes,
+                     rodata_contents,
+                     string_table,
+                     symbol_table,
+                     symbol_map,
+                     declared_symbols);
     } catch (viua::libs::errors::compile_time::Error const& e) {
         viua::libs::stage::display_error_and_exit(source_path, source_text, e);
     }
 
     auto text = Text{};
     try {
-        text = cook_instructions(
-            nodes, rodata_contents, string_table, symbol_table, symbol_map);
+        text = cook_instructions(nodes,
+                                 rodata_contents,
+                                 string_table,
+                                 symbol_table,
+                                 symbol_map,
+                                 declared_symbols);
     } catch (viua::libs::errors::compile_time::Error const& e) {
         viua::libs::stage::display_error_and_exit(source_path, source_text, e);
     }
-
-#if 0
-
-    stage::load_function_labels(nodes, string_table, symbol_table, symbol_map);
-    stage::load_value_labels(source_path,
-                             source_text,
-                             nodes,
-                             rodata_contents,
-                             string_table,
-                             symbol_table,
-                             symbol_map);
-
-    stage::cook_long_immediates(source_path,
-                                source_text,
-                                nodes,
-                                rodata_contents,
-                                symbol_table,
-                                symbol_map);
-#endif
 
     /*
      * ELF standard requires the last byte in the string table to be zero.
      */
     string_table.push_back('\0');
-
-#if 0
-    /*
-     * Pseudoinstruction- and macro-expansion.
-     *
-     * Replace pseudoinstructions (eg, li) with sequences of real instructions
-     * that will have the same effect. Ditto for macros.
-     */
-    stage::cook_pseudoinstructions(source_path, source_text, nodes, symbol_map);
-#endif
 
     /*
      * Detect entry point function.
@@ -2989,24 +3397,12 @@ auto main(int argc, char* argv[]) -> int
                   << std::setfill(' ') << "]\n";
     }
 
-#if 0
-    /*
-     * Bytecode emission.
-     *
-     * This stage is also responsible for preparing the function table. It is a
-     * table mapping function names to the offsets inside the .text section, at
-     * which their entry points reside.
-     */
-    auto const text = stage::emit_bytecode(
-        source_path, source_text, nodes, symbol_table, symbol_map);
-#endif
-    auto const reloc_table = make_reloc_table(text);
-
-    for (auto const& decl : declared_symbols) {
-        auto const& sym = symbol_table.at(symbol_map.at(decl.name.text));
+    for (auto const& [decl_sym, decl_sec] : declared_symbols) {
+        auto const& sym = symbol_table.at(
+            symbol_map.at(make_name_from_lexeme(decl_sym.name)));
 
         auto const was_declared_extern =
-            static_cast<bool>(decl.has_attr("extern"));
+            static_cast<bool>(decl_sym.has_attr("extern"));
         auto const was_defined =
             static_cast<bool>(sym.st_value and sym.st_size);
 
@@ -3015,7 +3411,7 @@ auto main(int argc, char* argv[]) -> int
             using viua::libs::errors::compile_time::Error;
 
             auto e = Error{
-                decl.name,
+                decl_sym.name,
                 Cause::None,
                 "symbol declared [[extern]], but a definition was provided"};
             viua::libs::stage::display_error_and_exit(
@@ -3024,7 +3420,7 @@ auto main(int argc, char* argv[]) -> int
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
 
-            auto e = Error{decl.name,
+            auto e = Error{decl_sym.name,
                            Cause::None,
                            "symbol declared, but no definition was provided"};
             e.note("add [[extern]] if the symbol is defined in another "
@@ -3037,6 +3433,7 @@ auto main(int argc, char* argv[]) -> int
     /*
      * ELF emission.
      */
+    auto const reloc_table = make_reloc_table(text);
     emit_elf(
         output_path,
         false,

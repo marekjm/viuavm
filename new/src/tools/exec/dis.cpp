@@ -29,14 +29,15 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <ranges>
 #include <regex>
 
 #include <viua/arch/ops.h>
 #include <viua/libs/assembler.h>
 #include <viua/libs/lexer.h>
+#include <viua/support/errno.h>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
-#include <viua/support/errno.h>
 #include <viua/vm/core.h>
 #include <viua/vm/elf.h>
 
@@ -124,6 +125,19 @@ auto match_atom(std::string_view sv) -> bool
     return std::regex_match(sv.data(), m, re);
 }
 
+auto is_jump_label(Elf64_Sym const sym) -> bool
+{
+    if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
+        return false;
+    }
+    if (ELF64_ST_BIND(sym.st_info) != STB_LOCAL) {
+        return false;
+    }
+    if (sym.st_other != STV_HIDDEN) {
+        return false;
+    }
+    return true;
+}
 auto is_extern(Elf64_Sym const sym) -> bool
 {
     return sym.st_value == 0;
@@ -334,24 +348,35 @@ auto demangle_canonical_li(Cooked_text& text,
             auto const lli       = F::decode(ins_at(i + 1));
             auto const low_part  = lli.immediate;
 
-            auto const literal = (high_part | low_part);
+            auto const value = (high_part | low_part);
 
             using viua::arch::ops::GREEDY;
             auto const needs_greedy   = m((i + 1), LLI, GREEDY);
             auto const needs_unsigned = m(i, LUIU, GREEDY);
 
+            auto const literal =
+                needs_unsigned
+                    ? ((value == std::numeric_limits<uint64_t>::max())
+                           ? "-1u"
+                           : (std::to_string(value) + 'u'))
+                    : std::to_string(static_cast<int64_t>(value));
+
             auto idx = text.at(i).index;
             ++i;  // skip the LLI
             idx.physical_span = i;
+
+            // FIXME detect if adding [[full]] is really needed
             tmp.emplace_back(
                 idx,
                 std::nullopt,
                 std::nullopt,
-                ((needs_greedy ? "g." : "") + std::string{"li "}
-                 + lui.out.to_string() + ", " + "[[full]] "
-                 + std::to_string(literal) + (needs_unsigned ? "u" : "")));
-            demangle_symbol_load(
-                text, tmp, i, lui.out, literal, symtab, strtab, rodata);
+                (std::string{"[[full]] "} + (needs_greedy ? "g." : "")
+                 + std::string{"li "} + lui.out.to_string() + ", " + literal));
+
+            if (needs_unsigned) {
+                demangle_symbol_load(
+                    text, tmp, i, lui.out, value, symtab, strtab, rodata);
+            }
         } else {
             tmp.push_back(std::move(text.at(i)));
         }
@@ -387,15 +412,20 @@ auto demangle_short_li(Cooked_text& text) -> void
                 auto const needs_unsigned =
                     (m(i, ADDIU, GREEDY) or m(i, ADDIU));
 
+                auto const value = addi.immediate;
+                auto const literal =
+                    needs_unsigned
+                        ? (std::to_string(value) + 'u')
+                        : std::to_string(static_cast<int32_t>(value << 8) >> 8);
+
                 auto idx          = text.at(i).index;
                 idx.physical_span = idx.physical;
-                tmp.emplace_back(idx,
-                                 std::nullopt,
-                                 std::nullopt,
-                                 ((needs_greedy ? "g." : "")
-                                  + std::string{"li "} + addi.out.to_string()
-                                  + ", " + std::to_string(addi.immediate)
-                                  + (needs_unsigned ? "u" : "")));
+                tmp.emplace_back(
+                    idx,
+                    std::nullopt,
+                    std::nullopt,
+                    ((needs_greedy ? "g." : "") + std::string{"li "}
+                     + addi.out.to_string() + ", " + literal));
 
                 continue;
             }
@@ -619,8 +649,8 @@ auto demangle_memory(Cooked_text& text) -> void
             auto const op     = E::decode(raw_op);
 
             auto desired_type = std::string{"void"};
-            switch (static_cast<viua::vm::Register::Types>(op.immediate)) {
-                using enum viua::vm::Register::Types;
+            switch (static_cast<viua::arch::FUNDAMENTAL_TYPES>(op.immediate)) {
+                using enum viua::arch::FUNDAMENTAL_TYPES;
             case INT:
                 desired_type = "int";
                 break;
@@ -832,9 +862,8 @@ auto main(int argc, char* argv[]) -> int
 
             std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                       << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                      << esc(2, ATTR_RESET)
-                      << ": " << errname
-                      << ": " << errdesc << "\n";
+                      << esc(2, ATTR_RESET) << ": " << errname << ": "
+                      << errdesc << "\n";
             return 1;
         }
         if ((statbuf.st_mode & S_IFMT) != S_IFREG) {
@@ -858,9 +887,8 @@ auto main(int argc, char* argv[]) -> int
 
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET)
-                  << ": " << errname
-                  << ": " << errdesc << "\n";
+                  << esc(2, ATTR_RESET) << ": " << errname << ": " << errdesc
+                  << "\n";
         return 1;
     }
 
@@ -936,6 +964,8 @@ auto main(int argc, char* argv[]) -> int
 
     auto const rodata = main_module.find_fragment(".rodata");
     if (rodata.has_value()) {
+        out << ".section \".rodata\"\n\n";
+
         auto const symtab                      = main_module.symtab;
         auto extern_object_definitions_present = false;
         for (auto const& sym : main_module.symtab) {
@@ -999,12 +1029,36 @@ auto main(int argc, char* argv[]) -> int
                 << " [.rodata+0x" << std::hex << std::setw(16)
                 << std::setfill('0') << (off + data_size) << "] (" << std::dec
                 << data_size << " byte" << (data_size == 1 ? "" : "s") << ")\n";
-            out << ".label: " << label << "\n";
 
-            out << ".value: string " << viua::support::string::quoted(sv)
+            auto const sym_bind = ELF64_ST_BIND(sym.st_info);
+            auto const sym_vis  = sym.st_other;
+            auto const sym_is_unit_local =
+                (sym_bind == STB_LOCAL and sym_vis == STV_DEFAULT);
+            auto const sym_is_module_local =
+                (sym_bind == STB_GLOBAL and sym_vis == STV_HIDDEN);
+            auto const sym_is_global =
+                (sym_bind == STB_GLOBAL and sym_vis == STV_DEFAULT);
+
+            if (sym_is_unit_local) {
+                out << ".symbol " << label << "\n";
+            } else if (sym_is_module_local) {
+                out << ".symbol [[global,hidden]] " << label << "\n";
+            } else if (sym_is_global) {
+                out << ".symbol [[global]] " << label << "\n";
+            } else {
+                /*
+                 * Do not emit .symbol directive.
+                 */
+            }
+
+            out << ".label " << label << "\n";
+
+            out << ".object string " << viua::support::string::quoted(sv)
                 << "\n\n";
         }
     }
+
+    out << ".section \".text\"\n";
 
     auto extern_fn_definitions_present = false;
     for (auto const& sym : main_module.symtab) {
@@ -1021,13 +1075,28 @@ auto main(int argc, char* argv[]) -> int
 
         auto const name      = std::string{main_module.str_at(sym.st_name)};
         auto const safe_name = match_atom(name) ? name : ('"' + name + '"');
-        out << ".function: [[extern]] " << safe_name << "\n";
+        out << "\n.symbol [[extern]] " << safe_name;
         extern_fn_definitions_present = true;
     }
     if (extern_fn_definitions_present) {
         out << "\n";
     }
 
+#if 0
+    auto const all_jump_labels = main_module.symtab | std::views::filter([](auto const& sym)
+    {
+        if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
+            return false;
+        }
+        if (ELF64_ST_BIND(sym.st_info) != STB_LOCAL) {
+            return false;
+        }
+        if (sym.st_other != STV_HIDDEN) {
+            return false;
+        }
+        return true;
+    });
+#endif
     auto ef = main_module.name_function_at(entry_addr);
     for (auto const& sym : main_module.symtab) {
         if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
@@ -1037,15 +1106,18 @@ auto main(int argc, char* argv[]) -> int
         if (is_extern(sym)) {
             continue;
         }
+        if (is_jump_label(sym)) {
+            continue;
+        }
 
         auto const addr      = sym.st_value;
         auto const size      = sym.st_size;
         auto const no_of_ops = (size / sizeof(viua::arch::instruction_type));
 
-        out << "; [.text+0x" << std::setw(16) << std::setfill('0') << addr
-            << "] to "
+        out << "\n; [.text+0x" << std::hex << std::setw(16) << std::setfill('0')
+            << addr << "] to "
             << "[.text+0x" << std::setw(16) << std::setfill('0')
-            << (addr + size) << "] (" << no_of_ops << " instruction"
+            << (addr + size) << "] (" << std::dec << no_of_ops << " instruction"
             << (no_of_ops ? "s" : "") << ")\n";
 
         /*
@@ -1054,8 +1126,73 @@ auto main(int argc, char* argv[]) -> int
          */
         auto const name      = std::string{main_module.str_at(sym.st_name)};
         auto const safe_name = match_atom(name) ? name : ('"' + name + '"');
-        out << ".function: " << ((ef == name) ? "[[entry_point]] " : "")
-            << safe_name << "\n";
+
+        auto const sym_bind = ELF64_ST_BIND(sym.st_info);
+        auto const sym_vis  = sym.st_other;
+        auto const sym_is_unit_local =
+            (sym_bind == STB_LOCAL and sym_vis == STV_DEFAULT);
+        auto const sym_is_module_local =
+            (sym_bind == STB_GLOBAL and sym_vis == STV_HIDDEN);
+        auto const sym_is_global =
+            (sym_bind == STB_GLOBAL and sym_vis == STV_DEFAULT);
+
+        if (sym_is_unit_local) {
+            out << ".symbol [[local]] " << safe_name << "\n";
+        } else if (sym_is_module_local) {
+            out << ".symbol [[hidden]] " << safe_name << "\n";
+        } else if (sym_is_global) {
+            out << ".symbol " << ((ef == name) ? "[[entry_point]] " : "")
+                << safe_name << "\n";
+        } else {
+            /*
+             * Do not emit .symbol directive.
+             * The symbol is not callable.
+             */
+        }
+
+        out << ".label " << safe_name << "\n";
+
+        auto own_jump_labels = std::map<size_t, Elf64_Sym const*>{};
+#if 0
+        std::ranges::copy(all_jump_labels
+            | std::views::filter([addr, size](auto const& sym)
+                {
+                    if (sym.st_value <= addr) {
+                        return false;
+                    }
+                    if (sym.st_value >= (addr + size)) {
+                        return false;
+                    }
+                    return true;
+                }), [&own_jump_labels](auto const& sym)
+                    {
+                        return own_jump_labels.emplace(sym.st_value, &sym);
+                    });
+#endif
+        std::for_each(main_module.symtab.begin(),
+                      main_module.symtab.end(),
+                      [&own_jump_labels, addr, size](auto const& sym) {
+                          if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
+                              return;
+                          }
+                          if (ELF64_ST_BIND(sym.st_info) != STB_LOCAL) {
+                              return;
+                          }
+                          if (sym.st_other != STV_HIDDEN) {
+                              return;
+                          }
+                          if (sym.st_value < addr) {
+                              return;
+                          }
+                          if (sym.st_value >= (addr + size)) {
+                              return;
+                          }
+                          own_jump_labels.emplace(sym.st_value, &sym);
+                      });
+
+        if (not own_jump_labels.empty()) {
+            out << ".begin\n";
+        }
 
         auto cooked_text  = Cooked_text{};
         auto const offset = (addr / sizeof(viua::arch::instruction_type));
@@ -1099,6 +1236,20 @@ auto main(int argc, char* argv[]) -> int
                "<logical>:<physical-span>\n";
         for (auto i = size_t{}; i < cooked_text.size(); ++i) {
             auto const& [index, op, ip, s] = cooked_text.at(i);
+            auto const op_addr =
+                (addr
+                 + (sizeof(viua::arch::instruction_type) * index.physical));
+
+            if (own_jump_labels.contains(op_addr)) {
+                auto jump_label_sym = own_jump_labels.at(op_addr);
+                auto const jl_name =
+                    std::string{main_module.str_at(jump_label_sym->st_name)};
+                auto const jl_safe_name =
+                    match_atom(jl_name) ? jl_name : ('"' + jl_name + '"');
+
+                out << ".label " << jl_safe_name << "\n";
+            }
+
             out << "    ; ";
             if (ip.has_value()) {
                 out << std::setw(16) << std::setfill('0') << std::hex << *ip;
@@ -1107,9 +1258,7 @@ auto main(int argc, char* argv[]) -> int
             }
 
             out << "  ";
-            out << std::setw(16) << std::setfill('0') << std::hex
-                << (addr
-                    + (sizeof(viua::arch::instruction_type) * index.physical));
+            out << std::setw(16) << std::setfill('0') << std::hex << op_addr;
 
             out << "  " << std::dec << std::setw(2) << std::setfill(' ') << i
                 << ":" << index.physical;
@@ -1121,7 +1270,9 @@ auto main(int argc, char* argv[]) -> int
             out << "    " << s << "\n";
         }
 
-        out << ".end\n\n";
+        if (not own_jump_labels.empty()) {
+            out << ".begin\n";
+        }
     }
 
     return 0;

@@ -22,8 +22,8 @@
 #include <filesystem>
 #include <iostream>
 
-#include <viua/support/tty.h>
 #include <viua/support/errno.h>
+#include <viua/support/tty.h>
 #include <viua/vm/elf.h>
 
 auto main(int argc, char* argv[]) -> int
@@ -105,9 +105,8 @@ auto main(int argc, char* argv[]) -> int
 
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.string()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET)
-                  << ": " << errname
-                  << ": " << errdesc << "\n";
+                  << esc(2, ATTR_RESET) << ": " << errname << ": " << errdesc
+                  << "\n";
         return 1;
     }
 
