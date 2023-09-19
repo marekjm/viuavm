@@ -737,11 +737,13 @@ auto main(int argc, char* argv[]) -> int
     }
 
     auto preferred_output_path = std::optional<std::filesystem::path>{};
-    auto demangle_li           = true;
     auto verbosity_level       = 0;
     auto show_version          = false;
     auto show_help             = false;
     auto singles               = std::vector<viua::arch::instruction_type>{};
+
+    auto demangle_li  = true;
+    auto demangle_mem = true;
 
     for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
         auto const& each = args.at(i);
@@ -753,9 +755,12 @@ auto main(int argc, char* argv[]) -> int
          * Tool-specific options.
          */
         else if (each == "--no-demangle=all") {
-            demangle_li = false;
+            demangle_li  = false;
+            demangle_mem = false;
         } else if (each == "--no-demangle=li") {
             demangle_li = false;
+        } else if (each == "--no-demangle=mem") {
+            demangle_mem = false;
         } else if (each == "-i") {
             singles.push_back(std::stoull(args.at(++i), nullptr, 0));
         } else if (each == "-o") {
@@ -1083,7 +1088,10 @@ auto main(int argc, char* argv[]) -> int
                              main_module.symtab,
                              main_module.strtab_quick,
                              rodata->get().data);
-        cook::demangle_memory(cooked_text);
+
+        if (demangle_mem) {
+            cook::demangle_memory(cooked_text);
+        }
 
         auto const physical_to_logical = cook::demangle_branches(cooked_text);
 
