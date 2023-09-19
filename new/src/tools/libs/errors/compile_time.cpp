@@ -45,8 +45,14 @@ auto to_string(Cause const ce) -> std::string_view
         return "invalid register access";
     case Cause::Too_few_operands:
         return "too few operands";
+    case Cause::Reference_to_undefined_symbol:
+        return "reference to undefined symbol";
     case Cause::Call_to_undefined_function:
         return "call to undefined function";
+    case Cause::Jump_to_undefined_label:
+        return "jump to undefined label";
+    case Cause::Invalid_reference:
+        return "invalid reference";
     case Cause::Value_out_of_range:
         return "value out of range";
     case Cause::Invalid_operand:

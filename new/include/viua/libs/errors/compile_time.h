@@ -62,7 +62,11 @@ enum class Cause {
     Invalid_register_access,
     Too_few_operands,
 
+    Reference_to_undefined_symbol,
     Call_to_undefined_function,
+    Jump_to_undefined_label,
+
+    Invalid_reference,
 
     Value_out_of_range,
     Invalid_operand,
