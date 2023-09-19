@@ -212,8 +212,15 @@ auto R::encode() const -> instruction_type
 }
 auto R::to_string() const -> std::string
 {
+    auto imm_str = std::to_string(immediate);
+    if (not(opcode & viua::arch::ops::UNSIGNED)) {
+        auto tmp = int32_t{};
+        memcpy(&tmp, &immediate, sizeof(immediate));
+        tmp     = ((tmp << 8) >> 8);  // sign extend
+        imm_str = std::to_string(tmp);
+    }
     return (viua::arch::ops::to_string(opcode) + " " + out.to_string() + ", "
-            + in.to_string() + ", " + std::to_string(immediate));
+            + in.to_string() + ", " + imm_str);
 }
 }  // namespace viua::arch::ops
 namespace viua::arch::ops {

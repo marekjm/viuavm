@@ -1847,6 +1847,143 @@ auto cache_function_labels(std::vector<std::unique_ptr<ast::Node>> const& nodes,
     }
 }
 
+auto operand_or_throw(ast::Instruction const& insn, size_t const index)
+    -> ast::Operand const&
+{
+    try {
+        return insn.operands.at(index);
+    } catch (std::out_of_range const&) {
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{insn.leader,
+                    Cause::Too_few_operands,
+                    ("operand " + std::to_string(index) + " not found")};
+    }
+}
+auto emit_instruction(ast::Instruction const insn)
+    -> viua::arch::instruction_type
+{
+    using viua::arch::opcode_type;
+    using viua::arch::ops::FORMAT;
+    using viua::arch::ops::FORMAT_MASK;
+    using viua::arch::ops::OPCODE;
+
+    auto opcode = opcode_type{};
+    try {
+        opcode = viua::arch::ops::parse_opcode(insn.leader.text);
+    } catch (std::invalid_argument const&) {
+        auto const e = insn.leader;
+
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{e, Cause::Unknown_opcode, e.text};
+    }
+    auto format = static_cast<FORMAT>(opcode & FORMAT_MASK);
+    switch (format) {
+    case FORMAT::N:
+        return static_cast<uint64_t>(opcode);
+    case FORMAT::T:
+        return viua::arch::ops::T{opcode,
+                                  operand_or_throw(insn, 0).make_access(),
+                                  operand_or_throw(insn, 1).make_access(),
+                                  operand_or_throw(insn, 2).make_access()}
+            .encode();
+    case FORMAT::D:
+        return viua::arch::ops::D{opcode,
+                                  operand_or_throw(insn, 0).make_access(),
+                                  operand_or_throw(insn, 1).make_access()}
+            .encode();
+    case FORMAT::S:
+        return viua::arch::ops::S{opcode,
+                                  operand_or_throw(insn, 0).make_access()}
+            .encode();
+    case FORMAT::F:
+    {
+        auto const raw = operand_or_throw(insn, 1).ingredients.front().text;
+        auto val       = static_cast<uint32_t>(std::stoul(raw, nullptr, 0));
+        if (static_cast<OPCODE>(opcode) == OPCODE::FLOAT) {
+            auto tmp = std::stof(raw);
+            memcpy(&val, &tmp, sizeof(val));
+        }
+        return viua::arch::ops::F{
+            opcode, operand_or_throw(insn, 0).make_access(), val}
+            .encode();
+    }
+    case FORMAT::E:
+        return viua::arch::ops::E{
+            opcode,
+            operand_or_throw(insn, 0).make_access(),
+            std::stoull(
+                operand_or_throw(insn, 1).ingredients.front().text, nullptr, 0)}
+            .encode();
+    case FORMAT::R:
+    {
+        auto const imm = insn.operands.back().ingredients.front();
+        auto const is_unsigned =
+            (static_cast<opcode_type>(opcode) & viua::arch::ops::UNSIGNED);
+        if (is_unsigned and imm.text.at(0) == '-'
+            and (imm.text != "-1" and imm.text != "-1u")) {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+            throw Error{imm,
+                        Cause::Value_out_of_range,
+                        "signed integer used for unsigned immediate"}
+                .note("the only signed value allowed in this context "
+                      "is -1, and\n"
+                      "it is used a symbol for maximum unsigned "
+                      "immediate value");
+        }
+        if ((not is_unsigned) and imm.text.back() == 'u') {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+            throw Error{imm,
+                        Cause::Value_out_of_range,
+                        "unsigned integer used for signed immediate"};
+        }
+        try {
+            auto val = uint32_t{};
+            if (is_unsigned) {
+                val = std::stoul(imm.text);
+            } else {
+                auto tmp = static_cast<int32_t>(std::stoi(imm.text));
+                memcpy(&val, &tmp, sizeof(tmp));
+            }
+
+            return viua::arch::ops::R{opcode,
+                                      insn.operands.at(0).make_access(),
+                                      insn.operands.at(1).make_access(),
+                                      val}
+                .encode();
+        } catch (std::invalid_argument const&) {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+            // FIXME make the error more precise, maybe encapsulate
+            // just the immediate operand conversion
+            throw Error{imm,
+                        Cause::Invalid_operand,
+                        "expected integer as immediate operand"};
+        }
+    }
+    case FORMAT::M:
+    {
+        auto const unit = insn.operands.front().ingredients.front();
+        auto const off  = insn.operands.back().ingredients.front();
+
+        return viua::arch::ops::M{opcode,
+                                  insn.operands.at(1).make_access(),
+                                  insn.operands.at(2).make_access(),
+                                  static_cast<uint16_t>(std::stoull(off.text)),
+                                  static_cast<uint8_t>(std::stoull(unit.text))}
+            .encode();
+    }
+    default:
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{
+            insn.leader, Cause::Unknown_opcode, "cannot emit instruction"};
+    }
+}
+
 using Text = std::vector<viua::arch::instruction_type>;
 auto cook_instructions(std::vector<std::unique_ptr<ast::Node>> const& nodes,
                        std::vector<uint8_t>& rodata_buf,
