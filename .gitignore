@@ -37,6 +37,10 @@ docs/manual/*.pdf
 docs/manual/*.txt
 docs/manual/*.json
 
+!.builds
+.builds/*
+!.builds/*.yml
+
 !.gitkeep
 !.gitignore
 !.travis.yml

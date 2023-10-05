@@ -25,8 +25,8 @@ VIUA_OPT_ETC_DIR=$(VIUA_OPT_ROOT)/etc
 
 ################################################################################
 # Compilation flags
-CXX=g++
-CXXSTD=c++23
+CXX?=g++
+CXXSTD?=c++23
 
 CXXFLAGS_OPTIMISATION=-g -Og
 
