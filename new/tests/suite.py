@@ -18,6 +18,8 @@ except ImportError:
 
 
 def colorise(color, s):
+    if colored is None:
+        return f"{s}"
     return "{}{}{}".format(colored.fg(color), s, colored.attr("reset"))
 
 
