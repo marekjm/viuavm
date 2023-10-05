@@ -49,7 +49,12 @@ auto errno_desc_impl[[maybe_unused]](int const, char* const txt, strerrordesc_ty
 
 auto errno_name(int const e) -> std::string
 {
-#if defined(_GNU_SOURCE)
+    /*
+     * In theory, checking for _GNU_SOURCE should be enough (see the strerror(3)
+     * page), but musl defines _GNU_SOURCE without actually providing all GNU
+     * extensions.
+     */
+#if defined(VIUA_PLATFORM_HAS_FEATURE_STRERRORNAME_NP)
     return std::string{strerrorname_np(e)};
 #else
     switch (e) {

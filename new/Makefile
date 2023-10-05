@@ -48,10 +48,14 @@ CXXFLAGS_INCLUDE=\
 				 -I./include \
 				 -I./3rd-party
 
+FEATURE_DETECT_FLAGS=\
+					 $(shell CXX=$(CXX) bash ./feature-tests/test.sh ./feature-tests/strerrorname_np.c)
+
 CXXFLAGS=\
 		 -std=$(CXXSTD) \
 		 -DVIUAVM_VERSION='"$(VIUAVM_VERSION)"' \
 		 -DVIUAVM_VERSION_FULL='"$(VIUAVM_VERSION_FULL)"' \
+		 $(FEATURE_DETECT_FLAGS) \
 		 $(CXXFLAGS_OPTIMISATION) \
 		 $(CXXFLAGS_WARNING) \
 		 $(CXXFLAGS_INCLUDE)
