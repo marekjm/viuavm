@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2022 Marek Marecki
+ *  Copyright (C) 2022-2023 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -16,6 +16,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include <endian.h>
 
 #include <iomanip>
 #include <iostream>

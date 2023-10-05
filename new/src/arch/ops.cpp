@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021-2022 Marek Marecki
+ *  Copyright (C) 2021-2023 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <endian.h>
 #include <string.h>
 
 #include <stdexcept>

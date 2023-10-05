@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2022 Marek Marecki
+ *  Copyright (C) 2022-2023 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -18,6 +18,7 @@
  */
 
 #include <elf.h>
+#include <endian.h>
 #include <string.h>
 
 #include <algorithm>

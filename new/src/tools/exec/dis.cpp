@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2022 Marek Marecki
+ *  Copyright (C) 2022-2023 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -19,6 +19,7 @@
 
 
 #include <ctype.h>
+#include <endian.h>
 #include <fcntl.h>
 #include <stdint.h>
 #include <string.h>
