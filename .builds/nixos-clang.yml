@@ -1,0 +1,22 @@
+---
+image: nixos/latest
+packages:
+  - nixos.llvmPackages_16.libcxxClang
+  - nixos.gnumake
+  - nixos.python3Minimal
+  - nixos.liburing
+  - nixos.libuuid
+  - nixos.openssl
+sources:
+  - https://git.sr.ht/~maelkum/viuavm
+environment:
+  CC: gcc
+  CXX: g++
+  CXXSTD: c++23
+tasks:
+  - build: |
+      cd viuavm/new
+      nix-shell --run 'make -j' --packages liburing libuuid
+  - test: |
+      cd viuavm/new
+      make test

@@ -30,11 +30,8 @@ CXXSTD?=c++23
 
 CXXFLAGS_OPTIMISATION=-g -Og
 
-CXXFLAGS_NOERROR=
-ifeq ($(CXX),g++)
 CXXFLAGS_NOERROR=\
-				 -Wno-error=dangling-reference
-endif
+				 -Wno-error=unused-result
 
 CXXFLAGS_WARNING=\
 				 -Wall \

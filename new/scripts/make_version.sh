@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 VERSION=$(cat $(git rev-parse --show-toplevel)/VERSION)
 TAG="v${VERSION}.0"
 COMMITS_SINCE=$(git log --oneline ${TAG}..HEAD | wc -l)
