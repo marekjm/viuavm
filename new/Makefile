@@ -181,17 +181,20 @@ $(BUILD)/%.o: ./src/%.cpp
 # Explicit dependencies
 $(BUILD)/tools/exec/readelf: \
 	$(BUILD)/vm/elf.o \
+	$(BUILD)/support/errno.o \
 	$(BUILD)/support/tty.o
 
 $(BUILD)/tools/exec/dis: \
 	$(BUILD)/tools/libs/assembler.o \
-	$(BUILD)/support/tty.o \
+	$(BUILD)/support/errno.o \
 	$(BUILD)/support/string.o \
+	$(BUILD)/support/tty.o \
 	$(BUILD)/vm/elf.o \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
 
 $(BUILD)/tools/exec/asm: \
+	$(BUILD)/support/errno.o \
 	$(BUILD)/support/string.o \
 	$(BUILD)/support/tty.o \
 	$(BUILD)/tools/libs/errors/compile_time.o \
@@ -211,6 +214,7 @@ $(BUILD)/tools/exec/ld: \
 	$(BUILD)/tools/libs/parser.o \
 	$(BUILD)/tools/libs/assembler.o \
 	$(BUILD)/tools/libs/stage.o \
+	$(BUILD)/support/errno.o \
 	$(BUILD)/support/string.o \
 	$(BUILD)/support/tty.o
 
@@ -219,6 +223,7 @@ VIUA_INSTRUCTION_IMPLS=\
 					   $(BUILD)/vm/ins/ecall.o
 
 $(BUILD)/tools/exec/vm: \
+	$(BUILD)/support/errno.o \
 	$(BUILD)/support/tty.o \
 	$(BUILD)/support/string.o \
 	$(BUILD)/vm/core.o \

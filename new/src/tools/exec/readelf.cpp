@@ -23,6 +23,7 @@
 #include <iostream>
 
 #include <viua/support/tty.h>
+#include <viua/support/errno.h>
 #include <viua/vm/elf.h>
 
 auto main(int argc, char* argv[]) -> int
@@ -99,16 +100,14 @@ auto main(int argc, char* argv[]) -> int
     auto const elf_fd = open(elf_path.c_str(), O_RDONLY);
     if (elf_fd == -1) {
         auto const saved_errno = errno;
-        auto const errname     = strerrorname_np(saved_errno);
-        auto const errdesc     = strerrordesc_np(saved_errno);
+        auto const errname     = viua::support::errno_name(saved_errno);
+        auto const errdesc     = viua::support::errno_desc(saved_errno);
 
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.string()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET);
-        if (errname) {
-            std::cerr << ": " << errname;
-        }
-        std::cerr << ": " << (errdesc ? errdesc : "unknown error") << "\n";
+                  << esc(2, ATTR_RESET)
+                  << ": " << errname
+                  << ": " << errdesc << "\n";
         return 1;
     }
 

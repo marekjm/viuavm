@@ -19,7 +19,6 @@
 
 #include <elf.h>
 #include <fcntl.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <uuid/uuid.h>
@@ -36,6 +35,7 @@
 #include <viua/libs/stage.h>
 #include <viua/support/tty.h>
 #include <viua/support/string.h>
+#include <viua/support/errno.h>
 #include <viua/vm/elf.h>
 
 using Text = std::vector<viua::arch::instruction_type>;
@@ -756,16 +756,14 @@ auto main(int argc, char** argv) -> int
             auto const lnk_elf_fd = open(lnk_path.c_str(), O_RDONLY);
             if (lnk_elf_fd == -1) {
                 auto const saved_errno = errno;
-                auto const errname     = strerrorname_np(saved_errno);
-                auto const errdesc     = strerrordesc_np(saved_errno);
+                auto const errname     = viua::support::errno_name(saved_errno);
+                auto const errdesc     = viua::support::errno_desc(saved_errno);
 
                 std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
                           << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                          << "error" << esc(2, ATTR_RESET);
-                if (errname) {
-                    std::cerr << ": " << errname;
-                }
-                std::cerr << ": " << (errdesc ? errdesc : "unknown error")
+                          << "error" << esc(2, ATTR_RESET)
+                          << ": " << errname
+                          << ": " << errdesc
                           << "\n";
                 return 1;
             }
@@ -882,16 +880,15 @@ auto main(int argc, char** argv) -> int
         auto const lnk_elf_fd = open(lnk_path.c_str(), O_RDONLY);
         if (lnk_elf_fd == -1) {
             auto const saved_errno = errno;
-            auto const errname     = strerrorname_np(saved_errno);
-            auto const errdesc     = strerrordesc_np(saved_errno);
+            auto const errname     = viua::support::errno_name(saved_errno);
+            auto const errdesc     = viua::support::errno_desc(saved_errno);
 
             std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
                       << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                      << "error" << esc(2, ATTR_RESET);
-            if (errname) {
-                std::cerr << ": " << errname;
-            }
-            std::cerr << ": " << (errdesc ? errdesc : "unknown error") << "\n";
+                      << "error" << esc(2, ATTR_RESET)
+                      << ": " << errname
+                      << ": " << errdesc
+                      << "\n";
             return 1;
         }
 

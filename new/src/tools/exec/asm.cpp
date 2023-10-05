@@ -54,6 +54,7 @@
 #include <viua/libs/stage.h>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
+#include <viua/support/errno.h>
 #include <viua/support/vector.h>
 
 
@@ -1061,7 +1062,7 @@ auto main(int argc, char* argv[]) -> int
             using viua::support::tty::send_escape_seq;
             constexpr auto esc = send_escape_seq;
 
-            auto const error_message = strerrordesc_np(errno);
+            auto const error_message = viua::support::errno_desc(errno);
             std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
                       << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
                       << "error" << esc(2, ATTR_RESET) << ": " << error_message
@@ -1077,7 +1078,7 @@ auto main(int argc, char* argv[]) -> int
             using viua::support::tty::send_escape_seq;
             constexpr auto esc = send_escape_seq;
 
-            auto const error_message = strerrordesc_np(errno);
+            auto const error_message = viua::support::errno_desc(errno);
             std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
                       << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
                       << "error" << esc(2, ATTR_RESET) << ": " << error_message
