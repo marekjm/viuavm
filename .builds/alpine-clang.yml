@@ -1,0 +1,23 @@
+---
+image: alpine/latest
+packages:
+  - clang
+  - make
+  - python3
+  - linux-headers  # needed by liburing
+  - liburing-dev
+  - util-linux-dev  # needed for <uuid/uuid.h>
+  - libuuid
+sources:
+  - https://git.sr.ht/~maelkum/viuavm
+environment:
+  CC: clang
+  CXX: clang++
+  CXXSTD: c++2b
+tasks:
+  - build: |
+      cd viuavm/new
+      make -j
+  - test: |
+      cd viuavm/new
+      make test
