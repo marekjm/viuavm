@@ -1481,6 +1481,10 @@ def main(args):
     )(len(seq) // 2)
     med = lambda seq: med_impl(seq) if seq else 0
 
+    if not perf_ops: perf_ops.append(0)
+    if not perf_time: perf_time.append(0)
+    if not perf_freq: perf_freq.append(0.0)
+
     perf_ops_avg = avg(perf_ops)
     perf_ops_med = med(perf_ops)
     perf_ops_min = min(perf_ops)
@@ -1497,7 +1501,7 @@ def main(args):
     perf_freq_max = max(perf_freq)
 
     print(
-        "\nperf counter     {}    /  {}     ({} ~ {}):".format(
+        "\nperf counter     {}    /  {}     ({} ~        {}):".format(
             colorise(AVG_COLOUR, "average"),
             colorise(MED_COLOUR, "median"),
             colorise(MIN_COLOUR, "min".ljust(11)),
@@ -1514,24 +1518,24 @@ def main(args):
     )
     print(
         "  VM run time:  {}   / {}   ({} ~ {})".format(
-            colorise(AVG_COLOUR, format_run_time_us(avg(perf_time))),
-            colorise(MED_COLOUR, format_run_time_us(med(perf_time))),
-            colorise("white", format_run_time_us(min(perf_time)).ljust(11))
+            colorise(AVG_COLOUR, format_run_time_us(perf_time_avg)),
+            colorise(MED_COLOUR, format_run_time_us(perf_time_med)),
+            colorise("white", format_run_time_us(perf_time_min).ljust(11))
             if perf_time
             else "--",
-            colorise("white", format_run_time_us(max(perf_time)))
+            colorise("white", format_run_time_us(perf_time_max))
             if perf_time
             else "--",
         )
     )
     print(
-        "  VM CPU freq:  {} / {} ({} ~ {})".format(
-            colorise(AVG_COLOUR, format_freq(avg(perf_freq))),
-            colorise(MED_COLOUR, format_freq(med(perf_freq))),
-            colorise(MIN_COLOUR, format_freq(min(perf_freq)).ljust(11))
+        "  VM CPU freq:  {}  / {}  ({} ~ {})".format(
+            colorise(AVG_COLOUR, format_freq(perf_freq_avg)),
+            colorise(MED_COLOUR, format_freq(perf_freq_med)),
+            colorise(MIN_COLOUR, format_freq(perf_freq_min).ljust(11))
             if perf_time
             else "--",
-            colorise(MAX_COLOUR, format_freq(max(perf_freq))) if perf_time else "--",
+            colorise(MAX_COLOUR, format_freq(perf_freq_max)) if perf_time else "--",
         )
     )
 
