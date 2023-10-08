@@ -45,10 +45,10 @@
 #include <viua/arch/arch.h>
 #include <viua/arch/ins.h>
 #include <viua/arch/ops.h>
+#include <viua/support/errno.h>
 #include <viua/support/fdstream.h>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
-#include <viua/support/errno.h>
 #include <viua/vm/core.h>
 #include <viua/vm/elf.h>
 #include <viua/vm/ins.h>
@@ -284,9 +284,8 @@ auto main(int argc, char* argv[]) -> int
 
             std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                       << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                      << esc(2, ATTR_RESET)
-                      << ": " << errname
-                      << ": " << errdesc << "\n";
+                      << esc(2, ATTR_RESET) << ": " << errname << ": "
+                      << errdesc << "\n";
             return 1;
         }
         if ((statbuf.st_mode & S_IFMT) != S_IFREG) {
@@ -310,9 +309,8 @@ auto main(int argc, char* argv[]) -> int
 
         std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
                   << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET)
-                  << ": " << errname
-                  << ": " << errdesc << "\n";
+                  << esc(2, ATTR_RESET) << ": " << errname << ": " << errdesc
+                  << "\n";
         return 1;
     }
 

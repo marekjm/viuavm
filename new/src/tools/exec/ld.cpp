@@ -33,8 +33,8 @@
 #include <viua/arch/arch.h>
 #include <viua/arch/ops.h>
 #include <viua/libs/stage.h>
-#include <viua/support/string.h>
 #include <viua/support/errno.h>
+#include <viua/support/string.h>
 #include <viua/support/tty.h>
 #include <viua/vm/elf.h>
 
@@ -779,10 +779,8 @@ auto main(int argc, char** argv) -> int
 
                 std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
                           << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                          << "error" << esc(2, ATTR_RESET)
-                          << ": " << errname
-                          << ": " << errdesc
-                          << "\n";
+                          << "error" << esc(2, ATTR_RESET) << ": " << errname
+                          << ": " << errdesc << "\n";
                 return 1;
             }
 
@@ -903,10 +901,8 @@ auto main(int argc, char** argv) -> int
 
             std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
                       << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                      << "error" << esc(2, ATTR_RESET)
-                      << ": " << errname
-                      << ": " << errdesc
-                      << "\n";
+                      << "error" << esc(2, ATTR_RESET) << ": " << errname
+                      << ": " << errdesc << "\n";
             return 1;
         }
 

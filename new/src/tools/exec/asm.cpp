@@ -28,6 +28,7 @@
 #include <unistd.h>
 
 #include <algorithm>
+#include <charconv>
 #include <chrono>
 #include <experimental/memory>
 #include <filesystem>
@@ -63,9 +64,9 @@
 #include <viua/support/vector.h>
 
 
-constexpr auto DEBUG_LEX       = true;
-constexpr auto DEBUG_PARSE     = true;
-constexpr auto DEBUG_EXPANSION = false;
+constexpr auto DEBUG_LEX                        = true;
+constexpr auto DEBUG_PARSE                      = true;
+constexpr auto DEBUG_EXPANSION [[maybe_unused]] = false;
 
 using viua::libs::stage::save_buffer_to_rodata;
 using viua::libs::stage::save_string_to_strtab;

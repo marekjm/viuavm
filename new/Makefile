@@ -211,10 +211,7 @@ $(BUILD)/tools/exec/ld: \
 	$(BUILD)/arch/ops.o \
 	$(BUILD)/vm/elf.o \
 	$(BUILD)/tools/libs/errors/compile_time.o \
-	$(BUILD)/tools/libs/lexer.o \
-	$(BUILD)/tools/libs/parser.o \
-	$(BUILD)/tools/libs/assembler.o \
-	$(BUILD)/tools/libs/stage.o \
+	$(BUILD)/tools/libs/stage/save.o \
 	$(BUILD)/support/errno.o \
 	$(BUILD)/support/string.o \
 	$(BUILD)/support/tty.o

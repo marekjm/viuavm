@@ -1094,8 +1094,10 @@ auto execute(LLI const op, Stack& stack, ip_type const) -> void
 auto execute(CAST const op, Stack& stack, ip_type const) -> void
 {
     auto target = mutable_proxy(stack, op.instruction.out);
+
+    using viua::arch::FUNDAMENTAL_TYPES;
     auto const desired_type =
-        static_cast<Register::Types>(op.instruction.immediate);
+        static_cast<FUNDAMENTAL_TYPES>(op.instruction.immediate);
 
     if (target.is_void()) {
         throw abort_execution{stack, "cannot cast void"};
@@ -1104,7 +1106,8 @@ auto execute(CAST const op, Stack& stack, ip_type const) -> void
     auto& slot = target.to()->get();
 
     switch (desired_type) {
-        using enum Register::Types;
+        using enum viua::arch::FUNDAMENTAL_TYPES;
+        ;
     case INT:
         slot.convert_undefined_to<Register::int_type>();
         break;
