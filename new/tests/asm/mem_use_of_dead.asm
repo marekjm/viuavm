@@ -1,4 +1,7 @@
-.function: [[entry_point]] main
+.section ".text"
+
+.symbol [[entry_point]] main
+.label main
     frame $0.a
     call $1.l, dummy
     ebreak
@@ -9,9 +12,9 @@
     ebreak
 
     return
-.end
 
-.function: dummy
+.symbol dummy
+.label dummy
     li $1.l, 0xffu
 
     li $2.l, 8u
@@ -21,4 +24,3 @@
 
     ebreak
     return $2.l
-.end

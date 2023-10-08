@@ -1,4 +1,7 @@
-.function: [[entry_point]] main
+.section ".text"
+
+.symbol [[entry_point]] main
+.label main
     li $1, 3u
     float $2, 3.14
 
@@ -6,4 +9,3 @@
 
     ebreak
     return
-.end

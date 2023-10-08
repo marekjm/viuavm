@@ -1,13 +1,15 @@
-.function: [[entry_point]] main
+.section ".text"
+
+.symbol [[entry_point]] main
+.label main
     atom $1, ok
     atom $2, not_ok
 
-    jump 4
+    if void, here
     move $1, $2
 
-    ; 4th instruction
+.label here
     noop
 
     ebreak
     return
-.end

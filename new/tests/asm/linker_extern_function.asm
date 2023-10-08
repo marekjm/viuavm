@@ -1,7 +1,9 @@
-.function: [[extern]] dummy
+.section ".text"
 
-.function: [[entry_point]] main
+.symbol [[extern]] dummy
+
+.symbol [[entry_point]] main
+.label main
     frame $0.a
     call void, dummy
     return
-.end

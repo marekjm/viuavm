@@ -1,19 +1,20 @@
-.function: [[entry_point]] main
+.section ".text"
+
+.symbol [[entry_point]] main
+.label main
     atom $1, equal
     atom $2, not_equal
 
     eq $3, $1, $2
 
-    ; 3rd instruction
-    if $3, 6
+    if $3, if_true
 
     move $3, $2
-    jump 7
+    if void, epilogue
 
-    ; 6th instruction
+.label if_true
     move $3, $1
 
-    ; 7th instruction
+.label epilogue
     ebreak
     return
-.end

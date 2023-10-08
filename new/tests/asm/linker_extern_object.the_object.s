@@ -1,2 +1,3 @@
-.label: object
-.value: atom hello_world
+.section ".rodata"
+.label object
+.object string "hello_world"

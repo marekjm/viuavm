@@ -1,7 +1,12 @@
-.label: hello_world
-.value: atom hello_world
+.section ".rodata"
 
-.function: [[entry_point]] main
+.label hello_world
+.object string "hello_world"
+
+.section ".text"
+
+.symbol [[entry_point]] main
+.label main
     atom $1, @hello_world
     ebreak
 
@@ -10,9 +15,8 @@
     call void, dummy
 
     return void
-.end
 
-.function: dummy
+.symbol [[local]] dummy
+.label dummy
     ebreak
     return void
-.end

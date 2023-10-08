@@ -1,12 +1,15 @@
-.function: [[entry_point]] main
+.section ".text"
+
+.symbol [[entry_point]] main
+.label main
     frame $0.a
     actor $1, "dummy::function"
 
     ebreak
     return
-.end
 
-.function: "dummy::function"
+.symbol "dummy::function"
+.label "dummy::function"
     li $1, 41
     ebreak
 
@@ -14,4 +17,3 @@
     ebreak
 
     return $1
-.end

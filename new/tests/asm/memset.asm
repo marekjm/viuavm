@@ -1,6 +1,9 @@
-.function: [[extern]] "std::memset"
+.section ".text"
 
-.function: [[entry_point]] main
+.symbol [[extern]] "std::memset"
+
+.symbol [[entry_point]] main
+.label main
     li $1, 16u
     amba $1.l, $1.l, 0
 
@@ -15,4 +18,3 @@
 
     ebreak
     return
-.end

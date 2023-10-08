@@ -1,4 +1,7 @@
-.function: [[entry_point]] main
+.section ".text"
+
+.symbol [[entry_point]] main
+.label main
     li $1, 1
     li $2, 0
 
@@ -6,4 +9,3 @@
 
     ebreak
     return
-.end

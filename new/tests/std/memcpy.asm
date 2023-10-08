@@ -1,11 +1,16 @@
 ; memcpy(3) implementation to be used by all tests.
 
-.function: "std::memcpy"
+.section ".text"
+
+.symbol "std::memcpy"
+.label "std::memcpy"
+.begin
     li $1, 0u
 
+.label "std::memcpy::loop"
     g.lt $2.l, $1.l, $2.p
     g.not $2.l, $2.l
-    if $2.l, 10
+    if $2.l, "std::memcpy::epilogue"
 
     ; load from src
     add $3.l, $1.p, $1.l
@@ -17,8 +22,9 @@
 
     ; increase counter and repeat
     addi $1, $1, 1u
-    jump 1
+    if void, "std::memcpy::loop"
 
+.label "std::memcpy::epilogue"
     move $2.l, $0.p
     return $2.l
 .end

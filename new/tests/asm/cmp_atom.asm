@@ -1,4 +1,7 @@
-.function: [[entry_point]] main
+.section ".text"
+
+.symbol [[entry_point]] main
+.label main
     atom $1, hello_world
     atom $2, hello_world
 
@@ -6,4 +9,3 @@
 
     ebreak
     return
-.end

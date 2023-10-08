@@ -1,4 +1,7 @@
-.function: [[entry_point]] main
+.section ".text"
+
+.symbol [[entry_point]] main
+.label main
     ; The struct looks like thus:
     ;
     ;   struct foo {
@@ -33,4 +36,3 @@
 
     ebreak
     return
-.end

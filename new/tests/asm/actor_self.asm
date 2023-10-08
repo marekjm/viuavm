@@ -1,5 +1,7 @@
-.function: [[entry_point]] main
+.section ".text"
+
+.symbol [[entry_point]] main
+.label main
     self $1
     ebreak
     return
-.end

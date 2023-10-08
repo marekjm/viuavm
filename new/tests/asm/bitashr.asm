@@ -1,4 +1,7 @@
-.function: [[entry_point]] main
+.section ".text"
+
+.symbol [[entry_point]] main
+.label main
     li $1, 0xfeedbeef00000000u
     li $2, 32u
 
@@ -6,4 +9,3 @@
 
     ebreak
     return
-.end

@@ -1,7 +1,11 @@
-.label: [[extern]] object
+.section ".rodata"
 
-.function: [[entry_point]] main
+.symbol [[extern]] object
+
+.section ".text"
+
+.symbol [[entry_point]] main
+.label main
     atom $1.l, @object
     ebreak
     return
-.end

@@ -1,7 +1,10 @@
-.function: [[extern]] "std::memset"
-.function: [[extern]] "std::memcpy"
+.section ".text"
 
-.function: [[entry_point]] main
+.symbol [[extern]] "std::memset"
+.symbol [[extern]] "std::memcpy"
+
+.symbol [[entry_point]] main
+.label main
     ; size of buffer
     li $3, 16u
 
@@ -34,4 +37,3 @@
 
     ebreak
     return
-.end

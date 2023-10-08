@@ -2,8 +2,7 @@
 
 ; Leave the string broken to test concatenation.
 .label some_string
-.object string "Hello, " \
-               "Wor" "ld!"
+.object string "He" 2 * "l" "o, World!"
 
 .section ".text"
 

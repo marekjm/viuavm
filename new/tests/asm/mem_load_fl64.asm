@@ -1,4 +1,7 @@
-.function: [[entry_point]] main
+.section ".text"
+
+.symbol [[entry_point]] main
+.label main
     li $1.l, 1u
     amda $1.l, $1.l, 0
 
@@ -11,4 +14,3 @@
 
     ebreak
     return
-.end
