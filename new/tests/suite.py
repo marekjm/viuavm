@@ -1429,12 +1429,14 @@ def main(args):
             )
 
     run_color: str = None
+    run_exit_code: int = 0
     if success_cases == len(cases):
         run_color = "green"
     elif (success_cases + skip_cases) == len(cases):
         run_color = "yellow"
     else:
         run_color = "red"
+        run_exit_code = 1
 
     print(
         "run {} test case{} with {}% success rate".format(
@@ -1481,9 +1483,12 @@ def main(args):
     )(len(seq) // 2)
     med = lambda seq: med_impl(seq) if seq else 0
 
-    if not perf_ops: perf_ops.append(0)
-    if not perf_time: perf_time.append(0)
-    if not perf_freq: perf_freq.append(0.0)
+    if not perf_ops:
+        perf_ops.append(0)
+    if not perf_time:
+        perf_time.append(0)
+    if not perf_freq:
+        perf_freq.append(0.0)
 
     perf_ops_avg = avg(perf_ops)
     perf_ops_med = med(perf_ops)
@@ -1523,9 +1528,7 @@ def main(args):
             colorise("white", format_run_time_us(perf_time_min).ljust(11))
             if perf_time
             else "--",
-            colorise("white", format_run_time_us(perf_time_max))
-            if perf_time
-            else "--",
+            colorise("white", format_run_time_us(perf_time_max)) if perf_time else "--",
         )
     )
     print(
@@ -1539,6 +1542,8 @@ def main(args):
         )
     )
 
+    return run_exit_code
+
 
 if __name__ == "__main__":
-    main(sys.argv)
+    exit(main(sys.argv))
