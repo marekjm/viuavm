@@ -1374,9 +1374,10 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
              */
 
             auto& instr = static_cast<ast::Instruction&>(*each);
+            auto saved_at = size_t{0};
+
             if (instr.leader == "atom" or instr.leader == "g.atom") {
                 auto const lx = instr.operands.back().ingredients.front();
-                auto saved_at = size_t{0};
                 using enum viua::libs::lexer::TOKEN;
                 if (lx.token == LITERAL_STRING or lx.token == LITERAL_ATOM) {
                     auto s = lx.text;
@@ -1456,16 +1457,8 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
 
                     throw e;
                 }
-
-                auto synth_op  = instr.operands.back().ingredients.front();
-                synth_op.token = TOKEN::LITERAL_INTEGER;
-                synth_op.text  = std::to_string(saved_at) + 'u';
-
-                instr.operands.back().ingredients.clear();
-                instr.operands.back().ingredients.push_back(synth_op);
             } else if (instr.leader == "arodp" or instr.leader == "g.arodp") {
                 auto const lx = instr.operands.back().ingredients.front();
-                auto saved_at = size_t{0};
                 using enum viua::libs::lexer::TOKEN;
                 if (lx.token == viua::libs::lexer::TOKEN::AT) {
                     auto const label = instr.operands.back().ingredients.back();
@@ -1506,20 +1499,12 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                     }
                     throw e;
                 }
-
-                auto synth_op  = instr.operands.back().ingredients.front();
-                synth_op.token = TOKEN::LITERAL_INTEGER;
-                synth_op.text  = std::to_string(saved_at);
-
-                instr.operands.back().ingredients.clear();
-                instr.operands.back().ingredients.push_back(synth_op);
             } else if (instr.leader == "double" or instr.leader == "g.double") {
                 auto const lx = instr.operands.back().ingredients.front();
-                auto saved_at = size_t{0};
                 using enum viua::libs::lexer::TOKEN;
                 if (lx.token == LITERAL_FLOAT) {
                     constexpr auto SIZE_OF_DOUBLE_PRECISION_FLOAT = size_t{8};
-                    auto f                                        = std::stod(
+                    auto const f                                  = std::stod(
                         instr.operands.back().ingredients.front().text);
                     auto s = std::string(SIZE_OF_DOUBLE_PRECISION_FLOAT, '\0');
                     memcpy(s.data(), &f, SIZE_OF_DOUBLE_PRECISION_FLOAT);
@@ -1591,10 +1576,17 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
 
                     throw e;
                 }
+            }
 
+            /*
+             * Only rewrite the instruction if needed. We can safely use the
+             * object offset for this since no value is ever saved at address
+             * zero in the .rodata section.
+             */
+            if (saved_at) {
                 auto synth_op  = instr.operands.back().ingredients.front();
                 synth_op.token = TOKEN::LITERAL_INTEGER;
-                synth_op.text  = std::to_string(saved_at);
+                synth_op.text  = std::to_string(saved_at) + 'u';
 
                 instr.operands.back().ingredients.clear();
                 instr.operands.back().ingredients.push_back(synth_op);
@@ -2287,6 +2279,43 @@ auto expand_atom(ast::Instruction const& raw) -> Text
 
     return cooked;
 }
+auto expand_double(ast::Instruction const& raw) -> Text
+{
+    auto cooked = Text{};
+
+    /*
+     * Synthesize loading the double offset first. It will emit a
+     * sequence of instructions that will load the offset of the
+     * data, which will then be used by the DOUBLE instruction to create the
+     * object.
+     */
+    auto li = raw;
+    {
+        li.leader      = raw.leader;
+        li.leader.text = "g.li";
+    }
+    std::ranges::copy(expand_li(li, true), std::back_inserter(cooked));
+
+    /*
+     * Then, synthesize the actual ATOM instruction. This means
+     * simply replacing the literal atom (or a reference to one) with the
+     * register containing its loaded offset ie, changing this code:
+     *
+     *      double $42, PI
+     *
+     * to this:
+     *
+     *      li $42, rodata_offset_of(PI)
+     *      double $42
+     */
+    auto synth = raw;
+    synth.operands.pop_back();
+    cooked.push_back(emit_instruction(synth));
+
+    std::cerr << "        cooked into " << cooked.size() << " ops\n";
+
+    return cooked;
+}
 auto expand_return(ast::Instruction const& raw) -> Text
 {
     if (not raw.operands.empty()) {
@@ -2453,6 +2482,8 @@ auto expand_instruction(ast::Instruction const& raw,
         return expand_return(raw);
     } else if (opcode == "atom") {
         return expand_atom(raw);
+    } else if (opcode == "double") {
+        return expand_double(raw);
     } else if (memory_access.contains(opcode)) {
         return expand_memory_access(raw);
     } else if (immediate_signed_arithmetic.contains(opcode)) {
@@ -2756,6 +2787,7 @@ auto make_reloc_table(Text const& text) -> std::vector<Elf64_Rel>
         case IF:
         case CALL:
         case ATOM:
+        case DOUBLE:
             push_reloc(i);
             break;
         default:

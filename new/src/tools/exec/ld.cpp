@@ -737,6 +737,12 @@ auto main(int argc, char** argv) -> int
     auto symtab = std::vector<Elf64_Sym>{};
 
     /*
+     * Allocate the first 64 bits of .rodata to prevent any local values from
+     * having address of 0.
+     */
+    rodata.resize(8);
+
+    /*
      * PREPARATIONS FOR .strtab
      *
      * Ensure that the glued-together .strtab begins with a nul character, as
