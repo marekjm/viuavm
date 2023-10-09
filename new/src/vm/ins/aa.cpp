@@ -68,6 +68,7 @@ auto execute(AA const op, Stack& stack, ip_type const) -> void
     pointer_info.size = size;
     stack.proc->record_pointer(pointer_info);
 
+    // FIXME check if there is enough memory to accomodate size
     memset(stack.proc->memory_at(pointer_address), 0, size);
 }
 }  // namespace viua::vm::ins
