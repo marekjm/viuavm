@@ -312,6 +312,23 @@ auto demangle_symbol_load(Cooked_text& raw,
         ++i;
         return;
     }
+    if (m(i + 1, IF) and D::decode(ins_at(i + 1)).in == out) {
+        auto ins = raw.at(i + 1);
+
+        auto const sym_name = get_symbol_name(immediate, symtab, strtab);
+        auto const safe_sym_name =
+            match_atom(sym_name) ? sym_name : ('"' + sym_name + '"');
+
+        auto tt =
+            ins.with_text("if " + D::decode(ins_at(i + 1)).out.to_string()
+                          + ", " + safe_sym_name);
+        tt.index = cooked.back().index;
+        cooked.pop_back();
+        tt.index.physical_span = tt.index.physical_span.value() + 1;
+        cooked.emplace_back(tt);
+        ++i;
+        return;
+    }
 }
 
 auto demangle_canonical_li(Cooked_text& text,

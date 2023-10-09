@@ -1262,10 +1262,13 @@ auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
     auto const condition = immutable_proxy(stack, op.instruction.out);
     auto tt              = mutable_proxy(stack, op.instruction.in);
 
-    auto take_branch = (condition.holds<void>() or *condition.cast_to<bool>());
-    auto const target =
-        take_branch ? (stack.back().entry_address + *tt.target->get<uint64_t>())
-                    : (ip + 1);
+    auto const take_branch =
+        (condition.holds<void>() or *condition.cast_to<bool>());
+
+    auto const target_addr =
+        (*tt.target->get<uint64_t>() / sizeof(viua::arch::instruction_type));
+    auto const target = take_branch ? (stack.proc->module.ip_base + target_addr)
+                                    : (ip + 1);
 
     tt.reset();
     return target;

@@ -2023,6 +2023,103 @@ auto expand_flow_control(ast::Instruction const& raw,
 {
     auto cooked = Text{};
 
+    auto const target = raw.operands.back();
+    auto jmp_offset   = target;
+    {
+        jmp_offset = ast::Operand{};
+
+        using viua::libs::lexer::TOKEN;
+        auto const& lx = target.ingredients.front();
+        jmp_offset.ingredients.push_back(lx.make_synth("$", TOKEN::DOLLAR));
+        jmp_offset.ingredients.push_back(
+            lx.make_synth("253", TOKEN::LITERAL_INTEGER));
+        jmp_offset.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
+        jmp_offset.ingredients.push_back(
+            lx.make_synth("l", TOKEN::LITERAL_ATOM));
+    }
+
+    auto li = ast::Instruction{};
+    {
+        li.leader      = raw.leader;
+        li.leader.text = "g.li";
+
+        li.operands.push_back(jmp_offset);
+        li.operands.push_back(raw.operands.back());
+
+        using viua::libs::lexer::TOKEN;
+
+        auto const sym_id   = raw.operands.back().ingredients.front();
+        auto const sym_name = make_name_from_lexeme(sym_id);
+        if (symbol_map.count(sym_name) == 0) {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+
+            auto const cause = (raw.leader == "if")
+                                   ? Cause::Jump_to_undefined_label
+                                   : Cause::Call_to_undefined_function;
+
+            throw Error{sym_id, cause, quote_fancy(sym_name)}.add(raw.leader);
+        }
+
+        auto const sym_off = symbol_map.at(sym_name);
+        auto const sym     = symbol_table.at(sym_off);
+        if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+
+            throw Error{sym_id, Cause::Invalid_reference, quote_fancy(sym_name)}
+                .aside("label " + quote_fancy(sym_name)
+                       + " does not point into .text section")
+                .add(raw.leader);
+        }
+
+        auto const is_jump_label = (ELF64_ST_BIND(sym.st_info) == STB_LOCAL)
+                                   and (sym.st_other == STV_HIDDEN);
+        if (not is_jump_label) {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+
+            auto const& [decl_sym, decl_sec] = *std::ranges::find_if(
+                decl_map, [&name = sym_name](auto const& dl) -> bool {
+                    return (dl.first.name.text == name);
+                });
+
+            throw Error{
+                sym_id,
+                Cause::Invalid_reference,
+                quote_fancy(sym_name) + " cannot be used as a jump target"}
+                .aside("label " + quote_fancy(sym_name)
+                       + " defined as callable")
+                .add(raw.leader)
+                .chain(Error{decl_sym.name, Cause::None}
+                           .note("declared here")
+                           .add(decl_sym.leader));
+        }
+
+        li.operands.back().ingredients.front().text =
+            (std::to_string(sym_off) + 'u');
+        li.operands.back().ingredients.front().token = TOKEN::LITERAL_INTEGER;
+    }
+    std::ranges::copy(expand_li(li, true), std::back_inserter(cooked));
+
+    auto jmp = ast::Instruction{};
+    {
+        jmp.leader = raw.leader;
+        jmp.operands.push_back(raw.operands.front());
+        jmp.operands.push_back(jmp_offset);
+    }
+    cooked.push_back(emit_instruction(jmp));
+
+    std::cerr << "        cooked into " << cooked.size() << " ops\n";
+
+    return cooked;
+}
+auto expand_call(ast::Instruction const& raw,
+                 std::vector<Elf64_Sym>& symbol_table,
+                 std::map<std::string, size_t> const& symbol_map) -> Text
+{
+    auto cooked = Text{};
+
     /*
      * Call instructions expansion is simple.
      *
@@ -2112,7 +2209,7 @@ auto expand_flow_control(ast::Instruction const& raw,
 
         auto const is_jump_label = (ELF64_ST_BIND(sym.st_info) == STB_LOCAL)
                                    and (sym.st_other == STV_HIDDEN);
-        if (is_jump_label and raw.leader != "if") {
+        if (is_jump_label) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
 
@@ -2122,26 +2219,6 @@ auto expand_flow_control(ast::Instruction const& raw,
                 .aside("label " + quote_fancy(sym_name)
                        + " defined as a jump target")
                 .add(raw.leader);
-        }
-        if ((not is_jump_label) and raw.leader == "if") {
-            using viua::libs::errors::compile_time::Cause;
-            using viua::libs::errors::compile_time::Error;
-
-            auto const& [decl_sym, decl_sec] = *std::ranges::find_if(
-                decl_map, [&name = sym_name](auto const& dl) -> bool {
-                    return (dl.first.name.text == name);
-                });
-
-            throw Error{
-                sym_id,
-                Cause::Invalid_reference,
-                quote_fancy(sym_name) + " cannot be used as a jump target"}
-                .aside("label " + quote_fancy(sym_name)
-                       + " defined as callable")
-                .add(raw.leader)
-                .chain(Error{decl_sym.name, Cause::None}
-                           .note("declared here")
-                           .add(decl_sym.leader));
         }
 
         li.operands.back().ingredients.front().text =
@@ -2368,8 +2445,10 @@ auto expand_instruction(ast::Instruction const& raw,
         return expand_li(raw);
     } else if (opcode == "delete") {
         return expand_delete(raw);
-    } else if (opcode == "call" or opcode == "actor" or opcode == "if") {
+    } else if (opcode == "if") {
         return expand_flow_control(raw, symbol_table, symbol_map, decl_map);
+    } else if (opcode == "call" or opcode == "actor") {
+        return expand_call(raw, symbol_table, symbol_map);
     } else if (opcode == "return") {
         return expand_return(raw);
     } else if (opcode == "atom") {
@@ -2674,6 +2753,7 @@ auto make_reloc_table(Text const& text) -> std::vector<Elf64_Rel>
             static_cast<OPCODE>(each & viua::arch::ops::OPCODE_MASK);
         switch (op) {
             using enum viua::arch::ops::OPCODE;
+        case IF:
         case CALL:
         case ATOM:
             push_reloc(i);
