@@ -2753,22 +2753,28 @@ auto make_reloc_table(Text const& text) -> std::vector<Elf64_Rel>
     auto reloc_table = std::vector<Elf64_Rel>{};
 
     auto const push_reloc = [&text, &reloc_table](size_t const i) -> void {
-        using viua::arch::ops::F;
-        auto const hi =
-            static_cast<uint64_t>(F::decode(text.at(i - 2)).immediate) << 32;
-        auto const lo                 = F::decode(text.at(i - 1)).immediate;
-        auto const symtab_entry_index = static_cast<uint32_t>(hi | lo);
-
         using viua::arch::ops::OPCODE;
         auto const op =
             static_cast<OPCODE>(text.at(i) & viua::arch::ops::OPCODE_MASK);
 
         using enum viua::arch::elf::R_VIUA;
-        auto const type = (op == OPCODE::ATOM) ? R_VIUA_OBJECT
-                                               : R_VIUA_JUMP_SLOT;
+        auto const into_rodata = (op == OPCODE::ATOM) or (op == OPCODE::DOUBLE) or (op == OPCODE::ARODP);
+        auto const type = into_rodata ? R_VIUA_OBJECT : R_VIUA_JUMP_SLOT;
+
+        auto symtab_entry_index = uint32_t{};
+        if (op == OPCODE::ARODP) {
+            using viua::arch::ops::E;
+            symtab_entry_index = static_cast<uint32_t>(E::decode(text.at(i)).immediate);
+        } else {
+            using viua::arch::ops::F;
+            auto const hi =
+                static_cast<uint64_t>(F::decode(text.at(i - 2)).immediate) << 32;
+            auto const lo                 = F::decode(text.at(i - 1)).immediate;
+            symtab_entry_index = static_cast<uint32_t>(hi | lo);
+        }
 
         Elf64_Rel rel;
-        rel.r_offset = (i - 2) * sizeof(viua::arch::instruction_type);
+        rel.r_offset = i * sizeof(viua::arch::instruction_type);
         rel.r_info =
             ELF64_R_INFO(symtab_entry_index, static_cast<uint8_t>(type));
         reloc_table.push_back(rel);
@@ -2788,6 +2794,7 @@ auto make_reloc_table(Text const& text) -> std::vector<Elf64_Rel>
         case CALL:
         case ATOM:
         case DOUBLE:
+        case ARODP:
             push_reloc(i);
             break;
         default:

@@ -556,7 +556,7 @@ auto demangle_arodp(Cooked_text& text,
 
             auto const sym = std::find_if(
                 symtab.begin(), symtab.end(), [off](auto const& each) -> bool {
-                    return (each.st_value == (off + sizeof(uint64_t)))
+                    return (each.st_value == off)
                            and (ELF64_ST_TYPE(each.st_info) == STT_OBJECT);
                 });
             auto const label_or_value = (sym == symtab.end())
