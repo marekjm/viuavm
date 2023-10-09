@@ -424,108 +424,12 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
         if (try_match(DOLLAR, TOKEN::DOLLAR)) {
             continue;
         }
-        if (try_match(AT, TOKEN::AT)) {
-            continue;
-        }
-
-#if 0
-        if (try_match(LITERAL_FLOAT, TOKEN::LITERAL_FLOAT)) {
-            try {
-                std::stod(lexemes.back().text);
-            } catch (std::out_of_range const&) {
-                using viua::libs::errors::compile_time::Cause;
-                using viua::libs::errors::compile_time::Error;
-                throw Error{lexemes.back(), Cause::Value_out_of_range};
-            }
-            continue;
-        }
-        if (try_match(LITERAL_INTEGER, TOKEN::LITERAL_INTEGER)) {
-            try {
-                auto const sv = std::string_view{lexemes.back().text};
-                if (sv.starts_with("0x")) {
-                    std::stoull(lexemes.back().text, nullptr, 16);
-                } else if (sv.starts_with("0o")) {
-                    std::stoull(lexemes.back().text, nullptr, 8);
-                } else if (sv.starts_with("0b")) {
-                    std::stoull(lexemes.back().text, nullptr, 2);
-                } else {
-                    std::stoull(lexemes.back().text, nullptr);
-                }
-            } catch (std::out_of_range const&) {
-                auto bits_needed = size_t{0};
-                auto const sv    = std::string_view{lexemes.back().text};
-                if (sv.starts_with("0x")) {
-                    bits_needed = ((sv.size() - 2) * 4);
-                } else if (sv.starts_with("0o")) {
-                    bits_needed = ((sv.size() - 2) * 3);
-                } else if (sv.starts_with("0b")) {
-                    bits_needed = (sv.size() - 2);
-                } else {
-                    // FIXME number of bits for a decimal integer
-                }
-
-                using viua::libs::errors::compile_time::Cause;
-                using viua::libs::errors::compile_time::Error;
-                throw Error{lexemes.back(), Cause::Value_out_of_range}.aside(
-                    "register width is 64 bits"
-                    + (bits_needed ? (", but this value needs "
-                                      + std::to_string(bits_needed))
-                                   : ""));
-            }
-            continue;
-        }
-        if (try_match(ATTR_LIST_OPEN, TOKEN::ATTR_LIST_OPEN)) {
-            continue;
-        }
-        if (try_match(ATTR_LIST_CLOSE, TOKEN::ATTR_LIST_CLOSE)) {
-            continue;
-        }
-        if (try_match(EQ, TOKEN::EQ)) {
+        if (try_match(STAR, TOKEN::STAR)) {
             continue;
         }
         if (try_match(AT, TOKEN::AT)) {
             continue;
         }
-
-        /*
-         * A colon is not allowed to appear by itself as a token. Let's see if
-         * we can detect why did it happen.
-         */
-        if (try_match(COLON, TOKEN::INVALID)) {
-            if (match_lookbehind(
-                    lexemes,
-                    {TOKEN::DOT, TOKEN::LITERAL_ATOM, TOKEN::INVALID})) {
-                using viua::libs::errors::compile_time::Cause;
-                using viua::libs::errors::compile_time::Error;
-                auto const lexeme = synth_lookbehind(lexemes, 3);
-                auto e            = Error{lexeme, Cause::Unknown_directive};
-
-                using viua::libs::lexer::OPCODE_NAMES;
-                using viua::support::string::levenshtein_filter;
-                auto const misspell_candidates =
-                    levenshtein_filter(lexeme.text,
-                                       {
-                                           ".function:",
-                                           ".label:",
-                                           ".end",
-                                       });
-                if (misspell_candidates.empty()) {
-                    throw e;
-                }
-
-                using viua::support::string::levenshtein_best;
-                auto best_candidate = levenshtein_best(
-                    lexeme.text, misspell_candidates, (lexeme.text.size() / 2));
-                if (best_candidate.second == lexeme.text) {
-                    throw e;
-                }
-
-                throw Error{lexeme, Cause::Unknown_directive}.aside(
-                    "did you mean \"" + best_candidate.second + "\"?");
-            }
-            continue;
-        }
-#endif
 
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;

@@ -39,6 +39,7 @@
 #include <memory>
 #include <numeric>
 #include <optional>
+#include <ranges>
 #include <set>
 #include <string>
 #include <string_view>
@@ -224,61 +225,6 @@ auto any_find_mistake(std::vector<Lexeme> const& lexemes)
     }
 
     return std::nullopt;
-}
-
-template<typename T>
-auto ston_int_impl(std::string const& n, int const base)
-    -> std::conditional_t<std::is_signed_v<T>, int64_t, uint64_t>
-{
-    if constexpr (std::is_signed_v<T>) {
-        return std::stoll(n, nullptr, base);
-    } else {
-        return std::stoull(n, nullptr, base);
-    }
-}
-
-template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
-auto ston(std::string n) -> T
-{
-    if constexpr (std::is_floating_point_v<T>) {
-        if constexpr (sizeof(T) == sizeof(float)) {
-            return std::stof(n);
-        } else {
-            return std::stod(n);
-        }
-    } else {
-        auto base = 10;
-        {
-            auto view = std::string_view{n};
-            auto const is_negative =
-                std::is_signed_v<T> and view.starts_with("-");
-            if (is_negative) {
-                view.remove_prefix(1);
-            }
-            if (view.starts_with("0x")) {
-                base = 16;
-            } else if (view.starts_with("0o")) {
-                base = 8;
-
-                /*
-                 * Octal literals in Viua assembly begin with "0o", but C++
-                 * converters take octals beginning with "0". We need to drop
-                 * the "o".
-                 */
-                n.erase(1 + static_cast<size_t>(is_negative), 1);
-            } else if (view.starts_with("0b")) {
-                base = 2;
-            }
-        }
-
-        auto const full   = ston_int_impl<T>(n, base);
-        auto const wanted = static_cast<T>(full);
-
-        if (wanted != full) {
-            throw std::out_of_range{"ston"};
-        }
-        return wanted;
-    }
 }
 
 auto fits_in_unsigned_r_immediate(uint32_t const n) -> bool
@@ -698,7 +644,9 @@ auto consume_object(viua::support::vector_view<Lexeme>& lexemes)
     }
     ss->type = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
     while (not look_ahead(TOKEN::TERMINATOR, lexemes)) {
-        ss->ctor.emplace_back(consume_token_of(TOKEN::LITERAL_STRING, lexemes));
+        ss->ctor.emplace_back(consume_token_of(
+            {TOKEN::LITERAL_STRING, TOKEN::STAR, TOKEN::LITERAL_INTEGER},
+            lexemes));
     }
     consume_token_of(TOKEN::TERMINATOR, lexemes);
     return ss;
@@ -1321,28 +1269,75 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                         tmp      = tmp.substr(1, tmp.size() - 2);
                         tmp      = viua::support::string::unescape(tmp);
                         s += tmp;
-                    } else if (each.token == STAR) {
-                        auto& next = alc.ctor.at(++i);
-                        if (next.token != LITERAL_INTEGER) {
+                    } else if (each.token == LITERAL_INTEGER) {
+                        auto& star = alc.ctor.at(i + 1);
+                        if (star.token != STAR) {
                             using viua::libs::errors::compile_time::Cause;
                             using viua::libs::errors::compile_time::Error;
 
                             throw Error{each,
                                         Cause::Invalid_operand,
-                                        "cannot multiply string constant "
-                                        "by non-integer"}
-                                .add(next)
-                                .add(alc.ctor.at(i - 2))
-                                .aside("right-hand side must be an "
+                                        "an integer must be followed by a star "
+                                        "in string concatenation"}
+                                .add(star)
+                                .add(alc.type);
+                        }
+                        continue;
+                    } else if (each.token == STAR) {
+                        if (i == 0) {
+                            using viua::libs::errors::compile_time::Cause;
+                            using viua::libs::errors::compile_time::Error;
+
+                            throw Error{each,
+                                        Cause::Invalid_operand,
+                                        "in string concatenation"}
+                                .aside("left-hand side must be an "
+                                       "positive integer, but star was the "
+                                       "first token");
+                        }
+
+                        auto const& n = alc.ctor.at(i - 1);
+                        if (n.token != LITERAL_INTEGER) {
+                            using viua::libs::errors::compile_time::Cause;
+                            using viua::libs::errors::compile_time::Error;
+
+                            throw Error{n,
+                                        Cause::Invalid_operand,
+                                        "in string concatenation"}
+                                .add(each)
+                                .aside("left-hand side must be an "
                                        "positive integer");
                         }
 
-                        auto x = viua::support::ston<size_t>(next.text);
-                        auto o = std::ostringstream{};
-                        for (auto i = size_t{0}; i < x; ++i) {
-                            o << s;
+                        auto const& part = alc.ctor.at(++i);
+                        if (part.token != LITERAL_STRING) {
+                            using viua::libs::errors::compile_time::Cause;
+                            using viua::libs::errors::compile_time::Error;
+
+                            throw Error{part,
+                                        Cause::Invalid_operand,
+                                        "in string concatenation"}
+                                .add(each)
+                                .aside(
+                                    "right-hand side must be a string literal");
                         }
-                        s += o.str();
+
+                        auto tmp = part.text;
+                        tmp      = tmp.substr(1, tmp.size() - 2);
+                        tmp      = viua::support::string::unescape(tmp);
+
+                        using viua::support::ston;
+                        auto const r = std::ranges::iota_view<size_t>(0ul)
+                                       | std::views::take(ston<size_t>(n.text));
+                        std::ranges::for_each(r,
+                                              [&s, &tmp](auto) { s += tmp; });
+                    } else {
+                        using viua::libs::errors::compile_time::Cause;
+                        using viua::libs::errors::compile_time::Error;
+
+                        throw Error{each,
+                                    Cause::Invalid_operand,
+                                    "expected an integer or a string"};
                     }
                 }
 
@@ -1373,7 +1368,7 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
              * loads.
              */
 
-            auto& instr = static_cast<ast::Instruction&>(*each);
+            auto& instr   = static_cast<ast::Instruction&>(*each);
             auto saved_at = size_t{0};
 
             if (instr.leader == "atom" or instr.leader == "g.atom") {
@@ -1770,9 +1765,9 @@ auto emit_instruction(ast::Instruction const insn)
         try {
             auto val = uint32_t{};
             if (is_unsigned) {
-                val = ston<uint32_t>(imm.text);
+                val = viua::support::ston<uint32_t>(imm.text);
             } else {
-                auto const tmp = ston<int32_t>(imm.text);
+                auto const tmp = viua::support::ston<int32_t>(imm.text);
                 memcpy(&val, &tmp, sizeof(tmp));
             }
 
@@ -1841,9 +1836,9 @@ auto expand_li(ast::Instruction const& raw, bool const force_full = false)
     auto value = uint64_t{};
     try {
         if (is_unsigned) {
-            value = ston<uint64_t>(raw_value.text);
+            value = viua::support::ston<uint64_t>(raw_value.text);
         } else {
-            auto const tmp = ston<int64_t>(raw_value.text);
+            auto const tmp = viua::support::ston<int64_t>(raw_value.text);
             memcpy(&value, &tmp, sizeof(tmp));
         }
     } catch (std::out_of_range const&) {
@@ -2758,18 +2753,21 @@ auto make_reloc_table(Text const& text) -> std::vector<Elf64_Rel>
             static_cast<OPCODE>(text.at(i) & viua::arch::ops::OPCODE_MASK);
 
         using enum viua::arch::elf::R_VIUA;
-        auto const into_rodata = (op == OPCODE::ATOM) or (op == OPCODE::DOUBLE) or (op == OPCODE::ARODP);
+        auto const into_rodata = (op == OPCODE::ATOM) or (op == OPCODE::DOUBLE)
+                                 or (op == OPCODE::ARODP);
         auto const type = into_rodata ? R_VIUA_OBJECT : R_VIUA_JUMP_SLOT;
 
         auto symtab_entry_index = uint32_t{};
         if (op == OPCODE::ARODP) {
             using viua::arch::ops::E;
-            symtab_entry_index = static_cast<uint32_t>(E::decode(text.at(i)).immediate);
+            symtab_entry_index =
+                static_cast<uint32_t>(E::decode(text.at(i)).immediate);
         } else {
             using viua::arch::ops::F;
             auto const hi =
-                static_cast<uint64_t>(F::decode(text.at(i - 2)).immediate) << 32;
-            auto const lo                 = F::decode(text.at(i - 1)).immediate;
+                static_cast<uint64_t>(F::decode(text.at(i - 2)).immediate)
+                << 32;
+            auto const lo      = F::decode(text.at(i - 1)).immediate;
             symtab_entry_index = static_cast<uint32_t>(hi | lo);
         }
 

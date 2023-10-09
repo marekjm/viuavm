@@ -319,9 +319,8 @@ auto demangle_symbol_load(Cooked_text& raw,
         auto const safe_sym_name =
             match_atom(sym_name) ? sym_name : ('"' + sym_name + '"');
 
-        auto tt =
-            ins.with_text("if " + D::decode(ins_at(i + 1)).out.to_string()
-                          + ", " + safe_sym_name);
+        auto tt = ins.with_text("if " + D::decode(ins_at(i + 1)).out.to_string()
+                                + ", " + safe_sym_name);
         tt.index = cooked.back().index;
         cooked.pop_back();
         tt.index.physical_span = tt.index.physical_span.value() + 1;

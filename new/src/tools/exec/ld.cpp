@@ -527,19 +527,19 @@ auto relocate(Text& text, Elf64_Rel const rel, uint64_t const value) -> void
 
     if (op == OPCODE::ARODP) {
         using viua::arch::ops::E;
-        auto imm_op = E::decode(text.at(text_ndx));
+        auto imm_op       = E::decode(text.at(text_ndx));
         text.at(text_ndx) = E{imm_op.opcode, imm_op.out, value}.encode();
     } else {
         using viua::arch::ops::F;
         auto const hi_ndx = text_ndx - 2;
         auto hi_op        = F::decode(text.at(hi_ndx));
         auto const hi     = static_cast<uint32_t>(value >> 32);
-        text.at(hi_ndx) = F{hi_op.opcode, hi_op.out, hi}.encode();
+        text.at(hi_ndx)   = F{hi_op.opcode, hi_op.out, hi}.encode();
 
         auto const lo_ndx = text_ndx - 1;
-        auto lo_op            = F::decode(text.at(lo_ndx));
-        auto const lo         = static_cast<uint32_t>(value);
-        text.at(lo_ndx) = F{lo_op.opcode, lo_op.out, lo}.encode();
+        auto lo_op        = F::decode(text.at(lo_ndx));
+        auto const lo     = static_cast<uint32_t>(value);
+        text.at(lo_ndx)   = F{lo_op.opcode, lo_op.out, lo}.encode();
     }
 }
 
