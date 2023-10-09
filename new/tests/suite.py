@@ -49,11 +49,11 @@ def format_run_time(run_time):
 
 
 def format_freq(hz):
-    unit = "Hz"
+    unit = " "
     if 1e3 <= hz < 1e6:
-        unit = "kHz"
+        unit = "k"
         hz = hz / 1e3
-    return "{:7.2f} {}".format(hz, unit)
+    return "{:7.2f} {}Hz".format(hz, unit)
 
 
 ENCODING = "utf-8"
@@ -1532,7 +1532,7 @@ def main(args):
         )
     )
     print(
-        "  VM CPU freq:  {}  / {}  ({} ~ {})".format(
+        "  VM CPU freq:  {} / {} ({} ~ {})".format(
             colorise(AVG_COLOUR, format_freq(perf_freq_avg)),
             colorise(MED_COLOUR, format_freq(perf_freq_med)),
             colorise(MIN_COLOUR, format_freq(perf_freq_min).ljust(11))
