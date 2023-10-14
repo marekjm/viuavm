@@ -49,6 +49,10 @@ CXXFLAGS_NOERROR?=\
 # -Wfloat-equal  -- breaks
 # -Wshadow       -- a bit too trigger-happy
 CXXFLAGS_WARNING?=\
+				  -Wctor-dtor-privacy \
+				  -Wnon-virtual-dtor \
+				  -Wreorder \
+				  -Winit-self \
 				  -Wuseless-cast \
 				  -Wstack-protector \
 				  -Wall \
