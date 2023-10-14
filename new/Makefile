@@ -83,6 +83,7 @@ CXXLIBS=\
 ################################################################################
 # High-level targets
 all: dist
+	@echo "Built version $(VIUAVM_VERSION_FULL)"
 
 dist: \
 	$(BUILD)/tools/exec/readelf \
