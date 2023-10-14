@@ -270,7 +270,10 @@ struct Node {
         -> std::optional<attribute_type>;
     auto attr [[maybe_unused]] (std::string_view const) const
         -> std::optional<Lexeme>;
+
+    virtual ~Node();
 };
+Node::~Node() {}
 auto Node::has_attr(std::string_view const key) const
     -> std::optional<attribute_type>
 {
