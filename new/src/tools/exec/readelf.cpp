@@ -175,9 +175,9 @@ auto main(int argc, char* argv[]) -> int
         if (name == ".viua.magic") {
             std::cout << INDENT << "  [Magic:";
             std::cout << std::hex;
-            for (auto const each : each.data) {
+            for (auto const c : each.data) {
                 std::cout << ' ' << std::setw(2) << std::setfill('0')
-                          << static_cast<int>(each);
+                          << static_cast<int>(c);
             }
             std::cout << std::dec;
 

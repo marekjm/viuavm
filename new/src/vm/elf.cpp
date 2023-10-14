@@ -157,12 +157,12 @@ auto Loaded_elf::entry_point() const -> std::optional<size_t>
 auto Loaded_elf::find_fragment(std::string_view const sv) const
     -> std::optional<std::reference_wrapper<Fragment const>>
 {
-    auto const frag = std::find_if(
+    auto const fragment = std::find_if(
         fragments.begin(), fragments.end(), [sv](auto const& frag) -> bool {
             return (frag.first == sv);
         });
-    return (frag == fragments.end()) ? std::nullopt
-                                     : std::optional{std::ref(frag->second)};
+    return (fragment == fragments.end()) ? std::nullopt
+                                     : std::optional{std::ref(fragment->second)};
 }
 auto Loaded_elf::load_strtab() -> void
 {

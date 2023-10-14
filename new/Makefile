@@ -33,6 +33,7 @@ CXXFLAGS_OPTIMISATION=-g -Og
 CXXFLAGS_NOERROR=\
 				 -Wno-error=unused-result
 
+# -Wshadow  -- a bit too trigger-happy
 CXXFLAGS_WARNING?=\
 				  -Wall \
 				  -Wextra \

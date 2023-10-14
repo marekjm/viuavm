@@ -35,6 +35,7 @@
 #include <viua/arch/ops.h>
 #include <viua/libs/assembler.h>
 #include <viua/libs/lexer.h>
+#include <viua/support/memory.h>
 #include <viua/support/errno.h>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
@@ -182,6 +183,36 @@ struct Cooked_op {
 using Cooked_text = std::vector<Cooked_op>;
 
 namespace cook {
+namespace {
+auto make_label_ref(std::map<size_t, std::string_view> const& strtab, Elf64_Sym const& sym) -> std::string {
+    return ("@" + std::string{strtab.at(sym.st_name)});
+}
+auto read_size(std::vector<uint8_t> const& data,
+                          size_t const off) -> uint64_t {
+    auto const size_offset = (off - sizeof(uint64_t));
+    return le64toh(viua::support::memload<uint64_t>(&data[size_offset]));
+}
+auto load_string(std::vector<uint8_t> const& data,
+                                     size_t const off) -> std::string {
+    auto s = std::string{reinterpret_cast<char const*>(data.data() + off),
+                         read_size(data, off)};
+    auto const needs_quotes =
+        std::any_of(s.begin(), s.end(), [](auto const each) -> bool {
+            return not(std::isalnum(each) or (each == '_'));
+        });
+    if (needs_quotes) {
+        s = ('"' + s + '"');
+    }
+    return s;
+}
+auto view_data(std::vector<uint8_t> const& data,
+                                   size_t const off) -> std::string_view {
+    return std::string_view{
+        reinterpret_cast<char const*>(data.data() + off),
+        read_size(data, off)};
+}
+}
+
 auto demangle_symbol_load(Cooked_text& raw,
                           Cooked_text& cooked,
                           size_t& i,
@@ -198,38 +229,6 @@ auto demangle_symbol_load(Cooked_text& raw,
                             viua::arch::ops::OPCODE const op,
                             viua::arch::opcode_type const flags = 0) -> bool {
         return match_opcode(ins_at(n), op, flags);
-    };
-
-    auto const read_size = [](std::vector<uint8_t> const& data,
-                              size_t const off) -> uint64_t {
-        auto const size_offset = (off - sizeof(uint64_t));
-        auto cooked            = uint64_t{};
-        memcpy(&cooked, &data[size_offset], sizeof(uint64_t));
-        return le64toh(cooked);
-    };
-    auto const load_string = [read_size](std::vector<uint8_t> const& data,
-                                         size_t const off) -> std::string {
-        auto s = std::string{reinterpret_cast<char const*>(data.data() + off),
-                             read_size(data, off)};
-        auto const needs_quotes =
-            std::any_of(s.begin(), s.end(), [](auto const each) -> bool {
-                return not(std::isalnum(each) or (each == '_'));
-            });
-        if (needs_quotes) {
-            s = ('"' + s + '"');
-        }
-        return s;
-    };
-    auto const view_data = [read_size](std::vector<uint8_t> const& data,
-                                       size_t const off) -> std::string_view {
-        return std::string_view{
-            reinterpret_cast<char const*>(data.data() + off),
-            read_size(data, off)};
-    };
-    auto const make_label_ref =
-        [](std::map<size_t, std::string_view> const& strtab,
-           Elf64_Sym const& sym) -> std::string {
-        return ("@" + std::string{strtab.at(sym.st_name)});
     };
 
     using enum viua::arch::ops::OPCODE;
@@ -508,39 +507,6 @@ auto demangle_arodp(Cooked_text& text,
                             viua::arch::ops::OPCODE const op,
                             viua::arch::opcode_type const flags = 0) -> bool {
         return match_opcode(ins_at(n), op, flags);
-    };
-    auto const read_size = [](std::vector<uint8_t> const& data,
-                              size_t const off) -> uint64_t {
-        auto const size_offset = off;
-        auto cooked            = uint64_t{};
-        memcpy(&cooked, &data[size_offset], sizeof(uint64_t));
-        return le64toh(cooked);
-    };
-    auto const load_string = [read_size](std::vector<uint8_t> const& data,
-                                         size_t const off) -> std::string {
-        auto s = std::string{
-            reinterpret_cast<char const*>(data.data() + off + sizeof(uint64_t)),
-            read_size(data, off)};
-        auto const needs_quotes =
-            std::any_of(s.begin(), s.end(), [](auto const each) -> bool {
-                return not(std::isalnum(each) or (each == '_'));
-            });
-        if (needs_quotes) {
-            s = ('"' + s + '"');
-        }
-        return s;
-    };
-    auto const view_data
-        [[maybe_unused]] = [read_size](std::vector<uint8_t> const& data,
-                                       size_t const off) -> std::string_view {
-        return std::string_view{
-            reinterpret_cast<char const*>(data.data() + off + sizeof(uint64_t)),
-            read_size(data, off)};
-    };
-    auto const make_label_ref =
-        [](std::map<size_t, std::string_view> const& strtab,
-           Elf64_Sym const& sym) -> std::string {
-        return ("@" + std::string{strtab.at(sym.st_name)});
     };
 
     using enum viua::arch::ops::OPCODE;
