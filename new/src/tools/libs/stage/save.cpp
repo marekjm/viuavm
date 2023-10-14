@@ -96,7 +96,7 @@ auto save_buffer_to_rodata(std::vector<uint8_t>& strings,
         }
     }
 
-    auto const data_size = htole64(static_cast<uint64_t>(data.size()));
+    auto const data_size = htole64(data.size());
     strings.resize(strings.size() + sizeof(data_size));
     memcpy((strings.data() + strings.size() - sizeof(data_size)),
            &data_size,

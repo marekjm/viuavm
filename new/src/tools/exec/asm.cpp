@@ -3524,8 +3524,7 @@ auto main(int argc, char* argv[]) -> int
 
         auto const was_declared_extern =
             static_cast<bool>(decl_sym.has_attr("extern"));
-        auto const was_defined =
-            static_cast<bool>(sym.st_value and sym.st_size);
+        auto const was_defined = sym.st_value and sym.st_size;
 
         if (was_declared_extern and was_defined) {
             using viua::libs::errors::compile_time::Cause;
