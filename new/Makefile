@@ -28,12 +28,26 @@ VIUA_OPT_ETC_DIR=$(VIUA_OPT_ROOT)/etc
 CXX?=g++
 CXXSTD?=c++23
 
-CXXFLAGS_OPTIMISATION=-g -Og
+CXXFLAGS_OPTIMISATION?=-Og
+CXXFLAGS_DEBUG?=-ggdb
 
-CXXFLAGS_NOERROR=\
-				 -Wno-error=unused-result
+# Default sanitiser is for GCC.
+# Remember to build without sanitisers if you want to use Valgrind.
+CXXFLAGS_SANITISER?=\
+					-fsanitize=leak \
+					-fsanitize=address \
+					-fsanitize=undefined
 
-# -Wshadow  -- a bit too trigger-happy
+CXXFLAGS_OPTION?=\
+				 -fstack-protector-all \
+				 -fstrict-aliasing \
+				 -fstrict-overflow
+
+CXXFLAGS_NOERROR?=\
+				  -Wno-error=unused-result
+
+# -Wfloat-equal  -- breaks
+# -Wshadow       -- a bit too trigger-happy
 CXXFLAGS_WARNING?=\
 				  -Wall \
 				  -Wextra \
@@ -54,6 +68,9 @@ CXXFLAGS=\
 		 -DVIUAVM_VERSION_FULL='"$(VIUAVM_VERSION_FULL)"' \
 		 $(FEATURE_DETECT_FLAGS) \
 		 $(CXXFLAGS_OPTIMISATION) \
+		 $(CXXFLAGS_DEBUG) \
+		 $(CXXFLAGS_SANITISER) \
+		 $(CXXFLAGS_OPTION) \
 		 $(CXXFLAGS_WARNING) \
 		 $(CXXFLAGS_NOERROR) \
 		 $(CXXFLAGS_INCLUDE)
