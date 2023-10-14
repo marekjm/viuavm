@@ -33,13 +33,12 @@ CXXFLAGS_OPTIMISATION=-g -Og
 CXXFLAGS_NOERROR=\
 				 -Wno-error=unused-result
 
-CXXFLAGS_WARNING=\
-				 -Wall \
-				 -Wextra \
-				 -Wpedantic \
-				 -Werror \
-				 -Wfatal-errors \
-				 $(CXXFLAGS_NOERROR)
+CXXFLAGS_WARNING?=\
+				  -Wall \
+				  -Wextra \
+				  -Wpedantic \
+				  -Werror \
+				  -Wfatal-errors
 
 CXXFLAGS_INCLUDE=\
 				 -I./include \
@@ -55,6 +54,7 @@ CXXFLAGS=\
 		 $(FEATURE_DETECT_FLAGS) \
 		 $(CXXFLAGS_OPTIMISATION) \
 		 $(CXXFLAGS_WARNING) \
+		 $(CXXFLAGS_NOERROR) \
 		 $(CXXFLAGS_INCLUDE)
 
 CXXLIBS=\
