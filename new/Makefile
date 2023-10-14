@@ -49,6 +49,8 @@ CXXFLAGS_NOERROR?=\
 # -Wfloat-equal  -- breaks
 # -Wshadow       -- a bit too trigger-happy
 CXXFLAGS_WARNING?=\
+				  -Wswitch-bool \
+				  -Wswitch \
 				  -Wctor-dtor-privacy \
 				  -Wnon-virtual-dtor \
 				  -Wreorder \
