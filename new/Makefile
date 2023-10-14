@@ -49,6 +49,7 @@ CXXFLAGS_NOERROR?=\
 # -Wfloat-equal  -- breaks
 # -Wshadow       -- a bit too trigger-happy
 CXXFLAGS_WARNING?=\
+				  -Wstack-protector \
 				  -Wall \
 				  -Wextra \
 				  -Wpedantic \
