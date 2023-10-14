@@ -37,7 +37,7 @@ def format_run_time_us(run_time):
     if run_time < 1e6:
         ms = run_time / 1e3
         return f"{ms:7.2f}ms"
-    return "{:9.4}s".format(run_time / 1e6)
+    return "{:7.2f}s ".format(run_time / 1e6)
 
 
 def format_run_time(run_time):
@@ -1327,6 +1327,15 @@ def main(args):
     ) in enumerate(cases, start=1):
         error_stream = io.StringIO()
 
+        print(
+            "    case {}. of {}: ".format(
+                colorise("white", str(case_no).rjust(pad_case_no)),
+                colorise("white", case_name.ljust(pad_case_name)),
+            ),
+            end="",
+            flush=True,
+        )
+
         rc = lambda: test_case(case_name, test_program, error_stream)
 
         result, symptom, run_time = (
@@ -1394,9 +1403,7 @@ def main(args):
             symptom = "internal test suite failure"
 
         print(
-            "    case {}. of {}: [{}] {}  {}".format(
-                colorise("white", str(case_no).rjust(pad_case_no)),
-                colorise("white", case_name.ljust(pad_case_name)),
+            "[{}] {}  {}".format(
                 colorise(tag_color, tag)
                 + ((" => " + colorise("light_red", symptom)) if symptom else ""),
                 (
