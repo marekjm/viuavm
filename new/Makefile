@@ -56,6 +56,7 @@ CXXFLAGS_WARNING?=\
 				  -Wreorder \
 				  -Winit-self \
 				  -Wuseless-cast \
+				  -Wsign-promo \
 				  -Wstack-protector \
 				  -Wall \
 				  -Wextra \

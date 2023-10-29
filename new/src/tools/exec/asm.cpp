@@ -831,7 +831,7 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
                 using viua::libs::errors::compile_time::Error;
                 throw Error{index, Cause::Invalid_register_access}.aside(
                     "register index range is 0-"
-                    + std::to_string(viua::arch::MAX_REGISTER_INDEX));
+                    + std::to_string(static_cast<uintmax_t>(viua::arch::MAX_REGISTER_INDEX)));
             }
 
             operand.ingredients.push_back(leader);
@@ -872,7 +872,7 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
                 consume_token_of({TOKEN::OPCODE, TOKEN::LITERAL_ATOM}, lexemes);
             operand.ingredients.push_back(value);
             auto& tt = operand.ingredients.front().text;
-            tt       = std::to_string(fundamental_type_names.at(tt));
+            tt       = std::to_string(static_cast<uintmax_t>(fundamental_type_names.at(tt)));
         } else if (lexemes.front() == TOKEN::LITERAL_INTEGER) {
             auto const value =
                 consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);

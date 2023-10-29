@@ -19,6 +19,7 @@
 
 #include <endian.h>
 #include <string.h>
+#include <stdint.h>
 
 #include <stdexcept>
 #include <string>
@@ -280,9 +281,9 @@ auto M::encode() const -> instruction_type
 }
 auto M::to_string() const -> std::string
 {
-    return (viua::arch::ops::to_string(opcode) + " " + std::to_string(spec)
+    return (viua::arch::ops::to_string(opcode) + " " + std::to_string(static_cast<uintmax_t>(spec))
             + ", " + out.to_string() + ", " + in.to_string() + ", "
-            + std::to_string(immediate));
+            + std::to_string(static_cast<uintmax_t>(immediate)));
 }
 }  // namespace viua::arch::ops
 

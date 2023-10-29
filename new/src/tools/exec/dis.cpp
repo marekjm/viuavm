@@ -622,7 +622,7 @@ auto demangle_memory(Cooked_text& text) -> void
                 op.opcode,
                 raw_op,
                 (name + " " + op.out.to_string() + ", " + op.in.to_string()
-                 + ", " + std::to_string(op.immediate)));
+                 + ", " + std::to_string(static_cast<uintmax_t>(op.immediate))));
             continue;
         }
         if (m(i, CAST)) {
