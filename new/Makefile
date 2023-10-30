@@ -44,22 +44,51 @@ CXXFLAGS_OPTION?=\
 				 -fstrict-overflow
 
 CXXFLAGS_NOERROR?=\
+				  -Wno-error=float-equal \
 				  -Wno-error=unused-result
 
-# -Wfloat-equal  -- breaks
-# -Wshadow       -- a bit too trigger-happy
+# Some nice-to-have warnings would be:
+#
+#  -Wconversion
+#  -Wsign-conversion
+#
 CXXFLAGS_WARNING?=\
-				  -Wswitch-bool \
-				  -Wswitch \
+				  -Warith-conversion \
 				  -Wctor-dtor-privacy \
+				  -Wdangling-reference \
+				  -Wdelete-non-virtual-dtor \
+				  -Wdiv-by-zero \
+				  -Wdouble-promotion \
+				  -Wduplicated-branches \
+				  -Wenum-conversion \
+				  -Wfloat-equal \
 				  -Wfloat-conversion \
+				  -Wimplicit-fallthrough=5 \
+				  -Winfinite-recursion \
+				  -Winit-list-lifetime \
+				  -Winvalid-constexpr \
 				  -Wnon-virtual-dtor \
-				  -Wreorder \
-				  -Winit-self \
+				  -Wlogical-op \
 				  -Wuseless-cast \
+				  -Wmissing-include-dirs \
+				  -Wmultiple-inheritance \
+				  -Wodr \
+				  -Wold-style-cast \
+				  -Woverflow \
+				  -Wredundant-decls \
+				  -Wredundant-move \
 				  -Wshadow=compatible-local \
 				  -Wsign-promo \
 				  -Wstack-protector \
+				  -Wstrict-aliasing=3 \
+				  -Wstrict-overflow=5 \
+				  -Wsuggest-attribute=noreturn \
+				  -Wsuggest-final-methods \
+				  -Wsuggest-final-types \
+				  -Wsuggest-override \
+				  -Wswitch-bool \
+				  -Wundef \
+				  -Wunused \
 				  -Wall \
 				  -Wextra \
 				  -Wpedantic \
