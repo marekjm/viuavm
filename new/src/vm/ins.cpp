@@ -1218,28 +1218,28 @@ auto execute_arithmetic_immediate_op(Op const op, Stack& stack) -> void
              : static_cast<immediate_type>(op.instruction.immediate));
 
     if (in.template holds<void>()) {
-        out = typename Op::functor_type<immediate_type>{}(0, immediate);
+        out = typename Op::template functor_type<immediate_type>{}(0, immediate);
         return;
     }
     if (auto const v = in.template get<uint64_t>(); v) {
-        out = typename Op::functor_type<uint64_t>{}(*v, immediate);
+        out = typename Op::template functor_type<uint64_t>{}(*v, immediate);
         return;
     }
     if (auto const v = in.template get<int64_t>(); v) {
-        out = typename Op::functor_type<int64_t>{}(*v, immediate);
+        out = typename Op::template functor_type<int64_t>{}(*v, immediate);
         return;
     }
     if (auto const v = in.template get<float>(); v) {
-        out = typename Op::functor_type<float>{}(*v, immediate);
+        out = typename Op::template functor_type<float>{}(*v, immediate);
         return;
     }
     if (auto const v = in.template get<double>(); v) {
-        out = typename Op::functor_type<double>{}(*v, immediate);
+        out = typename Op::template functor_type<double>{}(*v, immediate);
         return;
     }
     if (auto const v = in.template get<register_type::pointer_type>();
                v and not signed_immediate) {
-        auto const r = typename Op::functor_type{}(v->ptr, immediate);
+        auto const r = typename Op::template functor_type<uint64_t>{}(v->ptr, immediate);
         out          = register_type::pointer_type{static_cast<uint64_t>(r)};
         return;
     }

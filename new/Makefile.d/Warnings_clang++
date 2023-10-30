@@ -1,0 +1,15 @@
+# vim:ft=make
+
+CXXFLAGS_NOERROR?=
+
+# Some nice-to-have warnings would be:
+#
+#  -Wconversion
+#  -Wsign-conversion
+#
+CXXFLAGS_WARNING?=\
+				  -Wall \
+				  -Wextra \
+				  -Wpedantic \
+				  -Werror \
+				  -Wfatal-errors

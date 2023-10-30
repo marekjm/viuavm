@@ -43,57 +43,7 @@ CXXFLAGS_OPTION?=\
 				 -fstrict-aliasing \
 				 -fstrict-overflow
 
-CXXFLAGS_NOERROR?=\
-				  -Wno-error=float-equal \
-				  -Wno-error=unused-result
-
-# Some nice-to-have warnings would be:
-#
-#  -Wconversion
-#  -Wsign-conversion
-#
-CXXFLAGS_WARNING?=\
-				  -Warith-conversion \
-				  -Wctor-dtor-privacy \
-				  -Wdangling-reference \
-				  -Wdelete-non-virtual-dtor \
-				  -Wdiv-by-zero \
-				  -Wdouble-promotion \
-				  -Wduplicated-branches \
-				  -Wenum-conversion \
-				  -Wfloat-equal \
-				  -Wfloat-conversion \
-				  -Wimplicit-fallthrough=5 \
-				  -Winfinite-recursion \
-				  -Winit-list-lifetime \
-				  -Winvalid-constexpr \
-				  -Wnon-virtual-dtor \
-				  -Wlogical-op \
-				  -Wuseless-cast \
-				  -Wmissing-include-dirs \
-				  -Wmultiple-inheritance \
-				  -Wodr \
-				  -Wold-style-cast \
-				  -Woverflow \
-				  -Wredundant-decls \
-				  -Wredundant-move \
-				  -Wshadow=compatible-local \
-				  -Wsign-promo \
-				  -Wstack-protector \
-				  -Wstrict-aliasing=3 \
-				  -Wstrict-overflow=5 \
-				  -Wsuggest-attribute=noreturn \
-				  -Wsuggest-final-methods \
-				  -Wsuggest-final-types \
-				  -Wsuggest-override \
-				  -Wswitch-bool \
-				  -Wundef \
-				  -Wunused \
-				  -Wall \
-				  -Wextra \
-				  -Wpedantic \
-				  -Werror \
-				  -Wfatal-errors
+include Makefile.d/Warnings_$(CXX)
 
 CXXFLAGS_INCLUDE=\
 				 -I./include \
@@ -193,6 +143,7 @@ format:
 watch:
 	(\
 		ls -1 Makefile ;\
+		find Makefile.d -mindepth 1 ;\
 		find . -name '*.asm' ;\
 		find ./src -type f ;\
 		find ./include -type f\
@@ -202,6 +153,7 @@ watch:
 watch-sample:
 	(\
 		ls -1 Makefile ;\
+		find Makefile.d -mindepth 1 ;\
 		find . -name '*.asm' ;\
 		find ./src -type f ;\
 		find ./include -type f\
@@ -211,6 +163,7 @@ watch-sample:
 watch-sample-and-install:
 	(\
 		ls -1 Makefile ;\
+		find Makefile.d -mindepth 1 ;\
 		find . -name '*.asm' ;\
 		find ./src -type f ;\
 		find ./include -type f\
