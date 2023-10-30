@@ -1091,6 +1091,17 @@ auto execute(LLI const op, Stack& stack, ip_type const) -> void
                                   + std::string{out.type_name()}};
     }
 }
+template<typename T>
+auto cast_register_to(Stack& stack, register_type& target) -> void
+{
+    if (target.holds<Register::undefined_type>()) {
+        target.convert_undefined_to<T>();
+    } else if (auto const v = target.cast_to<T>(); v) {
+        target = *v;
+    } else {
+        throw abort_execution{stack, "invalid cast"};
+    }
+}
 auto execute(CAST const op, Stack& stack, ip_type const) -> void
 {
     auto target = mutable_proxy(stack, op.instruction.out);
@@ -1109,7 +1120,7 @@ auto execute(CAST const op, Stack& stack, ip_type const) -> void
         using enum viua::arch::FUNDAMENTAL_TYPES;
         ;
     case INT:
-        slot.convert_undefined_to<Register::int_type>();
+        cast_register_to<Register::int_type>(stack, slot);
         break;
     case UINT:
         slot.convert_undefined_to<Register::uint_type>();
