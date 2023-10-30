@@ -88,7 +88,7 @@ auto format_time(std::chrono::microseconds const us) -> std::string
     }
     return out.str();
 }
-auto format_hz(uint64_t const hz) -> std::string
+auto format_hz(double const hz) -> std::string
 {
     auto out = std::ostringstream{};
     if (hz > 1e3) {
