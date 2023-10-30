@@ -1207,25 +1207,36 @@ auto execute_arithmetic_immediate_op(Op const op, Stack& stack) -> void
              : static_cast<immediate_type>(op.instruction.immediate));
 
     if (in.template holds<void>()) {
-        out = typename Op::functor_type{}(0, immediate);
-    } else if (auto const v = in.template get<uint64_t>(); v) {
-        out = typename Op::functor_type{}(*v, immediate);
-    } else if (auto const v = in.template get<int64_t>(); v) {
-        out = typename Op::functor_type{}(*v, immediate);
-    } else if (auto const v = in.template get<float>(); v) {
-        out = typename Op::functor_type{}(*v, immediate);
-    } else if (auto const v = in.template get<double>(); v) {
-        out = typename Op::functor_type{}(*v, immediate);
-    } else if (auto const v = in.template get<register_type::pointer_type>();
+        out = typename Op::functor_type<immediate_type>{}(0, immediate);
+        return;
+    }
+    if (auto const v = in.template get<uint64_t>(); v) {
+        out = typename Op::functor_type<uint64_t>{}(*v, immediate);
+        return;
+    }
+    if (auto const v = in.template get<int64_t>(); v) {
+        out = typename Op::functor_type<int64_t>{}(*v, immediate);
+        return;
+    }
+    if (auto const v = in.template get<float>(); v) {
+        out = typename Op::functor_type<float>{}(*v, immediate);
+        return;
+    }
+    if (auto const v = in.template get<double>(); v) {
+        out = typename Op::functor_type<double>{}(*v, immediate);
+        return;
+    }
+    if (auto const v = in.template get<register_type::pointer_type>();
                v and not signed_immediate) {
         auto const r = typename Op::functor_type{}(v->ptr, immediate);
         out          = register_type::pointer_type{static_cast<uint64_t>(r)};
-    } else {
-        throw abort_execution{
-            stack,
-            "unsupported lhs operand type for immediate arithmetic operation: "
-                + std::string{in.type_name()}};
+        return;
     }
+
+    throw abort_execution{
+        stack,
+        "unsupported lhs operand type for immediate arithmetic operation: "
+            + std::string{in.type_name()}};
 }
 auto execute(ADDI const op, Stack& stack, ip_type const) -> void
 {
