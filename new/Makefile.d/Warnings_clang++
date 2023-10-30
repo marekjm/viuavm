@@ -1,6 +1,10 @@
 # vim:ft=make
 
-CXXFLAGS_NOERROR?=
+# -Wshorten-64-to-32 is sometimes equivallent to GCC's -Wsign-conversion which
+#  is a bit too trigger-happy on current code.
+CXXFLAGS_NOERROR?=\
+				  -Wno-error=covered-switch-default \
+				  -Wno-shorten-64-to-32
 
 # Some nice-to-have warnings would be:
 #
@@ -8,6 +12,27 @@ CXXFLAGS_NOERROR?=
 #  -Wsign-conversion
 #
 CXXFLAGS_WARNING?=\
+				  -Warray-bounds-pointer-arithmetic \
+				  -Warray-parameter \
+				  -Wassign-enum \
+				  -Watomic-implicit-seq-cst \
+				  -Wbad-function-cast \
+				  -Wbitwise-instead-of-logical \
+				  -Wbitwise-op-parentheses \
+				  -Wbool-operation \
+				  -Wcast-align \
+				  -Wcast-function-type \
+				  -Wcast-qual \
+				  -Wchar-subscripts \
+				  -Wcomma \
+				  -Wconditional-uninitialized \
+				  -Wenum-conversion \
+				  -Wfloat-conversion \
+				  -Wimplicit-float-conversion \
+				  -Wimplicit-int-conversion \
+				  -Wstring-conversion \
+				  -Wcovered-switch-default \
+				  -Wshorten-64-to-32 \
 				  -Wall \
 				  -Wextra \
 				  -Wpedantic \

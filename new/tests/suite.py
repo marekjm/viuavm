@@ -1357,9 +1357,9 @@ def main(args):
 
                         def make_vm_time(s):
                             if s.endswith("us"):
-                                return int(s[:-2])
+                                return float(s[:-2])
                             elif s.endswith("ms"):
-                                return int(float(s[:-2]) * 1000)
+                                return (float(s[:-2]) * 1000)
                             else:
                                 raise
 
@@ -1415,7 +1415,7 @@ def main(args):
                     (
                         "perf: {} ops in {} at {}".format(
                             colorise(CASE_RUNTIME_COLOUR, "{:3}".format(perf["ops"])),
-                            colorise(CASE_RUNTIME_COLOUR, perf["run_time"].rjust(6)),
+                            colorise(CASE_RUNTIME_COLOUR, perf["run_time"].rjust(8)),
                             colorise(CASE_RUNTIME_COLOUR, perf["freq"].rjust(10)),
                         )
                     )

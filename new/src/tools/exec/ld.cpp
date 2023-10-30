@@ -418,13 +418,13 @@ auto emit_elf(std::filesystem::path const output_path,
 
         elf_header.e_phoff     = sizeof(Elf64_Ehdr);
         elf_header.e_phentsize = sizeof(Elf64_Phdr);
-        elf_header.e_phnum     = elf_pheaders;
+        elf_header.e_phnum     = static_cast<Elf64_Half>(elf_pheaders);
 
         elf_header.e_shoff =
             elf_header.e_phoff + (elf_pheaders * sizeof(Elf64_Phdr));
         elf_header.e_shentsize = sizeof(Elf64_Shdr);
-        elf_header.e_shnum     = elf_sheaders;
-        elf_header.e_shstrndx  = elf_sheaders - 1;
+        elf_header.e_shnum     = static_cast<Elf64_Half>(elf_sheaders);
+        elf_header.e_shstrndx  = static_cast<Elf64_Half>(elf_sheaders - 1);
 
         write(a_out, &elf_header, sizeof(elf_header));
 
@@ -467,10 +467,10 @@ auto emit_elf(std::filesystem::path const output_path,
         for (auto& each : symbol_table) {
             switch (ELF64_ST_TYPE(each.st_info)) {
             case STT_FUNC:
-                each.st_shndx = text_section_ndx;
+                each.st_shndx = static_cast<Elf64_Section>(text_section_ndx);
                 break;
             case STT_OBJECT:
-                each.st_shndx = rodata_section_ndx;
+                each.st_shndx = static_cast<Elf64_Section>(rodata_section_ndx);
                 break;
             default:
                 break;

@@ -353,7 +353,7 @@ auto Operand::make_access() const -> viua::arch::Register_access
     }
 
     auto const direct = (lx == TOKEN::DOLLAR);
-    auto const index  = std::stoul(ingredients.at(1).text);
+    auto const index  = viua::support::ston<uint8_t>(ingredients.at(1).text);
     if (ingredients.size() == 2) {
         return viua::arch::Register_access::make_local(index, direct);
     }
@@ -1105,8 +1105,8 @@ auto save_declared_symbols(std::vector<std::unique_ptr<ast::Node>> const& nodes,
         }
 
         auto symbol     = make_symbol(sym.name, string_table);
-        symbol.st_info  = ELF64_ST_INFO(binding, type);
-        symbol.st_other = visibility;
+        symbol.st_info  = static_cast<uint8_t>(ELF64_ST_INFO(binding, type));
+        symbol.st_other = static_cast<uint8_t>(visibility);
 
         /*
          * Leave size and offset of the symbol empty since we do not have this
@@ -3182,13 +3182,13 @@ auto emit_elf(std::filesystem::path const output_path,
 
         elf_header.e_phoff     = sizeof(Elf64_Ehdr);
         elf_header.e_phentsize = sizeof(Elf64_Phdr);
-        elf_header.e_phnum     = elf_pheaders;
+        elf_header.e_phnum     = static_cast<Elf64_Half>(elf_pheaders);
 
         elf_header.e_shoff =
             elf_header.e_phoff + (elf_pheaders * sizeof(Elf64_Phdr));
         elf_header.e_shentsize = sizeof(Elf64_Shdr);
-        elf_header.e_shnum     = elf_sheaders;
-        elf_header.e_shstrndx  = elf_sheaders - 1;
+        elf_header.e_shnum     = static_cast<Elf64_Half>(elf_sheaders);
+        elf_header.e_shstrndx  = static_cast<Elf64_Half>(elf_sheaders - 1);
 
         write(a_out, &elf_header, sizeof(elf_header));
 
@@ -3231,10 +3231,10 @@ auto emit_elf(std::filesystem::path const output_path,
         for (auto& each : symbol_table) {
             switch (ELF64_ST_TYPE(each.st_info)) {
             case STT_FUNC:
-                each.st_shndx = text_section_ndx;
+                each.st_shndx = static_cast<Elf64_Section>(text_section_ndx);
                 break;
             case STT_OBJECT:
-                each.st_shndx = rodata_section_ndx;
+                each.st_shndx = static_cast<Elf64_Section>(rodata_section_ndx);
                 break;
             default:
                 break;

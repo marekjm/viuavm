@@ -42,7 +42,7 @@ auto Register_access::encode() const -> uint16_t
     auto base = uint16_t{index};
     auto mode = static_cast<uint16_t>(direct);
     auto rset = static_cast<uint16_t>(set);
-    return base | (mode << 8) | (rset << 9);
+    return static_cast<uint16_t>(base | (mode << 8) | (rset << 9));
 }
 
 auto Register_access::make_local(uint8_t const index, bool const direct)

@@ -79,12 +79,14 @@ auto format_time(std::chrono::microseconds const us) -> std::string
 {
     auto out = std::ostringstream{};
     out << std::fixed << std::setprecision(2);
-    if (us.count() > 1e6) {
-        out << (us.count() / 1.0e6) << "s";
-    } else if (us.count() > 1e3) {
-        out << (us.count() / 1.0e3) << "ms";
+
+    auto const c = static_cast<double>(us.count());
+    if (c > 1e6) {
+        out << (c / 1.0e6) << "s";
+    } else if (c > 1e3) {
+        out << (c / 1.0e3) << "ms";
     } else {
-        out << us.count() << "us";
+        out << c << "us";
     }
     return out.str();
 }
@@ -187,7 +189,7 @@ auto run(viua::vm::Core& core) -> void
         auto const total_us =
             std::chrono::duration_cast<std::chrono::microseconds>(
                 core.perf_counters.duration());
-        auto const approx_hz = (1e6 / total_us.count()) * total_ops;
+        auto const approx_hz = (1e6 / static_cast<double>(total_us.count())) * static_cast<double>(total_ops);
         viua::TRACE_STREAM << std::setfill(' ') << std::dec;
         viua::TRACE_STREAM << "[vm:perf] executed ops " << total_ops
                            << ", run time " << format_time(total_us)

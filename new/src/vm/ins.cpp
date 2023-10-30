@@ -965,7 +965,7 @@ auto execute(FRAME const op, Stack& stack, ip_type const) -> void
     case viua::arch::RS::LOCAL:
         if (auto v = immutable_proxy(stack, op.instruction.out).get<uint64_t>();
             v) {
-            capacity = *v;
+            capacity = static_cast<viua::arch::register_index_type>(*v);
         } else {
             throw abort_execution{
                 stack, "dynamic args count must be an unsigned integer"};
@@ -1230,11 +1230,11 @@ auto execute_arithmetic_immediate_op(Op const op, Stack& stack) -> void
         return;
     }
     if (auto const v = in.template get<float>(); v) {
-        out = typename Op::template functor_type<float>{}(*v, immediate);
+        out = typename Op::template functor_type<float>{}(*v, static_cast<float>(immediate));
         return;
     }
     if (auto const v = in.template get<double>(); v) {
-        out = typename Op::template functor_type<double>{}(*v, immediate);
+        out = typename Op::template functor_type<double>{}(*v, static_cast<double>(immediate));
         return;
     }
     if (auto const v = in.template get<register_type::pointer_type>();
