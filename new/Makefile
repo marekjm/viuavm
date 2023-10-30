@@ -52,6 +52,7 @@ CXXFLAGS_WARNING?=\
 				  -Wswitch-bool \
 				  -Wswitch \
 				  -Wctor-dtor-privacy \
+				  -Wfloat-conversion \
 				  -Wnon-virtual-dtor \
 				  -Wreorder \
 				  -Winit-self \
