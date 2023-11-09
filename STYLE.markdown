@@ -27,17 +27,14 @@ Class, struct, and enum names
     class big_endian;
 
 Always use `Snake_case` with capitalised first word; this avoids unreadable
-messes such as `TCPIPPacket`. For utility classes (i.e. those that could be used
+messes such as `TCPIPPacket`. For utility classes (ie, those that could be used
 outside of the VM's codebase as they are general purpose) can follow the style
 used by the C++ standard library.
 
 Namespace names
 ---------------
 
-    namespace network_stack {
-        namespace tcp_ip {
-        }
-    }
+    namespace snake_case {}
 
 Always use all-lowercase `snake_case`.
 
@@ -53,11 +50,11 @@ Make as many variables constant as possible.
 Constant names
 --------------
 
-    auto const AVOGADRO_NUMBER = 6.02;  // constant in global, namespace, or class scope
-    auto const other_constant = 3.14;   // constant in local scope
+    constexpr auto AVOGADRO_NUMBER = 6.02;  // constexpr
+    auto const other_constant = 3.14;   // regular scope
 
-Always use `UPPER_SNAKE_CASE` for global-ish constants.
-Apply rules for variables for local constants.
+Always use `UPPER_SNAKE_CASE` for `constexpr` constants.
+Apply rules for variables for `const` variables.
 
 ----
 
@@ -142,3 +139,13 @@ format your code before commiting; it will enforce correct indentation, brace
 placement, etc.
 
 Documentation for `clang-format`: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+
+----
+
+## Other style documents
+
+Just for reference:
+
+- GNU Coding Standards: https://www.gnu.org/prep/standards/standards.html
+- GCC Coding Conventions: https://gcc.gnu.org/codingconventions.html
+- LLVM Coding Standards: https://llvm.org/docs/CodingStandards.html
