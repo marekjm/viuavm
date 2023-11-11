@@ -26,6 +26,18 @@
 
 
 namespace viua::vm::elf {
+namespace {
+auto whole_read(int const fd, void* const buf, size_t const count) -> void
+{
+    auto done = ssize_t{0};
+    do {
+        if (auto const n = read(fd, static_cast<std::byte*>(buf) + done, count); n != -1) {
+            done += n;
+        }
+    } while (done != static_cast<ssize_t>(count));
+}
+}
+
 auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
 {
     auto loaded = Loaded_elf{};
@@ -86,7 +98,7 @@ auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
 
         for (auto i = size_t{0}; i < ehdr.e_phnum; ++i) {
             pheaders.emplace_back(Elf64_Phdr{});
-            read(elf_fd, &pheaders.back(), ehdr.e_phentsize);
+            whole_read(elf_fd, &pheaders.back(), ehdr.e_phentsize);
         }
     }
 
@@ -96,7 +108,7 @@ auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
 
         for (auto i = size_t{0}; i < ehdr.e_shnum; ++i) {
             sheaders.emplace_back(Elf64_Shdr{});
-            read(elf_fd, &sheaders.back(), ehdr.e_shentsize);
+            whole_read(elf_fd, &sheaders.back(), ehdr.e_shentsize);
         }
     }
 
@@ -106,7 +118,7 @@ auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
 
         auto buf = std::vector<char>(shstrtab.sh_size);
         lseek(elf_fd, shstrtab.sh_offset, SEEK_SET);
-        read(elf_fd, buf.data(), buf.size());
+        whole_read(elf_fd, buf.data(), buf.size());
 
         for (auto i = size_t{0}; i < shstrtab.sh_size; ++i) {
             section_names.emplace_back(&buf[i]);
@@ -132,7 +144,7 @@ auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
         if (sh.sh_size) {
             fragment.data.resize(sh.sh_size);
             lseek(elf_fd, sh.sh_offset, SEEK_SET);
-            read(elf_fd, fragment.data.data(), sh.sh_size);
+            whole_read(elf_fd, fragment.data.data(), sh.sh_size);
         }
 
         fragment.index = sh_index++;
