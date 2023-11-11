@@ -14,6 +14,7 @@ environment:
   CC: gcc
   CXX: g++
   CXXSTD: c++23
+  CXXFLAGS_SANITISER:
 tasks:
   - build: |
       cd viuavm/new
