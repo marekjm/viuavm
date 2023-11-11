@@ -39,9 +39,4 @@ CXXFLAGS_WARNING?=\
 				  -Wglobal-constructors \
 				  -Winfinite-recursion \
 				  -Wint-in-bool-context \
-				  -Wlogical-op-parentheses \
-				  -Wall \
-				  -Wextra \
-				  -Wpedantic \
-				  -Werror \
-				  -Wfatal-errors
+				  -Wlogical-op-parentheses

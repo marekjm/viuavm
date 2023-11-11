@@ -45,9 +45,4 @@ CXXFLAGS_WARNING?=\
 				  -Wsuggest-override \
 				  -Wswitch-bool \
 				  -Wundef \
-				  -Wunused \
-				  -Wall \
-				  -Wextra \
-				  -Wpedantic \
-				  -Werror \
-				  -Wfatal-errors
+				  -Wunused

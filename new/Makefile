@@ -43,7 +43,12 @@ CXXFLAGS_OPTION?=\
 				 -fstrict-aliasing \
 				 -fstrict-overflow
 
+# Only include extra warnings if there is no BUILD_SUBMITTER ie, when the build
+# is running in local environment. The CI runs with a basic set of common
+# warning flags that should work on any version of GCC and Clang.
+ifeq ($(BUILD_SUBMITTER),)
 include Makefile.d/Warnings_$(CXX)
+endif
 
 CXXFLAGS_INCLUDE=\
 				 -I./include \
@@ -62,6 +67,11 @@ CXXFLAGS=\
 		 $(CXXFLAGS_SANITISER) \
 		 $(CXXFLAGS_OPTION) \
 		 $(CXXFLAGS_WARNING) \
+		 -Wall \
+		 -Wextra \
+		 -Wpedantic \
+		 -Werror \
+		 -Wfatal-errors \
 		 $(CXXFLAGS_NOERROR) \
 		 $(CXXFLAGS_INCLUDE)
 
