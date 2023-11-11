@@ -4,13 +4,9 @@
 #  is a bit too trigger-happy on current code.
 CXXFLAGS_NOERROR?=\
 				  -Wno-error=covered-switch-default \
-				  -Wno-shorten-64-to-32
+				  -Wno-shorten-64-to-32 \
+				  -Wno-global-constructors
 
-# Some nice-to-have warnings would be:
-#
-#  -Wconversion
-#  -Wsign-conversion
-#
 CXXFLAGS_WARNING?=\
 				  -Warray-bounds-pointer-arithmetic \
 				  -Warray-parameter \
@@ -33,6 +29,17 @@ CXXFLAGS_WARNING?=\
 				  -Wstring-conversion \
 				  -Wcovered-switch-default \
 				  -Wshorten-64-to-32 \
+				  -Wdelete-non-virtual-dtor \
+				  -Wdouble-promotion \
+				  -Wduplicate-enum \
+				  -Wduplicate-method-arg \
+				  -Wduplicate-method-match \
+				  -Wextra-semi-stmt \
+				  -Wfloat-conversion \
+				  -Wglobal-constructors \
+				  -Winfinite-recursion \
+				  -Wint-in-bool-context \
+				  -Wlogical-op-parentheses \
 				  -Wall \
 				  -Wextra \
 				  -Wpedantic \

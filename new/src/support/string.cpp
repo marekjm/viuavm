@@ -132,7 +132,7 @@ auto unescape(std::string_view const sv) -> std::string
     return decoded.str();
 }
 
-auto levenshtein(std::string const source, std::string const target)
+auto levenshtein(std::string_view const source, std::string_view const target)
     -> LevenshteinDistance
 {
     if (not source.size()) {
@@ -177,8 +177,8 @@ auto levenshtein(std::string const source, std::string const target)
 
     return distance_matrix.at(source.size() - 1).at(target.size() - 1);
 }
-auto levenshtein_filter(std::string const source,
-                        std::set<std::string> const& candidates,
+auto levenshtein_filter(std::string_view const source,
+                        std::set<std::string_view> const& candidates,
                         LevenshteinDistance const limit)
     -> std::set<DistancePair>
 {
@@ -192,7 +192,7 @@ auto levenshtein_filter(std::string const source,
 
     return matched;
 }
-auto levenshtein_best(std::string const source,
+auto levenshtein_best(std::string_view const source,
                       std::set<DistancePair> const& candidates,
                       LevenshteinDistance const limit) -> DistancePair
 {

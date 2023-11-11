@@ -131,7 +131,7 @@ struct Lexeme {
  * With this one trick we can now feel free to define variables in header
  * files. Neat!
  */
-inline auto const OPCODE_NAMES = std::set<std::string>{
+inline auto const OPCODE_NAMES = std::set<std::string_view>{
     "noop",
     "halt",
     "ebreak",

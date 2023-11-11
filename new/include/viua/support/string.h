@@ -47,26 +47,26 @@ auto quote_fancy(std::string_view const) -> std::string;
 
 auto unescape(std::string_view const) -> std::string;
 
-using LevenshteinDistance = std::string::size_type;
+using LevenshteinDistance = std::string_view::size_type;
 using DistancePair        = std::pair<LevenshteinDistance, std::string>;
-auto levenshtein(std::string const, std::string const) -> LevenshteinDistance;
-auto levenshtein_filter(std::string const,
-                        std::set<std::string> const&,
+auto levenshtein(std::string_view const, std::string_view const) -> LevenshteinDistance;
+auto levenshtein_filter(std::string_view const,
+                        std::set<std::string_view> const&,
                         LevenshteinDistance const = LevenshteinDistance{
                             0xffffffffffffffff}) -> std::set<DistancePair>;
 template<typename K, typename V>
-auto levenshtein_filter(std::string const needle,
+auto levenshtein_filter(std::string_view const needle,
                         std::map<K, V> const& haystack,
                         LevenshteinDistance const dist = LevenshteinDistance{
                             0xffffffffffffffff}) -> std::set<DistancePair>
 {
-    auto candidates = std::set<std::string>{};
+    auto candidates = std::set<std::string_view>{};
     for (auto const& each : haystack) {
         candidates.emplace(each.first);
     }
     return levenshtein_filter(needle, candidates, dist);
 }
-auto levenshtein_best(std::string const,
+auto levenshtein_best(std::string_view const,
                       std::set<DistancePair> const&,
                       LevenshteinDistance const) -> DistancePair;
 }  // namespace viua::support::string

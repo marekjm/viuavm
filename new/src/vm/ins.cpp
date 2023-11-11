@@ -1118,18 +1118,17 @@ auto execute(CAST const op, Stack& stack, ip_type const) -> void
 
     switch (desired_type) {
         using enum viua::arch::FUNDAMENTAL_TYPES;
-        ;
     case INT:
         cast_register_to<Register::int_type>(stack, slot);
         break;
     case UINT:
-        slot.convert_undefined_to<Register::uint_type>();
+        cast_register_to<Register::uint_type>(stack, slot);
         break;
     case FLOAT32:
-        slot.convert_undefined_to<Register::float_type>();
+        cast_register_to<Register::float_type>(stack, slot);
         break;
     case FLOAT64:
-        slot.convert_undefined_to<Register::double_type>();
+        cast_register_to<Register::double_type>(stack, slot);
         break;
     case POINTER:
         slot.convert_undefined_to<Register::pointer_type>();
