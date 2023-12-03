@@ -734,7 +734,7 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
         if (e.token != viua::libs::lexer::TOKEN::LITERAL_ATOM) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{e, Cause::Unexpected_token, e.text};
+            throw Error{e, Cause::Unknown_opcode, e.text};
         }
 
         using viua::libs::lexer::OPCODE_NAMES;
@@ -743,7 +743,7 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
         if (misspell_candidates.empty()) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{e, Cause::Unexpected_token, e.text};
+            throw Error{e, Cause::Unknown_opcode, e.text};
         }
 
         using viua::support::string::levenshtein_best;
@@ -752,7 +752,7 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
         if (best_candidate.second == e.text) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{e, Cause::Unexpected_token, e.text};
+            throw Error{e, Cause::Unknown_opcode, e.text};
         }
 
         using viua::libs::errors::compile_time::Cause;
@@ -885,7 +885,7 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
         } else {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{lexemes.front(), Cause::Unexpected_token};
+            throw Error{lexemes.front(), Cause::Unexpected_token, "cannot consume"};
         }
 
         instruction->operands.push_back(std::move(operand));
