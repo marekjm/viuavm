@@ -428,7 +428,8 @@ auto parse_instruction(
         } else {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{lexemes.front(), Cause::Unexpected_token, "cannot parse"};
+            throw Error{
+                lexemes.front(), Cause::Unexpected_token, "cannot parse"};
         }
 
         instruction.operands.push_back(std::move(operand));

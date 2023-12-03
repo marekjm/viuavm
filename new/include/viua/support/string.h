@@ -49,7 +49,8 @@ auto unescape(std::string_view const) -> std::string;
 
 using LevenshteinDistance = std::string_view::size_type;
 using DistancePair        = std::pair<LevenshteinDistance, std::string>;
-auto levenshtein(std::string_view const, std::string_view const) -> LevenshteinDistance;
+auto levenshtein(std::string_view const, std::string_view const)
+    -> LevenshteinDistance;
 auto levenshtein_filter(std::string_view const,
                         std::set<std::string_view> const&,
                         LevenshteinDistance const = LevenshteinDistance{

@@ -77,10 +77,8 @@ auto const FUNDAMENTAL_TYPE_NAMES = std::map<std::string, uint8_t>{
     {"int", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::INT)},
     {"uint", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::UINT)},
     {"float", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::FLOAT32)},
-    {"double",
-     static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::FLOAT64)},
-    {"pointer",
-     static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::POINTER)},
+    {"double", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::FLOAT64)},
+    {"pointer", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::POINTER)},
     {"atom", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::ATOM)},
     {"pid", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::PID)},
 };
@@ -287,7 +285,8 @@ struct Node {
 
     virtual ~Node();
 };
-Node::~Node() {}
+Node::~Node()
+{}
 auto Node::has_attr(std::string_view const key) const
     -> std::optional<attribute_type>
 {
@@ -770,8 +769,7 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
         return instruction;
     }
 
-    auto const is_fun_type_name = [](Lexeme const& f) -> bool
-    {
+    auto const is_fun_type_name = [](Lexeme const& f) -> bool {
         return (f == TOKEN::OPCODE) and FUNDAMENTAL_TYPE_NAMES.contains(f.text);
     };
 
@@ -821,7 +819,8 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
                 using viua::libs::errors::compile_time::Error;
                 throw Error{index, Cause::Invalid_register_access}.aside(
                     "register index range is 0-"
-                    + std::to_string(static_cast<uintmax_t>(viua::arch::MAX_REGISTER_INDEX)));
+                    + std::to_string(static_cast<uintmax_t>(
+                        viua::arch::MAX_REGISTER_INDEX)));
             }
 
             operand.ingredients.push_back(leader);
@@ -879,13 +878,14 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
              * "atom" tokens. This is necessary because some of them are
              * duplicating opcode names (eg, "double").
              */
-            auto value = consume_token_of(TOKEN::OPCODE, lexemes);
+            auto value  = consume_token_of(TOKEN::OPCODE, lexemes);
             value.token = TOKEN::LITERAL_ATOM;
             operand.ingredients.push_back(value);
         } else {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{lexemes.front(), Cause::Unexpected_token, "cannot consume"};
+            throw Error{
+                lexemes.front(), Cause::Unexpected_token, "cannot consume"};
         }
 
         instruction->operands.push_back(std::move(operand));
@@ -2402,7 +2402,7 @@ auto expand_immediate_arithmetic(ast::Instruction const& raw) -> Text
 }
 auto expand_cast(ast::Instruction const& raw) -> Text
 {
-    auto synth = raw;
+    auto synth        = raw;
     auto& target_type = synth.operands.back().ingredients.back();
     if (not FUNDAMENTAL_TYPE_NAMES.contains(target_type.text)) {
         using viua::support::string::levenshtein_filter;
@@ -2411,29 +2411,31 @@ auto expand_cast(ast::Instruction const& raw) -> Text
         if (misspell_candidates.empty()) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{target_type, Cause::Invalid_cast, target_type.text}.add(raw.leader);
+            throw Error{target_type, Cause::Invalid_cast, target_type.text}.add(
+                raw.leader);
         }
 
         using viua::support::string::levenshtein_best;
-        auto best_candidate =
-            levenshtein_best(target_type.text,
-                             misspell_candidates,
-                             (target_type.text.size() / 2));
+        auto best_candidate = levenshtein_best(target_type.text,
+                                               misspell_candidates,
+                                               (target_type.text.size() / 2));
         if (best_candidate.second == target_type.text) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{target_type, Cause::Invalid_cast, target_type.text}.add(raw.leader);
+            throw Error{target_type, Cause::Invalid_cast, target_type.text}.add(
+                raw.leader);
         }
 
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw did_you_mean(
-            Error{raw.operands.back().ingredients.front(), Cause::Invalid_cast, target_type.text},
-            best_candidate.second)
+        throw did_you_mean(Error{raw.operands.back().ingredients.front(),
+                                 Cause::Invalid_cast,
+                                 target_type.text},
+                           best_candidate.second)
             .add(raw.leader);
     }
-    target_type.text = std::to_string(static_cast<uintmax_t>(
-                        FUNDAMENTAL_TYPE_NAMES.at(target_type.text)));
+    target_type.text = std::to_string(
+        static_cast<uintmax_t>(FUNDAMENTAL_TYPE_NAMES.at(target_type.text)));
 
     return {emit_instruction(synth)};
 }

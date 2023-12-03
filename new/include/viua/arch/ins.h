@@ -292,7 +292,7 @@ struct ARODP : Instruction {
 };
 
 struct ADDI : Instruction {
-    using value_type   = int64_t;
+    using value_type                                     = int64_t;
     template<typename T = value_type> using functor_type = std::plus<T>;
 
     viua::arch::ops::R instruction;
@@ -301,7 +301,7 @@ struct ADDI : Instruction {
     {}
 };
 struct ADDIU : Instruction {
-    using value_type   = uint64_t;
+    using value_type                                     = uint64_t;
     template<typename T = value_type> using functor_type = std::plus<T>;
 
     viua::arch::ops::R instruction;
@@ -310,7 +310,7 @@ struct ADDIU : Instruction {
     {}
 };
 struct SUBI : Instruction {
-    using value_type   = int64_t;
+    using value_type                                     = int64_t;
     template<typename T = value_type> using functor_type = std::minus<T>;
 
     viua::arch::ops::R instruction;
@@ -319,7 +319,7 @@ struct SUBI : Instruction {
     {}
 };
 struct SUBIU : Instruction {
-    using value_type   = uint64_t;
+    using value_type                                     = uint64_t;
     template<typename T = value_type> using functor_type = std::minus<T>;
 
     viua::arch::ops::R instruction;
@@ -328,7 +328,7 @@ struct SUBIU : Instruction {
     {}
 };
 struct MULI : Instruction {
-    using value_type   = int64_t;
+    using value_type                                     = int64_t;
     template<typename T = value_type> using functor_type = std::multiplies<T>;
 
     viua::arch::ops::R instruction;
@@ -337,7 +337,7 @@ struct MULI : Instruction {
     {}
 };
 struct MULIU : Instruction {
-    using value_type   = uint64_t;
+    using value_type                                     = uint64_t;
     template<typename T = value_type> using functor_type = std::multiplies<T>;
 
     viua::arch::ops::R instruction;
@@ -346,7 +346,7 @@ struct MULIU : Instruction {
     {}
 };
 struct DIVI : Instruction {
-    using value_type   = int64_t;
+    using value_type                                     = int64_t;
     template<typename T = value_type> using functor_type = std::divides<T>;
 
     viua::arch::ops::R instruction;
@@ -355,7 +355,7 @@ struct DIVI : Instruction {
     {}
 };
 struct DIVIU : Instruction {
-    using value_type   = uint64_t;
+    using value_type                                     = uint64_t;
     template<typename T = value_type> using functor_type = std::divides<T>;
 
     viua::arch::ops::R instruction;

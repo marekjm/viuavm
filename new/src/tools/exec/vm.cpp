@@ -189,7 +189,8 @@ auto run(viua::vm::Core& core) -> void
         auto const total_us =
             std::chrono::duration_cast<std::chrono::microseconds>(
                 core.perf_counters.duration());
-        auto const approx_hz = (1e6 / static_cast<double>(total_us.count())) * static_cast<double>(total_ops);
+        auto const approx_hz = (1e6 / static_cast<double>(total_us.count()))
+                               * static_cast<double>(total_ops);
         viua::TRACE_STREAM << std::setfill(' ') << std::dec;
         viua::TRACE_STREAM << "[vm:perf] executed ops " << total_ops
                            << ", run time " << format_time(total_us)

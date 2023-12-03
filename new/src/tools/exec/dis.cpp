@@ -35,8 +35,8 @@
 #include <viua/arch/ops.h>
 #include <viua/libs/assembler.h>
 #include <viua/libs/lexer.h>
-#include <viua/support/memory.h>
 #include <viua/support/errno.h>
+#include <viua/support/memory.h>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
 #include <viua/vm/core.h>
@@ -184,16 +184,19 @@ using Cooked_text = std::vector<Cooked_op>;
 
 namespace cook {
 namespace {
-auto make_label_ref(std::map<size_t, std::string_view> const& strtab, Elf64_Sym const& sym) -> std::string {
+auto make_label_ref(std::map<size_t, std::string_view> const& strtab,
+                    Elf64_Sym const& sym) -> std::string
+{
     return ("@" + std::string{strtab.at(sym.st_name)});
 }
-auto read_size(std::vector<uint8_t> const& data,
-                          size_t const off) -> uint64_t {
+auto read_size(std::vector<uint8_t> const& data, size_t const off) -> uint64_t
+{
     auto const size_offset = (off - sizeof(uint64_t));
     return le64toh(viua::support::memload<uint64_t>(&data[size_offset]));
 }
-auto load_string(std::vector<uint8_t> const& data,
-                                     size_t const off) -> std::string {
+auto load_string(std::vector<uint8_t> const& data, size_t const off)
+    -> std::string
+{
     auto s = std::string{reinterpret_cast<char const*>(data.data() + off),
                          read_size(data, off)};
     auto const needs_quotes =
@@ -205,13 +208,13 @@ auto load_string(std::vector<uint8_t> const& data,
     }
     return s;
 }
-auto view_data(std::vector<uint8_t> const& data,
-                                   size_t const off) -> std::string_view {
-    return std::string_view{
-        reinterpret_cast<char const*>(data.data() + off),
-        read_size(data, off)};
+auto view_data(std::vector<uint8_t> const& data, size_t const off)
+    -> std::string_view
+{
+    return std::string_view{reinterpret_cast<char const*>(data.data() + off),
+                            read_size(data, off)};
 }
-}
+}  // namespace
 
 auto demangle_symbol_load(Cooked_text& raw,
                           Cooked_text& cooked,
@@ -269,10 +272,8 @@ auto demangle_symbol_load(Cooked_text& raw,
         memcpy(&x, sv.data(), sizeof(x));
 
         auto ss = std::ostringstream{};
-        ss
-            << std::fixed
-            << std::setprecision(std::numeric_limits<double>::digits10)
-            << x;
+        ss << std::fixed
+           << std::setprecision(std::numeric_limits<double>::digits10) << x;
 
         cooked.emplace_back(
             ins.with_text(("double " + out.to_string() + ", " + ss.str())));
@@ -625,7 +626,8 @@ auto demangle_memory(Cooked_text& text) -> void
                 op.opcode,
                 raw_op,
                 (name + " " + op.out.to_string() + ", " + op.in.to_string()
-                 + ", " + std::to_string(static_cast<uintmax_t>(op.immediate))));
+                 + ", "
+                 + std::to_string(static_cast<uintmax_t>(op.immediate))));
             continue;
         }
         if (m(i, CAST)) {

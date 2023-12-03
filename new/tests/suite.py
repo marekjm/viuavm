@@ -1359,7 +1359,7 @@ def main(args):
                             if s.endswith("us"):
                                 return float(s[:-2])
                             elif s.endswith("ms"):
-                                return (float(s[:-2]) * 1000)
+                                return float(s[:-2]) * 1000
                             else:
                                 raise
 

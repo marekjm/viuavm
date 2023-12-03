@@ -31,12 +31,13 @@ auto whole_read(int const fd, void* const buf, size_t const count) -> void
 {
     auto done = ssize_t{0};
     do {
-        if (auto const n = read(fd, static_cast<std::byte*>(buf) + done, count); n != -1) {
+        if (auto const n = read(fd, static_cast<std::byte*>(buf) + done, count);
+            n != -1) {
             done += n;
         }
     } while (done != static_cast<ssize_t>(count));
 }
-}
+}  // namespace
 
 auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
 {
@@ -173,8 +174,9 @@ auto Loaded_elf::find_fragment(std::string_view const sv) const
         fragments.begin(), fragments.end(), [sv](auto const& frag) -> bool {
             return (frag.first == sv);
         });
-    return (fragment == fragments.end()) ? std::nullopt
-                                     : std::optional{std::ref(fragment->second)};
+    return (fragment == fragments.end())
+               ? std::nullopt
+               : std::optional{std::ref(fragment->second)};
 }
 auto Loaded_elf::load_strtab() -> void
 {
