@@ -58,6 +58,7 @@
 #include <viua/libs/lexer.h>
 #include <viua/libs/stage.h>
 #include <viua/support/errno.h>
+#include <viua/support/fdio.h>
 #include <viua/support/number.h>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
@@ -3227,7 +3228,8 @@ auto emit_elf(std::filesystem::path const output_path,
         elf_header.e_shnum     = static_cast<Elf64_Half>(elf_sheaders);
         elf_header.e_shstrndx  = static_cast<Elf64_Half>(elf_sheaders - 1);
 
-        write(a_out, &elf_header, sizeof(elf_header));
+        viua::support::posix::whole_write(
+            a_out, &elf_header, sizeof(elf_header));
 
         /*
          * Unfortunately, we have to have use two loops here because segment and
@@ -3239,31 +3241,37 @@ auto emit_elf(std::filesystem::path const output_path,
             if (not segment) {
                 continue;
             }
-            write(a_out,
-                  &*segment,
-                  sizeof(std::remove_reference_t<decltype(*segment)>));
+            viua::support::posix::whole_write(
+                a_out,
+                &*segment,
+                sizeof(std::remove_reference_t<decltype(*segment)>));
         }
         for (auto const& [_, section] : elf_headers) {
-            write(a_out,
-                  &section,
-                  sizeof(std::remove_reference_t<decltype(section)>));
+            viua::support::posix::whole_write(
+                a_out,
+                &section,
+                sizeof(std::remove_reference_t<decltype(section)>));
         }
 
-        write(a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);
+        viua::support::posix::whole_write(
+            a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);
 
         if (relocs.has_value()) {
             for (auto const& rel : *relocs) {
-                write(a_out, &rel, sizeof(std::decay_t<decltype(rel)>));
+                viua::support::posix::whole_write(
+                    a_out, &rel, sizeof(std::decay_t<decltype(rel)>));
             }
         }
 
         auto const text_size =
             (text.size() * sizeof(std::decay_t<decltype(text)>::value_type));
-        write(a_out, text.data(), text_size);
+        viua::support::posix::whole_write(a_out, text.data(), text_size);
 
-        write(a_out, rodata_buf.data(), rodata_buf.size());
+        viua::support::posix::whole_write(
+            a_out, rodata_buf.data(), rodata_buf.size());
 
-        write(a_out, VIUA_COMMENT.c_str(), VIUA_COMMENT.size() + 1);
+        viua::support::posix::whole_write(
+            a_out, VIUA_COMMENT.c_str(), VIUA_COMMENT.size() + 1);
 
         for (auto& each : symbol_table) {
             switch (ELF64_ST_TYPE(each.st_info)) {
@@ -3276,12 +3284,14 @@ auto emit_elf(std::filesystem::path const output_path,
             default:
                 break;
             }
-            write(a_out, &each, sizeof(std::decay_t<decltype(symbol_table)>));
+            viua::support::posix::whole_write(
+                a_out, &each, sizeof(std::decay_t<decltype(symbol_table)>));
         }
 
-        write(a_out, string_table.data(), string_table.size());
+        viua::support::posix::whole_write(
+            a_out, string_table.data(), string_table.size());
 
-        write(a_out, shstr.data(), shstr.size());
+        viua::support::posix::whole_write(a_out, shstr.data(), shstr.size());
     }
 
     close(a_out);
@@ -3419,7 +3429,8 @@ auto main(int argc, char* argv[]) -> int
         }
 
         source_text.resize(source_stat.st_size);
-        read(source_fd, source_text.data(), source_text.size());
+        viua::support::posix::whole_read(
+            source_fd, source_text.data(), source_text.size());
         close(source_fd);
     }
 

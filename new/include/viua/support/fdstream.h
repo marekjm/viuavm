@@ -24,6 +24,9 @@
 
 #include <sstream>
 
+#include <viua/support/fdio.h>
+
+
 namespace viua::support {
 struct fdstream {
     using fd_type = int;
@@ -49,7 +52,7 @@ struct fdstream {
     {
         buffer << "\n";
         auto const buf = buffer.str();
-        write(fd, buf.c_str(), buf.size());
+        viua::support::posix::whole_write(fd, buf.c_str(), buf.size());
         buffer.str("");
         return *this;
     }

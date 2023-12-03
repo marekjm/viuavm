@@ -22,22 +22,13 @@
 #include <iomanip>
 #include <iostream>
 
+#include <viua/support/fdio.h>
 #include <viua/vm/elf.h>
 
 
 namespace viua::vm::elf {
-namespace {
-auto whole_read(int const fd, void* const buf, size_t const count) -> void
-{
-    auto done = ssize_t{0};
-    do {
-        if (auto const n = read(fd, static_cast<std::byte*>(buf) + done, count);
-            n != -1) {
-            done += n;
-        }
-    } while (done != static_cast<ssize_t>(count));
-}
-}  // namespace
+using viua::support::posix::whole_read;
+using viua::support::posix::whole_write;
 
 auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
 {

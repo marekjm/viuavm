@@ -205,11 +205,13 @@ $(BUILD)/%.o: ./src/%.cpp
 $(BUILD)/tools/exec/readelf: \
 	$(BUILD)/vm/elf.o \
 	$(BUILD)/support/errno.o \
+	$(BUILD)/support/fdio.o \
 	$(BUILD)/support/tty.o
 
 $(BUILD)/tools/exec/dis: \
 	$(BUILD)/tools/libs/assembler.o \
 	$(BUILD)/support/errno.o \
+	$(BUILD)/support/fdio.o \
 	$(BUILD)/support/string.o \
 	$(BUILD)/support/tty.o \
 	$(BUILD)/vm/elf.o \
@@ -218,6 +220,7 @@ $(BUILD)/tools/exec/dis: \
 
 $(BUILD)/tools/exec/asm: \
 	$(BUILD)/support/errno.o \
+	$(BUILD)/support/fdio.o \
 	$(BUILD)/support/string.o \
 	$(BUILD)/support/tty.o \
 	$(BUILD)/tools/libs/errors/compile_time.o \
@@ -235,6 +238,7 @@ $(BUILD)/tools/exec/ld: \
 	$(BUILD)/tools/libs/errors/compile_time.o \
 	$(BUILD)/tools/libs/stage/save.o \
 	$(BUILD)/support/errno.o \
+	$(BUILD)/support/fdio.o \
 	$(BUILD)/support/string.o \
 	$(BUILD)/support/tty.o
 
@@ -244,6 +248,7 @@ VIUA_INSTRUCTION_IMPLS=\
 
 $(BUILD)/tools/exec/vm: \
 	$(BUILD)/support/errno.o \
+	$(BUILD)/support/fdio.o \
 	$(BUILD)/support/tty.o \
 	$(BUILD)/support/string.o \
 	$(BUILD)/vm/core.o \
@@ -261,6 +266,7 @@ $(BUILD)/tools/exec/repl: \
 	$(BUILD)/vm/elf.o \
 	$(BUILD)/vm/ins.o \
 	$(VIUA_INSTRUCTION_IMPLS) \
+	$(BUILD)/support/fdio.o \
 	$(BUILD)/support/string.o \
 	$(BUILD)/support/tty.o \
 	$(BUILD)/tools/libs/errors/compile_time.o \
