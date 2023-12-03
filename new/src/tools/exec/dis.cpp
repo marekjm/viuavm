@@ -269,7 +269,10 @@ auto demangle_symbol_load(Cooked_text& raw,
         memcpy(&x, sv.data(), sizeof(x));
 
         auto ss = std::ostringstream{};
-        ss << std::setprecision(std::numeric_limits<double>::digits10) << x;
+        ss
+            << std::fixed
+            << std::setprecision(std::numeric_limits<double>::digits10)
+            << x;
 
         cooked.emplace_back(
             ins.with_text(("double " + out.to_string() + ", " + ss.str())));
