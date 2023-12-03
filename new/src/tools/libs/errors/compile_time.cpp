@@ -63,6 +63,8 @@ auto to_string(Cause const ce) -> std::string_view
         return "unknown type";
     case Cause::Unknown_label:
         return "unknown label";
+    case Cause::Invalid_cast:
+        return "invalid cast";
     }
     return "illegal error";
 }

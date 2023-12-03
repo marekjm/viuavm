@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021-2022 Marek Marecki
+ *  Copyright (C) 2021-2023 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -71,6 +71,20 @@ constexpr auto DEBUG_EXPANSION [[maybe_unused]] = false;
 using viua::libs::stage::save_buffer_to_rodata;
 using viua::libs::stage::save_string_to_strtab;
 using viua::support::string::quote_fancy;
+
+namespace {
+auto const FUNDAMENTAL_TYPE_NAMES = std::map<std::string, uint8_t>{
+    {"int", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::INT)},
+    {"uint", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::UINT)},
+    {"float", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::FLOAT32)},
+    {"double",
+     static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::FLOAT64)},
+    {"pointer",
+     static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::POINTER)},
+    {"atom", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::ATOM)},
+    {"pid", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::PID)},
+};
+}
 
 namespace {
 using viua::libs::lexer::Lexeme;
@@ -756,33 +770,9 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
         return instruction;
     }
 
-    auto const fundamental_type_names = std::map<std::string, uint8_t>{
-        {"int", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::INT)},
-        {"uint", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::UINT)},
-        {"float", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::FLOAT32)},
-        {"double",
-         static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::FLOAT64)},
-        {"pointer",
-         static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::POINTER)},
-        {"atom", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::ATOM)},
-        {"pid", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::PID)},
-    };
-
-    auto valid_cast =
-        [&lexemes, &instruction, &fundamental_type_names]() -> bool {
-        if (instruction->leader != "cast" and instruction->leader != "g.cast") {
-            return false;
-        }
-
-        /*
-         * The type specifier (which in some cases looks like an instruction
-         * name) is only valid in the second position.
-         */
-        if (instruction->operands.size() != 1) {
-            return false;
-        }
-
-        return fundamental_type_names.count(lexemes.front().text);
+    auto const is_fun_type_name = [](Lexeme const& f) -> bool
+    {
+        return (f == TOKEN::OPCODE) and FUNDAMENTAL_TYPE_NAMES.contains(f.text);
     };
 
     while ((not lexemes.empty()) and lexemes.front() != TOKEN::END) {
@@ -867,12 +857,6 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
             }
             operand.ingredients.push_back(access);
             operand.ingredients.push_back(label);
-        } else if (valid_cast()) {
-            auto const value =
-                consume_token_of({TOKEN::OPCODE, TOKEN::LITERAL_ATOM}, lexemes);
-            operand.ingredients.push_back(value);
-            auto& tt = operand.ingredients.front().text;
-            tt       = std::to_string(static_cast<uintmax_t>(fundamental_type_names.at(tt)));
         } else if (lexemes.front() == TOKEN::LITERAL_INTEGER) {
             auto const value =
                 consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
@@ -885,6 +869,18 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
             operand.ingredients.push_back(value);
         } else if (lexemes.front() == TOKEN::LITERAL_ATOM) {
             auto const value = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
+            operand.ingredients.push_back(value);
+        } else if (lexemes.front() == TOKEN::LITERAL_ATOM) {
+            auto const value = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
+            operand.ingredients.push_back(value);
+        } else if (is_fun_type_name(lexemes.front())) {
+            /*
+             * Ensure that fundamental type names are always represented using
+             * "atom" tokens. This is necessary because some of them are
+             * duplicating opcode names (eg, "double").
+             */
+            auto value = consume_token_of(TOKEN::OPCODE, lexemes);
+            value.token = TOKEN::LITERAL_ATOM;
             operand.ingredients.push_back(value);
         } else {
             using viua::libs::errors::compile_time::Cause;
@@ -2404,6 +2400,43 @@ auto expand_immediate_arithmetic(ast::Instruction const& raw) -> Text
     }
     return {emit_instruction(synth)};
 }
+auto expand_cast(ast::Instruction const& raw) -> Text
+{
+    auto synth = raw;
+    auto& target_type = synth.operands.back().ingredients.back();
+    if (not FUNDAMENTAL_TYPE_NAMES.contains(target_type.text)) {
+        using viua::support::string::levenshtein_filter;
+        auto misspell_candidates =
+            levenshtein_filter(target_type.text, FUNDAMENTAL_TYPE_NAMES);
+        if (misspell_candidates.empty()) {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+            throw Error{target_type, Cause::Invalid_cast, target_type.text}.add(raw.leader);
+        }
+
+        using viua::support::string::levenshtein_best;
+        auto best_candidate =
+            levenshtein_best(target_type.text,
+                             misspell_candidates,
+                             (target_type.text.size() / 2));
+        if (best_candidate.second == target_type.text) {
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+            throw Error{target_type, Cause::Invalid_cast, target_type.text}.add(raw.leader);
+        }
+
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw did_you_mean(
+            Error{raw.operands.back().ingredients.front(), Cause::Invalid_cast, target_type.text},
+            best_candidate.second)
+            .add(raw.leader);
+    }
+    target_type.text = std::to_string(static_cast<uintmax_t>(
+                        FUNDAMENTAL_TYPE_NAMES.at(target_type.text)));
+
+    return {emit_instruction(synth)};
+}
 
 auto expand_instruction(ast::Instruction const& raw,
                         std::vector<Elf64_Sym>& symbol_table,
@@ -2485,6 +2518,8 @@ auto expand_instruction(ast::Instruction const& raw,
         return expand_double(raw);
     } else if (memory_access.contains(opcode)) {
         return expand_memory_access(raw);
+    } else if (opcode == "cast") {
+        return expand_cast(raw);
     } else if (immediate_signed_arithmetic.contains(opcode)) {
         return expand_immediate_arithmetic(raw);
     } else {

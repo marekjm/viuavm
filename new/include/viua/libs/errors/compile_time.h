@@ -75,6 +75,8 @@ enum class Cause {
 
     Unknown_type,
     Unknown_label,
+
+    Invalid_cast,
 };
 auto to_string(Cause const) -> std::string_view;
 
