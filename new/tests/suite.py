@@ -1367,13 +1367,12 @@ def main(args):
 
                         def make_hz(s):
                             n, hz = s.split()
-                            return int(
-                                float(n)
-                                * {
-                                    "kHz": 1e3,
-                                    "MHz": 1e6,
-                                }[hz]
-                            )
+                            multiplier = {
+                                "Hz": 1e0,
+                                "kHz": 1e3,
+                                "MHz": 1e6,
+                            }[hz]
+                            return int(float(n) * multiplier)
 
                         freq = make_hz(perf["freq"])
 
