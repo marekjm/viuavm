@@ -1091,17 +1091,6 @@ auto execute(LLI const op, Stack& stack, ip_type const) -> void
                                   + std::string{out.type_name()}};
     }
 }
-template<typename T>
-auto cast_register_to(Stack& stack, register_type& target) -> void
-{
-    if (target.holds<Register::undefined_type>()) {
-        target.convert_undefined_to<T>();
-    } else if (auto const v = target.cast_to<T>(); v) {
-        target = *v;
-    } else {
-        throw abort_execution{stack, "invalid cast"};
-    }
-}
 auto execute(CAST const op, Stack& stack, ip_type const) -> void
 {
     auto target = mutable_proxy(stack, op.instruction.out);
@@ -1115,20 +1104,23 @@ auto execute(CAST const op, Stack& stack, ip_type const) -> void
     }
 
     auto& slot = target.to()->get();
+    if (not slot.holds<Register::undefined_type>()) {
+        throw abort_execution{stack, "invalid cast"};
+    }
 
     switch (desired_type) {
         using enum viua::arch::FUNDAMENTAL_TYPES;
     case INT:
-        cast_register_to<Register::int_type>(stack, slot);
+        slot.convert_undefined_to<Register::int_type>();
         break;
     case UINT:
-        cast_register_to<Register::uint_type>(stack, slot);
+        slot.convert_undefined_to<Register::uint_type>();
         break;
     case FLOAT32:
-        cast_register_to<Register::float_type>(stack, slot);
+        slot.convert_undefined_to<Register::float_type>();
         break;
     case FLOAT64:
-        cast_register_to<Register::double_type>(stack, slot);
+        slot.convert_undefined_to<Register::double_type>();
         break;
     case POINTER:
         slot.convert_undefined_to<Register::pointer_type>();
