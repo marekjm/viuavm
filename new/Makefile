@@ -47,7 +47,7 @@ CXXFLAGS_OPTION?=\
 # is running in local environment. The CI runs with a basic set of common
 # warning flags that should work on any version of GCC and Clang.
 ifeq ($(BUILD_SUBMITTER),)
-include Makefile.d/Warnings_$(CXX)
+-include Makefile.d/Warnings_$(CXX)
 endif
 
 CXXFLAGS_INCLUDE=\
