@@ -96,7 +96,7 @@ dist: \
 	$(BUILD)/tools/exec/ld \
 	$(BUILD)/tools/exec/vm \
 	$(BUILD)/tools/exec/viua
-	ln --symbolic --force tools/exec build/bin
+	ln -s -f tools/exec build/bin
 
 test: dist
 	@python3 ./tests/suite.py
