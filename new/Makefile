@@ -96,13 +96,14 @@ dist: \
 	$(BUILD)/tools/exec/ld \
 	$(BUILD)/tools/exec/vm \
 	$(BUILD)/tools/exec/viua
+	ln --symbolic --force tools/exec build/bin
 
 test: dist
 	@python3 ./tests/suite.py
 
 clean-bin:
-	find $(BUILD) -type f -delete
-	find $(BUILD) -mindepth 1 -type d -delete
+	find $(BUILD) -type f -delete 2>/dev/null || true
+	find $(BUILD) -mindepth 1 -type d -delete 2>/dev/null || true
 
 clean-test:
 	find ./tests -type f -name '*.elf' -delete

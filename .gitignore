@@ -22,10 +22,7 @@
 contrib/*
 !contrib/example/
 
-build/assembler/*
-
-build/bin/vm/*
-build/bin/run/*
+build/
 
 tests/compiled/*
 
