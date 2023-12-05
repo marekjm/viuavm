@@ -141,8 +141,8 @@ auto run(viua::vm::Process& proc) -> bool
     }
 
     if (proc.stack.frames.empty()) {
-        std::cerr << "[vm:sched:proc] process " << proc.pid.to_string()
-                  << " has empty stack\n";
+        viua::TRACE_STREAM << "[vm:sched:proc] process " << proc.pid.to_string()
+                           << " has empty stack" << viua::TRACE_STREAM.endl;
         return false;
     }
     if (not ip_ok()) {
