@@ -167,7 +167,7 @@ const auto STAR            = std::regex{"^\\*"};
 const auto ATTR_LIST_OPEN  = std::regex{"^\\[\\["};
 const auto ATTR_LIST_CLOSE = std::regex{"^\\]\\]"};
 
-const auto OPCODE = std::regex{"^(?:g.)?[a-z]+(?:.[stw])?\\b"};
+const auto OPCODE = std::regex{"^(?:g.)?[a-z_]+(?:.[stw])?\\b"};
 
 namespace {
 auto match_lookbehind [[maybe_unused]] (std::vector<Lexeme> const& lexemes,
@@ -221,6 +221,20 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
     auto line      = size_t{};
     auto character = size_t{};
     auto offset    = size_t{};
+
+    auto const try_match = [&lexemes, &source_text, &line, &character, &offset](
+                               std::regex const& re, TOKEN const tt) -> bool {
+        std::cmatch m;
+        if (regex_search(source_text.data(), m, re)) {
+            lexemes.emplace_back(
+                m.str(), tt, Location{line, character, offset});
+
+            character += lexemes.back().text.size();
+            offset += lexemes.back().text.size();
+            source_text.remove_prefix(lexemes.back().text.size());
+        }
+        return (not m.empty());
+    };
 
     while (not source_text.empty()) {
         if (source_text[0] == '\n') {
@@ -326,21 +340,6 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
             continue;
         }
 
-        auto const try_match =
-            [&lexemes, &source_text, &line, &character, &offset](
-                std::regex const& re, TOKEN const tt) -> bool {
-            std::cmatch m;
-            if (regex_search(source_text.data(), m, re)) {
-                lexemes.emplace_back(
-                    m.str(), tt, Location{line, character, offset});
-
-                character += lexemes.back().text.size();
-                offset += lexemes.back().text.size();
-                source_text.remove_prefix(lexemes.back().text.size());
-            }
-            return (not m.empty());
-        };
-
         if (try_match(WHITESPACE, TOKEN::WHITESPACE)) {
             continue;
         }
@@ -385,7 +384,7 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
 
         if (try_match(OPCODE, TOKEN::OPCODE)) {
             auto const not_really_an_opcode =
-                (OPCODE_NAMES.count(lexemes.back().text) == 0);
+                not OPCODE_NAMES.contains(lexemes.back().text);
             auto const looks_atomish = [&lexemes]() -> bool {
                 std::smatch m;
                 return std::regex_match(lexemes.back().text, m, LITERAL_ATOM);
