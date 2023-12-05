@@ -1,26 +1,29 @@
-.label: some_string
-.value: string "Hello, World!\n"
+.section ".text"
 
-.function: [[entry_point]] main
+.symbol [[entry_point]] main
+.label main
     ; Allocate memory to hold the string.
-    li $3.l, 100u
+    li $3.l, 128u
     amba $4.l, $3.l, 0
 
     ; Create a write I/O request.
     ; It is a struct which looks like this:
     ;
     ;   struct {
-    ;       u8  opcode;
+    ;       u16 opcode;
     ;       u64 fd;
     ;       u64 buf_size;
     ;       u64 buf_addr;
     ;   };
+    ;
+    ; We allocate four doublewords because the fields are aligned (thus the
+    ; first u16 actually uses eight instead of two bytes).
     li $5.l, 4u
     amda $5.l, $5.l, 0
 
     ; Setup opcode: read.
     li $6.l, 0u
-    sh $6.l, $5.l, 0
+    sb $6.l, $5.l, 0
 
     ; Setup file descriptor (standard input).
     li $6.l, 0u
@@ -57,4 +60,3 @@
 
     ebreak
     return void
-.end
