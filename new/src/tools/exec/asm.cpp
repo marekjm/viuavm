@@ -968,7 +968,18 @@ auto parse(viua::support::vector_view<Lexeme> lexemes)
         default:
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{each, Cause::Unexpected_token}.note(
+
+            constexpr auto esc = viua::support::tty::send_escape_seq;
+            constexpr auto q   = viua::support::string::quote_fancy;
+            using viua::support::tty::ATTR_FONT_BOLD;
+            using viua::support::tty::ATTR_FONT_NORMAL;
+
+            auto const BOLD = std::string{esc(2, ATTR_FONT_BOLD)};
+            auto const NORM = std::string{esc(2, ATTR_FONT_NORMAL)};
+
+            auto m = q(BOLD + viua::libs::lexer::to_string(each.token) + NORM)
+                     + " cannot appear at top level";
+            throw Error{each, Cause::Unexpected_token, std::move(m)}.note(
                 "refer to viua-asm-lang(1) for more information");
         }
     }
