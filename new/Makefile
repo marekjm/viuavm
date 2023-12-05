@@ -28,6 +28,11 @@ VIUA_OPT_ETC_DIR=$(VIUA_OPT_ROOT)/etc
 CXX?=g++
 CXXSTD?=c++23
 
+PRESET?=default
+ifneq ($(PRESET),default)
+include Makefile.d/Preset/$(PRESET)
+endif
+
 CXXFLAGS_OPTIMISATION?=-Og
 CXXFLAGS_DEBUG?=-ggdb
 
