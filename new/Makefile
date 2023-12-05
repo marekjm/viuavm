@@ -151,34 +151,17 @@ format:
 ################################################################################
 # Development quality-of-life targets
 watch:
-	(\
-		ls -1 Makefile ;\
-		find Makefile.d -mindepth 1 ;\
-		find . -name '*.asm' ;\
-		find ./src -type f ;\
-		find ./include -type f\
-	) |\
-	entr -c make -j
+	make watch-impl | entr -c make -j
 
-watch-sample:
+.PHONY: watch-impl
+watch-impl:
 	(\
 		ls -1 Makefile ;\
 		find Makefile.d -mindepth 1 ;\
-		find . -name '*.asm' ;\
+		find . -mindepth 2 -name '*.asm' ;\
 		find ./src -type f ;\
 		find ./include -type f\
-	) |\
-	entr -cs 'make -j && ./build/tools/exec/asm sample.asm && VIUA_VM_TRACE_FD=2 ./build/tools/exec/vm ./a.out'
-
-watch-sample-and-install:
-	(\
-		ls -1 Makefile ;\
-		find Makefile.d -mindepth 1 ;\
-		find . -name '*.asm' ;\
-		find ./src -type f ;\
-		find ./include -type f\
-	) |\
-	entr -cs 'make -j && make install && ./build/tools/exec/asm sample.asm && ./a.out'
+	)
 
 watch-tests:
 	(\
