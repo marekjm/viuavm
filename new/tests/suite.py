@@ -649,7 +649,7 @@ def consume_live_ebreak_lines(ebreak_lines):
     return ebreak
 
 
-def run_and_capture(interpreter, executable, args=()):
+def run_and_capture(interpreter, executable, *, args=(), stdin=None):
     (
         read_fd,
         write_fd,
@@ -659,6 +659,7 @@ def run_and_capture(interpreter, executable, args=()):
     env["VIUA_VM_TRACE_FD"] = str(write_fd)
     proc = subprocess.Popen(
         args=(interpreter,) + (executable,) + args,
+        stdin=(subprocess.DEVNULL if stdin is None else subprocess.PIPE),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         pass_fds=(write_fd,),
@@ -666,7 +667,7 @@ def run_and_capture(interpreter, executable, args=()):
         text=True,
     )
     os.close(write_fd)
-    (stdout, stderr) = proc.communicate()
+    (stdout, stderr) = proc.communicate(input=stdin)
     result = proc.wait()
 
     buffer = b""
@@ -888,10 +889,18 @@ def test_case_impl(case_log, case_name, test_program, errors):
             None,
         )
 
-    result, ebreak, abort_report, perf = run_and_capture(
+    test_stdin = None
+    if os.path.isfile(stdin_path := f"{base_name}.stdin"):
+        with open(stdin_path, "r") as ifstream:
+            test_stdin = ifstream.read()
+
+    run_test = lambda: run_and_capture(
         INTERPRETER,
         test_executable,
+        stdin=test_stdin,
     )
+
+    result, ebreak, abort_report, perf = run_test()
     r_exit = result["exit"]
 
     if r_exit == -6 and check_kind == "abort":
@@ -1129,10 +1138,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
             None,
         )
 
-    result, ebreak, abort_report, _ = run_and_capture(
-        INTERPRETER,
-        test_executable,
-    )
+    result, ebreak, abort_report, _ = run_test()
     r_exit = result["exit"]
 
     if r_exit == -6 and check_kind == "abort":
