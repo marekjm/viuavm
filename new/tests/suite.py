@@ -22,6 +22,24 @@ def colorise(color, s):
         return f"{s}"
     return "{}{}{}".format(colored.fg(color), s, colored.attr("reset"))
 
+DEFAULT_QUOTE_STYLE = "square"
+def colorise_repr(color, s, style = DEFAULT_QUOTE_STYLE):
+    styles = {
+        "square": ("⌞", "⌝"),
+        "bracket": (
+            "⟨", # U+27e8
+            "⟩", # U+27e9
+        ),
+        "quote": (
+            "‘", # U+2018
+            "’", # U+2019
+        ),
+    }
+    left_quote = "⌞"
+    right_quote = "⌝"
+    c = colorise(color, repr(s)[1:-1])
+    return f"{left_quote}{c}{right_quote}"
+
 
 # CASE_RUNTIME_COLOUR = 'light_gray'
 CASE_RUNTIME_COLOUR = "grey_42"
@@ -641,7 +659,7 @@ def run_and_capture(interpreter, executable, args=()):
     env["VIUA_VM_TRACE_FD"] = str(write_fd)
     proc = subprocess.Popen(
         args=(interpreter,) + (executable,) + args,
-        stdout=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         pass_fds=(write_fd,),
         env=env,
@@ -721,7 +739,15 @@ def run_and_capture(interpreter, executable, args=()):
         ebreaks = es
 
     return (
-        result,
+        {
+          "exit": result,
+          "fd": {
+              "stdout": stdout,
+              "stderr": stderr,
+              1: stdout,
+              2: stderr,
+          },
+        },
         (ebreaks if ebreaks else None),
         abort,
         perf,
@@ -866,14 +892,15 @@ def test_case_impl(case_log, case_name, test_program, errors):
         INTERPRETER,
         test_executable,
     )
+    r_exit = result["exit"]
 
-    if result == -6 and check_kind == "abort":
+    if r_exit == -6 and check_kind == "abort":
         pass
-    elif result != 0:
+    elif r_exit != 0:
         return (
             Status.Normal,
             False,
-            f"crashed with non-zero return: {result}",
+            f"crashed with non-zero return: {r_exit}",
             count_runtime(),
             None,
         )
@@ -997,6 +1024,41 @@ def test_case_impl(case_log, case_name, test_program, errors):
                 )
             )
             raise Unexpected_value()
+    elif check_kind == "stdout":
+        stdout_test = os.path.splitext(test_program)[0] + ".stdout"
+        want_stdout : str
+        with open(stdout_test, "r") as ifstream:
+            want_stdout = ifstream.read()
+
+        if not want_stdout:
+            return (
+                Status.Normal,
+                False,
+                "empty stdout file",
+                count_runtime(),
+                None,
+            )
+
+        live_stdout = result["fd"]["stdout"]
+        if live_stdout != want_stdout:
+            errors.write(
+                "      want = {}\n".format(
+                    colorise_repr("green", want_stdout),
+                )
+            )
+            errors.write(
+                "      got =  {}\n".format(
+                    colorise_repr("red", live_stdout),
+                )
+            )
+            return (
+                Status.Normal,
+                False,
+                "bad stdout",
+                count_runtime(),
+                None,
+            )
+
 
     if SKIP_DISASSEMBLER_TESTS:
         return (
@@ -1071,10 +1133,11 @@ def test_case_impl(case_log, case_name, test_program, errors):
         INTERPRETER,
         test_executable,
     )
+    r_exit = result["exit"]
 
-    if result == -6 and check_kind == "abort":
+    if r_exit == -6 and check_kind == "abort":
         pass
-    elif result != 0:
+    elif r_exit != 0:
         return (
             Status.Normal,
             False,
