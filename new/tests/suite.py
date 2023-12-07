@@ -1291,6 +1291,11 @@ def main(args):
         for each in sorted(raw_cases)
     ]
 
+    if len(args) > 1:
+        run_only_these_cases = set(args[1].split(','))
+        d = dict(cases)
+        cases = list(map(lambda each: (each, d[each],), run_only_these_cases))
+
     print(
         "looking for test programs in: {} (found {} test program{})".format(
             CASES_DIR,

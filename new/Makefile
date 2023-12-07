@@ -99,7 +99,7 @@ dist: \
 	ln -s -f tools/exec build/bin
 
 test: dist
-	@python3 ./tests/suite.py
+	@python3 ./tests/suite.py $(TESTS)
 
 clean-bin:
 	find $(BUILD) -type f -delete 2>/dev/null || true
