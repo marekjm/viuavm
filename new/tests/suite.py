@@ -1539,6 +1539,13 @@ def main(args):
     )
     run_times = sorted(run_times)
     middle = len(run_times) // 2
+
+    # If we have only run two cases, we need to handle it with extra care. Otherwise, the
+    # code will crash later when it tries to access index 2 in a two-element list during
+    # median calculation.
+    if middle == 1:
+        middle = 0
+
     print(
         "median run time was {}".format(
             colorise(
