@@ -22,17 +22,20 @@ def colorise(color, s):
         return f"{s}"
     return "{}{}{}".format(colored.fg(color), s, colored.attr("reset"))
 
+
 DEFAULT_QUOTE_STYLE = "square"
-def colorise_repr(color, s, style = DEFAULT_QUOTE_STYLE):
+
+
+def colorise_repr(color, s, style=DEFAULT_QUOTE_STYLE):
     styles = {
         "square": ("⌞", "⌝"),
         "bracket": (
-            "⟨", # U+27e8
-            "⟩", # U+27e9
+            "⟨",  # U+27e8
+            "⟩",  # U+27e9
         ),
         "quote": (
-            "‘", # U+2018
-            "’", # U+2019
+            "‘",  # U+2018
+            "’",  # U+2019
         ),
     }
     left_quote = "⌞"
@@ -741,13 +744,13 @@ def run_and_capture(interpreter, executable, *, args=(), stdin=None):
 
     return (
         {
-          "exit": result,
-          "fd": {
-              "stdout": stdout,
-              "stderr": stderr,
-              1: stdout,
-              2: stderr,
-          },
+            "exit": result,
+            "fd": {
+                "stdout": stdout,
+                "stderr": stderr,
+                1: stdout,
+                2: stderr,
+            },
         },
         (ebreaks if ebreaks else None),
         abort,
@@ -1035,7 +1038,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
             raise Unexpected_value()
     elif check_kind == "stdout":
         stdout_test = os.path.splitext(test_program)[0] + ".stdout"
-        want_stdout : str
+        want_stdout: str
         with open(stdout_test, "r") as ifstream:
             want_stdout = ifstream.read()
 
@@ -1067,7 +1070,6 @@ def test_case_impl(case_log, case_name, test_program, errors):
                 count_runtime(),
                 None,
             )
-
 
     if SKIP_DISASSEMBLER_TESTS:
         return (
@@ -1361,9 +1363,17 @@ def main(args):
     ]
 
     if len(args) > 1:
-        run_only_these_cases = set(args[1].split(','))
+        run_only_these_cases = set(args[1].split(","))
         d = dict(cases)
-        cases = list(map(lambda each: (each, d[each],), run_only_these_cases))
+        cases = list(
+            map(
+                lambda each: (
+                    each,
+                    d[each],
+                ),
+                run_only_these_cases,
+            )
+        )
 
     print(
         "looking for test programs in: {} (found {} test program{})".format(
