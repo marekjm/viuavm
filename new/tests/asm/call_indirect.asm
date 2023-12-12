@@ -10,7 +10,7 @@
     atom $1, @hello_world
     ebreak
 
-    li $2.l, @dummy
+    atxtp $2.l, @dummy
 
     frame $1.a
     move $0.a, $1.l

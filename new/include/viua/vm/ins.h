@@ -77,6 +77,7 @@ Work_instruction(LUIU);
 Work_instruction(LLI);
 Work_instruction(CAST);
 Work_instruction(ARODP);
+Work_instruction(ATXTP);
 
 Work_instruction(FLOAT);
 Work_instruction(DOUBLE);

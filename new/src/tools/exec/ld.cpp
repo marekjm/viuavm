@@ -535,7 +535,7 @@ auto relocate(Text& text, Elf64_Rel const rel, uint64_t const value) -> void
     auto const op =
         static_cast<OPCODE>(text.at(text_ndx) & viua::arch::ops::OPCODE_MASK);
 
-    if (op == OPCODE::ARODP) {
+    if (op == OPCODE::ARODP or op == OPCODE::ATXTP) {
         using viua::arch::ops::E;
         auto imm_op       = E::decode(text.at(text_ndx));
         text.at(text_ndx) = E{imm_op.opcode, imm_op.out, value}.encode();

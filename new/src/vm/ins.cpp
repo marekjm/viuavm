@@ -163,6 +163,7 @@ auto execute(viua::vm::Stack& stack,
         break
             Work(CAST);
             Work(ARODP);
+            Work(ATXTP);
 #undef Work
         }
         break;
@@ -1149,6 +1150,11 @@ auto execute(ARODP const op, Stack& stack, ip_type const) -> void
     pointer_info.ptr     = reinterpret_cast<uintptr_t>(pointer_address);
     pointer_info.foreign = true;
     stack.proc->record_pointer(pointer_info);
+}
+auto execute(ATXTP const op, Stack& stack, ip_type const) -> void
+{
+    // FIXME Yeah... This should really be a pointer instead.
+    mutable_proxy(stack, op.instruction.out) = op.instruction.immediate;
 }
 
 auto execute(FLOAT const op, Stack& stack, ip_type const) -> void

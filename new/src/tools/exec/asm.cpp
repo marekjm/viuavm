@@ -1506,6 +1506,48 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                     }
                     throw e;
                 }
+            } else if (instr.leader == "atxtp" or instr.leader == "g.atxtp") {
+                auto const lx = instr.operands.back().ingredients.front();
+                using enum viua::libs::lexer::TOKEN;
+                if (lx.token == viua::libs::lexer::TOKEN::AT) {
+                    auto const label = instr.operands.back().ingredients.back();
+                    try {
+                        saved_at = symbol_map.at(label.text);
+                    } catch (std::out_of_range const&) {
+                        using viua::libs::errors::compile_time::Cause;
+                        using viua::libs::errors::compile_time::Error;
+
+                        auto e = Error{label, Cause::Unknown_label, label.text};
+                        e.add(lx);
+
+                        using viua::support::string::levenshtein_filter;
+                        auto misspell_candidates =
+                            levenshtein_filter(label.text, symbol_map);
+                        if (not misspell_candidates.empty()) {
+                            using viua::support::string::levenshtein_best;
+                            auto best_candidate =
+                                levenshtein_best(label.text,
+                                                 misspell_candidates,
+                                                 (label.text.size() / 2));
+                            if (best_candidate.second != label.text) {
+                                did_you_mean(e, best_candidate.second);
+                            }
+                        }
+
+                        throw e;
+                    }
+                } else {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+
+                    auto e = Error{lx,
+                                   Cause::Invalid_operand,
+                                   "expected a label reference"};
+                    if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
+                        did_you_mean(e, '@' + lx.text);
+                    }
+                    throw e;
+                }
             } else if (instr.leader == "double" or instr.leader == "g.double") {
                 auto const lx = instr.operands.back().ingredients.front();
                 using enum viua::libs::lexer::TOKEN;
@@ -2117,6 +2159,13 @@ auto expand_call(ast::Instruction const& raw,
                  std::vector<Elf64_Sym>& symbol_table,
                  std::map<std::string, size_t> const& symbol_map) -> Text
 {
+    using viua::libs::lexer::TOKEN;
+    auto const call_addr_already_loaded =
+        raw.operands.back().ingredients.front() == TOKEN::DOLLAR;
+    if (call_addr_already_loaded) {
+        return {emit_instruction(raw)};
+    }
+
     auto cooked = Text{};
 
     /*
@@ -2155,7 +2204,6 @@ auto expand_call(ast::Instruction const& raw,
          */
         fn_offset = ast::Operand{};
 
-        using viua::libs::lexer::TOKEN;
         auto const& lx = ret.ingredients.front();
         fn_offset.ingredients.push_back(lx.make_synth("$", TOKEN::DOLLAR));
         fn_offset.ingredients.push_back(
@@ -2810,18 +2858,41 @@ auto make_reloc_table(Text const& text) -> std::vector<Elf64_Rel>
                                  or (op == OPCODE::ARODP);
         auto const type = into_rodata ? R_VIUA_OBJECT : R_VIUA_JUMP_SLOT;
 
+        using viua::arch::ops::FORMAT_MASK;
+        using viua::arch::ops::FORMAT_F;
+        auto const reloc_to_section_ptr = op == OPCODE::ARODP or op == OPCODE::ATXTP;
+        auto const reloc_to_long_addr = (text.at(i - 1) & FORMAT_MASK) == FORMAT_F;
+
         auto symtab_entry_index = uint32_t{};
-        if (op == OPCODE::ARODP) {
+        if (reloc_to_section_ptr) {
             using viua::arch::ops::E;
             symtab_entry_index =
                 static_cast<uint32_t>(E::decode(text.at(i)).immediate);
-        } else {
+        } else if (reloc_to_long_addr) {
             using viua::arch::ops::F;
             auto const hi =
                 static_cast<uint64_t>(F::decode(text.at(i - 2)).immediate)
                 << 32;
             auto const lo      = F::decode(text.at(i - 1)).immediate;
             symtab_entry_index = static_cast<uint32_t>(hi | lo);
+        } else {
+            /*
+             * Well, it is not really a reloc after all.
+             * This case can be encountered when using
+             *
+             *      atxtp $x, fn
+             *      call void, $x
+             *
+             * instead of
+             *
+             *      call void, fn
+             *
+             * directly.
+             */
+            // FIXME This branch should be removed after calls and jumps use
+            // atxtp exclusively. Addresses should not really be loaded using
+            // integers, but using pointers instead. See AUIPC of RISC-V.
+            return;
         }
 
         Elf64_Rel rel;
@@ -2846,6 +2917,7 @@ auto make_reloc_table(Text const& text) -> std::vector<Elf64_Rel>
         case ATOM:
         case DOUBLE:
         case ARODP:
+        case ATXTP:
             push_reloc(i);
             break;
         default:

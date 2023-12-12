@@ -290,6 +290,12 @@ struct ARODP : Instruction {
     ARODP(viua::arch::ops::E i) : instruction{i}
     {}
 };
+struct ATXTP : Instruction {
+    viua::arch::ops::E instruction;
+
+    ATXTP(viua::arch::ops::E i) : instruction{i}
+    {}
+};
 
 struct ADDI : Instruction {
     using value_type                                     = int64_t;

@@ -248,6 +248,8 @@ inline auto const OPCODE_NAMES = std::set<std::string_view>{
 
     "arodp",
     "g.arodp",
+    "atxtp",
+    "g.atxtp",
 
     "sm",
     "g.sm",

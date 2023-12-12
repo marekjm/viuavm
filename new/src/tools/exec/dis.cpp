@@ -541,6 +541,29 @@ auto demangle_arodp(Cooked_text& text,
                               + arodp.out.to_string() + ", " + label_or_value));
             continue;
         }
+        if (m(i, ATXTP) or m(i, ATXTP, GREEDY)) {
+            using viua::arch::ops::E;
+            auto const atxtp        = E::decode(ins_at(i));
+            auto const needs_greedy = (atxtp.opcode & GREEDY);
+
+            auto const off = atxtp.immediate;
+
+            auto const sym = std::find_if(
+                symtab.begin(), symtab.end(), [off](auto const& each) -> bool {
+                    return (each.st_value == off)
+                           and (ELF64_ST_TYPE(each.st_info) == STT_FUNC);
+                });
+            // FIXME See if the symbol was actually found.
+
+            auto idx          = text.at(i).index;
+            idx.physical_span = idx.physical;
+            tmp.emplace_back(idx,
+                             std::nullopt,
+                             std::nullopt,
+                             ((needs_greedy ? "g." : "") + std::string{"atxtp "}
+                              + atxtp.out.to_string() + ", " + make_label_ref(strtab, *sym)));
+            continue;
+        }
 
         tmp.push_back(std::move(text.at(i)));
     }
