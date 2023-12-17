@@ -989,10 +989,13 @@ auto execute(CALL const op, Stack& stack, ip_type const) -> ip_type
     if (auto fn = mutable_proxy(stack, op.instruction.in).get<uint64_t>(); fn) {
         fn_addr = *fn;
         fn.reset();
+    } else {
+        throw abort_execution{stack,
+                              "invalid in operand to call instruction"};
     }
 
     if (fn_addr % sizeof(viua::arch::instruction_type)) {
-        throw abort_execution{stack, "invalid IP after call"};
+        throw abort_execution{stack, "invalid IP after synchronous call"};
     }
 
     /*
@@ -1405,21 +1408,18 @@ auto execute(IO_PEEK const, Stack&, ip_type const) -> void
 
 auto execute(ACTOR const op, Stack& stack, ip_type const) -> void
 {
-    auto fn_name = std::string{};
     auto fn_addr = size_t{};
-    {
-        if (auto fn = immutable_proxy(stack, op.instruction.in).get<uint64_t>();
-            fn) {
-            std::tie(fn_name, fn_addr) = stack.proc->module.function_at(*fn);
-            mutable_proxy(stack, op.instruction.in).reset();
-        } else {
-            throw abort_execution{stack,
-                                  "invalid in operand to actor instruction"};
-        }
+    if (auto fn = mutable_proxy(stack, op.instruction.in).get<uint64_t>();
+        fn) {
+        fn_addr = *fn;
+        fn.reset();
+    } else {
+        throw abort_execution{stack,
+                              "invalid in operand to actor instruction"};
     }
 
     if (fn_addr % sizeof(viua::arch::instruction_type)) {
-        throw abort_execution{stack, "invalid IP after call"};
+        throw abort_execution{stack, "invalid IP after asynchronous call"};
     }
 
     auto const fr_entry = (fn_addr / sizeof(viua::arch::instruction_type));

@@ -2219,13 +2219,13 @@ auto expand_call(ast::Instruction const& raw,
      * function, which will then be used by the call instruction to
      * invoke the function.
      */
-    auto li = ast::Instruction{};
+    auto atxtp = ast::Instruction{};
     {
-        li.leader      = raw.leader;
-        li.leader.text = "g.li";
+        atxtp.leader      = raw.leader;
+        atxtp.leader.text = "g.atxtp";
 
-        li.operands.push_back(fn_offset);
-        li.operands.push_back(fn_offset);
+        atxtp.operands.push_back(fn_offset);
+        atxtp.operands.push_back(fn_offset);
 
         using viua::libs::lexer::TOKEN;
 
@@ -2268,11 +2268,12 @@ auto expand_call(ast::Instruction const& raw,
                 .add(raw.leader);
         }
 
-        li.operands.back().ingredients.front().text =
+        atxtp.operands.back().ingredients.front().text =
             (std::to_string(sym_off) + 'u');
-        li.operands.back().ingredients.front().token = TOKEN::LITERAL_INTEGER;
+        atxtp.operands.back().ingredients.front().token =
+            TOKEN::LITERAL_INTEGER;
     }
-    std::ranges::copy(expand_li(li, true), std::back_inserter(cooked));
+    cooked.push_back(emit_instruction(atxtp));
 
     /*
      * Then, synthesize the actual call instruction. This means
@@ -2860,8 +2861,10 @@ auto make_reloc_table(Text const& text) -> std::vector<Elf64_Rel>
 
         using viua::arch::ops::FORMAT_MASK;
         using viua::arch::ops::FORMAT_F;
-        auto const reloc_to_section_ptr = op == OPCODE::ARODP or op == OPCODE::ATXTP;
-        auto const reloc_to_long_addr = (text.at(i - 1) & FORMAT_MASK) == FORMAT_F;
+        auto const reloc_to_section_ptr = op == OPCODE::ARODP
+                                          or op == OPCODE::ATXTP;
+        auto const reloc_to_long_addr =
+            (text.at(i - 1) & FORMAT_MASK) == FORMAT_F;
 
         auto symtab_entry_index = uint32_t{};
         if (reloc_to_section_ptr) {
@@ -2913,7 +2916,6 @@ auto make_reloc_table(Text const& text) -> std::vector<Elf64_Rel>
         switch (op) {
             using enum viua::arch::ops::OPCODE;
         case IF:
-        case CALL:
         case ATOM:
         case DOUBLE:
         case ARODP:

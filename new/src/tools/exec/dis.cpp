@@ -236,22 +236,28 @@ auto demangle_symbol_load(Cooked_text& raw,
 
     using enum viua::arch::ops::OPCODE;
     using viua::arch::ops::D;
+    using viua::arch::ops::E;
     using viua::arch::ops::S;
     if (m(i + 1, ATOM) and S::decode(ins_at(i + 1)).out == out) {
         auto ins = raw.at(i + 1);
 
-        auto const sym = std::find_if(
+        auto const sym_it = std::find_if(
             symtab.begin(),
             symtab.end(),
             [immediate](auto const& each) -> bool {
                 return (each.st_value == immediate)
                        and (ELF64_ST_TYPE(each.st_info) == STT_OBJECT);
             });
-        if (sym == symtab.end()) {
-            abort();  // FIXME symbol not found? should never happen here
-        }
-        auto const label_or_value = sym->st_name
-                                        ? make_label_ref(strtab, *sym)
+        /*
+         * FIXME OvsELF
+         * In executable files we need to find by .st_value ie, the real offset.
+         * In relocatable files we need to find by index into symbol table since
+         * relocations have not been performed yet.
+         */
+        auto const& sym = (sym_it == symtab.end()) ? symtab.at(immediate)
+                                                   : *sym_it;
+        auto const label_or_value = sym.st_name
+                                        ? make_label_ref(strtab, sym)
                                         : load_string(rodata, immediate);
 
         auto tt =
@@ -300,8 +306,7 @@ auto demangle_symbol_load(Cooked_text& raw,
     if (m(i + 1, ACTOR) and D::decode(ins_at(i + 1)).in == out) {
         auto ins = raw.at(i + 1);
 
-        auto const sym      = symtab.at(immediate);
-        auto const sym_name = get_symbol_name(sym.st_value, symtab, strtab);
+        auto const sym_name = get_symbol_name(immediate, symtab, strtab);
         auto const safe_sym_name =
             match_atom(sym_name) ? sym_name : ('"' + sym_name + '"');
 
@@ -392,6 +397,7 @@ auto demangle_canonical_li(Cooked_text& text,
                 (std::string{"[[full]] "} + (needs_greedy ? "g." : "")
                  + std::string{"li "} + lui.out.to_string() + ", " + literal));
 
+            // FIXME calls are using ATXTP instead of LUIU
             if (needs_unsigned) {
                 demangle_symbol_load(
                     text, tmp, i, lui.out, value, symtab, strtab, rodata);
@@ -548,20 +554,38 @@ auto demangle_arodp(Cooked_text& text,
 
             auto const off = atxtp.immediate;
 
-            auto const sym = std::find_if(
+            auto const sym_it = std::find_if(
                 symtab.begin(), symtab.end(), [off](auto const& each) -> bool {
                     return (each.st_value == off)
                            and (ELF64_ST_TYPE(each.st_info) == STT_FUNC);
                 });
-            // FIXME See if the symbol was actually found.
+            /*
+             * FIXME OvsELF
+             * In executable files we need to find by .st_value ie, the real
+             * offset. In relocatable files we need to find by index into symbol
+             * table since relocations have not been performed yet.
+             */
+            auto const& sym = (sym_it == symtab.end()) ? symtab.at(off)
+                                                       : *sym_it;
 
             auto idx          = text.at(i).index;
             idx.physical_span = idx.physical;
-            tmp.emplace_back(idx,
-                             std::nullopt,
-                             std::nullopt,
-                             ((needs_greedy ? "g." : "") + std::string{"atxtp "}
-                              + atxtp.out.to_string() + ", " + make_label_ref(strtab, *sym)));
+            tmp.emplace_back(
+                idx,
+                std::nullopt,
+                std::nullopt,
+                ((needs_greedy ? "g." : "") + std::string{"atxtp "}
+                 + atxtp.out.to_string() + ", " + make_label_ref(strtab, sym)));
+
+            demangle_symbol_load(text,
+                                 tmp,
+                                 i,
+                                 atxtp.out,
+                                 atxtp.immediate,
+                                 symtab,
+                                 strtab,
+                                 rodata);
+
             continue;
         }
 
@@ -1213,6 +1237,11 @@ auto main(int argc, char* argv[]) -> int
             cooked_text.emplace_back(i, opcode, ip, ins_to_string(ip));
         }
 
+        cook::demangle_arodp(cooked_text,
+                             main_module.symtab,
+                             main_module.strtab_quick,
+                             rodata->get().data);
+
         if (demangle_li) {
             /*
              * This demangles LI for long immediates; covering both integers for
@@ -1231,10 +1260,6 @@ auto main(int argc, char* argv[]) -> int
         }
 
         cook::demangle_addiu(cooked_text);
-        cook::demangle_arodp(cooked_text,
-                             main_module.symtab,
-                             main_module.strtab_quick,
-                             rodata->get().data);
 
         if (demangle_mem) {
             cook::demangle_memory(cooked_text);
