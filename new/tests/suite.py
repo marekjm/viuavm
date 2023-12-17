@@ -820,6 +820,8 @@ def test_case_impl_checks(
     if r_exit == -6 and check_kind == "abort":
         pass
     elif r_exit != 0:
+        case_log.write(f"test program crashed\n")
+        case_log.write(f"]$ gdb --args ./build/bin/vm {base_path}.elf\n")
         return (
             Status.Normal,
             False,
@@ -998,6 +1000,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
     check_kind = None
     try:
         check_kind = detect_check_kind(test_program)
+        case_log.write(f"using check kind: {check_kind}\n\n")
     except No_check_file_for:
         return (
             Status.Normal,
@@ -1022,6 +1025,8 @@ def test_case_impl(case_log, case_name, test_program, errors):
 
     test_relocatable = f"{base_path}.o"
     test_executable = f"{base_path}.elf"
+
+    case_log.write("First run\n")
 
     asm = lambda out_reloc, in_asm: test_case_impl_asm(case_log, out_reloc, in_asm)
 
@@ -1129,6 +1134,8 @@ def test_case_impl(case_log, case_name, test_program, errors):
 
     if SKIP_DISASSEMBLER_TESTS:
         return make_good_report()
+
+    case_log.write("Second run\n")
 
     # SECOND RUN
     #
@@ -1268,7 +1275,8 @@ def prepare_dependencies(cases_dir):
 
 
 def main(args):
-    CASES_DIR = os.environ.get("VIUA_VM_TEST_CASES_DIR", "./tests/asm")
+    DEFAULT_CASES_DIR = "./tests/asm"
+    CASES_DIR = os.environ.get("VIUA_VM_TEST_CASES_DIR", DEFAULT_CASES_DIR)
     raw_cases = glob.glob(f"{CASES_DIR}/*.asm")
     cases = [
         (
@@ -1278,9 +1286,15 @@ def main(args):
         for each in sorted(raw_cases)
     ]
 
+    CACHE_DIR = os.path.join(CASES_DIR, ".cache")
+
     if len(args) > 1:
         run_only_these_cases = set(args[1].split(","))
         d = dict(cases)
+        if "@fail" in run_only_these_cases:
+            run_only_these_cases.remove("@fail")
+            with open(os.path.join(CACHE_DIR, "fail"), "r") as ifstream:
+                run_only_these_cases.update(ifstream.read().splitlines())
         cases = list(
             map(
                 lambda each: (
@@ -1290,6 +1304,7 @@ def main(args):
                 run_only_these_cases,
             )
         )
+    cases.sort()
 
     print(
         "looking for test programs in: {} (found {} test program{})".format(
@@ -1319,6 +1334,18 @@ def main(args):
 
     run_times = []
     perf_stats = []
+
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    list_of_ok = []
+    list_of_fail = []
+    list_of_skip = []
+    list_of_bork = []
+    run_list = {
+        "ok": list_of_ok,
+        "fail": list_of_fail,
+        "skip": list_of_skip,
+        "bork": list_of_bork,
+    }
 
     print("  running cases")
     for case_no, (
@@ -1385,7 +1412,7 @@ def main(args):
                         )
 
                     if result:
-                        tag = " ok "
+                        tag = "ok"
                         tag_color = "green"
                         success_cases += 1
                     else:
@@ -1401,9 +1428,11 @@ def main(args):
             tag_color = "purple_1b"
             symptom = "internal test suite failure"
 
+        run_list[tag].append(case_name)
+
         print(
             "[{}] {}  {}".format(
-                colorise(tag_color, tag)
+                colorise(tag_color, f"{tag:^4s}")
                 + ((" => " + colorise("light_red", symptom)) if symptom else ""),
                 (
                     colorise(CASE_RUNTIME_COLOUR, format_run_time(run_time))
@@ -1433,6 +1462,10 @@ def main(args):
             traceback.print_exception(
                 internal_test_suite_failure, limit=None, chain=True
             )
+
+    for result_tag, tagged_cases in run_list.items():
+        with open(os.path.join(CACHE_DIR, result_tag), "w") as ofstream:
+            ofstream.write("\n".join(tagged_cases))
 
     run_color: str = None
     run_exit_code: int = 0
