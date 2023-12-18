@@ -986,12 +986,13 @@ auto execute(FRAME const op, Stack& stack, ip_type const) -> void
 auto execute(CALL const op, Stack& stack, ip_type const) -> ip_type
 {
     auto fn_addr = size_t{};
-    if (auto fn = mutable_proxy(stack, op.instruction.in).get<uint64_t>(); fn) {
-        fn_addr = *fn;
+    if (auto fn = mutable_proxy(stack, op.instruction.in)
+                      .get<register_type::pointer_type>();
+        fn) {
+        fn_addr = fn->ptr;
         fn.reset();
     } else {
-        throw abort_execution{stack,
-                              "invalid in operand to call instruction"};
+        throw abort_execution{stack, "invalid in operand to call instruction"};
     }
 
     if (fn_addr % sizeof(viua::arch::instruction_type)) {
@@ -1156,8 +1157,8 @@ auto execute(ARODP const op, Stack& stack, ip_type const) -> void
 }
 auto execute(ATXTP const op, Stack& stack, ip_type const) -> void
 {
-    // FIXME Yeah... This should really be a pointer instead.
-    mutable_proxy(stack, op.instruction.out) = op.instruction.immediate;
+    mutable_proxy(stack, op.instruction.out) =
+        register_type::pointer_type{op.instruction.immediate};
 }
 
 auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
@@ -1409,13 +1410,13 @@ auto execute(IO_PEEK const, Stack&, ip_type const) -> void
 auto execute(ACTOR const op, Stack& stack, ip_type const) -> void
 {
     auto fn_addr = size_t{};
-    if (auto fn = mutable_proxy(stack, op.instruction.in).get<uint64_t>();
+    if (auto fn = mutable_proxy(stack, op.instruction.in)
+                      .get<register_type::pointer_type>();
         fn) {
-        fn_addr = *fn;
+        fn_addr = fn->ptr;
         fn.reset();
     } else {
-        throw abort_execution{stack,
-                              "invalid in operand to actor instruction"};
+        throw abort_execution{stack, "invalid in operand to actor instruction"};
     }
 
     if (fn_addr % sizeof(viua::arch::instruction_type)) {
