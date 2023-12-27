@@ -2062,6 +2062,13 @@ auto expand_flow_control(ast::Instruction const& raw,
                          std::map<std::string, size_t> const& symbol_map,
                          Decl_map const& decl_map) -> Text
 {
+    using viua::libs::lexer::TOKEN;
+    auto const jump_addr_already_loaded =
+        raw.operands.back().ingredients.front() == TOKEN::DOLLAR;
+    if (jump_addr_already_loaded) {
+        return {emit_instruction(raw)};
+    }
+
     auto cooked = Text{};
 
     auto const target = raw.operands.back();
@@ -2079,13 +2086,13 @@ auto expand_flow_control(ast::Instruction const& raw,
             lx.make_synth("l", TOKEN::LITERAL_ATOM));
     }
 
-    auto li = ast::Instruction{};
+    auto atxtp = ast::Instruction{};
     {
-        li.leader      = raw.leader;
-        li.leader.text = "g.li";
+        atxtp.leader      = raw.leader;
+        atxtp.leader.text = "g.atxtp";
 
-        li.operands.push_back(jmp_offset);
-        li.operands.push_back(raw.operands.back());
+        atxtp.operands.push_back(jmp_offset);
+        atxtp.operands.push_back(raw.operands.back());
 
         using viua::libs::lexer::TOKEN;
 
@@ -2137,11 +2144,12 @@ auto expand_flow_control(ast::Instruction const& raw,
                            .add(decl_sym.leader));
         }
 
-        li.operands.back().ingredients.front().text =
+        atxtp.operands.back().ingredients.front().text =
             (std::to_string(sym_off) + 'u');
-        li.operands.back().ingredients.front().token = TOKEN::LITERAL_INTEGER;
+        atxtp.operands.back().ingredients.front().token =
+            TOKEN::LITERAL_INTEGER;
     }
-    std::ranges::copy(expand_li(li, true), std::back_inserter(cooked));
+    cooked.push_back(emit_instruction(atxtp));
 
     auto jmp = ast::Instruction{};
     {
@@ -2915,7 +2923,7 @@ auto make_reloc_table(Text const& text) -> std::vector<Elf64_Rel>
             static_cast<OPCODE>(each & viua::arch::ops::OPCODE_MASK);
         switch (op) {
             using enum viua::arch::ops::OPCODE;
-        case IF:
+        // FIXME ATOM and DOUBLE should rely on ARODP
         case ATOM:
         case DOUBLE:
         case ARODP:

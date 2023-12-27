@@ -1290,17 +1290,25 @@ auto execute(DIVIU const op, Stack& stack, ip_type const) -> void
 auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
 {
     auto const condition = immutable_proxy(stack, op.instruction.out);
-    auto tt              = mutable_proxy(stack, op.instruction.in);
 
     auto const take_branch =
         (condition.holds<void>() or *condition.cast_to<bool>());
 
+    auto target_offset = size_t{};
+    if (auto jmp = mutable_proxy(stack, op.instruction.in)
+                       .get<register_type::pointer_type>();
+        jmp) {
+        target_offset = jmp->ptr;
+        jmp.reset();
+    } else {
+        throw abort_execution{stack, "invalid in operand to if instruction"};
+    }
+
     auto const target_addr =
-        (*tt.target->get<uint64_t>() / sizeof(viua::arch::instruction_type));
+        target_offset / sizeof(viua::arch::instruction_type);
     auto const target = take_branch ? (stack.proc->module.ip_base + target_addr)
                                     : (ip + 1);
 
-    tt.reset();
     return target;
 }
 
