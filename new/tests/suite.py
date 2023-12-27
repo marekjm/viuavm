@@ -1488,6 +1488,14 @@ def main(args):
         )
     )
 
+    # If all tests failed, then we do not have anything in the run statistics lists. This
+    # breaks the code in many places, so let's just put dummy values where necessary to
+    # avoid crashes.
+    #
+    # Sure, the report may look weird, but at least the test suite will run to completion.
+    if not run_times:
+        run_times = [datetime.timedelta()]
+
     total_run_time = sum(run_times[1:], start=run_times[0])
     print(
         "\ntotal run time was {} ({} ~ {} per case)".format(
