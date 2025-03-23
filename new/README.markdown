@@ -102,7 +102,7 @@ For guidelines for potential contributors see the
 
 ## Copyright
 
-Copyright © 2021-2024 Marek Marecki
+Copyright © 2021-2025 Marek Marecki
 
 Viua VM is Free Software published under GNU GPL v3 license.
 
