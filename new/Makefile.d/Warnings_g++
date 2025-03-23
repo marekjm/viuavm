@@ -1,7 +1,6 @@
 # vim:ft=make
 
 CXXFLAGS_NOERROR?=\
-				  -Wno-error=float-equal \
 				  -Wno-error=unused-result
 
 # Some nice-to-have warnings would be:

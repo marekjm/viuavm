@@ -40,6 +40,7 @@
 #include <variant>
 #include <vector>
 
+#include <viua/support/number.h>
 #include <viua/arch/arch.h>
 #include <viua/runtime/pid.h>
 #include <viua/vm/elf.h>
@@ -225,10 +226,18 @@ struct Register {
             return static_cast<T>(*v);
         }
         if (auto v = get<float_type>(); v) {
-            return static_cast<T>(*v);
+            if (std::is_same_v<T, bool>) {
+                return viua::support::bool_of_float(*v);
+            } else {
+                return static_cast<T>(*v);
+            }
         }
         if (auto v = get<double_type>(); v) {
-            return static_cast<T>(*v);
+            if (std::is_same_v<T, bool>) {
+                return viua::support::bool_of_float(*v);
+            } else {
+                return static_cast<T>(*v);
+            }
         }
 
         return {};

@@ -83,6 +83,23 @@ auto ston(std::string n) -> T
         return wanted;
     }
 }
+
+template<typename T> auto bool_of_float(T const v) -> bool
+{
+    static_assert(std::is_floating_point<T>::value, "not a float");
+    static_assert(((sizeof(T) == sizeof(uint32_t)) or (sizeof(T) == sizeof(uint64_t))), "bad-sized float");
+    using int_type = std::conditional<(sizeof(T) == sizeof(uint32_t)), uint32_t, uint64_t>::type;
+
+    /*
+     * For casting to bool the roundabout way of memcpy(3) into a
+     * suitably-sized integer and casting that integer has to be used.
+     * Otherwise the -Wfloat-equal warning gets triggered on GCC and I
+     * cannot get a clean, warning-free compilation.
+     */
+    auto tmp = int_type{};
+    memcpy(&tmp, &v, sizeof(T));
+    return static_cast<bool>(tmp);
+}
 }  // namespace viua::support
 
 #endif
