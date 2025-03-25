@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021-2022 Marek Marecki
+ *  Copyright (C) 2021-2025 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -16,6 +16,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include <string>
+#include <sstream>
 
 #include <viua/arch/arch.h>
 #include <viua/arch/ops.h>

@@ -179,6 +179,7 @@ watch-tests:
 		ls -1 tests/suite.py \
 	) | entr -c python3 ./tests/suite.py
 
+
 ################################################################################
 # Template rules
 $(BUILD)/%: $(BUILD)/%.o
@@ -188,6 +189,10 @@ $(BUILD)/%: ./src/%.sh
 	@cp -v $^ $@
 
 $(BUILD)/%.o: ./src/%.cpp
+	@mkdir -p $(shell dirname $@)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(BUILD)/%.o: ./src/%.cc
 	@mkdir -p $(shell dirname $@)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
@@ -207,7 +212,15 @@ $(BUILD)/tools/exec/dis: \
 	$(BUILD)/support/string.o \
 	$(BUILD)/support/tty.o \
 	$(BUILD)/vm/elf.o \
-	$(BUILD)/arch/arch.o \
+	$(BUILD)/arch/ra.o \
+	$(BUILD)/arch/ops/n.o \
+	$(BUILD)/arch/ops/t.o \
+	$(BUILD)/arch/ops/d.o \
+	$(BUILD)/arch/ops/s.o \
+	$(BUILD)/arch/ops/f.o \
+	$(BUILD)/arch/ops/e.o \
+	$(BUILD)/arch/ops/r.o \
+	$(BUILD)/arch/ops/m.o \
 	$(BUILD)/arch/ops.o
 
 $(BUILD)/tools/exec/asm: \
@@ -220,12 +233,22 @@ $(BUILD)/tools/exec/asm: \
 	$(BUILD)/tools/libs/stage/error.o \
 	$(BUILD)/tools/libs/stage/save.o \
 	$(BUILD)/tools/libs/assembler.o \
-	$(BUILD)/arch/arch.o \
+	$(BUILD)/arch/ra.o \
+	$(BUILD)/arch/ops/n.o \
+	$(BUILD)/arch/ops/t.o \
+	$(BUILD)/arch/ops/d.o \
+	$(BUILD)/arch/ops/s.o \
+	$(BUILD)/arch/ops/f.o \
+	$(BUILD)/arch/ops/e.o \
+	$(BUILD)/arch/ops/r.o \
+	$(BUILD)/arch/ops/m.o \
 	$(BUILD)/arch/ops.o
 
 $(BUILD)/tools/exec/ld: \
-	$(BUILD)/arch/arch.o \
+	$(BUILD)/arch/ra.o \
 	$(BUILD)/arch/ops.o \
+	$(BUILD)/arch/ops/f.o \
+	$(BUILD)/arch/ops/e.o \
 	$(BUILD)/vm/elf.o \
 	$(BUILD)/tools/libs/errors/compile_time.o \
 	$(BUILD)/tools/libs/stage/save.o \
@@ -249,11 +272,19 @@ $(BUILD)/tools/exec/vm: \
 	$(BUILD)/vm/ins.o \
 	$(VIUA_INSTRUCTION_IMPLS) \
 	$(BUILD)/runtime/pid.o \
-	$(BUILD)/arch/arch.o \
+	$(BUILD)/arch/ra.o \
+	$(BUILD)/arch/ops/n.o \
+	$(BUILD)/arch/ops/t.o \
+	$(BUILD)/arch/ops/d.o \
+	$(BUILD)/arch/ops/s.o \
+	$(BUILD)/arch/ops/f.o \
+	$(BUILD)/arch/ops/e.o \
+	$(BUILD)/arch/ops/r.o \
+	$(BUILD)/arch/ops/m.o \
 	$(BUILD)/arch/ops.o
 
 $(BUILD)/tools/exec/repl: \
-	$(BUILD)/arch/arch.o \
+	$(BUILD)/arch/ra.o \
 	$(BUILD)/arch/ops.o \
 	$(BUILD)/vm/backtrace.o \
 	$(BUILD)/vm/core.o \
