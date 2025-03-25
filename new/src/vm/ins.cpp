@@ -964,7 +964,7 @@ auto execute(FRAME const op, Stack& stack, ip_type const) -> void
 
     auto capacity = viua::arch::register_index_type{};
     switch (rs) {
-    case viua::arch::RS::LOCAL:
+    case viua::arch::REGISTER_SET::LOCAL:
         if (auto v = immutable_proxy(stack, op.instruction.out).get<uint64_t>();
             v) {
             capacity = static_cast<viua::arch::register_index_type>(*v);
@@ -973,7 +973,7 @@ auto execute(FRAME const op, Stack& stack, ip_type const) -> void
                 stack, "dynamic args count must be an unsigned integer"};
         }
         break;
-    case viua::arch::RS::ARGUMENT:
+    case viua::arch::REGISTER_SET::ARGUMENT:
         capacity = index;
         break;
     default:
