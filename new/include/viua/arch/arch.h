@@ -106,7 +106,7 @@ struct Register_access {
 
     set_type set;
     bool direct;
-    uint8_t index;
+    register_index_type index;
 
     Register_access();
     Register_access(set_type const, bool const, uint8_t const);
