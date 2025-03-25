@@ -50,6 +50,7 @@
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
 #include <viua/vm/core.h>
+#include <viua/vm/backtrace.h>
 #include <viua/vm/elf.h>
 #include <viua/vm/ins.h>
 
@@ -419,7 +420,7 @@ auto main(int argc, char* argv[]) -> int
                   << std::dec << "\n";
         std::cerr << "Aborted instruction: " << std::hex << std::setfill('0')
                   << "0x" << std::setw(16) << *e.stack.ip << std::dec << "\n";
-        viua::vm::ins::print_backtrace(e.stack);
+        viua::vm::backtrace::print_backtrace(e.stack);
         if constexpr (true) {
             throw;
         } else {

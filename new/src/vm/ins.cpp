@@ -31,6 +31,7 @@
 
 #include <viua/arch/arch.h>
 #include <viua/support/fdstream.h>
+#include <viua/vm/backtrace.h>
 #include <viua/vm/ins.h>
 
 
@@ -1442,156 +1443,6 @@ auto execute(SELF const op, Stack& stack, ip_type const) -> void
     mutable_proxy(stack, op.instruction.out) = stack.proc->pid.get();
 }
 
-auto dump_registers(std::vector<register_type> const& registers,
-                    Process::atoms_map_type const& atoms,
-                    std::string_view const suffix) -> void
-{
-    for (auto i = size_t{0}; i < registers.size(); ++i) {
-        auto const& each = registers.at(i);
-        if (each.is_void()) {
-            continue;
-        }
-
-        TRACE_STREAM << "      " << std::setw(7) << std::setfill(' ')
-                     << ('[' + std::to_string(i) + '.' + suffix.data() + ']')
-                     << ' ';
-
-        if (each.is_void()) {
-            /* do nothing */
-        } else if (auto const v = each.get<register_type::undefined_type>();
-                   v) {
-            TRACE_STREAM << "raw" << std::hex << std::setfill('0');
-            for (auto const each : *v) {
-                TRACE_STREAM << " " << std::setw(2)
-                             << static_cast<unsigned>(each);
-            }
-            TRACE_STREAM << '\n';
-        } else if (auto const v = each.get<int64_t>(); v) {
-            TRACE_STREAM << "is " << std::hex << std::setw(16)
-                         << std::setfill('0') << *v << " " << std::dec << *v
-                         << '\n';
-        } else if (auto const v = each.get<uint64_t>(); v) {
-            TRACE_STREAM << "iu " << std::hex << std::setw(16)
-                         << std::setfill('0') << *v << " " << std::dec << *v
-                         << '\n';
-        } else if (auto const v = each.get<float>(); v) {
-            auto const precision = std::cerr.precision();
-            TRACE_STREAM
-                << "fl " << std::hexfloat << *v << " " << std::defaultfloat
-                << std::setprecision(std::numeric_limits<float>::digits10 + 1)
-                << *v << '\n';
-            TRACE_STREAM << std::setprecision(precision);
-        } else if (auto const v = each.get<double>(); v) {
-            auto const precision = std::cerr.precision();
-            TRACE_STREAM
-                << "db " << std::hexfloat << *v << " " << std::defaultfloat
-                << std::setprecision(std::numeric_limits<double>::digits10 + 1)
-                << *v << '\n';
-            TRACE_STREAM << std::setprecision(precision);
-        } else if (auto const v = each.get<register_type::pointer_type>(); v) {
-            TRACE_STREAM << "ptr " << std::hex << std::setw(16)
-                         << std::setfill('0') << v->ptr << " " << std::dec
-                         << v->ptr << '\n';
-        } else if (auto const v = each.get<register_type::atom_type>(); v) {
-            TRACE_STREAM << "atom " << atoms.at(v->key) << '\n';
-        } else if (auto const v = each.get<register_type::pid_type>(); v) {
-            TRACE_STREAM << "pid " << viua::runtime::PID{*v}.to_string()
-                         << '\n';
-        }
-    }
-}
-auto print_backtrace_line(Stack const& stack, size_t const frame_index) -> void
-{
-    auto const& elf  = stack.proc->module.elf;
-    auto const& each = stack.frames.at(frame_index);
-
-    auto entry_off =
-        static_cast<size_t>(each.entry_address - stack.proc->module.ip_base)
-        * sizeof(viua::arch::instruction_type);
-    auto const sym =
-        std::find_if(elf.symtab.begin(),
-                     elf.symtab.end(),
-                     [entry_off](auto const& each) -> bool {
-                         return (each.st_value == entry_off)
-                                and (ELF64_ST_TYPE(each.st_info) == STT_FUNC);
-                     });
-
-    viua::TRACE_STREAM << "    #" << frame_index << "  ";
-    viua::TRACE_STREAM
-        << ((sym == elf.symtab.end()) ? "??" : elf.str_at(sym->st_name));
-    viua::TRACE_STREAM << (each.parameters.empty() ? " ()" : " (...)");
-
-    auto ip_offset = size_t{};
-    if (frame_index < (stack.frames.size() - 1)) {
-        ip_offset = (stack.frames.at(frame_index + 1).return_address
-                     - stack.proc->module.ip_base);
-    } else {
-        ip_offset = (stack.ip - stack.proc->module.ip_base);
-    }
-    viua::TRACE_STREAM << " at " << stack.proc->module.elf_path.native()
-                       << "[.text+0x" << std::hex << std::setw(8)
-                       << std::setfill('0');
-    viua::TRACE_STREAM << (ip_offset * sizeof(viua::arch::instruction_type));
-    viua::TRACE_STREAM << std::dec << ']';
-
-    viua::TRACE_STREAM << " return to ";
-    if (each.return_address) {
-        viua::TRACE_STREAM
-            << stack.proc->module.elf_path.native() << "[.text+0x" << std::hex
-            << std::setw(8) << std::setfill('0')
-            << ((each.return_address - stack.proc->module.ip_base)
-                * sizeof(viua::arch::instruction_type))
-            << std::dec << ']';
-    } else {
-        viua::TRACE_STREAM << "null";
-    }
-
-    viua::TRACE_STREAM << viua::TRACE_STREAM.endl;
-}
-auto print_backtrace(Stack const& stack, std::optional<size_t> const only_for)
-    -> void
-{
-    if (only_for.has_value()) {
-        print_backtrace_line(stack, *only_for);
-    } else {
-        for (auto i = size_t{0}; i < stack.frames.size(); ++i) {
-            print_backtrace_line(stack, i);
-        }
-    }
-}
-auto dump_memory(std::vector<Page> const& memory) -> void
-{
-    viua::TRACE_STREAM << "  memory:" << viua::TRACE_STREAM.endl;
-
-    viua::TRACE_STREAM << std::hex << std::setfill('0');
-    for (auto line = size_t{0}; line < (memory.front().size() / MEM_LINE_SIZE);
-         ++line) {
-        viua::TRACE_STREAM << "    ";
-        viua::TRACE_STREAM
-            << std::setw(16)
-            << (MEM_FIRST_STACK_BREAK - ((line + 1) * MEM_LINE_SIZE) + 1)
-            << "--" << std::setw(2)
-            << ((MEM_FIRST_STACK_BREAK - (line * MEM_LINE_SIZE))
-                & 0x00000000000000ff)
-            << "  ";
-
-        auto const& page = memory.front();
-        auto at          = [&page, line](size_t const n) -> uint8_t {
-            return *((page.data() + page.size() - 1)
-                     - (line * MEM_LINE_SIZE + n));
-        };
-        for (auto i = MEM_LINE_SIZE; i; --i) {
-            viua::TRACE_STREAM << std::setw(2) << static_cast<int>(at(i - 1))
-                               << ' ';
-        }
-        viua::TRACE_STREAM << "| ";
-        for (auto i = MEM_LINE_SIZE; i; --i) {
-            auto const c = at(i - 1);
-            viua::TRACE_STREAM << (isprint(c) ? static_cast<char>(c) : '.');
-        }
-        viua::TRACE_STREAM << viua::TRACE_STREAM.endl;
-    }
-}
 auto dump_globals(Stack const& stack) -> void
 {
     viua::TRACE_STREAM << "  globals:" << viua::TRACE_STREAM.endl;
@@ -1653,7 +1504,7 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
                        << viua::TRACE_STREAM.endl;
 
     viua::TRACE_STREAM << "  backtrace:" << viua::TRACE_STREAM.endl;
-    print_backtrace(stack);
+    viua::vm::backtrace::print_backtrace(stack);
 
     viua::TRACE_STREAM << "  register contents:" << viua::TRACE_STREAM.endl;
     for (auto i = size_t{0}; i < stack.frames.size(); ++i) {
@@ -1670,12 +1521,12 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
                      << "iu " << std::hex << std::setw(16) << std::setfill('0')
                      << sbrk << " " << std::dec << sbrk << '\n';
 
-        dump_registers(each.parameters, stack.proc->atoms, "p");
-        dump_registers(each.registers, stack.proc->atoms, "l");
+        viua::vm::backtrace::dump_registers(each.parameters, stack.proc->atoms, "p");
+        viua::vm::backtrace::dump_registers(each.registers, stack.proc->atoms, "l");
     }
-    dump_registers(stack.args, stack.proc->atoms, "a");
+    viua::vm::backtrace::dump_registers(stack.args, stack.proc->atoms, "a");
 
-    dump_memory(stack.proc->memory);
+    viua::vm::backtrace::dump_memory(stack.proc->memory);
 
     dump_globals(stack);
 

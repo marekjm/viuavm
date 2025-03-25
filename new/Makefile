@@ -243,6 +243,7 @@ $(BUILD)/tools/exec/vm: \
 	$(BUILD)/support/fdio.o \
 	$(BUILD)/support/tty.o \
 	$(BUILD)/support/string.o \
+	$(BUILD)/vm/backtrace.o \
 	$(BUILD)/vm/core.o \
 	$(BUILD)/vm/elf.o \
 	$(BUILD)/vm/ins.o \
@@ -254,6 +255,7 @@ $(BUILD)/tools/exec/vm: \
 $(BUILD)/tools/exec/repl: \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o \
+	$(BUILD)/vm/backtrace.o \
 	$(BUILD)/vm/core.o \
 	$(BUILD)/vm/elf.o \
 	$(BUILD)/vm/ins.o \

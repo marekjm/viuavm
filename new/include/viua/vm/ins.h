@@ -122,18 +122,6 @@ using register_type = viua::vm::Register;
 
 auto execute(viua::vm::Stack&, ip_type const) -> ip_type;
 
-/*
- * Utility functions. Used in implementation of EBREAK, but also accessed by the
- * repl-debugger combo to dump backtraces and register dumps. Reuse makes
- * keeping the format consistent easier.
- */
-auto print_backtrace(viua::vm::Stack const&,
-                     std::optional<size_t> const = std::nullopt) -> void;
-auto dump_registers(std::vector<register_type> const&,
-                    Process::atoms_map_type const&,
-                    std::string_view const) -> void;
-auto dump_memory(std::vector<Page> const&) -> void;
-
 struct Immutable_proxy {
     register_type const& target;
 
