@@ -21,9 +21,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <stdexcept>
 #include <string>
-#include <string_view>
 
 #include <viua/arch/arch.h>
 #include <viua/arch/ops.h>

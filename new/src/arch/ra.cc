@@ -21,7 +21,6 @@
 #include <sstream>
 
 #include <viua/arch/arch.h>
-#include <viua/arch/ops.h>
 
 
 namespace viua::arch {

@@ -17,15 +17,10 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <endian.h>
-#include <stdint.h>
-#include <string.h>
-
 #include <stdexcept>
 #include <string>
 #include <string_view>
 
-#include <viua/arch/arch.h>
 #include <viua/arch/ops.h>
 
 
