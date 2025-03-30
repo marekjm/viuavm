@@ -271,6 +271,7 @@ $(BUILD)/tools/exec/vm: \
 	$(BUILD)/vm/elf.o \
 	$(BUILD)/vm/ins.o \
 	$(BUILD)/vm/ins/proxy.o \
+	$(BUILD)/vm/ins/exec.o \
 	$(VIUA_INSTRUCTION_IMPLS) \
 	$(BUILD)/runtime/pid.o \
 	$(BUILD)/arch/ra.o \
