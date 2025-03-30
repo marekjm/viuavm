@@ -258,8 +258,8 @@ $(BUILD)/tools/exec/ld: \
 	$(BUILD)/support/tty.o
 
 VIUA_INSTRUCTION_IMPLS=\
-					   $(BUILD)/vm/ins/aa.o \
-					   $(BUILD)/vm/ins/ecall.o
+					   $(BUILD)/vm/ins/impl/aa.o \
+					   $(BUILD)/vm/ins/impl/ecall.o
 
 $(BUILD)/tools/exec/vm: \
 	$(BUILD)/support/errno.o \
@@ -270,6 +270,7 @@ $(BUILD)/tools/exec/vm: \
 	$(BUILD)/vm/core.o \
 	$(BUILD)/vm/elf.o \
 	$(BUILD)/vm/ins.o \
+	$(BUILD)/vm/ins/proxy.o \
 	$(VIUA_INSTRUCTION_IMPLS) \
 	$(BUILD)/runtime/pid.o \
 	$(BUILD)/arch/ra.o \
