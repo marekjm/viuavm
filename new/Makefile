@@ -260,7 +260,8 @@ $(BUILD)/tools/exec/ld: \
 VIUA_INSTRUCTION_IMPLS=\
 					   $(BUILD)/vm/ins/impl/aa.o \
 					   $(BUILD)/vm/ins/impl/ebreak.o \
-					   $(BUILD)/vm/ins/impl/ecall.o
+					   $(BUILD)/vm/ins/impl/ecall.o \
+					   $(BUILD)/vm/ins/impl/io.o
 
 $(BUILD)/tools/exec/vm: \
 	$(BUILD)/support/errno.o \
