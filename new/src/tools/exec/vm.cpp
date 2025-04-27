@@ -222,6 +222,7 @@ auto main(int argc, char* argv[]) -> int
 
     auto verbosity_level = 0;
     auto show_version    = false;
+    auto show_built_with = false;
     auto show_help       = false;
 
     for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
@@ -237,6 +238,8 @@ auto main(int argc, char* argv[]) -> int
             ++verbosity_level;
         } else if (each == "--version") {
             show_version = true;
+        } else if (each == "--built-with") {
+            show_built_with = true;
         } else if (each == "--help") {
             show_help = true;
         } else if (each.front() == '-') {
@@ -255,6 +258,12 @@ auto main(int argc, char* argv[]) -> int
         }
         std::cout << (verbosity_level ? VIUAVM_VERSION_FULL : VIUAVM_VERSION)
                   << "\n";
+    }
+    if (show_built_with) {
+        std::cout << "compiler: " << CXX << " " << CXXVERSION << "\n";
+        std::cout << "standard: " << CXXSTD << "\n";
+    }
+    if (show_version or show_built_with) {
         return 0;
     }
     if (show_help) {

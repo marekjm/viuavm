@@ -66,6 +66,9 @@ CXXFLAGS=\
 		 -std=$(CXXSTD) \
 		 -DVIUAVM_VERSION='"$(VIUAVM_VERSION)"' \
 		 -DVIUAVM_VERSION_FULL='"$(VIUAVM_VERSION_FULL)"' \
+		 -DCXX='"$(CXX)"' \
+		 -DCXXVERSION='"$(shell $(CXX) -dumpversion)"' \
+		 -DCXXSTD='"$(CXXSTD)"' \
 		 $(FEATURE_DETECT_FLAGS) \
 		 $(CXXFLAGS_OPTIMISATION) \
 		 $(CXXFLAGS_DEBUG) \
