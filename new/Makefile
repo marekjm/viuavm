@@ -183,18 +183,33 @@ watch-tests:
 ################################################################################
 # Template rules
 $(BUILD)/%: $(BUILD)/%.o
+ifeq ($(VERBOSE),true)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
+else
+	@echo $(CXX) $@ '<=' $<
+	@$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
+endif
 
 $(BUILD)/%: ./src/%.sh
 	@cp -v $^ $@
 
 $(BUILD)/%.o: ./src/%.cpp
 	@mkdir -p $(shell dirname $@)
+ifeq ($(VERBOSE),true)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
+else
+	@echo $(CXX) $@ '<=' $<
+	@$(CXX) $(CXXFLAGS) -c -o $@ $<
+endif
 
 $(BUILD)/%.o: ./src/%.cc
 	@mkdir -p $(shell dirname $@)
+ifeq ($(VERBOSE),true)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
+else
+	@echo $(CXX) $@ '<=' $<
+	@$(CXX) $(CXXFLAGS) -c -o $@ $<
+endif
 
 
 ################################################################################

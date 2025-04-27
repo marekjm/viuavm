@@ -66,7 +66,7 @@ The whole toolchain can be compiled using GCC or Clang. The build is automated
 using GNU Make:
 
 ```
-]$ make -j
+]$ make -j      # or make VERBOSE=true -j to see full compiler invocations
 ]$ ./build/bin/vm --version -v
 ```
 
