@@ -1,6 +1,7 @@
 # vim:ft=make
 
 CXXFLAGS_NOERROR?=\
+				  -Wno-error=maybe-uninitialized \
 				  -Wno-error=unused-result
 
 # Some nice-to-have warnings would be:

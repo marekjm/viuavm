@@ -29,24 +29,7 @@ CXX?=g++
 CXXSTD?=c++23
 
 PRESET?=default
-ifneq ($(PRESET),default)
 include Makefile.d/Preset/$(PRESET)
-endif
-
-CXXFLAGS_OPTIMISATION?=-Og
-CXXFLAGS_DEBUG?=-ggdb
-
-# Default sanitiser is for GCC.
-# Remember to build without sanitisers if you want to use Valgrind.
-CXXFLAGS_SANITISER?=\
-					-fsanitize=leak \
-					-fsanitize=address \
-					-fsanitize=undefined
-
-CXXFLAGS_OPTION?=\
-				 -fstack-protector-all \
-				 -fstrict-aliasing \
-				 -fstrict-overflow
 
 # Only include extra warnings if there is no BUILD_SUBMITTER ie, when the build
 # is running in local environment. The CI runs with a basic set of common
@@ -226,13 +209,7 @@ $(BUILD)/tools/exec/readelf: \
 	$(BUILD)/support/fdio.o \
 	$(BUILD)/support/tty.o
 
-$(BUILD)/tools/exec/dis: \
-	$(BUILD)/tools/libs/assembler.o \
-	$(BUILD)/support/errno.o \
-	$(BUILD)/support/fdio.o \
-	$(BUILD)/support/string.o \
-	$(BUILD)/support/tty.o \
-	$(BUILD)/vm/elf.o \
+VM_OPERATION_TYPE_IMPL=\
 	$(BUILD)/arch/ra.o \
 	$(BUILD)/arch/ops/n.o \
 	$(BUILD)/arch/ops/t.o \
@@ -244,6 +221,15 @@ $(BUILD)/tools/exec/dis: \
 	$(BUILD)/arch/ops/m.o \
 	$(BUILD)/arch/ops.o
 
+$(BUILD)/tools/exec/dis: \
+	$(BUILD)/tools/libs/assembler.o \
+	$(BUILD)/support/errno.o \
+	$(BUILD)/support/fdio.o \
+	$(BUILD)/support/string.o \
+	$(BUILD)/support/tty.o \
+	$(BUILD)/vm/elf.o \
+	$(VM_OPERATION_TYPE_IMPL)
+
 $(BUILD)/tools/exec/asm: \
 	$(BUILD)/support/errno.o \
 	$(BUILD)/support/fdio.o \
@@ -254,16 +240,7 @@ $(BUILD)/tools/exec/asm: \
 	$(BUILD)/tools/libs/stage/error.o \
 	$(BUILD)/tools/libs/stage/save.o \
 	$(BUILD)/tools/libs/assembler.o \
-	$(BUILD)/arch/ra.o \
-	$(BUILD)/arch/ops/n.o \
-	$(BUILD)/arch/ops/t.o \
-	$(BUILD)/arch/ops/d.o \
-	$(BUILD)/arch/ops/s.o \
-	$(BUILD)/arch/ops/f.o \
-	$(BUILD)/arch/ops/e.o \
-	$(BUILD)/arch/ops/r.o \
-	$(BUILD)/arch/ops/m.o \
-	$(BUILD)/arch/ops.o
+	$(VM_OPERATION_TYPE_IMPL)
 
 $(BUILD)/tools/exec/ld: \
 	$(BUILD)/arch/ra.o \
@@ -278,11 +255,11 @@ $(BUILD)/tools/exec/ld: \
 	$(BUILD)/support/string.o \
 	$(BUILD)/support/tty.o
 
-VIUA_INSTRUCTION_IMPLS=\
-					   $(BUILD)/vm/ins/impl/aa.o \
-					   $(BUILD)/vm/ins/impl/ebreak.o \
-					   $(BUILD)/vm/ins/impl/ecall.o \
-					   $(BUILD)/vm/ins/impl/io.o
+VM_INSTRUCTION_IMPL=\
+	$(BUILD)/vm/ins/impl/aa.o \
+	$(BUILD)/vm/ins/impl/ebreak.o \
+	$(BUILD)/vm/ins/impl/ecall.o \
+	$(BUILD)/vm/ins/impl/io.o
 
 $(BUILD)/tools/exec/vm: \
 	$(BUILD)/support/errno.o \
@@ -295,18 +272,9 @@ $(BUILD)/tools/exec/vm: \
 	$(BUILD)/vm/ins.o \
 	$(BUILD)/vm/ins/proxy.o \
 	$(BUILD)/vm/ins/exec.o \
-	$(VIUA_INSTRUCTION_IMPLS) \
+	$(VM_INSTRUCTION_IMPL) \
 	$(BUILD)/runtime/pid.o \
-	$(BUILD)/arch/ra.o \
-	$(BUILD)/arch/ops/n.o \
-	$(BUILD)/arch/ops/t.o \
-	$(BUILD)/arch/ops/d.o \
-	$(BUILD)/arch/ops/s.o \
-	$(BUILD)/arch/ops/f.o \
-	$(BUILD)/arch/ops/e.o \
-	$(BUILD)/arch/ops/r.o \
-	$(BUILD)/arch/ops/m.o \
-	$(BUILD)/arch/ops.o
+	$(VM_OPERATION_TYPE_IMPL)
 
 $(BUILD)/tools/exec/repl: \
 	$(BUILD)/arch/ra.o \
@@ -315,7 +283,7 @@ $(BUILD)/tools/exec/repl: \
 	$(BUILD)/vm/core.o \
 	$(BUILD)/vm/elf.o \
 	$(BUILD)/vm/ins.o \
-	$(VIUA_INSTRUCTION_IMPLS) \
+	$(VM_INSTRUCTION_IMPL) \
 	$(BUILD)/support/fdio.o \
 	$(BUILD)/support/string.o \
 	$(BUILD)/support/tty.o \

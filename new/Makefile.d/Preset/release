@@ -1,14 +1,11 @@
 # vim:ft=make:
 
 CXXFLAGS_OPTIMISATION?=-O2
-CXXFLAGS_DEBUG?=
+CXXFLAGS_DEBUG?=-ggdb
 
 # Default sanitiser is for GCC.
 # Remember to build without sanitisers if you want to use Valgrind.
-CXXFLAGS_SANITISER?=\
-					-fsanitize=leak \
-					-fsanitize=address \
-					-fsanitize=undefined
+CXXFLAGS_SANITISER?=
 
 # No -fstack-protector-all because it slows code down too much.
 CXXFLAGS_OPTION?=\
