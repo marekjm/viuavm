@@ -12,7 +12,7 @@ BUILD_EXEC_DIR=$(BUILD)/tools/exec
 VIUA_LIB_DIR=$(LIBDIR)/viua
 VIUA_CORE_DIR=$(VIUA_LIB_DIR)/viua-core
 
-VIUAVM_VERSION=$(shell sh ./scripts/make_version.sh)
+VIUAVM_VERSION=$(shell sh ./scripts/make_version.sh short)
 VIUAVM_VERSION_FULL=$(shell sh ./scripts/make_version.sh full)
 
 OPTNAME=$(VIUAVM_VERSION)
@@ -108,17 +108,28 @@ clean-test:
 
 clean: clean-test clean-bin
 
+VIUA_TAG_DATESTAMP=$(shell git show --date=short HEAD |\
+				   awk '/^Date:/ { print $$2 }')
+VIUA_TAG_VERSION=$(VIUAVM_VERSION)
+
 install: all
 	mkdir -p $(VIUA_CORE_DIR)
-	@cp -v $(BUILD_EXEC_DIR)/{asm,dis,readelf,vm,repl} $(VIUA_CORE_DIR)/
+	@cp -v $(BUILD_EXEC_DIR)/{asm,dis,readelf,vm} $(VIUA_CORE_DIR)/
 	mkdir -p $(BINDIR)
 	@cp -v $(BUILD_EXEC_DIR)/viua $(BINDIR)/
 	mkdir -p \
 		$(MANDIR)/man1 \
 		$(MANDIR)/man7
 	@cp -v docs/man/*.1 $(MANDIR)/man1
+	@ls -1 $(MANDIR)/man1/viua*.1 |\
+		xargs -P 0 sed -i \
+		-e "s#PUT_VIUAVM_TAG_DATESTAMP_HERE#$(VIUA_TAG_DATESTAMP)#g" \
+		-e "s#PUT_VIUAVM_VERSION_HERE#$(VIUA_TAG_VERSION)#g"
 	@cp -v docs/man/*.7 $(MANDIR)/man7
-	@cp -v docs/man/viua.1 $(MANDIR)/man1/viua-viua.1
+	@ls -1 $(MANDIR)/man7/viua*.7 |\
+		xargs -P 0 sed -i \
+		-e "s#PUT_VIUAVM_TAG_DATESTAMP_HERE#$(VIUA_TAG_DATESTAMP)#g" \
+		-e "s#PUT_VIUAVM_VERSION_HERE#$(VIUA_TAG_VERSION)#g"
 
 erase:
 	rm $(BINDIR)/viua

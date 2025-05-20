@@ -12,7 +12,7 @@ if [[ $(git ls-files -m | wc -l) -ne 0 ]]; then
     GIT_DIRTY='-dirty'
 fi
 
-FINGERPRINT=$(cat $(find ./include ./src -type f | sort) | openssl dgst -sha3-256 | cut -d' ' -f1)
+FINGERPRINT=$(cat $(find ./include ./src -type f | sort) | openssl dgst -sha3-256 | cut -d' ' -f2)
 
 MODE=${1}
 case ${MODE} in
@@ -28,10 +28,13 @@ case ${MODE} in
     fingerprint|fp)
         echo "${FINGERPRINT}"
         ;;
+    short|default)
+        echo "${VERSION}.${COMMITS_SINCE}"
+        ;;
     base)
         echo "${VERSION}.0"
         ;;
     *)
-        echo "${VERSION}.${COMMITS_SINCE}"
+        exit 1
         ;;
 esac
