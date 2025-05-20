@@ -80,10 +80,14 @@ def format_freq(hz):
 
 
 ENCODING = "utf-8"
-INTERPRETER = "./build/tools/exec/vm"
-ASSEMBLER = "./build/tools/exec/asm"
-LINKER = "./build/tools/exec/ld"
-DISASSEMBLER = "./build/tools/exec/dis"
+
+PREFIX = os.path.expanduser(os.environ.get("PREFIX", "./build"))
+EXEDIR = os.path.join(PREFIX, "libexec", "viua")
+exe = lambda what: os.path.join(EXEDIR, what)
+INTERPRETER = exe("vm")
+ASSEMBLER = exe("asm")
+LINKER = exe("ld")
+DISASSEMBLER = exe("dis")
 
 DIS_EXTENSION = "~"
 
