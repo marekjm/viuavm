@@ -1,16 +1,16 @@
 ################################################################################
 # Base directories
 BUILD=./build
+BUILD_LIBDIR=$(BUILD)/lib
+BUILD_EXEDIR=$(BUILD)/libexec
+BUILD_BINDIR=$(BUILD)/bin
 
 PREFIX=~/.local
-BINDIR=$(PREFIX)/bin
 LIBDIR=$(PREFIX)/lib
+EXEDIR=$(PREFIX)/libexec/viua
+BINDIR=$(PREFIX)/bin
 SHAREDIR=$(PREFIX)/share
 MANDIR=$(SHAREDIR)/man
-
-BUILD_EXEC_DIR=$(BUILD)/tools/exec
-VIUA_LIB_DIR=$(LIBDIR)/viua
-VIUA_CORE_DIR=$(VIUA_LIB_DIR)/viua-core
 
 VIUAVM_VERSION=$(shell sh ./scripts/make_version.sh short)
 VIUAVM_VERSION_FULL=$(shell sh ./scripts/make_version.sh full)
@@ -79,16 +79,15 @@ CXXLIBS=\
 # High-level targets
 all: dist
 	@echo "Built version $(VIUAVM_VERSION_FULL)"
-	@./build/bin/vm --built-with
+	@$(BUILD_EXEDIR)/vm --built-with
 
 dist: \
-	$(BUILD)/tools/exec/readelf \
-	$(BUILD)/tools/exec/dis \
-	$(BUILD)/tools/exec/asm \
-	$(BUILD)/tools/exec/ld \
-	$(BUILD)/tools/exec/vm \
-	$(BUILD)/tools/exec/viua
-	ln -s -f tools/exec build/bin
+	$(BUILD_EXEDIR)/readelf \
+	$(BUILD_EXEDIR)/dis \
+	$(BUILD_EXEDIR)/asm \
+	$(BUILD_EXEDIR)/ld \
+	$(BUILD_EXEDIR)/vm \
+	$(BUILD_BINDIR)/viua
 
 test: dist
 	@python3 ./tests/suite.py $(TESTS)
@@ -112,11 +111,24 @@ VIUA_TAG_DATESTAMP=$(shell git show --date=short HEAD |\
 				   awk '/^Date:/ { print $$2 }')
 VIUA_TAG_VERSION=$(VIUAVM_VERSION)
 
-install: all
-	mkdir -p $(VIUA_CORE_DIR)
-	@cp -v $(BUILD_EXEC_DIR)/{asm,dis,readelf,vm} $(VIUA_CORE_DIR)/
+uninstall:
+	rm -rf $(EXEDIR)
+	rm -rf $(BINDIR)/viua
+	rm -rf $(MANDIR)/man1/viua*
+	rm -rf $(MANDIR)/man7/viua*
+
+install: dist
+	mkdir -p $(EXEDIR)
+	install \
+		--mode 755 \
+		--target-directory $(EXEDIR) \
+		$(BUILD_EXEDIR)/{asm,dis,readelf,vm}
 	mkdir -p $(BINDIR)
-	@cp -v $(BUILD_EXEC_DIR)/viua $(BINDIR)/
+	install \
+		--mode 755 \
+		--target-directory $(BINDIR) \
+		$(BUILD_BINDIR)/viua
+	sed -i -e "s#^PREFIX=.*#PREFIX=$(PREFIX)#" $(BINDIR)/viua
 	mkdir -p \
 		$(MANDIR)/man1 \
 		$(MANDIR)/man7
@@ -125,6 +137,7 @@ install: all
 		xargs -P 0 sed -i \
 		-e "s#PUT_VIUAVM_TAG_DATESTAMP_HERE#$(VIUA_TAG_DATESTAMP)#g" \
 		-e "s#PUT_VIUAVM_VERSION_HERE#$(VIUA_TAG_VERSION)#g"
+	ln -sf $(MANDIR)/man1/{viua,viua-viua}.1
 	@cp -v docs/man/*.7 $(MANDIR)/man7
 	@ls -1 $(MANDIR)/man7/viua*.7 |\
 		xargs -P 0 sed -i \
@@ -177,7 +190,7 @@ watch-impl:
 
 watch-tests:
 	(\
-		find $(BUILD_EXEC_DIR) -type f ;\
+		find $(BUILD_EXEDIR) -type f ;\
 		find ./tests/asm -type f ;\
 		ls -1 tests/suite.py \
 	) | entr -c python3 ./tests/suite.py
@@ -193,7 +206,17 @@ else
 	@$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
 endif
 
-$(BUILD)/%: ./src/%.sh
+$(BUILD_EXEDIR)/%: $(BUILD)/tools/exec/%.o
+	@mkdir -p $(shell dirname $@)
+ifeq ($(VERBOSE),true)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
+else
+	@echo $(CXX) $@ '<=' $<
+	@$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
+endif
+
+$(BUILD_BINDIR)/%: ./src/tools/exec/%.sh
+	@mkdir -p $(BUILD_BINDIR)
 	@cp -v $^ $@
 
 $(BUILD)/%.o: ./src/%.cpp
@@ -217,7 +240,7 @@ endif
 
 ################################################################################
 # Explicit dependencies
-$(BUILD)/tools/exec/readelf: \
+$(BUILD_EXEDIR)/readelf: \
 	$(BUILD)/vm/elf.o \
 	$(BUILD)/support/errno.o \
 	$(BUILD)/support/fdio.o \
@@ -235,7 +258,7 @@ VM_OPERATION_TYPE_IMPL=\
 	$(BUILD)/arch/ops/m.o \
 	$(BUILD)/arch/ops.o
 
-$(BUILD)/tools/exec/dis: \
+$(BUILD_EXEDIR)/dis: \
 	$(BUILD)/tools/libs/assembler.o \
 	$(BUILD)/support/errno.o \
 	$(BUILD)/support/fdio.o \
@@ -244,7 +267,7 @@ $(BUILD)/tools/exec/dis: \
 	$(BUILD)/vm/elf.o \
 	$(VM_OPERATION_TYPE_IMPL)
 
-$(BUILD)/tools/exec/asm: \
+$(BUILD_EXEDIR)/asm: \
 	$(BUILD)/support/errno.o \
 	$(BUILD)/support/fdio.o \
 	$(BUILD)/support/string.o \
@@ -256,7 +279,7 @@ $(BUILD)/tools/exec/asm: \
 	$(BUILD)/tools/libs/assembler.o \
 	$(VM_OPERATION_TYPE_IMPL)
 
-$(BUILD)/tools/exec/ld: \
+$(BUILD_EXEDIR)/ld: \
 	$(BUILD)/arch/ra.o \
 	$(BUILD)/arch/ops.o \
 	$(BUILD)/arch/ops/f.o \
@@ -275,7 +298,7 @@ VM_INSTRUCTION_IMPL=\
 	$(BUILD)/vm/ins/impl/ecall.o \
 	$(BUILD)/vm/ins/impl/io.o
 
-$(BUILD)/tools/exec/vm: \
+$(BUILD_EXEDIR)/vm: \
 	$(BUILD)/support/errno.o \
 	$(BUILD)/support/fdio.o \
 	$(BUILD)/support/tty.o \
@@ -290,7 +313,7 @@ $(BUILD)/tools/exec/vm: \
 	$(BUILD)/runtime/pid.o \
 	$(VM_OPERATION_TYPE_IMPL)
 
-$(BUILD)/tools/exec/repl: \
+$(BUILD_EXEDIR)/repl: \
 	$(BUILD)/arch/ra.o \
 	$(BUILD)/arch/ops.o \
 	$(BUILD)/vm/backtrace.o \
