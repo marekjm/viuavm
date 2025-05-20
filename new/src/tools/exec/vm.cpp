@@ -263,6 +263,8 @@ auto main(
     if (show_built_with) {
         std::println("compiler: {} {}", CXX, CXXVERSION);
         std::println("standard: {}", CXXSTD);
+        std::println("preset:   {}", VIUAVM_CXX_PRESET);
+        std::println("options:  {}", VIUAVM_CXX_OPTIONS);
     }
     if (show_version or show_built_with) {
         return 0;

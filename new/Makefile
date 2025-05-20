@@ -48,6 +48,8 @@ FEATURE_DETECT_FLAGS=\
 VERSION_FLAGS=\
 			  -DVIUAVM_VERSION='"$(VIUAVM_VERSION)"' \
 			  -DVIUAVM_VERSION_FULL='"$(VIUAVM_VERSION_FULL)"' \
+			  -DVIUAVM_CXX_PRESET='"$(PRESET)"' \
+			  -DVIUAVM_CXX_OPTIONS='"$(CXXFLAGS_OPTIMISATION) $(CXXFLAGS_DEBUG) $(CXXFLAGS_SANITISER) $(CXXFLAGS_OPTION)"' \
 			  -DCXX='"$(CXX)"' \
 			  -DCXXVERSION='"$(shell $(CXX) -dumpversion)"' \
 			  -DCXXSTD='"$(CXXSTD)"'
@@ -77,6 +79,7 @@ CXXLIBS=\
 # High-level targets
 all: dist
 	@echo "Built version $(VIUAVM_VERSION_FULL)"
+	@./build/bin/vm --built-with
 
 dist: \
 	$(BUILD)/tools/exec/readelf \
