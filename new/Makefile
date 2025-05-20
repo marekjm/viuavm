@@ -2,7 +2,7 @@
 # Base directories
 BUILD=./build
 BUILD_LIBDIR=$(BUILD)/lib
-BUILD_EXEDIR=$(BUILD)/libexec
+BUILD_EXEDIR=$(BUILD)/libexec/viua
 BUILD_BINDIR=$(BUILD)/bin
 
 PREFIX=~/.local
@@ -122,7 +122,7 @@ install: dist
 	install \
 		--mode 755 \
 		--target-directory $(EXEDIR) \
-		$(BUILD_EXEDIR)/{asm,dis,readelf,vm}
+		$(BUILD_EXEDIR)/*
 	mkdir -p $(BINDIR)
 	install \
 		--mode 755 \
@@ -132,15 +132,16 @@ install: dist
 	mkdir -p \
 		$(MANDIR)/man1 \
 		$(MANDIR)/man7
-	@cp -v docs/man/*.1 $(MANDIR)/man1
-	@ls -1 $(MANDIR)/man1/viua*.1 |\
-		xargs -P 0 sed -i \
-		-e "s#PUT_VIUAVM_TAG_DATESTAMP_HERE#$(VIUA_TAG_DATESTAMP)#g" \
-		-e "s#PUT_VIUAVM_VERSION_HERE#$(VIUA_TAG_VERSION)#g"
-	ln -sf $(MANDIR)/man1/{viua,viua-viua}.1
-	@cp -v docs/man/*.7 $(MANDIR)/man7
-	@ls -1 $(MANDIR)/man7/viua*.7 |\
-		xargs -P 0 sed -i \
+	install \
+		--mode 644 \
+		--target-directory $(MANDIR)/man1 \
+		docs/man/*.1
+	install \
+		--mode 644 \
+		--target-directory $(MANDIR)/man7 \
+		docs/man/*.7
+	find $(MANDIR) -type f -name 'viua*' -print0 |\
+		xargs -P 0 -0 sed -i \
 		-e "s#PUT_VIUAVM_TAG_DATESTAMP_HERE#$(VIUA_TAG_DATESTAMP)#g" \
 		-e "s#PUT_VIUAVM_VERSION_HERE#$(VIUA_TAG_VERSION)#g"
 

@@ -7,16 +7,15 @@ function show_help {
     exec man viua-${WHAT_FOR}
 }
 
-PREFIX=/usr
+PREFIX=$(realpath $(dirname $(realpath "${0}"))/../../../build)
 LIBDIR=${PREFIX}/lib
 EXEDIR=${PREFIX}/libexec/viua
 BINDIR=${PREFIX}/bin
 
 function main {
-    TOOL=${1}
+    local TOOL=${1}
     case ${TOOL} in
         asm|dis|vm|readelf|repl)
-            set -x
             exec ${EXEDIR}/${TOOL} "${@:2}"
             ;;
         help)
