@@ -7,8 +7,10 @@ import io
 import os
 import re
 import random
+import select
 import subprocess
 import sys
+import time
 import traceback
 
 try:
@@ -670,18 +672,95 @@ def run_and_capture(interpreter, executable, *, args=(), stdin=None):
         text=True,
     )
     os.close(write_fd)
-    (stdout, stderr) = proc.communicate(input=stdin)
+
+    monitor = select.epoll(sizehint=4)
+    monitor.register(read_fd, select.EPOLLIN)
+    monitor.register((stdout_fd := proc.stdout.fileno()), select.EPOLLIN)
+    monitor.register((stderr_fd := proc.stderr.fileno()), select.EPOLLIN)
+    if stdin is not None:
+        monitor.register((stdin_fd := proc.stdin.fileno()), select.EPOLLOUT)
+    else:
+        stdin_fd = None
+
+    trace = b""
+    stdin_written = 0
+    stdout = b""
+    stderr = b""
+    BUF_SIZE = 4096
+
+    WORM = (
+        "*    ",
+        "**   ",
+        "***  ",
+        "**** ",
+        " ****",
+        "  ***",
+        "   **",
+        "    *",
+    )
+    SPINNER = (
+        "-",
+        "\\",
+        "|",
+        "/",
+    )
+
+    stdin = stdin.encode(ENCODING) if stdin else None
+
+    # n = 0
+    while fds := monitor.poll(timeout=0.016):
+        # print("\b" * 79)
+        # print("[{}] {} in={:<4} ot={:<4} er={:<4} tr={:<4}".format(
+        #     WORM[n % len(WORM)],
+        #     SPINNER[n % len(SPINNER)],
+        #     stdin_written,
+        #     len(stdout),
+        #     len(stderr),
+        #     len(trace),
+        #     ), end="")
+        # n += 1
+        # time.sleep(0.016)
+
+        if not fds:
+            break
+
+        activity = False
+        for fd, events in fds:
+            if fd == read_fd and events & select.EPOLLIN:
+                chunk = os.read(fd, BUF_SIZE)
+                if not chunk:
+                    continue
+                trace += chunk
+                activity = True
+            elif fd == stdout_fd and events & select.EPOLLIN:
+                chunk = os.read(fd, BUF_SIZE)
+                if not chunk:
+                    continue
+                stdout += chunk
+                activity = True
+            elif fd == stderr_fd and events & select.EPOLLIN:
+                chunk = os.read(fd, BUF_SIZE)
+                if not chunk:
+                    continue
+                stderr += chunk
+                activity = True
+            elif fd == stdin_fd and events & select.EPOLLERR:
+                pass
+            elif fd == stdin_fd and events & select.EPOLLOUT:
+                activity = True
+                if stdin_written >= len(stdin):
+                    continue
+                chunk = os.write(fd, stdin[stdin_written:])
+                stdin_written += chunk
+
+        if not activity:
+            break
+
     result = proc.wait()
 
-    buffer = b""
-    BUF_SIZE = 4096
-    while True:
-        chunk = os.read(read_fd, BUF_SIZE)
-        if not chunk:
-            break
-        buffer += chunk
-
-    buffer = buffer.decode(ENCODING)
+    stdout = stdout.decode(ENCODING)
+    stderr = stderr.decode(ENCODING)
+    buffer = trace.decode(ENCODING)
 
     lines = list(map(str.strip, buffer.splitlines()))
 
