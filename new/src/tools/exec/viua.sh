@@ -2,7 +2,7 @@
 
 set -e
 
-PREFIX=$(realpath $(dirname $(realpath "${0}"))/../../../build)
+PREFIX=$(realpath $(dirname $(realpath "${0}"))/../../build)
 
 LIBDIR=${PREFIX}/lib
 EXEDIR=${PREFIX}/libexec/viua
