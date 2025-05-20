@@ -26,9 +26,9 @@
 
 #include <viua/libs/lexer.h>
 
-
 namespace viua::libs::errors::compile_time {
-enum class Cause {
+enum class Cause
+{
     /*
      * Unknown cause is for errors which don't have a precise cause, or used to
      * initialise Cause variables.
@@ -89,7 +89,7 @@ struct Error {
      * The message may be empty if the error cause is self-explanatory when
      * taken together with the highlighted lexemes.
      */
-    Cause const cause{Cause::Unknown};
+    Cause const cause{ Cause::Unknown };
     std::string message;
 
     /*
@@ -236,6 +236,5 @@ struct Error {
     auto str() const -> std::string;
 };
 }  // namespace viua::libs::errors::compile_time
-
 
 #endif

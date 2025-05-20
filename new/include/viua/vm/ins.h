@@ -25,7 +25,6 @@
 #include <viua/arch/ins.h>
 #include <viua/vm/core.h>
 
-
 namespace viua::vm::ins {
 #define Base_instruction(it)                \
     auto execute(viua::arch::ins::it const, \
@@ -35,7 +34,6 @@ namespace viua::vm::ins {
 #define Work_instruction(it) Base_instruction(it)->void
 #define Flow_instruction(it) \
     Base_instruction(it)->viua::arch::instruction_type const*
-
 
 Work_instruction(ADD);
 Work_instruction(SUB);
@@ -125,18 +123,23 @@ auto execute(viua::vm::Stack&, ip_type const) -> ip_type;
 struct Immutable_proxy {
     register_type const& target;
 
-    Immutable_proxy(register_type const& t) : target{t}
+    Immutable_proxy(
+        register_type const& t)
+        : target{ t }
     {}
 
-    template<typename T> auto holds() const -> bool
+    template<typename T>
+    auto holds() const -> bool
     {
         return target.holds<T>();
     }
-    template<typename T> auto cast_to() const
+    template<typename T>
+    auto cast_to() const
     {
         return target.cast_to<T>();
     }
-    template<typename T> auto get() const
+    template<typename T>
+    auto get() const
     {
         return target.get<T>();
     }
@@ -156,21 +159,24 @@ struct Immutable_proxy {
 struct Mutable_proxy {
     register_type* const target;
 
-    template<typename T> auto holds() const -> bool
+    template<typename T>
+    auto holds() const -> bool
     {
         if (target == nullptr) {
             return false;
         }
         return target->holds<T>();
     }
-    template<typename T> auto cast_to() const -> std::optional<T>
+    template<typename T>
+    auto cast_to() const -> std::optional<T>
     {
         if (target == nullptr) {
             return std::nullopt;
         }
         return target->cast_to<T>();
     }
-    template<typename T> auto get() const -> std::optional<T>
+    template<typename T>
+    auto get() const -> std::optional<T>
     {
         if (target == nullptr) {
             return std::nullopt;
@@ -180,7 +186,7 @@ struct Mutable_proxy {
     auto type_name() const
     {
         if (target == nullptr) {
-            return std::string_view{"void"};
+            return std::string_view{ "void" };
         }
         return target->type_name();
     }
@@ -196,14 +202,17 @@ struct Mutable_proxy {
         return std::nullopt;
     }
 
-    auto operator=(Immutable_proxy const& fp) const -> Mutable_proxy const&
+    auto operator=(
+        Immutable_proxy const& fp) const -> Mutable_proxy const&
     {
         if (target) {
             *target = fp.target;
         }
         return *this;
     }
-    template<typename T> auto operator=(T&& value) const -> Mutable_proxy const&
+    template<typename T>
+    auto operator=(
+        T&& value) const -> Mutable_proxy const&
     {
         /*
          * If the target is not set it means that the save proxy refers to the

@@ -24,13 +24,14 @@
 
 #include <viua/support/tty.h>
 
-
 namespace viua::support::tty {
-auto send_escape_seq(int const fd, std::string_view const seq)
-    -> std::string_view
+auto send_escape_seq(
+    int const fd,
+    std::string_view const seq) -> std::string_view
 {
-    auto const colour_flag = std::string_view{
-        getenv("VIUA_COLOUR") ? getenv("VIUA_COLOUR") : "default"};
+    auto const colour_flag =
+        std::string_view{ getenv("VIUA_COLOUR") ? getenv("VIUA_COLOUR")
+                                                : "default" };
 
     auto apply_colour = static_cast<bool>(isatty(fd));
     if (colour_flag == "default") {

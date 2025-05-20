@@ -26,18 +26,17 @@
 #include <string_view>
 #include <utility>
 
-
 namespace viua::support::string {
-constexpr auto CORNER_QUOTE_LL = std::string_view{"⌞"};  // lower left
-constexpr auto CORNER_QUOTE_UR = std::string_view{"⌝"};  // upper right
+constexpr auto CORNER_QUOTE_LL = std::string_view{ "⌞" };  // lower left
+constexpr auto CORNER_QUOTE_UR = std::string_view{ "⌝" };  // upper right
 
 constexpr auto MATHEMATICAL_ANGLE_BRACKET_LEFT =
-    std::string_view{"⟨"};  // u+27e8
+    std::string_view{ "⟨" };  // u+27e8
 constexpr auto MATHEMATICAL_ANGLE_BRACKET_RIGHT =
-    std::string_view{"⟩"};  // u+27e9
+    std::string_view{ "⟩" };  // u+27e9
 
-constexpr auto SINGLE_QUOTATION_MARK_LEFT  = std::string_view{"‘"};  // u+2018
-constexpr auto SINGLE_QUOTATION_MARK_RIGHT = std::string_view{"’"};  // u+2019
+constexpr auto SINGLE_QUOTATION_MARK_LEFT  = std::string_view{ "‘" };  // u+2018
+constexpr auto SINGLE_QUOTATION_MARK_RIGHT = std::string_view{ "’" };  // u+2019
 
 auto quoted(std::string_view const) -> std::string;
 
@@ -53,13 +52,15 @@ auto levenshtein(std::string_view const, std::string_view const)
     -> LevenshteinDistance;
 auto levenshtein_filter(std::string_view const,
                         std::set<std::string_view> const&,
-                        LevenshteinDistance const = LevenshteinDistance{
-                            0xffffffffffffffff}) -> std::set<DistancePair>;
+                        LevenshteinDistance const =
+                            LevenshteinDistance{ 0xff'ff'ff'ff'ff'ff'ff'ff })
+    -> std::set<DistancePair>;
 template<typename K, typename V>
-auto levenshtein_filter(std::string_view const needle,
-                        std::map<K, V> const& haystack,
-                        LevenshteinDistance const dist = LevenshteinDistance{
-                            0xffffffffffffffff}) -> std::set<DistancePair>
+auto levenshtein_filter(
+    std::string_view const needle,
+    std::map<K, V> const& haystack,
+    LevenshteinDistance const dist = LevenshteinDistance{
+        0xff'ff'ff'ff'ff'ff'ff'ff }) -> std::set<DistancePair>
 {
     auto candidates = std::set<std::string_view>{};
     for (auto const& each : haystack) {

@@ -30,10 +30,10 @@
 
 #include <viua/libs/stage.h>
 
-
 namespace viua::libs::stage {
-auto save_string_to_strtab(std::vector<uint8_t>& tab,
-                           std::string_view const data) -> size_t
+auto save_string_to_strtab(
+    std::vector<uint8_t>& tab,
+    std::string_view const data) -> size_t
 {
     {
         /*
@@ -44,10 +44,11 @@ auto save_string_to_strtab(std::vector<uint8_t>& tab,
          * FIXME This is ridiculously slow. Maybe add some cache instead of
          * linearly browsing through the whole table every time?
          */
-        auto i = size_t{0};
+        auto i = size_t{ 0 };
         while ((i + data.size()) < tab.size()) {
-            auto const existing = std::string_view{
-                reinterpret_cast<char const*>(tab.data() + i), data.size()};
+            auto const existing =
+                std::string_view{ reinterpret_cast<char const*>(tab.data() + i),
+                                  data.size() };
 
             auto const content_matches = (existing == data);
             auto const nul_matches = (*(tab.data() + i + data.size()) == '\0');
@@ -66,8 +67,9 @@ auto save_string_to_strtab(std::vector<uint8_t>& tab,
 
     return saved_location;
 }
-auto save_buffer_to_rodata(std::vector<uint8_t>& strings,
-                           std::string_view const data) -> size_t
+auto save_buffer_to_rodata(
+    std::vector<uint8_t>& strings,
+    std::string_view const data) -> size_t
 {
     {
         /*
@@ -78,7 +80,7 @@ auto save_buffer_to_rodata(std::vector<uint8_t>& strings,
          * FIXME This is ridiculously slow. Maybe add some cache instead of
          * linearly browsing through the whole table every time?
          */
-        auto i = size_t{0};
+        auto i = size_t{ 0 };
         while (i < strings.size()) {
             auto data_size = uint64_t{};
             memcpy(&data_size, strings.data() + i, sizeof(data_size));
@@ -87,7 +89,8 @@ auto save_buffer_to_rodata(std::vector<uint8_t>& strings,
             i += sizeof(data_size);
 
             auto const existing = std::string_view{
-                reinterpret_cast<char const*>(strings.data() + i), data_size};
+                reinterpret_cast<char const*>(strings.data() + i), data_size
+            };
             if (existing == data) {
                 return i;
             }
@@ -108,10 +111,11 @@ auto save_buffer_to_rodata(std::vector<uint8_t>& strings,
     return saved_location;
 }
 
-auto record_symbol(std::string name,
-                   Elf64_Sym const symbol,
-                   std::vector<Elf64_Sym>& symbol_table,
-                   std::map<std::string, size_t>& symbol_map) -> size_t
+auto record_symbol(
+    std::string name,
+    Elf64_Sym const symbol,
+    std::vector<Elf64_Sym>& symbol_table,
+    std::map<std::string, size_t>& symbol_map) -> size_t
 {
     auto const sym_ndx          = symbol_table.size();
     symbol_map[std::move(name)] = sym_ndx;

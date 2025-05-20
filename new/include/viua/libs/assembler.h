@@ -25,7 +25,6 @@
 
 #include <utility>
 
-
 namespace viua::libs::assembler {
 auto to_loading_parts_unsigned(uint64_t const value)
     -> std::pair<uint32_t, uint32_t>;

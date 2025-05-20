@@ -29,10 +29,9 @@
 #include <utility>
 #include <vector>
 
-#include <viua/support/fdstream.h>
 #include <viua/arch/arch.h>
+#include <viua/support/fdstream.h>
 #include <viua/vm/ins.h>
-
 
 namespace viua {
 extern viua::support::fdstream TRACE_STREAM;
@@ -42,7 +41,10 @@ namespace viua::vm::ins {
 using namespace viua::arch::ins;
 using viua::vm::Stack;
 
-auto execute(ADD const op, Stack& stack, ip_type const) -> void
+auto execute(
+    ADD const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
     auto const lhs = immutable_proxy(stack, op.instruction.lhs);
@@ -85,7 +87,7 @@ auto execute(ADD const op, Stack& stack, ip_type const) -> void
             auto o = std::ostringstream{};
             o << "illegal offset of " << offset << " bytes into a region of "
               << old_ptr->size << " byte(s)";
-            throw abort_execution{stack, o.str()};
+            throw abort_execution{ stack, o.str() };
         }
 
         auto new_ptr    = Pointer{};
@@ -95,15 +97,19 @@ auto execute(ADD const op, Stack& stack, ip_type const) -> void
         new_ptr.parent  = old_ptr->ptr;
         stack.proc->record_pointer(new_ptr);
 
-        out = Pt{new_address};
+        out = Pt{ new_address };
 
         return;
     }
 
-    throw abort_execution{stack,
-                          "unsupported operand types for arithmetic operation"};
+    throw abort_execution{
+        stack, "unsupported operand types for arithmetic operation"
+    };
 }
-auto execute(SUB const op, Stack& stack, ip_type const) -> void
+auto execute(
+    SUB const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
     auto const lhs = immutable_proxy(stack, op.instruction.lhs);
@@ -133,10 +139,14 @@ auto execute(SUB const op, Stack& stack, ip_type const) -> void
         return;
     }
 
-    throw abort_execution{stack,
-                          "unsupported operand types for arithmetic operation"};
+    throw abort_execution{
+        stack, "unsupported operand types for arithmetic operation"
+    };
 }
-auto execute(MUL const op, Stack& stack, ip_type const) -> void
+auto execute(
+    MUL const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
     auto const lhs = immutable_proxy(stack, op.instruction.lhs);
@@ -166,10 +176,14 @@ auto execute(MUL const op, Stack& stack, ip_type const) -> void
         return;
     }
 
-    throw abort_execution{stack,
-                          "unsupported operand types for arithmetic operation"};
+    throw abort_execution{
+        stack, "unsupported operand types for arithmetic operation"
+    };
 }
-auto execute(DIV const op, Stack& stack, ip_type const) -> void
+auto execute(
+    DIV const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
     auto const lhs = immutable_proxy(stack, op.instruction.lhs);
@@ -199,10 +213,14 @@ auto execute(DIV const op, Stack& stack, ip_type const) -> void
         return;
     }
 
-    throw abort_execution{stack,
-                          "unsupported operand types for arithmetic operation"};
+    throw abort_execution{
+        stack, "unsupported operand types for arithmetic operation"
+    };
 }
-auto execute(MOD const op, Stack& stack, ip_type const) -> void
+auto execute(
+    MOD const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
     auto const lhs = immutable_proxy(stack, op.instruction.lhs);
@@ -222,11 +240,15 @@ auto execute(MOD const op, Stack& stack, ip_type const) -> void
         return;
     }
 
-    throw abort_execution{stack,
-                          "unsupported operand types for arithmetic operation"};
+    throw abort_execution{
+        stack, "unsupported operand types for arithmetic operation"
+    };
 }
 
-auto execute(BITSHL const op, Stack& stack, ip_type const) -> void
+auto execute(
+    BITSHL const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
     auto const lhs = immutable_proxy(stack, op.instruction.lhs);
@@ -238,9 +260,13 @@ auto execute(BITSHL const op, Stack& stack, ip_type const) -> void
         return;
     }
 
-    throw abort_execution{stack, "unsupported operand types for bit operation"};
+    throw abort_execution{ stack,
+                           "unsupported operand types for bit operation" };
 }
-auto execute(BITSHR const op, Stack& stack, ip_type const) -> void
+auto execute(
+    BITSHR const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
     auto const lhs = immutable_proxy(stack, op.instruction.lhs);
@@ -252,9 +278,13 @@ auto execute(BITSHR const op, Stack& stack, ip_type const) -> void
         return;
     }
 
-    throw abort_execution{stack, "unsupported operand types for bit operation"};
+    throw abort_execution{ stack,
+                           "unsupported operand types for bit operation" };
 }
-auto execute(BITASHR const op, Stack& stack, ip_type const) -> void
+auto execute(
+    BITASHR const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
     auto const lhs = immutable_proxy(stack, op.instruction.lhs);
@@ -267,13 +297,23 @@ auto execute(BITASHR const op, Stack& stack, ip_type const) -> void
         return;
     }
 
-    throw abort_execution{stack, "unsupported operand types for bit operation"};
+    throw abort_execution{ stack,
+                           "unsupported operand types for bit operation" };
 }
-auto execute(BITROL const, Stack&, ip_type const) -> void
+auto execute(
+    BITROL const,
+    Stack&,
+    ip_type const) -> void
 {}
-auto execute(BITROR const, Stack&, ip_type const) -> void
+auto execute(
+    BITROR const,
+    Stack&,
+    ip_type const) -> void
 {}
-auto execute(BITAND const op, Stack& stack, ip_type const) -> void
+auto execute(
+    BITAND const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
     auto const lhs = immutable_proxy(stack, op.instruction.lhs);
@@ -285,9 +325,13 @@ auto execute(BITAND const op, Stack& stack, ip_type const) -> void
         return;
     }
 
-    throw abort_execution{stack, "unsupported operand types for bit operation"};
+    throw abort_execution{ stack,
+                           "unsupported operand types for bit operation" };
 }
-auto execute(BITOR const op, Stack& stack, ip_type const) -> void
+auto execute(
+    BITOR const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
     auto const lhs = immutable_proxy(stack, op.instruction.lhs);
@@ -299,9 +343,13 @@ auto execute(BITOR const op, Stack& stack, ip_type const) -> void
         return;
     }
 
-    throw abort_execution{stack, "unsupported operand types for bit operation"};
+    throw abort_execution{ stack,
+                           "unsupported operand types for bit operation" };
 }
-auto execute(BITXOR const op, Stack& stack, ip_type const) -> void
+auto execute(
+    BITXOR const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
     auto const lhs = immutable_proxy(stack, op.instruction.lhs);
@@ -313,9 +361,13 @@ auto execute(BITXOR const op, Stack& stack, ip_type const) -> void
         return;
     }
 
-    throw abort_execution{stack, "unsupported operand types for bit operation"};
+    throw abort_execution{ stack,
+                           "unsupported operand types for bit operation" };
 }
-auto execute(BITNOT const op, Stack& stack, ip_type const) -> void
+auto execute(
+    BITNOT const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
     auto const in  = immutable_proxy(stack, op.instruction.in);
@@ -324,10 +376,14 @@ auto execute(BITNOT const op, Stack& stack, ip_type const) -> void
         return;
     }
 
-    throw abort_execution{stack, "unsupported operand types for bit operation"};
+    throw abort_execution{ stack,
+                           "unsupported operand types for bit operation" };
 }
 
-auto execute(EQ const op, Stack& stack, ip_type const) -> void
+auto execute(
+    EQ const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto cmp_result = std::partial_ordering::unordered;
 
@@ -372,12 +428,15 @@ auto execute(EQ const op, Stack& stack, ip_type const) -> void
     }
 
     if (cmp_result == std::partial_ordering::unordered) {
-        throw abort_execution{stack, "cannot eq unordered values"};
+        throw abort_execution{ stack, "cannot eq unordered values" };
     }
 
     out = (cmp_result == 0);
 }
-auto execute(LT const op, Stack& stack, ip_type const) -> void
+auto execute(
+    LT const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto cmp_result = std::partial_ordering::unordered;
 
@@ -386,10 +445,10 @@ auto execute(LT const op, Stack& stack, ip_type const) -> void
     auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     if (lhs.holds<void>()) {
-        throw abort_execution{stack, "invalid read from empty register"};
+        throw abort_execution{ stack, "invalid read from empty register" };
     }
     if (rhs.holds<void>()) {
-        throw abort_execution{stack, "invalid read from empty register"};
+        throw abort_execution{ stack, "invalid read from empty register" };
     }
 
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
@@ -429,12 +488,15 @@ auto execute(LT const op, Stack& stack, ip_type const) -> void
     }
 
     if (cmp_result == std::partial_ordering::unordered) {
-        throw abort_execution{stack, "cannot lt unordered values"};
+        throw abort_execution{ stack, "cannot lt unordered values" };
     }
 
     out = (cmp_result < 0);
 }
-auto execute(GT const op, Stack& stack, ip_type const) -> void
+auto execute(
+    GT const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto cmp_result = std::partial_ordering::unordered;
 
@@ -479,12 +541,15 @@ auto execute(GT const op, Stack& stack, ip_type const) -> void
     }
 
     if (cmp_result == std::partial_ordering::unordered) {
-        throw abort_execution{stack, "cannot lt unordered values"};
+        throw abort_execution{ stack, "cannot lt unordered values" };
     }
 
     out = (cmp_result > 0);
 }
-auto execute(CMP const op, Stack& stack, ip_type const) -> void
+auto execute(
+    CMP const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto cmp_result = std::partial_ordering::unordered;
 
@@ -533,12 +598,15 @@ auto execute(CMP const op, Stack& stack, ip_type const) -> void
     }
 
     if (cmp_result == std::partial_ordering::unordered) {
-        throw abort_execution{stack, "cannot cmp unordered values"};
+        throw abort_execution{ stack, "cannot cmp unordered values" };
     }
 
     out = (cmp_result < 0) ? -1 : (0 < cmp_result) ? 1 : 0;
 }
-auto execute(AND const op, Stack& stack, ip_type const) -> void
+auto execute(
+    AND const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
     auto const lhs = immutable_proxy(stack, op.instruction.lhs).cast_to<bool>();
@@ -549,7 +617,8 @@ auto execute(AND const op, Stack& stack, ip_type const) -> void
         return;
     }
 
-    throw abort_execution{stack, "unsupported operand types for and operation"};
+    throw abort_execution{ stack,
+                           "unsupported operand types for and operation" };
 
     /*
      * This is the old implementation which was moving the operand that
@@ -568,7 +637,10 @@ auto execute(AND const op, Stack& stack, ip_type const) -> void
     }
     */
 }
-auto execute(OR const op, Stack& stack, ip_type const) -> void
+auto execute(
+    OR const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
     auto const lhs = immutable_proxy(stack, op.instruction.lhs).cast_to<bool>();
@@ -579,9 +651,13 @@ auto execute(OR const op, Stack& stack, ip_type const) -> void
         return;
     }
 
-    throw abort_execution{stack, "unsupported operand types for or operation"};
+    throw abort_execution{ stack,
+                           "unsupported operand types for or operation" };
 }
-auto execute(NOT const op, Stack& stack, ip_type const) -> void
+auto execute(
+    NOT const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
     auto const in  = immutable_proxy(stack, op.instruction.in).cast_to<bool>();
@@ -590,41 +666,55 @@ auto execute(NOT const op, Stack& stack, ip_type const) -> void
         return;
     }
 
-    throw abort_execution{stack, "unsupported operand type for not operation"};
+    throw abort_execution{ stack,
+                           "unsupported operand type for not operation" };
 }
 
-auto execute(COPY const op, Stack& stack, ip_type const) -> void
+auto execute(
+    COPY const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const in = immutable_proxy(stack, op.instruction.in);
     mutable_proxy(stack, op.instruction.out) = in;
 }
-auto execute(MOVE const op, Stack& stack, ip_type const) -> void
+auto execute(
+    MOVE const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto in = mutable_proxy(stack, op.instruction.in);
     if (in.target->is_void()) {
-        throw abort_execution{stack, "cannot move out of void"};
+        throw abort_execution{ stack, "cannot move out of void" };
     }
 
     mutable_proxy(stack, op.instruction.out) = std::move(*in.target);
     in.reset();
 }
-auto execute(SWAP const op, Stack& stack, ip_type const) -> void
+auto execute(
+    SWAP const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto lhs = mutable_proxy(stack, op.instruction.in);
     auto rhs = mutable_proxy(stack, op.instruction.out);
     std::swap(*lhs.target, *rhs.target);
 }
 
-auto execute(ATOM const op, Stack& stack, ip_type const) -> void
+auto execute(
+    ATOM const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto target = mutable_proxy(stack, op.instruction.out);
 
     auto const& strtab     = *stack.proc->strtab;
     auto const data_offset = target.get<uint64_t>();
     if (not data_offset.has_value()) {
-        throw abort_execution{stack, "invalid operand for atom constructor"};
+        throw abort_execution{ stack, "invalid operand for atom constructor" };
     }
-    auto const data_size = [&strtab, data_offset]() -> uint64_t {
+    auto const data_size = [&strtab, data_offset]() -> uint64_t
+    {
         auto const size_offset = (*data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
         memcpy(&tmp, &strtab[size_offset], sizeof(uint64_t));
@@ -634,39 +724,49 @@ auto execute(ATOM const op, Stack& stack, ip_type const) -> void
     auto const data_address =
         reinterpret_cast<char const*>(&strtab[0] + *data_offset);
     auto const key         = reinterpret_cast<uint64_t>(data_address);
-    auto value             = std::string{data_address, data_size};
+    auto value             = std::string{ data_address, data_size };
     stack.proc->atoms[key] = std::move(value);
-    target                 = register_type::atom_type{key};
+    target                 = register_type::atom_type{ key };
 }
 
-auto execute(FRAME const op, Stack& stack, ip_type const) -> void
+auto execute(
+    FRAME const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const index = op.instruction.out.index;
     auto const rs    = op.instruction.out.set;
 
     auto capacity = viua::arch::register_index_type{};
     switch (rs) {
-    case viua::arch::REGISTER_SET::LOCAL:
-        if (auto v = immutable_proxy(stack, op.instruction.out).get<uint64_t>();
-            v) {
-            capacity = static_cast<viua::arch::register_index_type>(*v);
-        } else {
+        case viua::arch::REGISTER_SET::LOCAL:
+            if (auto v =
+                    immutable_proxy(stack, op.instruction.out).get<uint64_t>();
+                v) {
+                capacity = static_cast<viua::arch::register_index_type>(*v);
+            } else {
+                throw abort_execution{
+                    stack, "dynamic args count must be an unsigned integer"
+                };
+            }
+            break;
+        case viua::arch::REGISTER_SET::ARGUMENT:
+            capacity = index;
+            break;
+        default:
             throw abort_execution{
-                stack, "dynamic args count must be an unsigned integer"};
-        }
-        break;
-    case viua::arch::REGISTER_SET::ARGUMENT:
-        capacity = index;
-        break;
-    default:
-        throw abort_execution{
-            stack, "args count must come from local or argument register set"};
+                stack,
+                "args count must come from local or argument register set"
+            };
     }
 
     stack.args = std::vector<register_type>(capacity);
 }
 
-auto execute(CALL const op, Stack& stack, ip_type const) -> ip_type
+auto execute(
+    CALL const op,
+    Stack& stack,
+    ip_type const) -> ip_type
 {
     auto fn_addr = size_t{};
     if (auto fn = mutable_proxy(stack, op.instruction.in)
@@ -675,11 +775,12 @@ auto execute(CALL const op, Stack& stack, ip_type const) -> ip_type
         fn_addr = fn->ptr;
         fn.reset();
     } else {
-        throw abort_execution{stack, "invalid in operand to call instruction"};
+        throw abort_execution{ stack,
+                               "invalid in operand to call instruction" };
     }
 
     if (fn_addr % sizeof(viua::arch::instruction_type)) {
-        throw abort_execution{stack, "invalid IP after synchronous call"};
+        throw abort_execution{ stack, "invalid IP after synchronous call" };
     }
 
     /*
@@ -715,7 +816,10 @@ auto execute(CALL const op, Stack& stack, ip_type const) -> ip_type
     return fr_entry;
 }
 
-auto execute(RETURN const op, Stack& stack, ip_type const) -> ip_type
+auto execute(
+    RETURN const op,
+    Stack& stack,
+    ip_type const) -> ip_type
 {
     auto fr = std::move(stack.frames.back());
     stack.frames.pop_back();
@@ -735,7 +839,8 @@ auto execute(RETURN const op, Stack& stack, ip_type const) -> ip_type
         auto const ret = immutable_proxy(fr, op.instruction.out, stack);
         if (ret.holds<void>()) {
             throw abort_execution{
-                stack, "return value requested from function returning void"};
+                stack, "return value requested from function returning void"
+            };
         }
 
         mutable_proxy(stack, rt) = ret;
@@ -748,22 +853,31 @@ auto execute(RETURN const op, Stack& stack, ip_type const) -> ip_type
     return fr.return_address;
 }
 
-auto execute(LUI const op, Stack& stack, ip_type const) -> void
+auto execute(
+    LUI const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto out = mutable_proxy(stack, op.instruction.out);
     out      = static_cast<int64_t>(op.instruction.immediate) << 32;
 }
-auto execute(LUIU const op, Stack& stack, ip_type const) -> void
+auto execute(
+    LUIU const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto out = mutable_proxy(stack, op.instruction.out);
     out      = static_cast<uint64_t>(op.instruction.immediate) << 32;
 }
-auto execute(LLI const op, Stack& stack, ip_type const) -> void
+auto execute(
+    LLI const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto out = mutable_proxy(stack, op.instruction.out);
 
-    constexpr auto LOW_32  = uint64_t{0x00000000ffffffff};
-    constexpr auto HIGH_32 = uint64_t{0xffffffff00000000};
+    constexpr auto LOW_32  = uint64_t{ 0x00'00'00'00'ff'ff'ff'ff };
+    constexpr auto HIGH_32 = uint64_t{ 0xff'ff'ff'ff'00'00'00'00 };
 
     if (auto const v = out.get<uint64_t>(); v) {
         auto const high = (HIGH_32 & *v);
@@ -774,12 +888,15 @@ auto execute(LLI const op, Stack& stack, ip_type const) -> void
         auto const low  = (LOW_32 & op.instruction.immediate);
         out             = static_cast<int64_t>(high | low);
     } else {
-        throw abort_execution{stack,
-                              "unsupported operand type for lli operation: "
-                                  + std::string{out.type_name()}};
+        throw abort_execution{ stack,
+                               "unsupported operand type for lli operation: "
+                                   + std::string{ out.type_name() } };
     }
 }
-auto execute(CAST const op, Stack& stack, ip_type const) -> void
+auto execute(
+    CAST const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto target = mutable_proxy(stack, op.instruction.out);
 
@@ -788,63 +905,73 @@ auto execute(CAST const op, Stack& stack, ip_type const) -> void
         static_cast<FUNDAMENTAL_TYPES>(op.instruction.immediate);
 
     if (target.is_void()) {
-        throw abort_execution{stack, "cannot cast void"};
+        throw abort_execution{ stack, "cannot cast void" };
     }
 
     auto& slot = target.to()->get();
     if (not slot.holds<Register::undefined_type>()) {
-        throw abort_execution{stack, "invalid cast"};
+        throw abort_execution{ stack, "invalid cast" };
     }
 
     switch (desired_type) {
         using enum viua::arch::FUNDAMENTAL_TYPES;
-    case INT:
-        slot.convert_undefined_to<Register::int_type>();
-        break;
-    case UINT:
-        slot.convert_undefined_to<Register::uint_type>();
-        break;
-    case FLOAT32:
-        slot.convert_undefined_to<Register::float_type>();
-        break;
-    case FLOAT64:
-        slot.convert_undefined_to<Register::double_type>();
-        break;
-    case POINTER:
-        slot.convert_undefined_to<Register::pointer_type>();
-        break;
-    case ATOM:
-        slot.convert_undefined_to<Register::atom_type>();
-        break;
-    case PID:
-        slot.convert_undefined_to<Register::pid_type>();
-        break;
-    case VOID:
-    case UNDEFINED:
-        throw abort_execution{stack, "invalid cast"};
+        case INT:
+            slot.convert_undefined_to<Register::int_type>();
+            break;
+        case UINT:
+            slot.convert_undefined_to<Register::uint_type>();
+            break;
+        case FLOAT32:
+            slot.convert_undefined_to<Register::float_type>();
+            break;
+        case FLOAT64:
+            slot.convert_undefined_to<Register::double_type>();
+            break;
+        case POINTER:
+            slot.convert_undefined_to<Register::pointer_type>();
+            break;
+        case ATOM:
+            slot.convert_undefined_to<Register::atom_type>();
+            break;
+        case PID:
+            slot.convert_undefined_to<Register::pid_type>();
+            break;
+        case VOID:
+        case UNDEFINED:
+            throw abort_execution{ stack, "invalid cast" };
     }
 }
-auto execute(ARODP const op, Stack& stack, ip_type const) -> void
+auto execute(
+    ARODP const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const& strtab     = *stack.proc->strtab;
     auto const data_offset = op.instruction.immediate;
 
     auto const pointer_address = const_cast<uint8_t*>(&strtab[data_offset]);
     mutable_proxy(stack, op.instruction.out) = register_type::pointer_type{
-        reinterpret_cast<uintptr_t>(pointer_address)};
+        reinterpret_cast<uintptr_t>(pointer_address)
+    };
 
     auto pointer_info    = Pointer{};
     pointer_info.ptr     = reinterpret_cast<uintptr_t>(pointer_address);
     pointer_info.foreign = true;
     stack.proc->record_pointer(pointer_info);
 }
-auto execute(ATXTP const op, Stack& stack, ip_type const) -> void
+auto execute(
+    ATXTP const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     mutable_proxy(stack, op.instruction.out) =
-        register_type::pointer_type{op.instruction.immediate};
+        register_type::pointer_type{ op.instruction.immediate };
 }
 
-auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
+auto execute(
+    FLOAT const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto out = mutable_proxy(stack, op.instruction.out);
 
@@ -856,7 +983,10 @@ auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
 
     out = v;
 }
-auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
+auto execute(
+    DOUBLE const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto target = mutable_proxy(stack, op.instruction.out);
 
@@ -864,10 +994,11 @@ auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
 
     auto const data_offset = target.get<uint64_t>();
     if (not data_offset.has_value()) {
-        throw abort_execution{stack, "invalid operand"};
+        throw abort_execution{ stack, "invalid operand" };
     }
 
-    auto const data_size = [&strtab, data_offset]() -> uint64_t {
+    auto const data_size = [&strtab, data_offset]() -> uint64_t
+    {
         auto const size_offset = (*data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
         memcpy(&tmp, &strtab[size_offset], sizeof(uint64_t));
@@ -886,7 +1017,9 @@ auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
 }
 
 template<typename Op>
-auto execute_arithmetic_immediate_op(Op const op, Stack& stack) -> void
+auto execute_arithmetic_immediate_op(
+    Op const op,
+    Stack& stack) -> void
 {
     auto out = mutable_proxy(stack, op.instruction.out);
     auto in  = immutable_proxy(stack, op.instruction.in);
@@ -898,7 +1031,7 @@ auto execute_arithmetic_immediate_op(Op const op, Stack& stack) -> void
     auto const immediate =
         (signed_immediate
              ? static_cast<immediate_type>(
-                 static_cast<int32_t>(op.instruction.immediate << 8) >> 8)
+                   static_cast<int32_t>(op.instruction.immediate << 8) >> 8)
              : static_cast<immediate_type>(op.instruction.immediate));
 
     if (in.template holds<void>()) {
@@ -928,49 +1061,77 @@ auto execute_arithmetic_immediate_op(Op const op, Stack& stack) -> void
         v and not signed_immediate) {
         auto const r =
             typename Op::template functor_type<uint64_t>{}(v->ptr, immediate);
-        out = register_type::pointer_type{static_cast<uint64_t>(r)};
+        out = register_type::pointer_type{ static_cast<uint64_t>(r) };
         return;
     }
 
     throw abort_execution{
         stack,
         "unsupported lhs operand type for immediate arithmetic operation: "
-            + std::string{in.type_name()}};
+            + std::string{ in.type_name() }
+    };
 }
-auto execute(ADDI const op, Stack& stack, ip_type const) -> void
+auto execute(
+    ADDI const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     execute_arithmetic_immediate_op(op, stack);
 }
-auto execute(ADDIU const op, Stack& stack, ip_type const) -> void
+auto execute(
+    ADDIU const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     execute_arithmetic_immediate_op(op, stack);
 }
-auto execute(SUBI const op, Stack& stack, ip_type const) -> void
+auto execute(
+    SUBI const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     execute_arithmetic_immediate_op(op, stack);
 }
-auto execute(SUBIU const op, Stack& stack, ip_type const) -> void
+auto execute(
+    SUBIU const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     execute_arithmetic_immediate_op(op, stack);
 }
-auto execute(MULI const op, Stack& stack, ip_type const) -> void
+auto execute(
+    MULI const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     execute_arithmetic_immediate_op(op, stack);
 }
-auto execute(MULIU const op, Stack& stack, ip_type const) -> void
+auto execute(
+    MULIU const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     execute_arithmetic_immediate_op(op, stack);
 }
-auto execute(DIVI const op, Stack& stack, ip_type const) -> void
+auto execute(
+    DIVI const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     execute_arithmetic_immediate_op(op, stack);
 }
-auto execute(DIVIU const op, Stack& stack, ip_type const) -> void
+auto execute(
+    DIVIU const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     execute_arithmetic_immediate_op(op, stack);
 }
 
-auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
+auto execute(
+    IF const op,
+    Stack& stack,
+    ip_type const ip) -> ip_type
 {
     auto const condition = immutable_proxy(stack, op.instruction.out);
 
@@ -984,18 +1145,21 @@ auto execute(IF const op, Stack& stack, ip_type const ip) -> ip_type
         target_offset = jmp->ptr;
         jmp.reset();
     } else {
-        throw abort_execution{stack, "invalid in operand to if instruction"};
+        throw abort_execution{ stack, "invalid in operand to if instruction" };
     }
 
     auto const target_addr =
         target_offset / sizeof(viua::arch::instruction_type);
-    auto const target = take_branch ? (stack.proc->module.ip_base + target_addr)
-                                    : (ip + 1);
+    auto const target =
+        take_branch ? (stack.proc->module.ip_base + target_addr) : (ip + 1);
 
     return target;
 }
 
-auto execute(ACTOR const op, Stack& stack, ip_type const) -> void
+auto execute(
+    ACTOR const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto fn_addr = size_t{};
     if (auto fn = mutable_proxy(stack, op.instruction.in)
@@ -1004,11 +1168,12 @@ auto execute(ACTOR const op, Stack& stack, ip_type const) -> void
         fn_addr = fn->ptr;
         fn.reset();
     } else {
-        throw abort_execution{stack, "invalid in operand to actor instruction"};
+        throw abort_execution{ stack,
+                               "invalid in operand to actor instruction" };
     }
 
     if (fn_addr % sizeof(viua::arch::instruction_type)) {
-        throw abort_execution{stack, "invalid IP after asynchronous call"};
+        throw abort_execution{ stack, "invalid IP after asynchronous call" };
     }
 
     auto const fr_entry = (fn_addr / sizeof(viua::arch::instruction_type));
@@ -1017,19 +1182,25 @@ auto execute(ACTOR const op, Stack& stack, ip_type const) -> void
     auto dst       = mutable_proxy(stack, op.instruction.out);
     dst            = pid.get();
 }
-auto execute(SELF const op, Stack& stack, ip_type const) -> void
+auto execute(
+    SELF const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     mutable_proxy(stack, op.instruction.out) = stack.proc->pid.get();
 }
 
-auto execute(GTS const op, Stack& stack, ip_type const) -> void
+auto execute(
+    GTS const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const key = immutable_proxy(stack, op.instruction.out)
                          .get<register_type::atom_type>();
     auto const value = immutable_proxy(stack, op.instruction.in);
 
     if (not key.has_value()) {
-        throw abort_execution{stack, "invalid type used as global table key"};
+        throw abort_execution{ stack, "invalid type used as global table key" };
     }
 
     if (value.is_void()) {
@@ -1038,27 +1209,33 @@ auto execute(GTS const op, Stack& stack, ip_type const) -> void
         stack.proc->globals[key->key] = value.target;
     }
 }
-auto execute(GTL const op, Stack& stack, ip_type const) -> void
+auto execute(
+    GTL const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto value     = mutable_proxy(stack, op.instruction.out);
     auto const key = immutable_proxy(stack, op.instruction.in)
                          .get<register_type::atom_type>();
 
     if (not key.has_value()) {
-        throw abort_execution{stack, "invalid type used as global table key"};
+        throw abort_execution{ stack, "invalid type used as global table key" };
     }
 
     auto& gt = stack.proc->globals;
     if (not gt.contains(key->key)) {
-        throw abort_execution{stack,
-                              ("key not present in globals table: "
-                               + stack.proc->atoms[key->key])};
+        throw abort_execution{ stack,
+                               ("key not present in globals table: "
+                                + stack.proc->atoms[key->key]) };
     }
 
     value = gt[key->key];
 }
 
-auto execute(SM const op, Stack& stack, ip_type const) -> void
+auto execute(
+    SM const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const base = immutable_proxy(stack, op.instruction.in)
                           .get<register_type::pointer_type>();
@@ -1068,8 +1245,8 @@ auto execute(SM const op, Stack& stack, ip_type const) -> void
     auto const offset    = (op.instruction.immediate * copy_size);
 
     if (not base.has_value()) {
-        throw abort_execution{stack,
-                              "invalid base operand for memory instruction"};
+        throw abort_execution{ stack,
+                               "invalid base operand for memory instruction" };
     }
 
     auto const pointer_info = stack.proc->get_pointer(base->ptr);
@@ -1077,20 +1254,20 @@ auto execute(SM const op, Stack& stack, ip_type const) -> void
         auto o = std::ostringstream{};
         o << "unknown pointer: ";
         o << std::hex << std::setfill('0') << std::setw(16) << base->ptr;
-        throw abort_execution{stack, o.str()};
+        throw abort_execution{ stack, o.str() };
     }
 
     if (offset >= pointer_info->size) {
         auto o = std::ostringstream{};
         o << "illegal offset of " << offset << " bytes into a region of "
           << pointer_info->size << " byte(s)";
-        throw abort_execution{stack, o.str()};
+        throw abort_execution{ stack, o.str() };
     }
     if ((offset + copy_size) > pointer_info->size) {
         auto o = std::ostringstream{};
         o << "illegal store of " << copy_size << " bytes into a region of "
           << (pointer_info->size - offset) << " byte(s)";
-        throw abort_execution{stack, o.str()};
+        throw abort_execution{ stack, o.str() };
     }
 
     auto const user_addr = base->ptr + offset;
@@ -1099,18 +1276,21 @@ auto execute(SM const op, Stack& stack, ip_type const) -> void
         auto o = std::ostringstream{};
         o << "invalid store address: ";
         o << std::hex << std::setfill('0') << std::setw(16) << user_addr;
-        throw abort_execution{stack, o.str()};
+        throw abort_execution{ stack, o.str() };
     }
 
     auto const in = immutable_proxy(stack, op.instruction.out);
     if (in.holds<void>()) {
-        throw abort_execution{stack,
-                              "invalid in operand for memory instruction"};
+        throw abort_execution{ stack,
+                               "invalid in operand for memory instruction" };
     }
     auto const buf = in.target.as_memory();
     memcpy(addr, buf.data(), copy_size);
 }
-auto execute(LM const op, Stack& stack, ip_type const) -> void
+auto execute(
+    LM const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const base = immutable_proxy(stack, op.instruction.in)
                           .get<register_type::pointer_type>();
@@ -1120,8 +1300,8 @@ auto execute(LM const op, Stack& stack, ip_type const) -> void
     auto const offset    = (op.instruction.immediate * copy_size);
 
     if (not base.has_value()) {
-        throw abort_execution{stack,
-                              "invalid base operand for memory instruction"};
+        throw abort_execution{ stack,
+                               "invalid base operand for memory instruction" };
     }
 
     auto const pointer_info = stack.proc->get_pointer(base->ptr);
@@ -1129,7 +1309,7 @@ auto execute(LM const op, Stack& stack, ip_type const) -> void
         auto o = std::ostringstream{};
         o << "unknown pointer: ";
         o << std::hex << std::setfill('0') << std::setw(16) << base->ptr;
-        throw abort_execution{stack, o.str()};
+        throw abort_execution{ stack, o.str() };
     }
 
     auto const ffi_pointer = pointer_info->foreign;
@@ -1137,13 +1317,13 @@ auto execute(LM const op, Stack& stack, ip_type const) -> void
         auto o = std::ostringstream{};
         o << "illegal offset of " << offset << " bytes into a region of "
           << pointer_info->size << " byte(s)";
-        throw abort_execution{stack, o.str()};
+        throw abort_execution{ stack, o.str() };
     }
     if ((not ffi_pointer) and (offset + copy_size) > pointer_info->size) {
         auto o = std::ostringstream{};
         o << "illegal load of " << copy_size << " bytes from a region of "
           << (pointer_info->size - offset) << " byte(s)";
-        throw abort_execution{stack, o.str()};
+        throw abort_execution{ stack, o.str() };
     }
 
     auto const user_addr = base->ptr + offset;
@@ -1153,7 +1333,7 @@ auto execute(LM const op, Stack& stack, ip_type const) -> void
         auto o = std::ostringstream{};
         o << "invalid load address: ";
         o << std::hex << std::setfill('0') << std::setw(16) << user_addr;
-        throw abort_execution{stack, o.str()};
+        throw abort_execution{ stack, o.str() };
     }
 
     auto out = mutable_proxy(stack, op.instruction.out);
@@ -1162,8 +1342,14 @@ auto execute(LM const op, Stack& stack, ip_type const) -> void
     out                         = raw;
     out.to()->get().loaded_size = copy_size;
 }
-auto execute(AD const, Stack&, ip_type const) -> void
+auto execute(
+    AD const,
+    Stack&,
+    ip_type const) -> void
 {}
-auto execute(PTR const, Stack&, ip_type const) -> void
+auto execute(
+    PTR const,
+    Stack&,
+    ip_type const) -> void
 {}
 }  // namespace viua::vm::ins

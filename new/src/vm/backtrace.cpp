@@ -22,18 +22,17 @@
 #include <viua/support/fdstream.h>
 #include <viua/vm/backtrace.h>
 
-
 namespace viua {
 extern viua::support::fdstream TRACE_STREAM;
 }
 
-
 namespace viua::vm::backtrace {
-auto dump_registers(std::vector<viua::vm::Register> const& registers,
-                    viua::vm::Process::atoms_map_type const& atoms,
-                    std::string_view const suffix) -> void
+auto dump_registers(
+    std::vector<viua::vm::Register> const& registers,
+    viua::vm::Process::atoms_map_type const& atoms,
+    std::string_view const suffix) -> void
 {
-    for (auto i = size_t{0}; i < registers.size(); ++i) {
+    for (auto i = size_t{ 0 }; i < registers.size(); ++i) {
         auto const& each = registers.at(i);
         if (each.is_void()) {
             continue;
@@ -83,12 +82,14 @@ auto dump_registers(std::vector<viua::vm::Register> const& registers,
         } else if (auto const v = each.get<register_type::atom_type>(); v) {
             TRACE_STREAM << "atom " << atoms.at(v->key) << '\n';
         } else if (auto const v = each.get<register_type::pid_type>(); v) {
-            TRACE_STREAM << "pid " << viua::runtime::PID{*v}.to_string()
+            TRACE_STREAM << "pid " << viua::runtime::PID{ *v }.to_string()
                          << '\n';
         }
     }
 }
-auto print_backtrace_line(viua::vm::Stack const& stack, size_t const frame_index) -> void
+auto print_backtrace_line(
+    viua::vm::Stack const& stack,
+    size_t const frame_index) -> void
 {
     auto const& elf  = stack.proc->module.elf;
     auto const& each = stack.frames.at(frame_index);
@@ -99,7 +100,8 @@ auto print_backtrace_line(viua::vm::Stack const& stack, size_t const frame_index
     auto const sym =
         std::find_if(elf.symtab.begin(),
                      elf.symtab.end(),
-                     [entry_off](auto const& each) -> bool {
+                     [entry_off](auto const& each) -> bool
+                     {
                          return (each.st_value == entry_off)
                                 and (ELF64_ST_TYPE(each.st_info) == STT_FUNC);
                      });
@@ -136,23 +138,26 @@ auto print_backtrace_line(viua::vm::Stack const& stack, size_t const frame_index
 
     viua::TRACE_STREAM << viua::TRACE_STREAM.endl;
 }
-auto print_backtrace(viua::vm::Stack const& stack, std::optional<size_t> const only_for)
-    -> void
+auto print_backtrace(
+    viua::vm::Stack const& stack,
+    std::optional<size_t> const only_for) -> void
 {
     if (only_for.has_value()) {
         print_backtrace_line(stack, *only_for);
     } else {
-        for (auto i = size_t{0}; i < stack.frames.size(); ++i) {
+        for (auto i = size_t{ 0 }; i < stack.frames.size(); ++i) {
             print_backtrace_line(stack, i);
         }
     }
 }
-auto dump_memory(std::vector<viua::vm::Page> const& memory) -> void
+auto dump_memory(
+    std::vector<viua::vm::Page> const& memory) -> void
 {
     viua::TRACE_STREAM << "  memory:" << viua::TRACE_STREAM.endl;
 
     viua::TRACE_STREAM << std::hex << std::setfill('0');
-    for (auto line = size_t{0}; line < (memory.front().size() / MEM_LINE_SIZE);
+    for (auto line = size_t{ 0 };
+         line < (memory.front().size() / MEM_LINE_SIZE);
          ++line) {
         viua::TRACE_STREAM << "    ";
         viua::TRACE_STREAM
@@ -160,11 +165,12 @@ auto dump_memory(std::vector<viua::vm::Page> const& memory) -> void
             << (MEM_FIRST_STACK_BREAK - ((line + 1) * MEM_LINE_SIZE) + 1)
             << "--" << std::setw(2)
             << ((MEM_FIRST_STACK_BREAK - (line * MEM_LINE_SIZE))
-                & 0x00000000000000ff)
+                & 0x00'00'00'00'00'00'00'ff)
             << "  ";
 
         auto const& page = memory.front();
-        auto at          = [&page, line](size_t const n) -> uint8_t {
+        auto at          = [&page, line](size_t const n) -> uint8_t
+        {
             return *((page.data() + page.size() - 1)
                      - (line * MEM_LINE_SIZE + n));
         };
@@ -180,4 +186,4 @@ auto dump_memory(std::vector<viua::vm::Page> const& memory) -> void
         viua::TRACE_STREAM << viua::TRACE_STREAM.endl;
     }
 }
-}
+}  // namespace viua::vm::backtrace

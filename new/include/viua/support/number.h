@@ -25,11 +25,12 @@
 #include <string_view>
 #include <type_traits>
 
-
 namespace viua::support {
 namespace {
 template<typename T>
-auto ston_int_impl(std::string const& n, int const base)
+auto ston_int_impl(
+    std::string const& n,
+    int const base)
     -> std::conditional_t<std::is_signed_v<T>, int64_t, uint64_t>
 {
     if constexpr (std::is_signed_v<T>) {
@@ -41,7 +42,8 @@ auto ston_int_impl(std::string const& n, int const base)
 }  // namespace
 
 template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
-auto ston(std::string n) -> T
+auto ston(
+    std::string n) -> T
 {
     if constexpr (std::is_floating_point_v<T>) {
         if constexpr (sizeof(T) == sizeof(float)) {
@@ -52,7 +54,7 @@ auto ston(std::string n) -> T
     } else {
         auto base = 10;
         {
-            auto view = std::string_view{n};
+            auto view = std::string_view{ n };
             auto const is_negative =
                 std::is_signed_v<T> and view.starts_with("-");
             if (is_negative) {
@@ -78,17 +80,22 @@ auto ston(std::string n) -> T
         auto const wanted = static_cast<T>(full);
 
         if (wanted != full) {
-            throw std::out_of_range{"ston"};
+            throw std::out_of_range{ "ston" };
         }
         return wanted;
     }
 }
 
-template<typename T> auto bool_of_float(T const v) -> bool
+template<typename T>
+auto bool_of_float(
+    T const v) -> bool
 {
     static_assert(std::is_floating_point<T>::value, "not a float");
-    static_assert(((sizeof(T) == sizeof(uint32_t)) or (sizeof(T) == sizeof(uint64_t))), "bad-sized float");
-    using int_type = std::conditional<(sizeof(T) == sizeof(uint32_t)), uint32_t, uint64_t>::type;
+    static_assert(
+        ((sizeof(T) == sizeof(uint32_t)) or (sizeof(T) == sizeof(uint64_t))),
+        "bad-sized float");
+    using int_type = std::
+        conditional<(sizeof(T) == sizeof(uint32_t)), uint32_t, uint64_t>::type;
 
     /*
      * For casting to bool the roundabout way of memcpy(3) into a

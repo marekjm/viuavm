@@ -32,22 +32,23 @@
 #include <viua/support/string.h>
 #include <viua/support/vector.h>
 
-
 namespace viua::libs::parser {
-template<typename T> auto ston(std::string const& s) -> T
+template<typename T>
+auto ston(
+    std::string const& s) -> T
 {
     if constexpr (std::is_signed_v<T>) {
         auto const full_width = std::stoll(s);
         auto const want_width = static_cast<T>(full_width);
         if (full_width != want_width) {
-            throw std::out_of_range{"ston"};
+            throw std::out_of_range{ "ston" };
         }
         return want_width;
     } else {
         auto const full_width = std::stoull(s);
         auto const want_width = static_cast<T>(full_width);
         if (full_width != want_width) {
-            throw std::out_of_range{"ston"};
+            throw std::out_of_range{ "ston" };
         }
         return want_width;
     }
@@ -80,7 +81,7 @@ struct Instruction : Node {
     viua::libs::lexer::Lexeme opcode;
     std::vector<Operand> operands;
 
-    size_t physical_index{static_cast<size_t>(-1)};
+    size_t physical_index{ static_cast<size_t>(-1) };
 
     auto to_string() const -> std::string override;
     auto parse_opcode() const -> viua::arch::opcode_type;

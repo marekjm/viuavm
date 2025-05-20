@@ -22,10 +22,10 @@
 #include <viua/support/tty.h>
 #include <viua/vm/core.h>
 
-
 namespace viua::libs::parser {
 namespace ast {
-auto Node::has_attr(std::string_view const key) const -> bool
+auto Node::has_attr(
+    std::string_view const key) const -> bool
 {
     for (auto const& each : attributes) {
         if (each.first == key) {
@@ -34,7 +34,8 @@ auto Node::has_attr(std::string_view const key) const -> bool
     }
     return false;
 }
-auto Node::attr(std::string_view const key) const -> std::optional<Lexeme>
+auto Node::attr(
+    std::string_view const key) const -> std::optional<Lexeme>
 {
     for (auto const& each : attributes) {
         if (each.first == key) {
@@ -63,7 +64,7 @@ auto Operand::make_access() const -> viua::arch::Register_access
     if (lx != TOKEN::DOLLAR) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{ingredients.front(), Cause::Invalid_register_access};
+        throw Error{ ingredients.front(), Cause::Invalid_register_access };
     }
 
     auto const direct = (lx == TOKEN::DOLLAR);
@@ -82,7 +83,7 @@ auto Operand::make_access() const -> viua::arch::Register_access
     } else {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{ingredients.back(), Cause::Invalid_register_access}
+        throw Error{ ingredients.back(), Cause::Invalid_register_access }
             .add(ingredients.at(0))
             .add(ingredients.at(1))
             .add(ingredients.at(2))
@@ -138,13 +139,15 @@ auto Label_def::to_string() const -> std::string
 }
 }  // namespace ast
 
-auto did_you_mean(viua::libs::errors::compile_time::Error& e, std::string what)
-    -> viua::libs::errors::compile_time::Error&
+auto did_you_mean(
+    viua::libs::errors::compile_time::Error& e,
+    std::string what) -> viua::libs::errors::compile_time::Error&
 {
     return e.aside("did you mean \"" + what + "\"?");
 }
-auto did_you_mean(viua::libs::errors::compile_time::Error&& e, std::string what)
-    -> viua::libs::errors::compile_time::Error
+auto did_you_mean(
+    viua::libs::errors::compile_time::Error&& e,
+    std::string what) -> viua::libs::errors::compile_time::Error
 {
     did_you_mean(e, what);
     return e;
@@ -170,7 +173,7 @@ auto consume_token_of(
     if (ts.count(lexemes.front().token) == 0) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        auto e = Error{lexemes.front(), Cause::Unexpected_token};
+        auto e = Error{ lexemes.front(), Cause::Unexpected_token };
         {
             auto s = std::ostringstream{};
             s << "expected ";
@@ -183,8 +186,8 @@ auto consume_token_of(
             using viua::support::tty::ATTR_FONT_BOLD;
             using viua::support::tty::ATTR_FONT_NORMAL;
 
-            auto const BOLD = std::string{esc(2, ATTR_FONT_BOLD)};
-            auto const NORM = std::string{esc(2, ATTR_FONT_NORMAL)};
+            auto const BOLD = std::string{ esc(2, ATTR_FONT_BOLD) };
+            auto const NORM = std::string{ esc(2, ATTR_FONT_NORMAL) };
 
             auto it = ts.begin();
             s << q(BOLD + viua::libs::lexer::to_string(*it) + NORM);
@@ -270,7 +273,7 @@ auto parse_instruction(
         if (e.token != viua::libs::lexer::TOKEN::LITERAL_ATOM) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{e, Cause::Unexpected_token, e.text};
+            throw Error{ e, Cause::Unexpected_token, e.text };
         }
 
         using viua::libs::lexer::OPCODE_NAMES;
@@ -279,7 +282,7 @@ auto parse_instruction(
         if (misspell_candidates.empty()) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{e, Cause::Unexpected_token, e.text};
+            throw Error{ e, Cause::Unexpected_token, e.text };
         }
 
         using viua::support::string::levenshtein_best;
@@ -288,12 +291,12 @@ auto parse_instruction(
         if (best_candidate.second == e.text) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{e, Cause::Unexpected_token, e.text};
+            throw Error{ e, Cause::Unexpected_token, e.text };
         }
 
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw did_you_mean(Error{e, Cause::Unknown_opcode, e.text},
+        throw did_you_mean(Error{ e, Cause::Unknown_opcode, e.text },
                            best_candidate.second);
     }
 
@@ -307,17 +310,18 @@ auto parse_instruction(
     }
 
     auto const fundamental_type_names = std::map<std::string, uint8_t>{
-        {"int", static_cast<uint8_t>(viua::vm::Register::Types::INT)},
-        {"uint", static_cast<uint8_t>(viua::vm::Register::Types::UINT)},
-        {"float", static_cast<uint8_t>(viua::vm::Register::Types::FLOAT32)},
-        {"double", static_cast<uint8_t>(viua::vm::Register::Types::FLOAT64)},
-        {"pointer", static_cast<uint8_t>(viua::vm::Register::Types::POINTER)},
-        {"atom", static_cast<uint8_t>(viua::vm::Register::Types::ATOM)},
-        {"pid", static_cast<uint8_t>(viua::vm::Register::Types::PID)},
+        { "int", static_cast<uint8_t>(viua::vm::Register::Types::INT) },
+        { "uint", static_cast<uint8_t>(viua::vm::Register::Types::UINT) },
+        { "float", static_cast<uint8_t>(viua::vm::Register::Types::FLOAT32) },
+        { "double", static_cast<uint8_t>(viua::vm::Register::Types::FLOAT64) },
+        { "pointer", static_cast<uint8_t>(viua::vm::Register::Types::POINTER) },
+        { "atom", static_cast<uint8_t>(viua::vm::Register::Types::ATOM) },
+        { "pid", static_cast<uint8_t>(viua::vm::Register::Types::PID) },
     };
 
     auto valid_cast =
-        [&lexemes, &instruction, &fundamental_type_names]() -> bool {
+        [&lexemes, &instruction, &fundamental_type_names]() -> bool
+    {
         if (instruction.opcode != "cast" and instruction.opcode != "g.cast") {
             return false;
         }
@@ -357,29 +361,29 @@ auto parse_instruction(
         if (lexemes.front() == TOKEN::RA_VOID) {
             operand.ingredients.push_back(
                 consume_token_of(TOKEN::RA_VOID, lexemes));
-        } else if (look_ahead({TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF},
+        } else if (look_ahead({ TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF },
                               lexemes)) {
             auto const access = consume_token_of(
-                {TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF}, lexemes);
+                { TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF }, lexemes);
             auto index = viua::libs::lexer::Lexeme{};
             try {
                 index = consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
             } catch (viua::libs::lexer::Lexeme const& e) {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
-                throw Error{e, Cause::Invalid_register_access}
+                throw Error{ e, Cause::Invalid_register_access }
                     .add(access)
                     .aside("register index must be an integer");
             }
             try {
                 auto const n = std::stoul(index.text);
                 if (n > viua::arch::MAX_REGISTER_INDEX) {
-                    throw std::out_of_range{""};
+                    throw std::out_of_range{ "" };
                 }
             } catch (std::out_of_range const&) {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
-                throw Error{index, Cause::Invalid_register_access}
+                throw Error{ index, Cause::Invalid_register_access }
                     .add(access)
                     .aside("register index range is 0-"
                            + std::to_string(viua::arch::MAX_REGISTER_INDEX));
@@ -401,14 +405,14 @@ auto parse_instruction(
             } catch (viua::libs::lexer::Lexeme const& e) {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
-                throw Error{e, Cause::Unexpected_token}.add(access).aside(
+                throw Error{ e, Cause::Unexpected_token }.add(access).aside(
                     "label name must be an atom");
             }
             operand.ingredients.push_back(access);
             operand.ingredients.push_back(atom);
         } else if (valid_cast()) {
-            auto const value =
-                consume_token_of({TOKEN::OPCODE, TOKEN::LITERAL_ATOM}, lexemes);
+            auto const value = consume_token_of(
+                { TOKEN::OPCODE, TOKEN::LITERAL_ATOM }, lexemes);
             operand.ingredients.push_back(value);
             auto& tt = operand.ingredients.front().text;
             tt       = std::to_string(fundamental_type_names.at(tt));
@@ -428,8 +432,9 @@ auto parse_instruction(
         } else {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{
-                lexemes.front(), Cause::Unexpected_token, "cannot parse"};
+            throw Error{ lexemes.front(),
+                         Cause::Unexpected_token,
+                         "cannot parse" };
         }
 
         instruction.operands.push_back(std::move(operand));
@@ -450,7 +455,7 @@ auto parse_instruction(
 
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{lexemes.front(), Cause::Unexpected_token}.note(
+        throw Error{ lexemes.front(), Cause::Unexpected_token }.note(
             "expected a comma, or a newline");
     }
 
@@ -469,8 +474,8 @@ auto parse_function_definition(
         fn->attributes = parse_attr_list(lexemes);
     }
 
-    auto fn_name =
-        consume_token_of({TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING}, lexemes);
+    auto fn_name = consume_token_of(
+        { TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING }, lexemes);
     fn->name = std::move(fn_name);
 
     try {
@@ -478,9 +483,9 @@ auto parse_function_definition(
     } catch (viua::libs::lexer::Lexeme const& e) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{lexemes.front(),
-                    Cause::Unexpected_token,
-                    "in definition of a function"}
+        throw Error{ lexemes.front(),
+                     Cause::Unexpected_token,
+                     "in definition of a function" }
             .add(fn->start);
     }
 
@@ -499,7 +504,7 @@ auto parse_function_definition(
     }
 
     auto instructions       = std::vector<std::unique_ptr<ast::Node>>{};
-    auto ins_physical_index = size_t{0};
+    auto ins_physical_index = size_t{ 0 };
     while ((not lexemes.empty()) and lexemes.front() != TOKEN::END) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
@@ -508,9 +513,9 @@ auto parse_function_definition(
             fn->instructions.push_back(std::move(instruction));
             fn->instructions.back().physical_index = ins_physical_index++;
         } catch (Error& e) {
-            throw Error{fn->name,
-                        Cause::None,
-                        "in definition of function " + fn->name.text}
+            throw Error{ fn->name,
+                         Cause::None,
+                         "in definition of function " + fn->name.text }
                 .add(fn->start)
                 .chain(std::move(e));
         }
@@ -535,8 +540,8 @@ auto parse_constant_definition(
         ct->attributes = parse_attr_list(lexemes);
     }
 
-    auto ct_name =
-        consume_token_of({TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING}, lexemes);
+    auto ct_name = consume_token_of(
+        { TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING }, lexemes);
     ct->name = std::move(ct_name);
     consume_token_of(TOKEN::TERMINATOR, lexemes);
 
@@ -564,7 +569,7 @@ auto parse_constant_definition(
         consume_token_of(TOKEN::DEF_VALUE, lexemes);
 
         auto value_type =
-            consume_token_of({TOKEN::LITERAL_ATOM, TOKEN::OPCODE}, lexemes);
+            consume_token_of({ TOKEN::LITERAL_ATOM, TOKEN::OPCODE }, lexemes);
         auto const known_types = std::set<std::string>{
             /*
              * Only strings allowed. Other types may be added later.
@@ -592,7 +597,7 @@ auto parse_constant_definition(
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
             throw did_you_mean(
-                Error{value_type, Cause::Unknown_type, value_type.text},
+                Error{ value_type, Cause::Unknown_type, value_type.text },
                 best_candidate.second);
         }
 
@@ -604,10 +609,10 @@ auto parse_constant_definition(
                 consume_token_of(TOKEN::LITERAL_FLOAT, lexemes));
         } else if (value_type == "string") {
             do {
-                ct->value.push_back(consume_token_of({TOKEN::LITERAL_ATOM,
-                                                      TOKEN::LITERAL_STRING,
-                                                      TOKEN::LITERAL_INTEGER,
-                                                      TOKEN::RA_PTR_DEREF},
+                ct->value.push_back(consume_token_of({ TOKEN::LITERAL_ATOM,
+                                                       TOKEN::LITERAL_STRING,
+                                                       TOKEN::LITERAL_INTEGER,
+                                                       TOKEN::RA_PTR_DEREF },
                                                      lexemes));
             } while (not look_ahead(TOKEN::TERMINATOR, lexemes));
         } else if (value_type == "atom") {
@@ -621,7 +626,8 @@ auto parse_constant_definition(
     return ct;
 }
 
-auto parse(viua::support::vector_view<viua::libs::lexer::Lexeme> lexemes)
+auto parse(
+    viua::support::vector_view<viua::libs::lexer::Lexeme> lexemes)
     -> std::vector<std::unique_ptr<ast::Node>>
 {
     auto nodes = std::vector<std::unique_ptr<ast::Node>>{};
@@ -639,7 +645,7 @@ auto parse(viua::support::vector_view<viua::libs::lexer::Lexeme> lexemes)
         } else {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{each, Cause::Unexpected_token}
+            throw Error{ each, Cause::Unexpected_token }
                 .aside("only directives can be top-level tokens")
                 .note("refer to viua-asm-lang(1) for more information");
         }

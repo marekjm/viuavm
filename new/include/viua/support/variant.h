@@ -27,7 +27,6 @@
 #include <stdexcept>
 #include <vector>
 
-
 namespace viua::support {
 /*
  * The type always contains a constexpr member variable `value' which evaluates
@@ -37,9 +36,11 @@ namespace viua::support {
  *
  * The type makes it possible to use std::visit() in a semi-sane way.
  */
-template<typename T> struct always_false : std::false_type {};
+template<typename T>
+struct always_false : std::false_type {};
 
-template<typename T> constexpr auto non_exhaustive_visitor() -> void
+template<typename T>
+constexpr auto non_exhaustive_visitor() -> void
 {
     static_assert(always_false<T>::value, "non-exhaustive visitor");
 }

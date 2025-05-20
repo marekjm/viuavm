@@ -54,17 +54,15 @@
 #include <viua/vm/elf.h>
 #include <viua/vm/ins.h>
 
-
 constexpr auto VIUA_SLOW_CYCLES = false;
 
 namespace viua {
-auto TRACE_STREAM = viua::support::fdstream{2};
+auto TRACE_STREAM = viua::support::fdstream{ 2 };
 }
 
-
 namespace {
-auto run_instruction(viua::vm::Stack& stack)
-    -> viua::arch::instruction_type const*
+auto run_instruction(
+    viua::vm::Stack& stack) -> viua::arch::instruction_type const*
 {
     auto instruction = viua::arch::instruction_type{};
     do {
@@ -76,7 +74,8 @@ auto run_instruction(viua::vm::Stack& stack)
     return stack.ip;
 }
 
-auto format_time(std::chrono::microseconds const us) -> std::string
+auto format_time(
+    std::chrono::microseconds const us) -> std::string
 {
     auto out = std::ostringstream{};
     out << std::fixed << std::setprecision(2);
@@ -91,7 +90,8 @@ auto format_time(std::chrono::microseconds const us) -> std::string
     }
     return out.str();
 }
-auto format_hz(double const hz) -> std::string
+auto format_hz(
+    double const hz) -> std::string
 {
     auto out = std::ostringstream{};
     if (hz > 1e3) {
@@ -102,24 +102,24 @@ auto format_hz(double const hz) -> std::string
     }
     return out.str();
 }
-auto run(viua::vm::Process& proc) -> bool
+auto run(
+    viua::vm::Process& proc) -> bool
 {
-    auto const ip_ok = [&proc]() -> bool {
-        return proc.module.ip_in_valid_range(proc.stack.ip);
-    };
+    auto const ip_ok = [&proc]() -> bool
+    { return proc.module.ip_in_valid_range(proc.stack.ip); };
 
     if constexpr (viua::vm::ins::VIUA_TRACE_CYCLES) {
-        viua::TRACE_STREAM << "cycle at " << proc.module.elf_path.native()
-                           << "[.text+0x" << std::hex << std::setw(16)
-                           << std::setfill('0')
-                           << ((proc.stack.ip - proc.module.ip_base)
-                               * sizeof(viua::arch::instruction_type))
-                           << std::dec << "] in process "
-                           << proc.pid.to_string() << viua::TRACE_STREAM.endl;
+        viua::TRACE_STREAM
+            << "cycle at " << proc.module.elf_path.native() << "[.text+0x"
+            << std::hex << std::setw(16) << std::setfill('0')
+            << ((proc.stack.ip - proc.module.ip_base)
+                * sizeof(viua::arch::instruction_type))
+            << std::dec << "] in process " << proc.pid.to_string()
+            << viua::TRACE_STREAM.endl;
     }
 
-    constexpr auto PREEMPTION_THRESHOLD = size_t{42};
-    for (auto i = size_t{0}; i < PREEMPTION_THRESHOLD and ip_ok(); ++i) {
+    constexpr auto PREEMPTION_THRESHOLD = size_t{ 42 };
+    for (auto i = size_t{ 0 }; i < PREEMPTION_THRESHOLD and ip_ok(); ++i) {
         /*
          * This is needed to detect greedy bundles and adjust preemption
          * counter appropriately. If a greedy bundle contains more
@@ -166,7 +166,8 @@ auto run(viua::vm::Process& proc) -> bool
 
     return true;
 }
-auto run(viua::vm::Core& core) -> void
+auto run(
+    viua::vm::Core& core) -> void
 {
     core.perf_counters.start();
 
@@ -202,7 +203,9 @@ auto run(viua::vm::Core& core) -> void
 }
 }  // namespace
 
-auto main(int argc, char* argv[]) -> int
+auto main(
+    int argc,
+    char* argv[]) -> int
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_CYAN;
@@ -213,7 +216,7 @@ auto main(int argc, char* argv[]) -> int
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    auto const args = std::vector<std::string>{(argv + 1), (argv + argc)};
+    auto const args = std::vector<std::string>{ (argv + 1), (argv + argc) };
     if (args.empty()) {
         std::println(stderr,
                      "{}error{}: no executable to run",
@@ -277,7 +280,7 @@ auto main(int argc, char* argv[]) -> int
      * regular file - trying to execute directories or device files does not
      * make much sense.
      */
-    auto const elf_path = std::filesystem::path{args.back()};
+    auto const elf_path = std::filesystem::path{ args.back() };
     if (not std::filesystem::exists(elf_path)) {
         viua::support::errorln("file does not exist: {}{}{}",
                                esc(2, COLOR_FG_WHITE),
@@ -347,7 +350,7 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
 
-    auto entry_addr = size_t{0};
+    auto entry_addr = size_t{ 0 };
     if (auto const ep = main_module.entry_point(); ep.has_value()) {
         entry_addr = (*ep / sizeof(viua::arch::instruction_type));
     } else {
@@ -356,7 +359,7 @@ auto main(int argc, char* argv[]) -> int
     }
 
     auto core = viua::vm::Core{};
-    core.modules.emplace("", viua::vm::Module{elf_path, main_module});
+    core.modules.emplace("", viua::vm::Module{ elf_path, main_module });
     auto const main_pid [[maybe_unused]] = core.spawn("", entry_addr);
 
     if constexpr (viua::vm::ins::VIUA_TRACE_CYCLES) {
@@ -366,14 +369,14 @@ auto main(int argc, char* argv[]) -> int
                  * Assume an file descriptor opened for writing was received.
                  */
                 viua::TRACE_STREAM =
-                    viua::support::fdstream{std::stoi(trace_fd)};
+                    viua::support::fdstream{ std::stoi(trace_fd) };
             } catch (std::invalid_argument const&) {
                 /*
                  * Otherwise, treat the thing received as a filename and open it
                  * for writing.
                  */
-                viua::TRACE_STREAM = viua::support::fdstream{
-                    open(trace_fd, O_WRONLY | O_CLOEXEC)};
+                viua::TRACE_STREAM = viua::support::fdstream{ open(
+                    trace_fd, O_WRONLY | O_CLOEXEC) };
             }
         }
     }

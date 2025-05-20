@@ -26,6 +26,8 @@
 #include <format>
 #include <print>
 
+#include <viua/support/tty.h>
+
 
 namespace viua::support {
 template<typename... Ts>

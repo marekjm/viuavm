@@ -1658,9 +1658,11 @@ def main(args):
         "  VM run time:  {}   / {}   ({} ~ {})".format(
             colorise(AVG_COLOUR, format_run_time_us(perf_time_avg)),
             colorise(MED_COLOUR, format_run_time_us(perf_time_med)),
-            colorise("white", format_run_time_us(perf_time_min).ljust(11))
-            if perf_time
-            else "--",
+            (
+                colorise("white", format_run_time_us(perf_time_min).ljust(11))
+                if perf_time
+                else "--"
+            ),
             colorise("white", format_run_time_us(perf_time_max)) if perf_time else "--",
         )
     )
@@ -1668,9 +1670,11 @@ def main(args):
         "  VM CPU freq:  {} / {} ({} ~ {})".format(
             colorise(AVG_COLOUR, format_freq(perf_freq_avg)),
             colorise(MED_COLOUR, format_freq(perf_freq_med)),
-            colorise(MIN_COLOUR, format_freq(perf_freq_min).ljust(11))
-            if perf_time
-            else "--",
+            (
+                colorise(MIN_COLOUR, format_freq(perf_freq_min).ljust(11))
+                if perf_time
+                else "--"
+            ),
             colorise(MAX_COLOUR, format_freq(perf_freq_max)) if perf_time else "--",
         )
     )

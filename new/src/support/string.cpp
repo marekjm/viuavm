@@ -25,9 +25,9 @@
 
 #include <viua/support/string.h>
 
-
 namespace viua::support::string {
-auto quoted(std::string_view const sv) -> std::string
+auto quoted(
+    std::string_view const sv) -> std::string
 {
     auto out = std::ostringstream{};
     out << std::quoted(sv);
@@ -46,27 +46,31 @@ auto quoted(std::string_view const sv) -> std::string
     return out.str();
 }
 
-auto quote_squares(std::string_view const sv) -> std::string
+auto quote_squares(
+    std::string_view const sv) -> std::string
 {
     auto out = std::ostringstream{};
     out << CORNER_QUOTE_LL << sv << CORNER_QUOTE_UR;
     return out.str();
 }
-auto quote_math_angle(std::string_view const sv) -> std::string
+auto quote_math_angle(
+    std::string_view const sv) -> std::string
 {
     auto out = std::ostringstream{};
     out << MATHEMATICAL_ANGLE_BRACKET_LEFT << sv
         << MATHEMATICAL_ANGLE_BRACKET_RIGHT;
     return out.str();
 }
-auto quote_fancy(std::string_view const sv) -> std::string
+auto quote_fancy(
+    std::string_view const sv) -> std::string
 {
     auto out = std::ostringstream{};
     out << SINGLE_QUOTATION_MARK_LEFT << sv << SINGLE_QUOTATION_MARK_RIGHT;
     return out.str();
 }
 
-auto unescape(std::string_view const sv) -> std::string
+auto unescape(
+    std::string_view const sv) -> std::string
 {
     /*
      * Decode escape sequences in strings.
@@ -85,46 +89,46 @@ auto unescape(std::string_view const sv) -> std::string
      */
     auto decoded = std::ostringstream{};
     auto c       = char{};
-    for (auto i = std::string::size_type{0}; i < sv.size(); ++i) {
+    for (auto i = std::string::size_type{ 0 }; i < sv.size(); ++i) {
         c = sv[i];
         if (c == '\\' and i < (sv.size() - 1)) {
             ++i;
             switch (sv[i]) {
-            case '\'':
-                c = '\'';
-                break;
-            case '"':
-                c = '"';
-                break;
-            case '?':
-                c = '?';
-                break;
-            case '\\':
-                c = '\\';
-                break;
-            case 'a':
-                c = '\a';
-                break;
-            case 'b':
-                c = '\b';
-                break;
-            case 'f':
-                c = '\f';
-                break;
-            case 'n':
-                c = '\n';
-                break;
-            case 'r':
-                c = '\r';
-                break;
-            case 't':
-                c = '\t';
-                break;
-            case 'v':
-                c = '\v';
-                break;
-            default:
-                c = sv[i];
+                case '\'':
+                    c = '\'';
+                    break;
+                case '"':
+                    c = '"';
+                    break;
+                case '?':
+                    c = '?';
+                    break;
+                case '\\':
+                    c = '\\';
+                    break;
+                case 'a':
+                    c = '\a';
+                    break;
+                case 'b':
+                    c = '\b';
+                    break;
+                case 'f':
+                    c = '\f';
+                    break;
+                case 'n':
+                    c = '\n';
+                    break;
+                case 'r':
+                    c = '\r';
+                    break;
+                case 't':
+                    c = '\t';
+                    break;
+                case 'v':
+                    c = '\v';
+                    break;
+                default:
+                    c = sv[i];
             }
         }
         decoded << c;
@@ -132,8 +136,9 @@ auto unescape(std::string_view const sv) -> std::string
     return decoded.str();
 }
 
-auto levenshtein(std::string_view const source, std::string_view const target)
-    -> LevenshteinDistance
+auto levenshtein(
+    std::string_view const source,
+    std::string_view const target) -> LevenshteinDistance
 {
     if (not source.size()) {
         return target.size();
@@ -145,24 +150,24 @@ auto levenshtein(std::string_view const source, std::string_view const target)
     auto distance_matrix = std::vector<std::vector<LevenshteinDistance>>{};
 
     distance_matrix.reserve(source.size());
-    for (auto i = LevenshteinDistance{0}; i < source.size() + 1; ++i) {
+    for (auto i = LevenshteinDistance{ 0 }; i < source.size() + 1; ++i) {
         auto row = decltype(distance_matrix)::value_type{};
         row.reserve(target.size());
-        for (auto j = LevenshteinDistance{0}; j < target.size() + 1; ++j) {
+        for (auto j = LevenshteinDistance{ 0 }; j < target.size() + 1; ++j) {
             row.push_back(0);
         }
         distance_matrix.push_back(std::move(row));
     }
-    for (auto i = LevenshteinDistance{0}; i < source.size() + 1; ++i) {
+    for (auto i = LevenshteinDistance{ 0 }; i < source.size() + 1; ++i) {
         distance_matrix.at(i).at(0) = i;
     }
-    for (auto i = LevenshteinDistance{0}; i < target.size() + 1; ++i) {
+    for (auto i = LevenshteinDistance{ 0 }; i < target.size() + 1; ++i) {
         distance_matrix.at(0).at(i) = i;
     }
 
-    for (auto i = LevenshteinDistance{1}; i < source.size() + 1; ++i) {
-        for (auto j = LevenshteinDistance{1}; j < target.size() + 1; ++j) {
-            auto cost = LevenshteinDistance{0};
+    for (auto i = LevenshteinDistance{ 1 }; i < source.size() + 1; ++i) {
+        for (auto j = LevenshteinDistance{ 1 }; j < target.size() + 1; ++j) {
+            auto cost = LevenshteinDistance{ 0 };
 
             cost = (source.at(i - 1) != target.at(j - 1));
 
@@ -177,10 +182,10 @@ auto levenshtein(std::string_view const source, std::string_view const target)
 
     return distance_matrix.at(source.size() - 1).at(target.size() - 1);
 }
-auto levenshtein_filter(std::string_view const source,
-                        std::set<std::string_view> const& candidates,
-                        LevenshteinDistance const limit)
-    -> std::set<DistancePair>
+auto levenshtein_filter(
+    std::string_view const source,
+    std::set<std::string_view> const& candidates,
+    LevenshteinDistance const limit) -> std::set<DistancePair>
 {
     auto matched = std::set<DistancePair>{};
 
@@ -192,11 +197,12 @@ auto levenshtein_filter(std::string_view const source,
 
     return matched;
 }
-auto levenshtein_best(std::string_view const source,
-                      std::set<DistancePair> const& candidates,
-                      LevenshteinDistance const limit) -> DistancePair
+auto levenshtein_best(
+    std::string_view const source,
+    std::set<DistancePair> const& candidates,
+    LevenshteinDistance const limit) -> DistancePair
 {
-    auto best = DistancePair{0xffffffffffffffff, source};
+    auto best = DistancePair{ 0xff'ff'ff'ff'ff'ff'ff'ff, source };
 
     for (auto const& each : candidates) {
         if (each.first <= limit and each.first < best.first) {

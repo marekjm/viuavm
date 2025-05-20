@@ -26,7 +26,9 @@
 #include <viua/support/tty.h>
 #include <viua/vm/elf.h>
 
-auto main(int argc, char* argv[]) -> int
+auto main(
+    int argc,
+    char* argv[]) -> int
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_CYAN;
@@ -37,7 +39,7 @@ auto main(int argc, char* argv[]) -> int
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    auto const args = std::vector<std::string>{(argv + 1), (argv + argc)};
+    auto const args = std::vector<std::string>{ (argv + 1), (argv + argc) };
     if (args.empty()) {
         std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
                   << ": not path to load\n";
@@ -89,7 +91,7 @@ auto main(int argc, char* argv[]) -> int
         }
     }
 
-    auto const elf_path = std::filesystem::path{args.back()};
+    auto const elf_path = std::filesystem::path{ args.back() };
     if (not std::filesystem::exists(elf_path)) {
         std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
                   << ": file does not exist: " << esc(2, COLOR_FG_WHITE)

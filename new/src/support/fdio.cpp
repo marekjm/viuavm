@@ -23,9 +23,12 @@
 #include <string_view>
 
 namespace viua::support::posix {
-auto whole_read(int const fd, void* const buf, size_t const count) -> void
+auto whole_read(
+    int const fd,
+    void* const buf,
+    size_t const count) -> void
 {
-    auto done = ssize_t{0};
+    auto done = ssize_t{ 0 };
     do {
         if (auto const n = read(fd, static_cast<std::byte*>(buf) + done, count);
             n != -1) {
@@ -33,9 +36,12 @@ auto whole_read(int const fd, void* const buf, size_t const count) -> void
         }
     } while (done < static_cast<ssize_t>(count));
 }
-auto whole_write(int const fd, void const* buf, size_t const count) -> void
+auto whole_write(
+    int const fd,
+    void const* buf,
+    size_t const count) -> void
 {
-    auto done = ssize_t{0};
+    auto done = ssize_t{ 0 };
     do {
         if (auto const n =
                 write(fd, static_cast<std::byte const*>(buf) + done, count);

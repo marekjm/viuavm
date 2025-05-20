@@ -39,7 +39,6 @@
 #include <viua/vm/core.h>
 #include <viua/vm/ins.h>
 
-
 struct Global_state {
     viua::vm::Core core{};
 
@@ -48,20 +47,19 @@ struct Global_state {
     std::optional<size_t> selected_frame;
 
     std::string last_input;
-    bool crash_on_internal{false};
+    bool crash_on_internal{ false };
 };
-
 
 namespace {
 auto REPL_STATE = std::experimental::observer_ptr<Global_state>{};
 }
 
-
 /*
  * Utility namespace.
  */
 namespace {
-auto split_on_space(std::string_view sv) -> std::vector<std::string_view>
+auto split_on_space(
+    std::string_view sv) -> std::vector<std::string_view>
 {
     auto parts = std::vector<std::string_view>{};
 
@@ -74,7 +72,7 @@ auto split_on_space(std::string_view sv) -> std::vector<std::string_view>
         }
 
         if (space != 0) {
-            parts.push_back(std::string_view{sv.data(), space});
+            parts.push_back(std::string_view{ sv.data(), space });
         }
 
         sv.remove_prefix(space + 1);
@@ -84,7 +82,9 @@ auto split_on_space(std::string_view sv) -> std::vector<std::string_view>
 }
 }  // namespace
 
-auto completion(char const* buf, linenoiseCompletions* const lc) -> void
+auto completion(
+    char const* buf,
+    linenoiseCompletions* const lc) -> void
 {
     static std::vector<std::string> candidates;
     candidates.clear();
@@ -116,14 +116,15 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
         linenoiseAddCompletion(lc, each.c_str());
     }
 
-    auto const sv    = std::string_view{buf};
+    auto const sv    = std::string_view{ buf };
     auto const parts = split_on_space(sv);
     if (parts.empty()) {
         return;
     }
 
-    auto const p = [&parts](size_t const n) -> std::optional<std::string_view> {
-        return (n < parts.size()) ? std::optional{parts.at(n)} : std::nullopt;
+    auto const p = [&parts](size_t const n) -> std::optional<std::string_view>
+    {
+        return (n < parts.size()) ? std::optional{ parts.at(n) } : std::nullopt;
     };
 
     static std::vector<std::string> runtime_candidates;
@@ -150,7 +151,7 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
          * MUST be checked first. If nothing was supplied assume the user wants
          * to complete over all files in the current directory.
          */
-        auto const raw = fs::path{p(2).value_or(".")};
+        auto const raw = fs::path{ p(2).value_or(".") };
 
         /*
          * If the path was given as "bar/foo" where "foo" is the beginning of a
@@ -169,10 +170,10 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
          * broken.
          */
         auto const parent =
-            (raw.parent_path().string().empty() ? fs::path{"."}
+            (raw.parent_path().string().empty() ? fs::path{ "." }
                                                 : raw.parent_path());
 
-        auto const prefix = "load " + std::string{*p(1)} + ' ';
+        auto const prefix = "load " + std::string{ *p(1) } + ' ';
 
         if (fs::exists(raw) and fs::is_regular_file(raw)) {
             /*
@@ -180,13 +181,13 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
              * file.
              */
         } else if (fs::exists(raw) and fs::is_directory(raw)) {
-            for (auto& p : fs::directory_iterator{raw}) {
+            for (auto& p : fs::directory_iterator{ raw }) {
                 runtime_candidates.push_back(
                     prefix + p.path().native()
                     + (fs::is_directory(p.path()) ? "/" : ""));
             }
         } else if (fs::exists(parent) and fs::is_directory(parent)) {
-            for (auto& p : fs::directory_iterator{parent}) {
+            for (auto& p : fs::directory_iterator{ parent }) {
                 if (not p.path().stem().string().starts_with(stem.string())) {
                     continue;
                 }
@@ -199,7 +200,7 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
 
     if (*p(0) == "actor" and p(1).has_value() and *p(1) == "new") {
         auto const stem   = p(2).value_or("");
-        auto const prefix = std::string{"actor new "};
+        auto const prefix = std::string{ "actor new " };
         for (auto const& [mod_name, mod] : REPL_STATE->core.modules) {
             for (auto const& [fn_off, fn] : mod.elf.function_table()) {
                 auto const fn_id = (mod_name.empty() ? "" : (mod_name + "::"))
@@ -216,8 +217,10 @@ auto completion(char const* buf, linenoiseCompletions* const lc) -> void
     }
 }
 
-auto hints_impl(char const* buf, int* const color, int* const bold)
-    -> char const*
+auto hints_impl(
+    char const* buf,
+    int* const color,
+    int* const bold) -> char const*
 {
     static_cast<void>(buf);
     static_cast<void>(color);
@@ -225,13 +228,16 @@ auto hints_impl(char const* buf, int* const color, int* const bold)
 
     return nullptr;
 }
-auto hints(char const* buf, int* const color, int* const bold) -> char*
+auto hints(
+    char const* buf,
+    int* const color,
+    int* const bold) -> char*
 {
     return const_cast<char*>(hints_impl(buf, color, bold));
 }
 
 namespace viua {
-auto TRACE_STREAM = viua::support::fdstream{2};
+auto TRACE_STREAM = viua::support::fdstream{ 2 };
 }
 
 /*
@@ -239,8 +245,9 @@ auto TRACE_STREAM = viua::support::fdstream{2};
  * designated as the main module.
  */
 constexpr auto MAIN_MODULE_MNEMONIC = "main";
-auto load_module(std::string_view const name, std::filesystem::path elf_path)
-    -> void
+auto load_module(
+    std::string_view const name,
+    std::filesystem::path elf_path) -> void
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_CYAN;
@@ -264,7 +271,7 @@ auto load_module(std::string_view const name, std::filesystem::path elf_path)
         return;
     }
     {
-        struct stat statbuf {};
+        struct stat statbuf{};
         if (stat(elf_path.c_str(), &statbuf) == -1) {
             auto const saved_errno = errno;
             auto const errname     = strerrorname_np(saved_errno);
@@ -351,10 +358,11 @@ auto load_module(std::string_view const name, std::filesystem::path elf_path)
 
     REPL_STATE->core.modules.emplace(
         ((name == MAIN_MODULE_MNEMONIC) ? "" : name),
-        viua::vm::Module{elf_path, mod});
+        viua::vm::Module{ elf_path, mod });
 }
 
-auto evaluate_asm_expression(std::string const source_text) -> void
+auto evaluate_asm_expression(
+    std::string const source_text) -> void
 {
     auto lexemes = std::vector<viua::libs::lexer::Lexeme>{};
     try {
@@ -365,7 +373,7 @@ auto evaluate_asm_expression(std::string const source_text) -> void
         return;
     }
 
-    auto lv = viua::support::vector_view{lexemes};
+    auto lv = viua::support::vector_view{ lexemes };
     auto p  = viua::libs::parser::ast::Instruction{};
     try {
         p = viua::libs::parser::parse_instruction(lv);
@@ -420,7 +428,8 @@ auto evaluate_asm_expression(std::string const source_text) -> void
     proc->strtab = &proc->module.strings_table;
 }
 
-auto repl_eval(std::vector<std::string_view> const parts) -> bool
+auto repl_eval(
+    std::vector<std::string_view> const parts) -> bool
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_CYAN;
@@ -431,8 +440,9 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    auto const p = [&parts](size_t const n) -> std::optional<std::string_view> {
-        return (n < parts.size()) ? std::optional{parts.at(n)} : std::nullopt;
+    auto const p = [&parts](size_t const n) -> std::optional<std::string_view>
+    {
+        return (n < parts.size()) ? std::optional{ parts.at(n) } : std::nullopt;
     };
 
     if (*p(0) == "quit") {
@@ -440,7 +450,8 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
     } else if (*p(0) == "repl") {
         if (*p(1) == "pid-base") {
             using viua::runtime::PID;
-            std::cout << PID{REPL_STATE->core.pids.base}.to_string() << "\n\r";
+            std::cout << PID{ REPL_STATE->core.pids.base }.to_string()
+                      << "\n\r";
         } else if (*p(1) == "abort-internal") {
             if (*p(2) == "true") {
                 REPL_STATE->crash_on_internal = true;
@@ -452,7 +463,7 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
         }
     } else if (*p(0) == "load") {
         auto const name     = *p(1);
-        auto const elf_path = std::filesystem::path{*p(2)};
+        auto const elf_path = std::filesystem::path{ *p(2) };
         load_module(name, elf_path);
     } else if (*p(0) == "actor") {
         if (*p(1) == "new" and p(2).has_value()) {
@@ -464,9 +475,9 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
 
             auto const fn_id = *p(2);
             auto const mod_name =
-                std::string{(fn_id.rfind("::") == std::string::npos)
-                                ? ""
-                                : fn_id.substr(0, fn_id.rfind("::"))};
+                std::string{ (fn_id.rfind("::") == std::string::npos)
+                                 ? ""
+                                 : fn_id.substr(0, fn_id.rfind("::")) };
             auto const fn_name = (fn_id.rfind("::") == std::string::npos)
                                      ? fn_id
                                      : fn_id.substr(fn_id.rfind("::") + 2);
@@ -534,7 +545,7 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
             }
 
             auto const user_frame_index =
-                (p(2).has_value() ? std::stoull(std::string{*p(2)})
+                (p(2).has_value() ? std::stoull(std::string{ *p(2) })
                                   : REPL_STATE->selected_frame.value_or(0));
             if (user_frame_index >= proc->stack.frames.size()) {
                 std::cerr << esc(2, COLOR_FG_RED) << "error"
@@ -578,7 +589,7 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
             std::cout
                 << "  " << std::string(16, ' ') << " "
                 << module.elf_path.native() << "[.text+0x" << std::hex
-                << std::setfill('0') << std::setw(16) << unsigned{1} << " -- "
+                << std::setfill('0') << std::setw(16) << unsigned{ 1 } << " -- "
                 << "0x" << std::hex << std::setfill('0') << std::setw(16)
                 << ((module.ip_base + module.text.size()) - module.ip_base)
                 << "]"
@@ -600,15 +611,16 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
             return true;
         }
 
-        auto const limit = std::stoull(std::string{p(1).value_or("1")});
+        auto const limit = std::stoull(std::string{ p(1).value_or("1") });
 
         REPL_STATE->selected_frame.reset();
 
         try {
-            for (auto i = size_t{0}; i < limit; ++i) {
+            for (auto i = size_t{ 0 }; i < limit; ++i) {
                 if (not proc->module.ip_in_valid_range(proc->stack.ip)) {
                     throw viua::vm::abort_execution{
-                        proc->stack, "ip outside of valid range"};
+                        proc->stack, "ip outside of valid range"
+                    };
                 }
                 proc->stack.ip =
                     viua::vm::ins::execute(proc->stack, proc->stack.ip);
@@ -634,17 +646,18 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
             return true;
         }
 
-        auto const limit = std::stoull(std::string{p(1).value_or("1")});
+        auto const limit = std::stoull(std::string{ p(1).value_or("1") });
 
         REPL_STATE->selected_frame.reset();
 
         try {
-            for (auto i = size_t{0}; i < limit; ++i) {
+            for (auto i = size_t{ 0 }; i < limit; ++i) {
                 auto instruction = viua::arch::instruction_type{};
                 do {
                     if (not proc->module.ip_in_valid_range(proc->stack.ip)) {
                         throw viua::vm::abort_execution{
-                            proc->stack, "ip outside of valid range"};
+                            proc->stack, "ip outside of valid range"
+                        };
                     }
                     instruction = *proc->stack.ip;
                     proc->stack.ip =
@@ -729,7 +742,7 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
 
         auto asm_text = std::ostringstream{};
         asm_text << *p(2);
-        for (auto i = size_t{3}; p(i).has_value(); ++i) {
+        for (auto i = size_t{ 3 }; p(i).has_value(); ++i) {
             asm_text << ' ' << *p(i);
         }
         asm_text << '\n';
@@ -745,11 +758,11 @@ auto repl_main() -> void
     auto raw_line = static_cast<char*>(nullptr);
     while ((raw_line = linenoise(DEFAULT_PROMPT))) {
         linenoiseHistoryAdd(raw_line);
-        auto const line = std::string{raw_line};
+        auto const line = std::string{ raw_line };
         free(raw_line);
 
         auto const useful_line =
-            std::string_view{line.empty() ? REPL_STATE->last_input : line};
+            std::string_view{ line.empty() ? REPL_STATE->last_input : line };
         if (auto const parts = split_on_space(useful_line); not parts.empty()) {
             if (not repl_eval(parts)) {
                 break;
@@ -759,7 +772,9 @@ auto repl_main() -> void
     }
 }
 
-auto main(int argc, char* argv[]) -> int
+auto main(
+    int argc,
+    char* argv[]) -> int
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_CYAN;
@@ -770,7 +785,7 @@ auto main(int argc, char* argv[]) -> int
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    auto args            = std::vector<std::string>{(argv + 1), (argv + argc)};
+    auto args = std::vector<std::string>{ (argv + 1), (argv + argc) };
     auto verbosity_level = 0;
     {
         auto show_version = false;
@@ -805,7 +820,7 @@ auto main(int argc, char* argv[]) -> int
             }
         }
 
-        args = std::vector<std::string>{args.begin() + i, args.end()};
+        args = std::vector<std::string>{ args.begin() + i, args.end() };
 
         if (show_version) {
             if (verbosity_level) {

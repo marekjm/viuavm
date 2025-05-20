@@ -19,21 +19,21 @@
 
 #include <viua/libs/assembler.h>
 
-
 namespace viua::libs::assembler {
 namespace {
-constexpr auto LOW_32  = uint64_t{0x00000000ffffffff};
-constexpr auto HIGH_32 = uint64_t{0xffffffff00000000};
+constexpr auto LOW_32  = uint64_t{ 0x00'00'00'00'ff'ff'ff'ff };
+constexpr auto HIGH_32 = uint64_t{ 0xff'ff'ff'ff'00'00'00'00 };
 }  // namespace
 
-auto to_loading_parts_unsigned(uint64_t const value)
-    -> std::pair<uint32_t, uint32_t>
+auto to_loading_parts_unsigned(
+    uint64_t const value) -> std::pair<uint32_t, uint32_t>
 {
     auto const hi_part = static_cast<uint32_t>((value & HIGH_32) >> 32);
     auto const lo_part = static_cast<uint32_t>((value & LOW_32) >> 0);
-    return {hi_part, lo_part};
+    return { hi_part, lo_part };
 }
-auto li_cost(uint64_t const value) -> size_t
+auto li_cost(
+    uint64_t const value) -> size_t
 {
     auto const high_part = static_cast<bool>(value & HIGH_32);
     auto const low_part  = static_cast<bool>(value & LOW_32);

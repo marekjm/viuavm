@@ -26,7 +26,6 @@
 // definition, with I/O, processes, schedulers, etc.
 #include <viua/vm/core.h>
 
-
 namespace viua::vm::backtrace {
 /*
  * Utility functions. Used in implementation of EBREAK, but also accessed by the
@@ -39,6 +38,6 @@ auto dump_registers(std::vector<viua::vm::Register> const&,
                     viua::vm::Process::atoms_map_type const&,
                     std::string_view const) -> void;
 auto dump_memory(std::vector<viua::vm::Page> const&) -> void;
-}
+}  // namespace viua::vm::backtrace
 
 #endif

@@ -44,14 +44,15 @@ using Text = std::vector<viua::arch::instruction_type>;
 using viua::support::string::quote_fancy;
 
 namespace stage {
-auto emit_elf(std::filesystem::path const output_path,
-              bool const as_executable,
-              std::optional<uint64_t> const entry_point_fn,
-              Text const& text,
-              std::optional<std::vector<Elf64_Rel>> relocs,
-              std::vector<uint8_t> const& rodata_buf,
-              std::vector<uint8_t> const& string_table,
-              std::vector<Elf64_Sym>& symbol_table) -> void
+auto emit_elf(
+    std::filesystem::path const output_path,
+    bool const as_executable,
+    std::optional<uint64_t> const entry_point_fn,
+    Text const& text,
+    std::optional<std::vector<Elf64_Rel>> relocs,
+    std::vector<uint8_t> const& rodata_buf,
+    std::vector<uint8_t> const& string_table,
+    std::vector<Elf64_Sym>& symbol_table) -> void
 {
     auto const a_out = open(output_path.c_str(),
                             O_CREAT | O_TRUNC | O_WRONLY,
@@ -62,8 +63,8 @@ auto emit_elf(std::filesystem::path const output_path,
     }
 
     constexpr auto VIUA_MAGIC [[maybe_unused]] = "\x7fVIUA\x00\x00\x00";
-    auto const VIUAVM_INTERP                   = std::string{"viua-vm"};
-    auto const VIUA_COMMENT = std::string{VIUAVM_VERSION_FULL};
+    auto const VIUAVM_INTERP                   = std::string{ "viua-vm" };
+    auto const VIUA_COMMENT = std::string{ VIUAVM_VERSION_FULL };
 
     {
         // see elf(5)
@@ -83,19 +84,20 @@ auto emit_elf(std::filesystem::path const output_path,
         elf_header.e_flags  = 0;  // processor-specific flags, should be 0
         elf_header.e_ehsize = sizeof(elf_header);
 
-        auto shstr            = std::vector<char>{'\0'};
-        auto save_shstr_entry = [&shstr](std::string_view const sv) -> size_t {
+        auto shstr            = std::vector<char>{ '\0' };
+        auto save_shstr_entry = [&shstr](std::string_view const sv) -> size_t
+        {
             auto const saved_at = shstr.size();
             std::copy(sv.begin(), sv.end(), std::back_inserter(shstr));
             shstr.push_back('\0');
             return saved_at;
         };
 
-        auto text_section_ndx   = size_t{0};
-        auto rel_section_ndx    = size_t{0};
-        auto rodata_section_ndx = size_t{0};
-        auto symtab_section_ndx = size_t{0};
-        auto strtab_section_ndx = size_t{0};
+        auto text_section_ndx   = size_t{ 0 };
+        auto rel_section_ndx    = size_t{ 0 };
+        auto rodata_section_ndx = size_t{ 0 };
+        auto symtab_section_ndx = size_t{ 0 };
+        auto strtab_section_ndx = size_t{ 0 };
 
         using Header_pair = std::pair<std::optional<Elf64_Phdr>, Elf64_Shdr>;
         auto elf_headers  = std::vector<Header_pair>{};
@@ -116,7 +118,7 @@ auto emit_elf(std::filesystem::path const output_path,
             Elf64_Shdr void_section{};
             void_section.sh_type = SHT_NULL;
 
-            elf_headers.push_back({seg, void_section});
+            elf_headers.push_back({ seg, void_section });
         }
         {
             /*
@@ -140,7 +142,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_size   = 8;
             sec.sh_flags  = 0;
 
-            elf_headers.push_back({seg, sec});
+            elf_headers.push_back({ seg, sec });
         }
         {
             /*
@@ -165,7 +167,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_size   = VIUAVM_INTERP.size() + 1;
             sec.sh_flags  = 0;
 
-            elf_headers.push_back({seg, sec});
+            elf_headers.push_back({ seg, sec });
         }
         if (relocs.has_value()) {
             /*
@@ -197,7 +199,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_info = 0;
 
             rel_section_ndx = elf_headers.size();
-            elf_headers.push_back({std::nullopt, sec});
+            elf_headers.push_back({ std::nullopt, sec });
         }
         {
             /*
@@ -225,7 +227,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_flags  = SHF_ALLOC | SHF_EXECINSTR;
 
             text_section_ndx = elf_headers.size();
-            elf_headers.push_back({seg, sec});
+            elf_headers.push_back({ seg, sec });
         }
         {
             /*
@@ -258,7 +260,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_flags  = SHF_ALLOC;
 
             rodata_section_ndx = elf_headers.size();
-            elf_headers.push_back({seg, sec});
+            elf_headers.push_back({ seg, sec });
         }
         {
             /*
@@ -271,7 +273,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_size   = VIUA_COMMENT.size() + 1;
             sec.sh_flags  = 0;
 
-            elf_headers.push_back({std::nullopt, sec});
+            elf_headers.push_back({ std::nullopt, sec });
         }
         {
             /*
@@ -300,7 +302,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_info    = 0;
 
             symtab_section_ndx = elf_headers.size();
-            elf_headers.push_back({std::nullopt, sec});
+            elf_headers.push_back({ std::nullopt, sec });
         }
         {
             /*
@@ -314,7 +316,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_flags  = SHF_STRINGS;
 
             strtab_section_ndx = elf_headers.size();
-            elf_headers.push_back({std::nullopt, sec});
+            elf_headers.push_back({ std::nullopt, sec });
         }
         {
             /*
@@ -335,7 +337,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_size   = shstr.size();
             sec.sh_flags  = SHF_STRINGS;
 
-            elf_headers.push_back({std::nullopt, sec});
+            elf_headers.push_back({ std::nullopt, sec });
         }
 
         /*
@@ -352,10 +354,10 @@ auto emit_elf(std::filesystem::path const output_path,
             elf_headers.at(rel_section_ndx).second.sh_info = text_section_ndx;
         }
 
-        auto elf_pheaders = std::count_if(
-            elf_headers.begin(),
-            elf_headers.end(),
-            [](auto const& each) -> bool { return each.first.has_value(); });
+        auto elf_pheaders = std::count_if(elf_headers.begin(),
+                                          elf_headers.end(),
+                                          [](auto const& each) -> bool
+                                          { return each.first.has_value(); });
         auto elf_sheaders = elf_headers.size();
 
         auto const elf_size = sizeof(Elf64_Ehdr)
@@ -363,7 +365,7 @@ auto emit_elf(std::filesystem::path const output_path,
                               + (elf_sheaders * sizeof(Elf64_Shdr));
         auto text_offset = std::optional<size_t>{};
         {
-            auto offset_accumulator = size_t{0};
+            auto offset_accumulator = size_t{ 0 };
             for (auto& [segment, section] : elf_headers) {
                 if (segment.has_value() and (segment->p_type != PT_NULL)) {
                     if (segment->p_type == PT_NULL) {
@@ -474,14 +476,16 @@ auto emit_elf(std::filesystem::path const output_path,
 
         for (auto& each : symbol_table) {
             switch (ELF64_ST_TYPE(each.st_info)) {
-            case STT_FUNC:
-                each.st_shndx = static_cast<Elf64_Section>(text_section_ndx);
-                break;
-            case STT_OBJECT:
-                each.st_shndx = static_cast<Elf64_Section>(rodata_section_ndx);
-                break;
-            default:
-                break;
+                case STT_FUNC:
+                    each.st_shndx =
+                        static_cast<Elf64_Section>(text_section_ndx);
+                    break;
+                case STT_OBJECT:
+                    each.st_shndx =
+                        static_cast<Elf64_Section>(rodata_section_ndx);
+                    break;
+                default:
+                    break;
             }
             viua::support::posix::whole_write(
                 a_out, &each, sizeof(std::decay_t<decltype(symbol_table)>));
@@ -496,13 +500,13 @@ auto emit_elf(std::filesystem::path const output_path,
     close(a_out);
 }
 
-auto make_relocations_from(std::vector<uint8_t> const data)
-    -> std::vector<Elf64_Rel>
+auto make_relocations_from(
+    std::vector<uint8_t> const data) -> std::vector<Elf64_Rel>
 {
     auto rels = std::vector<Elf64_Rel>{};
     rels.reserve(data.size() / sizeof(Elf64_Rel));
 
-    for (auto off = size_t{0}; off < data.size(); off += sizeof(Elf64_Rel)) {
+    for (auto off = size_t{ 0 }; off < data.size(); off += sizeof(Elf64_Rel)) {
         auto each = Elf64_Rel{};
         memcpy(&each, data.data() + off, sizeof(Elf64_Rel));
         rels.push_back(each);
@@ -511,12 +515,13 @@ auto make_relocations_from(std::vector<uint8_t> const data)
     return rels;
 }
 
-auto make_symtab_from(std::vector<uint8_t> const data) -> std::vector<Elf64_Sym>
+auto make_symtab_from(
+    std::vector<uint8_t> const data) -> std::vector<Elf64_Sym>
 {
     auto rels = std::vector<Elf64_Sym>{};
     rels.reserve(data.size() / sizeof(Elf64_Sym));
 
-    for (auto off = size_t{0}; off < data.size(); off += sizeof(Elf64_Sym)) {
+    for (auto off = size_t{ 0 }; off < data.size(); off += sizeof(Elf64_Sym)) {
         auto each = Elf64_Sym{};
         memcpy(&each, data.data() + off, sizeof(Elf64_Sym));
         rels.push_back(each);
@@ -527,7 +532,10 @@ auto make_symtab_from(std::vector<uint8_t> const data) -> std::vector<Elf64_Sym>
 }  // namespace stage
 
 namespace {
-auto relocate(Text& text, Elf64_Rel const rel, uint64_t const value) -> void
+auto relocate(
+    Text& text,
+    Elf64_Rel const rel,
+    uint64_t const value) -> void
 {
     auto const text_ndx = (rel.r_offset / sizeof(viua::arch::instruction_type));
 
@@ -538,23 +546,24 @@ auto relocate(Text& text, Elf64_Rel const rel, uint64_t const value) -> void
     if (op == OPCODE::ARODP or op == OPCODE::ATXTP) {
         using viua::arch::ops::E;
         auto imm_op       = E::decode(text.at(text_ndx));
-        text.at(text_ndx) = E{imm_op.opcode, imm_op.out, value}.encode();
+        text.at(text_ndx) = E{ imm_op.opcode, imm_op.out, value }.encode();
     } else {
         using viua::arch::ops::F;
         auto const hi_ndx = text_ndx - 2;
         auto hi_op        = F::decode(text.at(hi_ndx));
         auto const hi     = static_cast<uint32_t>(value >> 32);
-        text.at(hi_ndx)   = F{hi_op.opcode, hi_op.out, hi}.encode();
+        text.at(hi_ndx)   = F{ hi_op.opcode, hi_op.out, hi }.encode();
 
         auto const lo_ndx = text_ndx - 1;
         auto lo_op        = F::decode(text.at(lo_ndx));
         auto const lo     = static_cast<uint32_t>(value);
-        text.at(lo_ndx)   = F{lo_op.opcode, lo_op.out, lo}.encode();
+        text.at(lo_ndx)   = F{ lo_op.opcode, lo_op.out, lo }.encode();
     }
 }
 
-auto is_usable_module(std::filesystem::path const path,
-                      viua::vm::elf::Loaded_elf const& module) -> bool
+auto is_usable_module(
+    std::filesystem::path const path,
+    viua::vm::elf::Loaded_elf const& module) -> bool
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_CYAN;
@@ -629,13 +638,16 @@ auto is_usable_module(std::filesystem::path const path,
     return true;
 }
 
-auto show_or_anonymous(std::string_view const view) -> std::string_view
+auto show_or_anonymous(
+    std::string_view const view) -> std::string_view
 {
     return (view.empty() ? "<anonymous>" : view);
 }
 }  // namespace
 
-auto main(int argc, char** argv) -> int
+auto main(
+    int argc,
+    char** argv) -> int
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_CYAN;
@@ -646,7 +658,7 @@ auto main(int argc, char** argv) -> int
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    auto const args = std::vector<std::string>{(argv + 1), (argv + argc)};
+    auto const args = std::vector<std::string>{ (argv + 1), (argv + argc) };
     if (args.empty()) {
         std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
                   << ": no file to link\n";
@@ -677,7 +689,7 @@ auto main(int argc, char** argv) -> int
          * Tool-specific options.
          */
         else if (each == "-o") {
-            preferred_output_path = std::filesystem::path{args.at(++i)};
+            preferred_output_path = std::filesystem::path{ args.at(++i) };
         } else if (each == "--type=shared") {
             as_shared_lib = true;
         } else if (each == "--type=exec") {
@@ -736,10 +748,11 @@ auto main(int argc, char** argv) -> int
 
     auto const source_path = input_files.front();
     auto const output_path = preferred_output_path.value_or(
-        as_executable ? std::filesystem::path{"a.out"}
+        as_executable ? std::filesystem::path{ "a.out" }
                       : [source_path,
                          as_shared_lib,
-                         as_object_lib]() -> std::filesystem::path {
+                         as_object_lib]() -> std::filesystem::path
+        {
             auto o = source_path;
             o.replace_extension(as_shared_lib ? "so"
                                               : (as_object_lib ? "o" : "a"));
@@ -778,7 +791,7 @@ auto main(int argc, char** argv) -> int
         /*
          * Need space for the beginning and ending nul characters.
          */
-        auto needed_strtab_size = size_t{2};
+        auto needed_strtab_size = size_t{ 2 };
 
         for (auto const& lnk_path : input_files) {
             auto const lnk_elf_fd = open(lnk_path.c_str(), O_RDONLY);
@@ -844,14 +857,15 @@ auto main(int argc, char** argv) -> int
         [&symtab, &symtab_cache, &anonymous_symtab_cache](
             std::string_view const name,
             Elf64_Sym const sym,
-            std::filesystem::path const path) -> size_t {
+            std::filesystem::path const path) -> size_t
+    {
         auto const sym_ndx = symtab.size();
 
         /*
          * Treat anonymous symbols differently. Since they do not have names
          * the linker uses their addresses to differentiate them.
          */
-        auto const sym_def = std::pair{symtab.size(), path};
+        auto const sym_def = std::pair{ symtab.size(), path };
         if (name.empty()) {
             anonymous_symtab_cache.emplace(sym.st_value, sym_def);
         } else {
@@ -863,16 +877,20 @@ auto main(int argc, char** argv) -> int
     };
     // FIXME also add is_defined(std::string_view) for checks by name
     auto is_defined = [&strtab, &symtab_cache, &anonymous_symtab_cache](
-                          Elf64_Sym const sym) -> bool {
-        auto const sym_name = std::string_view{
-            reinterpret_cast<char const*>(strtab.data()) + sym.st_name};
+                          Elf64_Sym const sym) -> bool
+    {
+        auto const sym_name =
+            std::string_view{ reinterpret_cast<char const*>(strtab.data())
+                              + sym.st_name };
         return (sym.st_name ? symtab_cache.count(sym_name)
                             : anonymous_symtab_cache.count(sym.st_value));
     };
     auto get_symtab_index = [&strtab, &symtab_cache, &anonymous_symtab_cache](
-                                Elf64_Sym const sym) -> size_t {
-        auto const sym_name = std::string_view{
-            reinterpret_cast<char const*>(strtab.data()) + sym.st_name};
+                                Elf64_Sym const sym) -> size_t
+    {
+        auto const sym_name =
+            std::string_view{ reinterpret_cast<char const*>(strtab.data())
+                              + sym.st_name };
         return (sym_name.empty() ? anonymous_symtab_cache.at(sym.st_value)
                                  : symtab_cache.at(sym_name))
             .first;
@@ -948,7 +966,7 @@ auto main(int argc, char** argv) -> int
                           << entry_addr->second.native() << "\n";
                 return 1;
             }
-            entry_addr = {*ep + text_addend, lnk_path};
+            entry_addr = { *ep + text_addend, lnk_path };
         }
 
         /*
@@ -963,29 +981,30 @@ auto main(int argc, char** argv) -> int
          */
         using viua::libs::stage::save_buffer_to_rodata;
         using viua::libs::stage::save_string_to_strtab;
-        auto sym_ndx = size_t{0};
+        auto sym_ndx = size_t{ 0 };
         for (auto& sym : lnk_symtab) {
             auto const lnk_sym_name = std::string_view{
-                reinterpret_cast<char const*>(lnk_strtab.data()) + sym.st_name};
+                reinterpret_cast<char const*>(lnk_strtab.data()) + sym.st_name
+            };
             auto const sym_type = ELF64_ST_TYPE(sym.st_info);
             if (verbosity_level) {
                 std::cerr << "  " << sym_ndx++ << ": symbol: ";
                 switch (sym_type) {
-                case STT_NOTYPE:
-                    std::cerr << "STT_NOTYPE";
-                    break;
-                case STT_FUNC:
-                    std::cerr << "STT_FUNC";
-                    break;
-                case STT_OBJECT:
-                    std::cerr << "STT_OBJECT";
-                    break;
-                case STT_FILE:
-                    std::cerr << "STT_FILE";
-                    break;
-                default:
-                    std::cerr << "<unknown type>";
-                    break;
+                    case STT_NOTYPE:
+                        std::cerr << "STT_NOTYPE";
+                        break;
+                    case STT_FUNC:
+                        std::cerr << "STT_FUNC";
+                        break;
+                    case STT_OBJECT:
+                        std::cerr << "STT_OBJECT";
+                        break;
+                    case STT_FILE:
+                        std::cerr << "STT_FILE";
+                        break;
+                    default:
+                        std::cerr << "<unknown type>";
+                        break;
                 }
                 std::cerr << ": " << show_or_anonymous(lnk_sym_name) << "\n";
             }
@@ -994,9 +1013,10 @@ auto main(int argc, char** argv) -> int
                 continue;
             }
 
-            sym.st_name         = save_string_to_strtab(strtab, lnk_sym_name);
-            auto const sym_name = std::string_view{
-                reinterpret_cast<char const*>(strtab.data()) + sym.st_name};
+            sym.st_name = save_string_to_strtab(strtab, lnk_sym_name);
+            auto const sym_name =
+                std::string_view{ reinterpret_cast<char const*>(strtab.data())
+                                  + sym.st_name };
             if (verbosity_level and sym.st_name) {
                 std::cerr << "    global sym name: " << sym_name << "\n";
                 std::cerr << "    global .st_name: " << sym.st_name << "\n";
@@ -1035,15 +1055,15 @@ auto main(int argc, char** argv) -> int
                         auto const def_sym = symtab.at(def_sym_ndx);
                         std::cerr << "    address: ";
                         switch (ELF64_ST_TYPE(def_sym.st_info)) {
-                        case STT_FUNC:
-                            std::cerr << "[.text+0x";
-                            break;
-                        case STT_OBJECT:
-                            std::cerr << "[.rodata+0x";
-                            break;
-                        default:
-                            std::cerr << "[<invalid>+0x";
-                            break;
+                            case STT_FUNC:
+                                std::cerr << "[.text+0x";
+                                break;
+                            case STT_OBJECT:
+                                std::cerr << "[.rodata+0x";
+                                break;
+                            default:
+                                std::cerr << "[<invalid>+0x";
+                                break;
                         }
                         std::cout << std::hex << std::setfill('0')
                                   << std::setw(16) << def_sym.st_value
@@ -1071,12 +1091,12 @@ auto main(int argc, char** argv) -> int
             }
 
             switch (ELF64_ST_TYPE(sym.st_info)) {
-            case STT_FUNC:
-                sym.st_value += text_addend;
-                break;
-            case STT_OBJECT:
-                sym.st_value += rodata_addend;
-                break;
+                case STT_FUNC:
+                    sym.st_value += text_addend;
+                    break;
+                case STT_OBJECT:
+                    sym.st_value += rodata_addend;
+                    break;
             }
 
             auto const sym_ndx = record_symbol(sym_name, sym, lnk_path);
@@ -1084,15 +1104,15 @@ auto main(int argc, char** argv) -> int
                 std::cerr << "    defined as symbol " << sym_ndx << "\n";
                 std::cerr << "    address: ";
                 switch (ELF64_ST_TYPE(sym.st_info)) {
-                case STT_FUNC:
-                    std::cerr << "[.text+0x";
-                    break;
-                case STT_OBJECT:
-                    std::cerr << "[.rodata+0x";
-                    break;
-                default:
-                    std::cerr << "[<invalid>+0x";
-                    break;
+                    case STT_FUNC:
+                        std::cerr << "[.text+0x";
+                        break;
+                    case STT_OBJECT:
+                        std::cerr << "[.rodata+0x";
+                        break;
+                    default:
+                        std::cerr << "[<invalid>+0x";
+                        break;
                 }
                 std::cout << std::hex << std::setfill('0') << std::setw(16)
                           << sym.st_value << std::dec << std::setfill(' ')
@@ -1101,10 +1121,11 @@ auto main(int argc, char** argv) -> int
         }
 
         for (auto& rel : lnk_rel) {
-            auto const sym_ndx  = ELF64_R_SYM(rel.r_info);
-            auto const lnk_sym  = lnk_symtab.at(sym_ndx);
-            auto const sym_name = std::string_view{
-                reinterpret_cast<char const*>(strtab.data()) + lnk_sym.st_name};
+            auto const sym_ndx = ELF64_R_SYM(rel.r_info);
+            auto const lnk_sym = lnk_symtab.at(sym_ndx);
+            auto const sym_name =
+                std::string_view{ reinterpret_cast<char const*>(strtab.data())
+                                  + lnk_sym.st_name };
 
             if (verbosity_level) {
                 std::cerr << "  rel at " << rel.r_offset
@@ -1181,7 +1202,7 @@ auto main(int argc, char** argv) -> int
     if (verbosity_level) {
         std::cerr << "applying relocations (" << relocations.size() << ")\n";
     }
-    auto rel_i = size_t{0};
+    auto rel_i = size_t{ 0 };
     for (auto const& rel : relocations) {
         if (verbosity_level) {
             std::cerr << "  " << rel_i++ << ": relocation at [.text+0x"
@@ -1212,16 +1233,16 @@ auto main(int argc, char** argv) -> int
 
                 std::cerr << "    .st_value: ";
                 switch (ELF64_ST_TYPE(sym.st_info)) {
-                case STT_FUNC:
-                    std::cerr << "[.text+0x";
-                    break;
-                case STT_OBJECT:
-                    std::cerr << "[.rodata+0x";
-                    break;
-                default:
-                    std::cerr << "[<invalid>+0x";
-                    invalid_relocation = true;
-                    break;
+                    case STT_FUNC:
+                        std::cerr << "[.text+0x";
+                        break;
+                    case STT_OBJECT:
+                        std::cerr << "[.rodata+0x";
+                        break;
+                    default:
+                        std::cerr << "[<invalid>+0x";
+                        invalid_relocation = true;
+                        break;
                 }
                 std::cout << std::hex << std::setfill('0') << std::setw(16)
                           << sym.st_value << std::dec << std::setfill(' ')
@@ -1233,10 +1254,11 @@ auto main(int argc, char** argv) -> int
             }
             relocate(text, rel, sym.st_value);
         } else {
-            auto const sym_ndx  = ELF64_R_SYM(rel.r_info);
-            auto const sym      = symtab.at(sym_ndx);
-            auto const sym_name = std::string_view{
-                reinterpret_cast<char const*>(strtab.data()) + sym.st_name};
+            auto const sym_ndx = ELF64_R_SYM(rel.r_info);
+            auto const sym     = symtab.at(sym_ndx);
+            auto const sym_name =
+                std::string_view{ reinterpret_cast<char const*>(strtab.data())
+                                  + sym.st_name };
 
             if (verbosity_level) {
                 std::cerr << "    symbol: " << show_or_anonymous(sym_name)
@@ -1245,16 +1267,16 @@ auto main(int argc, char** argv) -> int
 
                 std::cerr << "    .st_value: ";
                 switch (ELF64_ST_TYPE(sym.st_info)) {
-                case STT_FUNC:
-                    std::cerr << "[.text+0x";
-                    break;
-                case STT_OBJECT:
-                    std::cerr << "[.rodata+0x";
-                    break;
-                default:
-                    std::cerr << "[<invalid>+0x";
-                    invalid_relocation = true;
-                    break;
+                    case STT_FUNC:
+                        std::cerr << "[.text+0x";
+                        break;
+                    case STT_OBJECT:
+                        std::cerr << "[.rodata+0x";
+                        break;
+                    default:
+                        std::cerr << "[<invalid>+0x";
+                        invalid_relocation = true;
+                        break;
                 }
                 std::cout << std::hex << std::setfill('0') << std::setw(16)
                           << sym.st_value << std::dec << std::setfill(' ')
@@ -1288,9 +1310,9 @@ auto main(int argc, char** argv) -> int
     if (dump_strtab) {
         std::cerr << "[.strtab] allocated size: " << strtab.size()
                   << " bytes\n";
-        for (auto i = size_t{0}; i < strtab.size(); ++i) {
-            auto const sv = std::string_view{
-                reinterpret_cast<char const*>(strtab.data() + i)};
+        for (auto i = size_t{ 0 }; i < strtab.size(); ++i) {
+            auto const sv = std::string_view{ reinterpret_cast<char const*>(
+                strtab.data() + i) };
             std::cout << "[.strtab+0x" << std::hex << std::setfill('0')
                       << std::setw(16) << i << std::dec << std::setfill(' ')
                       << "] = " << quote_fancy(sv) << "\n";
@@ -1298,16 +1320,16 @@ auto main(int argc, char** argv) -> int
         }
     }
 
-    stage::emit_elf(
-        output_path,
-        as_executable,
-        (entry_addr.has_value() ? std::optional{entry_addr->first}
-                                : std::nullopt),
-        text,
-        (as_executable ? std::nullopt : std::optional{std::move(relocations)}),
-        rodata,
-        strtab,
-        symtab);
+    stage::emit_elf(output_path,
+                    as_executable,
+                    (entry_addr.has_value() ? std::optional{ entry_addr->first }
+                                            : std::nullopt),
+                    text,
+                    (as_executable ? std::nullopt
+                                   : std::optional{ std::move(relocations) }),
+                    rodata,
+                    strtab,
+                    symtab);
 
     return 0;
 }

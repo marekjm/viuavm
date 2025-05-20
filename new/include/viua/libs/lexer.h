@@ -29,7 +29,6 @@
 #include <string_view>
 #include <vector>
 
-
 namespace viua::libs::lexer {
 struct Location {
     size_t line{};
@@ -37,7 +36,8 @@ struct Location {
     size_t offset{};
 };
 
-enum class TOKEN {
+enum class TOKEN
+{
     /*
      * Used for synthetic errors during lexical analysis phase, when there are
      * no tokens available yet.
@@ -102,8 +102,13 @@ struct Lexeme {
     std::optional<std::tuple<std::string, TOKEN, Location>> synthesized_from{};
 
     Lexeme() = default;
-    inline Lexeme(std::string tx, TOKEN tk, Location ln)
-            : text{std::move(tx)}, token{tk}, location{ln}
+    inline Lexeme(
+        std::string tx,
+        TOKEN tk,
+        Location ln)
+        : text{ std::move(tx) }
+        , token{ tk }
+        , location{ ln }
     {}
 
     auto operator==(TOKEN const) const -> bool;

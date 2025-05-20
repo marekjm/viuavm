@@ -30,17 +30,17 @@
 #include <viua/support/fdio.h>
 #include <viua/vm/elf.h>
 
-
 namespace viua::vm::elf {
 using viua::support::posix::whole_read;
 using viua::support::posix::whole_write;
 
-auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
+auto Loaded_elf::load(
+    int const elf_fd) -> Loaded_elf
 {
     auto loaded = Loaded_elf{};
     if (read(elf_fd, &loaded.header, sizeof(loaded.header))
         != sizeof(loaded.header)) {
-        throw std::runtime_error{"could not read program header"};
+        throw std::runtime_error{ "could not read program header" };
     }
 
     auto const& ehdr = loaded.header;
@@ -55,7 +55,7 @@ auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
         auto const magic_is_ok =
             (magic_leader and magic_e and magic_l and magic_f);
         if (not magic_is_ok) {
-            throw std::runtime_error{"invalid ELF magic"};
+            throw std::runtime_error{ "invalid ELF magic" };
         }
     }
     {
@@ -63,29 +63,30 @@ auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
          * Verify other ELF attributes.
          */
         if (ehdr.e_ident[EI_CLASS] != ELFCLASS64) {
-            throw std::runtime_error{"invalid ELF class"};
+            throw std::runtime_error{ "invalid ELF class" };
         }
         if (ehdr.e_ident[EI_DATA] != ELFDATA2LSB) {
-            throw std::runtime_error{"invalid ELF endianness"};
+            throw std::runtime_error{ "invalid ELF endianness" };
         }
         if (ehdr.e_ident[EI_VERSION] != EV_CURRENT) {
             throw std::runtime_error{
-                "invalid ELF version in identification array"};
+                "invalid ELF version in identification array"
+            };
         }
         if (ehdr.e_ident[EI_OSABI] != ELFOSABI_STANDALONE) {
-            throw std::runtime_error{"invalid ELF OS ABI"};
+            throw std::runtime_error{ "invalid ELF OS ABI" };
         }
         if (ehdr.e_ident[EI_ABIVERSION] != 0) {
-            throw std::runtime_error{"invalid ELF ABI version"};
+            throw std::runtime_error{ "invalid ELF ABI version" };
         }
         if (ehdr.e_machine != ET_NONE) {
-            throw std::runtime_error{"invalid ELF machine"};
+            throw std::runtime_error{ "invalid ELF machine" };
         }
         if (ehdr.e_version != EV_CURRENT) {
-            throw std::runtime_error{"invalid ELF version"};
+            throw std::runtime_error{ "invalid ELF version" };
         }
         if (ehdr.e_flags != 0) {
-            throw std::runtime_error{"invalid ELF flags"};
+            throw std::runtime_error{ "invalid ELF flags" };
         }
     }
 
@@ -93,7 +94,7 @@ auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
     {
         lseek(elf_fd, ehdr.e_phoff, SEEK_SET);
 
-        for (auto i = size_t{0}; i < ehdr.e_phnum; ++i) {
+        for (auto i = size_t{ 0 }; i < ehdr.e_phnum; ++i) {
             pheaders.emplace_back(Elf64_Phdr{});
             whole_read(elf_fd, &pheaders.back(), ehdr.e_phentsize);
         }
@@ -103,7 +104,7 @@ auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
     {
         lseek(elf_fd, ehdr.e_shoff, SEEK_SET);
 
-        for (auto i = size_t{0}; i < ehdr.e_shnum; ++i) {
+        for (auto i = size_t{ 0 }; i < ehdr.e_shnum; ++i) {
             sheaders.emplace_back(Elf64_Shdr{});
             whole_read(elf_fd, &sheaders.back(), ehdr.e_shentsize);
         }
@@ -117,18 +118,19 @@ auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
         lseek(elf_fd, shstrtab.sh_offset, SEEK_SET);
         whole_read(elf_fd, buf.data(), buf.size());
 
-        for (auto i = size_t{0}; i < shstrtab.sh_size; ++i) {
+        for (auto i = size_t{ 0 }; i < shstrtab.sh_size; ++i) {
             section_names.emplace_back(&buf[i]);
             i += section_names.back().size();
         }
     }
 
-    auto sh_index = size_t{0};
+    auto sh_index = size_t{ 0 };
     for (auto const& sh : sheaders) {
-        auto const ph = std::find_if(
-            pheaders.begin(), pheaders.end(), [&sh](auto const& each) -> bool {
-                return (each.p_offset == sh.sh_offset);
-            });
+        auto const ph =
+            std::find_if(pheaders.begin(),
+                         pheaders.end(),
+                         [&sh](auto const& each) -> bool
+                         { return (each.p_offset == sh.sh_offset); });
 
         auto fragment = Fragment{};
 
@@ -146,7 +148,7 @@ auto Loaded_elf::load(int const elf_fd) -> Loaded_elf
 
         fragment.index = sh_index++;
         loaded.fragments.push_back(
-            {section_names.at(fragment.index), std::move(fragment)});
+            { section_names.at(fragment.index), std::move(fragment) });
     }
 
     loaded.load_strtab();
@@ -163,16 +165,17 @@ auto Loaded_elf::entry_point() const -> std::optional<size_t>
         return std::nullopt;
     }
 }
-auto Loaded_elf::find_fragment(std::string_view const sv) const
+auto Loaded_elf::find_fragment(
+    std::string_view const sv) const
     -> std::optional<std::reference_wrapper<Fragment const>>
 {
-    auto const fragment = std::find_if(
-        fragments.begin(), fragments.end(), [sv](auto const& frag) -> bool {
-            return (frag.first == sv);
-        });
+    auto const fragment = std::find_if(fragments.begin(),
+                                       fragments.end(),
+                                       [sv](auto const& frag) -> bool
+                                       { return (frag.first == sv); });
     return (fragment == fragments.end())
                ? std::nullopt
-               : std::optional{std::ref(fragment->second)};
+               : std::optional{ std::ref(fragment->second) };
 }
 auto Loaded_elf::load_strtab() -> void
 {
@@ -186,18 +189,19 @@ auto Loaded_elf::load_strtab() -> void
     }
 
     auto const strtab_size = elf_strtab->get().section_header.sh_size;
-    strtab                 = std::string_view{
-        reinterpret_cast<char const*>(elf_strtab->get().data.data()),
-        strtab_size};
+    strtab                 = std::string_view{ reinterpret_cast<char const*>(
+                                   elf_strtab->get().data.data()),
+                               strtab_size };
     auto const strtab_data =
         reinterpret_cast<char const*>(elf_strtab->get().data.data());
-    for (auto i = size_t{0}; i < strtab_size; ++i) {
-        auto sv = std::string_view{strtab_data + i};
+    for (auto i = size_t{ 0 }; i < strtab_size; ++i) {
+        auto sv = std::string_view{ strtab_data + i };
         strtab_quick.emplace(i, sv);
         i += sv.size();
     }
 }
-auto Loaded_elf::str_at(size_t const off) const -> std::string_view
+auto Loaded_elf::str_at(
+    size_t const off) const -> std::string_view
 {
     auto name = std::string_view{};
     if (strtab_quick.count(off)) {
@@ -205,7 +209,7 @@ auto Loaded_elf::str_at(size_t const off) const -> std::string_view
     } else {
         name = strtab;
         name.remove_prefix(off);
-        name = std::string_view{name.data()};
+        name = std::string_view{ name.data() };
     }
     if (strtab.size() <= off) {
         abort();
@@ -226,7 +230,7 @@ auto Loaded_elf::load_symtab() -> void
     auto const symtab_data = elf_symtab->get().data.data();
     auto const no_of_symtab_entries =
         elf_symtab->get().section_header.sh_size / sizeof(Elf64_Sym);
-    for (auto i = size_t{0}; i < no_of_symtab_entries; ++i) {
+    for (auto i = size_t{ 0 }; i < no_of_symtab_entries; ++i) {
         auto sym = Elf64_Sym{};
         memcpy(&sym, symtab_data + (i * sizeof(Elf64_Sym)), sizeof(Elf64_Sym));
 
@@ -237,15 +241,17 @@ auto Loaded_elf::load_symtab() -> void
     }
 }
 
-auto Loaded_elf::fn_at(std::vector<uint8_t> const& function_table,
-                       size_t const offset) -> std::pair<std::string, size_t>
+auto Loaded_elf::fn_at(
+    std::vector<uint8_t> const& function_table,
+    size_t const offset) -> std::pair<std::string, size_t>
 {
     auto sz = uint64_t{};
     memcpy(&sz, (function_table.data() + offset - sizeof(sz)), sizeof(sz));
     sz = le64toh(sz);
 
     auto name = std::string{
-        reinterpret_cast<char const*>(function_table.data()) + offset, sz};
+        reinterpret_cast<char const*>(function_table.data()) + offset, sz
+    };
 
     auto addr = uint64_t{};
     memcpy(&addr, (function_table.data() + offset + sz), sizeof(addr));
@@ -258,9 +264,10 @@ auto Loaded_elf::fn_at(std::vector<uint8_t> const& function_table,
         std::println("Address:    {}", addr);
     }
 
-    return {name, addr};
+    return { name, addr };
 }
-auto Loaded_elf::name_function_at(size_t const offset) const -> std::string_view
+auto Loaded_elf::name_function_at(
+    size_t const offset) const -> std::string_view
 {
     for (auto const& sym : symtab) {
         if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
@@ -281,7 +288,7 @@ auto Loaded_elf::function_table() const
     auto const& raw = find_fragment(".symtab")->get();
     auto ft         = std::map<size_t, std::pair<std::string, size_t>>{};
 
-    for (auto i = size_t{sizeof(uint64_t)}; i < raw.data.size();
+    for (auto i = size_t{ sizeof(uint64_t) }; i < raw.data.size();
          i += (2 * sizeof(uint64_t))) {
         auto fn = fn_at(raw.data, i);
         ft[i]   = std::move(fn);
@@ -299,14 +306,14 @@ auto Loaded_elf::labels_table() const -> std::map<size_t, std::string>
     }
 
     auto const data = raw->get().data;
-    for (auto i = size_t{sizeof(uint64_t)}; i < data.size();
+    for (auto i = size_t{ sizeof(uint64_t) }; i < data.size();
          i += (2 * sizeof(uint64_t))) {
         auto sz = uint64_t{};
         memcpy(&sz, (data.data() + i - sizeof(sz)), sizeof(sz));
         sz = le64toh(sz);
 
         auto name =
-            std::string{reinterpret_cast<char const*>(data.data() + i), sz};
+            std::string{ reinterpret_cast<char const*>(data.data() + i), sz };
         auto addr = uint64_t{};
         memcpy(&addr, (data.data() + i + sz), sizeof(addr));
         addr = le64toh(addr);
@@ -319,12 +326,13 @@ auto Loaded_elf::labels_table() const -> std::map<size_t, std::string>
     return lt;
 }
 
-auto Loaded_elf::make_text_from(Fragment::data_type const& data)
+auto Loaded_elf::make_text_from(
+    Fragment::data_type const& data)
     -> std::vector<viua::arch::instruction_type>
 {
     auto text = std::vector<viua::arch::instruction_type>{};
     text.reserve(data.size() / sizeof(viua::arch::instruction_type));
-    for (auto i = size_t{0}; i < data.size();
+    for (auto i = size_t{ 0 }; i < data.size();
          i += sizeof(viua::arch::instruction_type)) {
         text.emplace_back(viua::arch::instruction_type{});
         memcpy(&text.back(), &data[i], sizeof(viua::arch::instruction_type));

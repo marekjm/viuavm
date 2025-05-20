@@ -64,7 +64,6 @@
 #include <viua/support/tty.h>
 #include <viua/support/vector.h>
 
-
 constexpr auto DEBUG_LEX                        = true;
 constexpr auto DEBUG_PARSE                      = true;
 constexpr auto DEBUG_EXPANSION [[maybe_unused]] = false;
@@ -75,19 +74,20 @@ using viua::support::string::quote_fancy;
 
 namespace {
 auto const FUNDAMENTAL_TYPE_NAMES = std::map<std::string, uint8_t>{
-    {"int", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::INT)},
-    {"uint", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::UINT)},
-    {"float", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::FLOAT32)},
-    {"double", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::FLOAT64)},
-    {"pointer", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::POINTER)},
-    {"atom", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::ATOM)},
-    {"pid", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::PID)},
+    { "int", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::INT) },
+    { "uint", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::UINT) },
+    { "float", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::FLOAT32) },
+    { "double", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::FLOAT64) },
+    { "pointer", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::POINTER) },
+    { "atom", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::ATOM) },
+    { "pid", static_cast<uint8_t>(viua::arch::FUNDAMENTAL_TYPES::PID) },
 };
 }
 
 namespace {
 using viua::libs::lexer::Lexeme;
-auto dump_lexemes(std::vector<Lexeme> const& lexemes) -> void
+auto dump_lexemes(
+    std::vector<Lexeme> const& lexemes) -> void
 {
     if (lexemes.empty()) {
         return;
@@ -97,19 +97,17 @@ auto dump_lexemes(std::vector<Lexeme> const& lexemes) -> void
     auto const pad_line = std::to_string(max_line).size();
 
     auto const max_char =
-        std::max_element(lexemes.begin(),
-                         lexemes.end(),
-                         [](Lexeme const& lhs, Lexeme const& rhs) -> bool {
-                             return lhs.location.character
-                                    < rhs.location.character;
-                         })
+        std::max_element(
+            lexemes.begin(),
+            lexemes.end(),
+            [](Lexeme const& lhs, Lexeme const& rhs) -> bool
+            { return lhs.location.character < rhs.location.character; })
             ->location.character;
     auto const max_size =
         std::max_element(lexemes.begin(),
                          lexemes.end(),
-                         [](Lexeme const& lhs, Lexeme const& rhs) -> bool {
-                             return lhs.text.size() < rhs.text.size();
-                         })
+                         [](Lexeme const& lhs, Lexeme const& rhs) -> bool
+                         { return lhs.text.size() < rhs.text.size(); })
             ->text.size();
     auto const pad_location =
         1 + std::to_string(max_char).size() + std::to_string(max_size).size();
@@ -148,13 +146,16 @@ auto dump_lexemes(std::vector<Lexeme> const& lexemes) -> void
     }
 }
 
-auto looks_octal(std::string_view const sv) -> bool
+auto looks_octal(
+    std::string_view const sv) -> bool
 {
-    return std::all_of(sv.begin(), sv.end(), [](char const c) -> bool {
-        return (c >= '0') and (c <= '7');
-    });
+    return std::all_of(sv.begin(),
+                       sv.end(),
+                       [](char const c) -> bool
+                       { return (c >= '0') and (c <= '7'); });
 }
-auto any_find_mistake(std::vector<Lexeme> const& lexemes)
+auto any_find_mistake(
+    std::vector<Lexeme> const& lexemes)
     -> std::optional<viua::libs::errors::compile_time::Error>
 {
     if (lexemes.empty()) {
@@ -163,21 +164,21 @@ auto any_find_mistake(std::vector<Lexeme> const& lexemes)
 
     using viua::libs::lexer::TOKEN;
 
-    auto const at = [&lexemes](size_t const n) -> Lexeme const& {
-        return lexemes.at(n);
-    };
-    auto const is = [&lexemes](size_t const n, TOKEN const t) -> bool {
-        return lexemes.at(n).token == t;
-    };
+    auto const at = [&lexemes](size_t const n) -> Lexeme const&
+    { return lexemes.at(n); };
+    auto const is = [&lexemes](size_t const n, TOKEN const t) -> bool
+    { return lexemes.at(n).token == t; };
     auto const iso =
-        [&lexemes](size_t const n, ssize_t const off, TOKEN const t) -> bool {
+        [&lexemes](size_t const n, ssize_t const off, TOKEN const t) -> bool
+    {
         if ((off < 0) and (static_cast<size_t>(std::abs(off)) > n)) {
             return false;
         }
         auto const effective_n = n + off;
         return lexemes.at(effective_n).token == t;
     };
-    auto const next_is_glued = [&lexemes](size_t const n) -> bool {
+    auto const next_is_glued = [&lexemes](size_t const n) -> bool
+    {
         return (lexemes.at(n).location.offset + lexemes.at(n).text.size())
                == lexemes.at(n + 1).location.offset;
     };
@@ -185,7 +186,7 @@ auto any_find_mistake(std::vector<Lexeme> const& lexemes)
     /*
      * Detect invalid numeric literals.
      */
-    for (auto i = size_t{0}; i < (lexemes.size() - 1); ++i) {
+    for (auto i = size_t{ 0 }; i < (lexemes.size() - 1); ++i) {
         if (not next_is_glued(i)) {
             continue;
         }
@@ -201,8 +202,9 @@ auto any_find_mistake(std::vector<Lexeme> const& lexemes)
             using viua::libs::errors::compile_time::Error;
 
             if (at(i).text == "0" and looks_octal(at(i + 1).text)) {
-                auto e = Error{
-                    at(i), Cause::Invalid_token, NOT_A_VALID_NUMERIC_LITERAL};
+                auto e = Error{ at(i),
+                                Cause::Invalid_token,
+                                NOT_A_VALID_NUMERIC_LITERAL };
                 e.add(at(i + 1));
                 e.aside("use " + quote_fancy("0o")
                         + " prefix for octal literals");
@@ -211,8 +213,9 @@ auto any_find_mistake(std::vector<Lexeme> const& lexemes)
 
             auto synth_text = at(i).text + at(i + 1).text;
             auto synth      = at(i).make_synth(synth_text, at(i).token);
-            return Error{
-                synth, Cause::Invalid_token, NOT_A_VALID_NUMERIC_LITERAL};
+            return Error{ synth,
+                          Cause::Invalid_token,
+                          NOT_A_VALID_NUMERIC_LITERAL };
         }
         if (is(i, TOKEN::LITERAL_INTEGER)
             and not is(i + 1, TOKEN::LITERAL_INTEGER)) {
@@ -223,15 +226,15 @@ auto any_find_mistake(std::vector<Lexeme> const& lexemes)
              *
              * Or if it the glued character is a comma.
              */
-            auto const yeah_looks_ok = iso(i, -1, TOKEN::DOLLAR)
-                                       or iso(i, +1, TOKEN::COMMA);
+            auto const yeah_looks_ok =
+                iso(i, -1, TOKEN::DOLLAR) or iso(i, +1, TOKEN::COMMA);
             if (not yeah_looks_ok) {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
 
-                auto e = Error{at(i + 1),
-                               Cause::Invalid_token,
-                               NOT_A_VALID_NUMERIC_LITERAL};
+                auto e = Error{ at(i + 1),
+                                Cause::Invalid_token,
+                                NOT_A_VALID_NUMERIC_LITERAL };
                 e.add(at(i));
                 return e;
             }
@@ -241,31 +244,34 @@ auto any_find_mistake(std::vector<Lexeme> const& lexemes)
     return std::nullopt;
 }
 
-auto fits_in_unsigned_r_immediate(uint32_t const n) -> bool
+auto fits_in_unsigned_r_immediate(
+    uint32_t const n) -> bool
 {
-    constexpr auto LOW_24 = uint32_t{0x00ffffff};
+    constexpr auto LOW_24 = uint32_t{ 0x00'ff'ff'ff };
     return ((n & LOW_24) == n);
 }
-auto fits_in_signed_r_immediate(uint32_t const n) -> bool
+auto fits_in_signed_r_immediate(
+    uint32_t const n) -> bool
 {
-    constexpr auto LOW_24 = uint32_t{0x00ffffff};
+    constexpr auto LOW_24 = uint32_t{ 0x00'ff'ff'ff };
     auto const just_low   = (n & LOW_24);
     return (static_cast<int32_t>(n)
             == (static_cast<int32_t>(just_low << 8) >> 8));
 }
 
-auto make_name_from_lexeme(viua::libs::lexer::Lexeme const& r) -> std::string
+auto make_name_from_lexeme(
+    viua::libs::lexer::Lexeme const& r) -> std::string
 {
     switch (r.token) {
         using enum viua::libs::lexer::TOKEN;
-    case LITERAL_ATOM:
-        return r.text;
-    case LITERAL_STRING:
-        return r.text.substr(1, r.text.size() - 2);
-    default:
-        using viua::libs::errors::compile_time::Cause;
-        using viua::libs::errors::compile_time::Error;
-        throw Error{r, Cause::None, "token cannot be used as name"};
+        case LITERAL_ATOM:
+            return r.text;
+        case LITERAL_STRING:
+            return r.text.substr(1, r.text.size() - 2);
+        default:
+            using viua::libs::errors::compile_time::Cause;
+            using viua::libs::errors::compile_time::Error;
+            throw Error{ r, Cause::None, "token cannot be used as name" };
     }
 }
 }  // namespace
@@ -288,8 +294,8 @@ struct Node {
 };
 Node::~Node()
 {}
-auto Node::has_attr(std::string_view const key) const
-    -> std::optional<attribute_type>
+auto Node::has_attr(
+    std::string_view const key) const -> std::optional<attribute_type>
 {
     for (auto const& each : attributes) {
         if (each.first == key) {
@@ -298,7 +304,8 @@ auto Node::has_attr(std::string_view const key) const
     }
     return {};
 }
-auto Node::attr(std::string_view const key) const -> std::optional<Lexeme>
+auto Node::attr(
+    std::string_view const key) const -> std::optional<Lexeme>
 {
     for (auto const& each : attributes) {
         if (each.first == key) {
@@ -335,7 +342,7 @@ struct Section : Node {
 };
 auto Section::which() const -> std::string_view
 {
-    return std::string_view{name.text.c_str() + 1, name.text.size() - 2};
+    return std::string_view{ name.text.c_str() + 1, name.text.size() - 2 };
 }
 struct Label : Node {
     Lexeme name;
@@ -363,7 +370,7 @@ auto Operand::make_access() const -> viua::arch::Register_access
     if (lx != TOKEN::DOLLAR) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{lx, Cause::Invalid_register_access};
+        throw Error{ lx, Cause::Invalid_register_access };
     }
 
     auto const direct = (lx == TOKEN::DOLLAR);
@@ -382,7 +389,7 @@ auto Operand::make_access() const -> viua::arch::Register_access
     } else {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{ingredients.back(), Cause::Invalid_register_access}
+        throw Error{ ingredients.back(), Cause::Invalid_register_access }
             .add(ingredients.at(0))
             .add(ingredients.at(1))
             .add(ingredients.at(2))
@@ -398,7 +405,8 @@ struct Instruction : Node {
 struct Begin : Node {};
 struct End : Node {};
 }  // namespace ast
-auto dump_nodes(std::vector<std::unique_ptr<ast::Node>> const& nodes) -> void
+auto dump_nodes(
+    std::vector<std::unique_ptr<ast::Node>> const& nodes) -> void
 {
     if (nodes.empty()) {
         return;
@@ -410,19 +418,19 @@ auto dump_nodes(std::vector<std::unique_ptr<ast::Node>> const& nodes) -> void
     auto const max_char =
         std::max_element(nodes.begin(),
                          nodes.end(),
-                         [](auto const& lhs, auto const& rhs) -> bool {
+                         [](auto const& lhs, auto const& rhs) -> bool
+                         {
                              return lhs->leader.location.character
                                     < rhs->leader.location.character;
                          })
             ->get()
             ->leader.location.character;
     auto const max_size =
-        std::max_element(nodes.begin(),
-                         nodes.end(),
-                         [](auto const& lhs, auto const& rhs) -> bool {
-                             return lhs->leader.text.size()
-                                    < rhs->leader.text.size();
-                         })
+        std::max_element(
+            nodes.begin(),
+            nodes.end(),
+            [](auto const& lhs, auto const& rhs) -> bool
+            { return lhs->leader.text.size() < rhs->leader.text.size(); })
             ->get()
             ->leader.text.size();
     auto const pad_location =
@@ -452,23 +460,23 @@ auto dump_nodes(std::vector<std::unique_ptr<ast::Node>> const& nodes) -> void
         auto printable = std::string{};
         switch (leader.token) {
             using enum viua::libs::lexer::TOKEN;
-        case SWITCH_TO_SECTION:
-            printable = static_cast<ast::Section&>(*each).which();
-            break;
-        case DEFINE_LABEL:
-            printable = static_cast<ast::Label&>(*each).name.text;
-            break;
-        case DECLARE_SYMBOL:
-            printable = static_cast<ast::Symbol&>(*each).name.text;
-            break;
-        case ALLOCATE_OBJECT:
-            printable = static_cast<ast::Object&>(*each).type.text;
-            break;
-        case OPCODE:
-            printable = static_cast<ast::Instruction&>(*each).leader.text;
-            break;
-        default:
-            break;
+            case SWITCH_TO_SECTION:
+                printable = static_cast<ast::Section&>(*each).which();
+                break;
+            case DEFINE_LABEL:
+                printable = static_cast<ast::Label&>(*each).name.text;
+                break;
+            case DECLARE_SYMBOL:
+                printable = static_cast<ast::Symbol&>(*each).name.text;
+                break;
+            case ALLOCATE_OBJECT:
+                printable = static_cast<ast::Object&>(*each).type.text;
+                break;
+            case OPCODE:
+                printable = static_cast<ast::Instruction&>(*each).leader.text;
+                break;
+            default:
+                break;
         }
         if (not printable.empty()) {
             std::cerr << "  " << printable;
@@ -478,13 +486,15 @@ auto dump_nodes(std::vector<std::unique_ptr<ast::Node>> const& nodes) -> void
     }
 }
 
-auto did_you_mean(viua::libs::errors::compile_time::Error& e, std::string what)
-    -> viua::libs::errors::compile_time::Error&
+auto did_you_mean(
+    viua::libs::errors::compile_time::Error& e,
+    std::string what) -> viua::libs::errors::compile_time::Error&
 {
     return e.aside("did you mean " + quote_fancy(what) + "?");
 }
-auto did_you_mean(viua::libs::errors::compile_time::Error&& e, std::string what)
-    -> viua::libs::errors::compile_time::Error
+auto did_you_mean(
+    viua::libs::errors::compile_time::Error&& e,
+    std::string what) -> viua::libs::errors::compile_time::Error
 {
     did_you_mean(e, what);
     return e;
@@ -498,15 +508,15 @@ auto consume_token_of(
     if (lexemes.front().token != tt) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        auto e = Error{lexemes.front(), Cause::Unexpected_token};
+        auto e = Error{ lexemes.front(), Cause::Unexpected_token };
         {
             constexpr auto esc = viua::support::tty::send_escape_seq;
             constexpr auto q   = viua::support::string::quote_fancy;
             using viua::support::tty::ATTR_FONT_BOLD;
             using viua::support::tty::ATTR_FONT_NORMAL;
 
-            auto const BOLD = std::string{esc(2, ATTR_FONT_BOLD)};
-            auto const NORM = std::string{esc(2, ATTR_FONT_NORMAL)};
+            auto const BOLD = std::string{ esc(2, ATTR_FONT_BOLD) };
+            auto const NORM = std::string{ esc(2, ATTR_FONT_NORMAL) };
 
             e.aside("expected "
                     + q(BOLD + viua::libs::lexer::to_string(tt) + NORM));
@@ -525,7 +535,7 @@ auto consume_token_of(
     if (ts.count(lexemes.front().token) == 0) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        auto e = Error{lexemes.front(), Cause::Unexpected_token};
+        auto e = Error{ lexemes.front(), Cause::Unexpected_token };
         {
             auto s = std::ostringstream{};
             s << "expected ";
@@ -538,8 +548,8 @@ auto consume_token_of(
             using viua::support::tty::ATTR_FONT_BOLD;
             using viua::support::tty::ATTR_FONT_NORMAL;
 
-            auto const BOLD = std::string{esc(2, ATTR_FONT_BOLD)};
-            auto const NORM = std::string{esc(2, ATTR_FONT_NORMAL)};
+            auto const BOLD = std::string{ esc(2, ATTR_FONT_BOLD) };
+            auto const NORM = std::string{ esc(2, ATTR_FONT_NORMAL) };
 
             auto it = ts.begin();
             s << q(BOLD + viua::libs::lexer::to_string(*it) + NORM);
@@ -572,20 +582,20 @@ auto look_ahead [[maybe_unused]] (
     return (not lexemes.empty()) and (ts.count(lexemes.front().token) != 0);
 }
 
-auto consume_one_attr(viua::support::vector_view<Lexeme>& lexemes)
-    -> ast::Node::attribute_type
+auto consume_one_attr(
+    viua::support::vector_view<Lexeme>& lexemes) -> ast::Node::attribute_type
 {
     using viua::libs::lexer::TOKEN;
     auto key   = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
     auto value = key.make_synth();
     if (look_ahead(TOKEN::EQ, lexemes)) {
         consume_token_of(TOKEN::EQ, lexemes);
-        value = consume_token_of({TOKEN::LITERAL_INTEGER,
-                                  TOKEN::LITERAL_STRING,
-                                  TOKEN::LITERAL_ATOM},
+        value = consume_token_of({ TOKEN::LITERAL_INTEGER,
+                                   TOKEN::LITERAL_STRING,
+                                   TOKEN::LITERAL_ATOM },
                                  lexemes);
     }
-    return {std::move(key), std::move(value)};
+    return { std::move(key), std::move(value) };
 }
 auto consume_attrs(
     viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes)
@@ -608,7 +618,8 @@ auto consume_attrs(
     return attrs;
 }
 
-auto consume_switch_to_text(viua::support::vector_view<Lexeme>& lexemes)
+auto consume_switch_to_text(
+    viua::support::vector_view<Lexeme>& lexemes)
     -> std::unique_ptr<ast::Section>
 {
     using viua::libs::lexer::TOKEN;
@@ -619,7 +630,8 @@ auto consume_switch_to_text(viua::support::vector_view<Lexeme>& lexemes)
     consume_token_of(TOKEN::TERMINATOR, lexemes);
     return ss;
 }
-auto consume_switch_to_rodata(viua::support::vector_view<Lexeme>& lexemes)
+auto consume_switch_to_rodata(
+    viua::support::vector_view<Lexeme>& lexemes)
     -> std::unique_ptr<ast::Section>
 {
     using viua::libs::lexer::TOKEN;
@@ -630,7 +642,8 @@ auto consume_switch_to_rodata(viua::support::vector_view<Lexeme>& lexemes)
     consume_token_of(TOKEN::TERMINATOR, lexemes);
     return ss;
 }
-auto consume_switch_to_section(viua::support::vector_view<Lexeme>& lexemes)
+auto consume_switch_to_section(
+    viua::support::vector_view<Lexeme>& lexemes)
     -> std::unique_ptr<ast::Section>
 {
     using viua::libs::lexer::TOKEN;
@@ -640,19 +653,19 @@ auto consume_switch_to_section(viua::support::vector_view<Lexeme>& lexemes)
     consume_token_of(TOKEN::TERMINATOR, lexemes);
     return ss;
 }
-auto consume_label(viua::support::vector_view<Lexeme>& lexemes)
-    -> std::unique_ptr<ast::Label>
+auto consume_label(
+    viua::support::vector_view<Lexeme>& lexemes) -> std::unique_ptr<ast::Label>
 {
     using viua::libs::lexer::TOKEN;
     auto ss    = std::make_unique<ast::Label>();
     ss->leader = consume_token_of(TOKEN::DEFINE_LABEL, lexemes);
-    ss->name =
-        consume_token_of({TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING}, lexemes);
+    ss->name = consume_token_of({ TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING },
+                                lexemes);
     consume_token_of(TOKEN::TERMINATOR, lexemes);
     return ss;
 }
-auto consume_object(viua::support::vector_view<Lexeme>& lexemes)
-    -> std::unique_ptr<ast::Object>
+auto consume_object(
+    viua::support::vector_view<Lexeme>& lexemes) -> std::unique_ptr<ast::Object>
 {
     using viua::libs::lexer::TOKEN;
     auto ss    = std::make_unique<ast::Object>();
@@ -663,14 +676,14 @@ auto consume_object(viua::support::vector_view<Lexeme>& lexemes)
     ss->type = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
     while (not look_ahead(TOKEN::TERMINATOR, lexemes)) {
         ss->ctor.emplace_back(consume_token_of(
-            {TOKEN::LITERAL_STRING, TOKEN::STAR, TOKEN::LITERAL_INTEGER},
+            { TOKEN::LITERAL_STRING, TOKEN::STAR, TOKEN::LITERAL_INTEGER },
             lexemes));
     }
     consume_token_of(TOKEN::TERMINATOR, lexemes);
     return ss;
 }
-auto consume_symbol(viua::support::vector_view<Lexeme>& lexemes)
-    -> std::unique_ptr<ast::Symbol>
+auto consume_symbol(
+    viua::support::vector_view<Lexeme>& lexemes) -> std::unique_ptr<ast::Symbol>
 {
     using viua::libs::lexer::TOKEN;
     auto ss    = std::make_unique<ast::Symbol>();
@@ -683,7 +696,7 @@ auto consume_symbol(viua::support::vector_view<Lexeme>& lexemes)
     using viua::libs::errors::compile_time::Error;
     try {
         ss->name = consume_token_of(
-            {TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING}, lexemes);
+            { TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING }, lexemes);
     } catch (Error& e) {
         if (lexemes.size() < 3) {
             throw e;
@@ -697,15 +710,15 @@ auto consume_symbol(viua::support::vector_view<Lexeme>& lexemes)
             throw e;
         }
 
-        throw e.chain(Error{label, Cause::None}.note(
+        throw e.chain(Error{ label, Cause::None }.note(
             ("did you mean " + quote_fancy(make_name_from_lexeme(label))
              + "?")));
     }
     consume_token_of(TOKEN::TERMINATOR, lexemes);
     return ss;
 }
-auto consume_begin(viua::support::vector_view<Lexeme>& lexemes)
-    -> std::unique_ptr<ast::Begin>
+auto consume_begin(
+    viua::support::vector_view<Lexeme>& lexemes) -> std::unique_ptr<ast::Begin>
 {
     using viua::libs::lexer::TOKEN;
     auto ss    = std::make_unique<ast::Begin>();
@@ -713,8 +726,8 @@ auto consume_begin(viua::support::vector_view<Lexeme>& lexemes)
     consume_token_of(TOKEN::TERMINATOR, lexemes);
     return ss;
 }
-auto consume_end(viua::support::vector_view<Lexeme>& lexemes)
-    -> std::unique_ptr<ast::End>
+auto consume_end(
+    viua::support::vector_view<Lexeme>& lexemes) -> std::unique_ptr<ast::End>
 {
     using viua::libs::lexer::TOKEN;
     auto ss    = std::make_unique<ast::End>();
@@ -722,7 +735,8 @@ auto consume_end(viua::support::vector_view<Lexeme>& lexemes)
     consume_token_of(TOKEN::TERMINATOR, lexemes);
     return ss;
 }
-auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
+auto consume_instruction(
+    viua::support::vector_view<Lexeme>& lexemes)
     -> std::unique_ptr<ast::Instruction>
 {
     auto instruction = std::make_unique<ast::Instruction>();
@@ -734,7 +748,7 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
         if (e.token != viua::libs::lexer::TOKEN::LITERAL_ATOM) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{e, Cause::Unknown_opcode, e.text};
+            throw Error{ e, Cause::Unknown_opcode, e.text };
         }
 
         using viua::libs::lexer::OPCODE_NAMES;
@@ -743,7 +757,7 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
         if (misspell_candidates.empty()) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{e, Cause::Unknown_opcode, e.text};
+            throw Error{ e, Cause::Unknown_opcode, e.text };
         }
 
         using viua::support::string::levenshtein_best;
@@ -752,12 +766,12 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
         if (best_candidate.second == e.text) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{e, Cause::Unknown_opcode, e.text};
+            throw Error{ e, Cause::Unknown_opcode, e.text };
         }
 
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw did_you_mean(Error{e, Cause::Unknown_opcode, e.text},
+        throw did_you_mean(Error{ e, Cause::Unknown_opcode, e.text },
                            best_candidate.second);
     }
 
@@ -770,7 +784,8 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
         return instruction;
     }
 
-    auto const is_fun_type_name = [](Lexeme const& f) -> bool {
+    auto const is_fun_type_name = [](Lexeme const& f) -> bool
+    {
         return (f == TOKEN::OPCODE) and FUNDAMENTAL_TYPE_NAMES.contains(f.text);
     };
 
@@ -806,19 +821,19 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
             } catch (viua::libs::lexer::Lexeme const& e) {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
-                throw Error{e, Cause::Invalid_register_access}
+                throw Error{ e, Cause::Invalid_register_access }
                     .add(leader)
                     .aside("register index must be an integer");
             }
             try {
                 auto const n = std::stoul(index.text);
                 if (n > viua::arch::MAX_REGISTER_INDEX) {
-                    throw std::out_of_range{""};
+                    throw std::out_of_range{ "" };
                 }
             } catch (std::out_of_range const&) {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
-                throw Error{index, Cause::Invalid_register_access}.aside(
+                throw Error{ index, Cause::Invalid_register_access }.aside(
                     "register index range is 0-"
                     + std::to_string(static_cast<uintmax_t>(
                         viua::arch::MAX_REGISTER_INDEX)));
@@ -838,12 +853,12 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
                  * register set, so let's consider the only other valid
                  * following tokens.
                  */
-                if (not look_ahead({TOKEN::COMMA, TOKEN::TERMINATOR},
+                if (not look_ahead({ TOKEN::COMMA, TOKEN::TERMINATOR },
                                    lexemes)) {
                     /*
                      * Yeah, the token stream did not match expectations. Abort.
                      */
-                    consume_token_of({TOKEN::COMMA, TOKEN::DOT}, lexemes);
+                    consume_token_of({ TOKEN::COMMA, TOKEN::DOT }, lexemes);
                 }
             }
         } else if (look_ahead(TOKEN::AT, lexemes)) {
@@ -851,7 +866,7 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
             auto label        = viua::libs::lexer::Lexeme{};
             try {
                 label = consume_token_of(
-                    {TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING}, lexemes);
+                    { TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING }, lexemes);
             } catch (viua::libs::errors::compile_time::Error& e) {
                 throw e.add(access).aside("label must be an atom or a string");
             }
@@ -885,8 +900,9 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
         } else {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{
-                lexemes.front(), Cause::Unexpected_token, "cannot consume"};
+            throw Error{ lexemes.front(),
+                         Cause::Unexpected_token,
+                         "cannot consume" };
         }
 
         instruction->operands.push_back(std::move(operand));
@@ -902,9 +918,9 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
             if (look_ahead(TOKEN::TERMINATOR, lexemes)) {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
-                throw Error{comma,
-                            Cause::None,
-                            "expected an operand to follow a comma"};
+                throw Error{ comma,
+                             Cause::None,
+                             "expected an operand to follow a comma" };
             }
 
             continue;
@@ -916,13 +932,14 @@ auto consume_instruction(viua::support::vector_view<Lexeme>& lexemes)
 
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{lexemes.front(), Cause::Unexpected_token}.note(
+        throw Error{ lexemes.front(), Cause::Unexpected_token }.note(
             "expected a comma, or a newline");
     }
 
     return instruction;
 }
-auto parse(viua::support::vector_view<Lexeme> lexemes)
+auto parse(
+    viua::support::vector_view<Lexeme> lexemes)
     -> std::vector<std::unique_ptr<ast::Node>>
 {
     auto nodes = std::vector<std::unique_ptr<ast::Node>>{};
@@ -934,61 +951,63 @@ auto parse(viua::support::vector_view<Lexeme> lexemes)
 
         using viua::libs::lexer::TOKEN;
         switch (each.token) {
-        case TOKEN::SWITCH_TO_TEXT:
-            nodes.emplace_back(consume_switch_to_text(lexemes));
-            break;
-        case TOKEN::SWITCH_TO_RODATA:
-            nodes.emplace_back(consume_switch_to_rodata(lexemes));
-            break;
-        case TOKEN::SWITCH_TO_SECTION:
-            nodes.emplace_back(consume_switch_to_section(lexemes));
-            break;
-        case TOKEN::DEFINE_LABEL:
-            nodes.emplace_back(consume_label(lexemes));
-            break;
-        case TOKEN::ALLOCATE_OBJECT:
-            nodes.emplace_back(consume_object(lexemes));
-            break;
-        case TOKEN::DECLARE_SYMBOL:
-            nodes.emplace_back(consume_symbol(lexemes));
-            break;
-        case TOKEN::BEGIN:
-            nodes.emplace_back(consume_begin(lexemes));
-            break;
-        case TOKEN::END:
-            nodes.emplace_back(consume_end(lexemes));
-            break;
-        case TOKEN::ATTR_LIST_OPEN:
-            attributes = consume_attrs(lexemes);
-            [[fallthrough]];
-        case TOKEN::OPCODE:
-            nodes.emplace_back(consume_instruction(lexemes));
-            nodes.back()->attributes = std::move(attributes);
-            break;
-        default:
-            using viua::libs::errors::compile_time::Cause;
-            using viua::libs::errors::compile_time::Error;
+            case TOKEN::SWITCH_TO_TEXT:
+                nodes.emplace_back(consume_switch_to_text(lexemes));
+                break;
+            case TOKEN::SWITCH_TO_RODATA:
+                nodes.emplace_back(consume_switch_to_rodata(lexemes));
+                break;
+            case TOKEN::SWITCH_TO_SECTION:
+                nodes.emplace_back(consume_switch_to_section(lexemes));
+                break;
+            case TOKEN::DEFINE_LABEL:
+                nodes.emplace_back(consume_label(lexemes));
+                break;
+            case TOKEN::ALLOCATE_OBJECT:
+                nodes.emplace_back(consume_object(lexemes));
+                break;
+            case TOKEN::DECLARE_SYMBOL:
+                nodes.emplace_back(consume_symbol(lexemes));
+                break;
+            case TOKEN::BEGIN:
+                nodes.emplace_back(consume_begin(lexemes));
+                break;
+            case TOKEN::END:
+                nodes.emplace_back(consume_end(lexemes));
+                break;
+            case TOKEN::ATTR_LIST_OPEN:
+                attributes = consume_attrs(lexemes);
+                [[fallthrough]];
+            case TOKEN::OPCODE:
+                nodes.emplace_back(consume_instruction(lexemes));
+                nodes.back()->attributes = std::move(attributes);
+                break;
+            default:
+                using viua::libs::errors::compile_time::Cause;
+                using viua::libs::errors::compile_time::Error;
 
-            constexpr auto esc = viua::support::tty::send_escape_seq;
-            constexpr auto q   = viua::support::string::quote_fancy;
-            using viua::support::tty::ATTR_FONT_BOLD;
-            using viua::support::tty::ATTR_FONT_NORMAL;
+                constexpr auto esc = viua::support::tty::send_escape_seq;
+                constexpr auto q   = viua::support::string::quote_fancy;
+                using viua::support::tty::ATTR_FONT_BOLD;
+                using viua::support::tty::ATTR_FONT_NORMAL;
 
-            auto const BOLD = std::string{esc(2, ATTR_FONT_BOLD)};
-            auto const NORM = std::string{esc(2, ATTR_FONT_NORMAL)};
+                auto const BOLD = std::string{ esc(2, ATTR_FONT_BOLD) };
+                auto const NORM = std::string{ esc(2, ATTR_FONT_NORMAL) };
 
-            auto m = q(BOLD + viua::libs::lexer::to_string(each.token) + NORM)
-                     + " cannot appear at top level";
-            throw Error{each, Cause::Unexpected_token, std::move(m)}.note(
-                "refer to viua-asm-lang(1) for more information");
+                auto m =
+                    q(BOLD + viua::libs::lexer::to_string(each.token) + NORM)
+                    + " cannot appear at top level";
+                throw Error{ each, Cause::Unexpected_token, std::move(m) }.note(
+                    "refer to viua-asm-lang(1) for more information");
         }
     }
 
     return nodes;
 }
 
-auto make_symbol(std::string_view const name,
-                 std::vector<uint8_t>& string_table) -> Elf64_Sym
+auto make_symbol(
+    std::string_view const name,
+    std::vector<uint8_t>& string_table) -> Elf64_Sym
 {
     auto const name_off =
         name.empty() ? 0 : save_string_to_strtab(string_table, name);
@@ -997,8 +1016,9 @@ auto make_symbol(std::string_view const name,
     sym.st_name = name_off;
     return sym;
 }
-auto make_symbol(viua::libs::lexer::Lexeme const& name,
-                 std::vector<uint8_t>& string_table) -> Elf64_Sym
+auto make_symbol(
+    viua::libs::lexer::Lexeme const& name,
+    std::vector<uint8_t>& string_table) -> Elf64_Sym
 {
     auto const& unquoted_name = make_name_from_lexeme(name);
     auto const name_off =
@@ -1014,13 +1034,15 @@ auto make_symbol(viua::libs::lexer::Lexeme const& name,
 using Decl_map =
     std::vector<std::pair<ast::Symbol const&, ast::Section const&>>;
 
-auto save_declared_symbols(std::vector<std::unique_ptr<ast::Node>> const& nodes,
-                           std::vector<uint8_t>& string_table,
-                           std::vector<Elf64_Sym>& symbol_table,
-                           std::map<std::string, size_t>& symbol_map,
-                           Decl_map& declarations) -> void
+auto save_declared_symbols(
+    std::vector<std::unique_ptr<ast::Node>> const& nodes,
+    std::vector<uint8_t>& string_table,
+    std::vector<Elf64_Sym>& symbol_table,
+    std::map<std::string, size_t>& symbol_map,
+    Decl_map& declarations) -> void
 {
-    enum class SECTION {
+    enum class SECTION
+    {
         NONE,
         RODATA,
         TEXT,
@@ -1034,16 +1056,16 @@ auto save_declared_symbols(std::vector<std::unique_ptr<ast::Node>> const& nodes,
             activator.reset(static_cast<ast::Section const*>(each.get()));
             auto const& sec = *activator;
             auto const name = sec.which();
-            if (name == std::string_view{".rodata"}) {
+            if (name == std::string_view{ ".rodata" }) {
                 active_section = SECTION::RODATA;
-            } else if (name == std::string_view{".text"}) {
+            } else if (name == std::string_view{ ".text" }) {
                 active_section = SECTION::TEXT;
             } else {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
-                throw Error{sec.name,
-                            Cause::None,
-                            "unknown section: " + quote_fancy(name)};
+                throw Error{ sec.name,
+                             Cause::None,
+                             "unknown section: " + quote_fancy(name) };
             }
             continue;
         }
@@ -1054,14 +1076,14 @@ auto save_declared_symbols(std::vector<std::unique_ptr<ast::Node>> const& nodes,
         if (active_section == SECTION::NONE) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{each->leader, Cause::None, "no active section"};
+            throw Error{ each->leader, Cause::None, "no active section" };
         }
 
         auto const& sym = static_cast<ast::Symbol const&>(*each);
 
         auto type = (active_section == SECTION::TEXT) ? STT_FUNC : STT_OBJECT;
-        auto binding    = (active_section == SECTION::TEXT) ? STB_GLOBAL
-                                                            : STB_LOCAL;
+        auto binding =
+            (active_section == SECTION::TEXT) ? STB_GLOBAL : STB_LOCAL;
         auto visibility = STV_DEFAULT;
 
         if (sym.has_attr("local") and sym.has_attr("global")) {
@@ -1072,12 +1094,12 @@ auto save_declared_symbols(std::vector<std::unique_ptr<ast::Node>> const& nodes,
             auto const loc = sym.has_attr("local").value();
             auto const [earlier, later] =
                 (glo.first.location.offset < loc.first.location.offset)
-                    ? std::pair{glo, loc}
-                    : std::pair{loc, glo};
+                    ? std::pair{ glo, loc }
+                    : std::pair{ loc, glo };
 
-            auto e = Error{later.first,
-                           Cause::None,
-                           "symbols cannot be explicitly local and global"};
+            auto e = Error{ later.first,
+                            Cause::None,
+                            "symbols cannot be explicitly local and global" };
             e.add(earlier.first);
             e.aside("remove one of the tags");
             throw e;
@@ -1095,12 +1117,13 @@ auto save_declared_symbols(std::vector<std::unique_ptr<ast::Node>> const& nodes,
             and visibility != STV_HIDDEN) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            auto e = Error{sym.has_attr("global")
-                               .value_or(std::pair{each->leader, std::nullopt})
-                               .first,
-                           Cause::None,
-                           "object symbols cannot be globally visible"};
-            e.chain(Error{activator->leader, Cause::None}.note(
+            auto e =
+                Error{ sym.has_attr("global")
+                           .value_or(std::pair{ each->leader, std::nullopt })
+                           .first,
+                       Cause::None,
+                       "object symbols cannot be globally visible" };
+            e.chain(Error{ activator->leader, Cause::None }.note(
                 "section activated here"));
 
             if (auto const g = sym.has_attr("global"); g) {
@@ -1143,14 +1166,16 @@ auto save_declared_symbols(std::vector<std::unique_ptr<ast::Node>> const& nodes,
     }
 }
 
-auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
-                  std::vector<uint8_t>& rodata_buf,
-                  std::vector<uint8_t>& string_table,
-                  std::vector<Elf64_Sym>& symbol_table,
-                  std::map<std::string, size_t>& symbol_map,
-                  Decl_map const& declared_symbols) -> void
+auto save_objects(
+    std::vector<std::unique_ptr<ast::Node>>& nodes,
+    std::vector<uint8_t>& rodata_buf,
+    std::vector<uint8_t>& string_table,
+    std::vector<Elf64_Sym>& symbol_table,
+    std::map<std::string, size_t>& symbol_map,
+    Decl_map const& declared_symbols) -> void
 {
-    enum class SECTION {
+    enum class SECTION
+    {
         NONE,
         RODATA,
         TEXT,
@@ -1170,16 +1195,16 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
             activator.reset(static_cast<ast::Section const*>(each.get()));
             auto const& sec = *activator;
             auto const name = sec.which();
-            if (name == std::string_view{".rodata"}) {
+            if (name == std::string_view{ ".rodata" }) {
                 active_section = SECTION::RODATA;
-            } else if (name == std::string_view{".text"}) {
+            } else if (name == std::string_view{ ".text" }) {
                 active_section = SECTION::TEXT;
             } else {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
-                throw Error{sec.name,
-                            Cause::None,
-                            "unknown section: " + quote_fancy(name)};
+                throw Error{ sec.name,
+                             Cause::None,
+                             "unknown section: " + quote_fancy(name) };
             }
             continue;
         }
@@ -1195,7 +1220,7 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
         if (active_section == SECTION::NONE) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{each->leader, Cause::None, "no active section"};
+            throw Error{ each->leader, Cause::None, "no active section" };
         }
 
         if (is_label and (active_section == SECTION::RODATA)) {
@@ -1223,27 +1248,26 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
 
                     auto const& sym_name = labeller->name;
 
-                    auto e = Error{each->leader,
-                                   Cause::None,
-                                   "invalid definition of symbol "
-                                       + quote_fancy(sym_name.text) + "..."};
+                    auto e = Error{ each->leader,
+                                    Cause::None,
+                                    "invalid definition of symbol "
+                                        + quote_fancy(sym_name.text) + "..." };
                     e.add(sym_name, true);
-                    e.chain(Error{activator->leader,
-                                  Cause::None,
-                                  ("...in section " + activator->name.text)});
+                    e.chain(Error{ activator->leader,
+                                   Cause::None,
+                                   ("...in section " + activator->name.text) });
 
                     auto const& [decl_sym, decl_sec] = *std::ranges::find_if(
                         declared_symbols,
-                        [&name = labeller->name.text](auto const& dl) -> bool {
-                            return (dl.first.name.text == name);
-                        });
-                    e.chain(Error{decl_sym.leader,
-                                  Cause::None,
-                                  "previously declared here..."}
+                        [&name = labeller->name.text](auto const& dl) -> bool
+                        { return (dl.first.name.text == name); });
+                    e.chain(Error{ decl_sym.leader,
+                                   Cause::None,
+                                   "previously declared here..." }
                                 .add(decl_sym.name, true));
-                    e.chain(Error{decl_sec.leader,
-                                  Cause::None,
-                                  ("...in section " + decl_sec.name.text)});
+                    e.chain(Error{ decl_sec.leader,
+                                   Cause::None,
+                                   ("...in section " + decl_sec.name.text) });
 
                     throw e;
                 }
@@ -1264,7 +1288,7 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
 
-            throw Error{each->leader, Cause::None, "FUCKUP"};
+            throw Error{ each->leader, Cause::None, "FUCKUP" };
         } else if (is_alloc) {
             auto const& alc = static_cast<ast::Object&>(*each);
             std::cerr << "allocating " << alc.type.text << " under label "
@@ -1272,7 +1296,7 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
 
             if (alc.type.text == "string") {
                 auto s = std::string{};
-                for (auto i = size_t{0}; i < alc.ctor.size(); ++i) {
+                for (auto i = size_t{ 0 }; i < alc.ctor.size(); ++i) {
                     auto& each = alc.ctor.at(i);
 
                     using enum viua::libs::lexer::TOKEN;
@@ -1287,10 +1311,12 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                             using viua::libs::errors::compile_time::Cause;
                             using viua::libs::errors::compile_time::Error;
 
-                            throw Error{each,
-                                        Cause::Invalid_operand,
-                                        "an integer must be followed by a star "
-                                        "in string concatenation"}
+                            throw Error{
+                                each,
+                                Cause::Invalid_operand,
+                                "an integer must be followed by a star "
+                                "in string concatenation"
+                            }
                                 .add(star)
                                 .add(alc.type);
                         }
@@ -1300,12 +1326,13 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                             using viua::libs::errors::compile_time::Cause;
                             using viua::libs::errors::compile_time::Error;
 
-                            throw Error{each,
-                                        Cause::Invalid_operand,
-                                        "in string concatenation"}
-                                .aside("left-hand side must be an "
-                                       "positive integer, but star was the "
-                                       "first token");
+                            throw Error{ each,
+                                         Cause::Invalid_operand,
+                                         "in string concatenation" }
+                                .aside(
+                                    "left-hand side must be an "
+                                    "positive integer, but star was the "
+                                    "first token");
                         }
 
                         auto const& n = alc.ctor.at(i - 1);
@@ -1313,12 +1340,13 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                             using viua::libs::errors::compile_time::Cause;
                             using viua::libs::errors::compile_time::Error;
 
-                            throw Error{n,
-                                        Cause::Invalid_operand,
-                                        "in string concatenation"}
+                            throw Error{ n,
+                                         Cause::Invalid_operand,
+                                         "in string concatenation" }
                                 .add(each)
-                                .aside("left-hand side must be an "
-                                       "positive integer");
+                                .aside(
+                                    "left-hand side must be an "
+                                    "positive integer");
                         }
 
                         auto const& part = alc.ctor.at(++i);
@@ -1326,9 +1354,9 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                             using viua::libs::errors::compile_time::Cause;
                             using viua::libs::errors::compile_time::Error;
 
-                            throw Error{part,
-                                        Cause::Invalid_operand,
-                                        "in string concatenation"}
+                            throw Error{ part,
+                                         Cause::Invalid_operand,
+                                         "in string concatenation" }
                                 .add(each)
                                 .aside(
                                     "right-hand side must be a string literal");
@@ -1347,9 +1375,9 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                         using viua::libs::errors::compile_time::Cause;
                         using viua::libs::errors::compile_time::Error;
 
-                        throw Error{each,
-                                    Cause::Invalid_operand,
-                                    "expected an integer or a string"};
+                        throw Error{ each,
+                                     Cause::Invalid_operand,
+                                     "expected an integer or a string" };
                     }
                 }
 
@@ -1381,7 +1409,7 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
              */
 
             auto& instr   = static_cast<ast::Instruction&>(*each);
-            auto saved_at = size_t{0};
+            auto saved_at = size_t{ 0 };
 
             if (instr.leader == "atom" or instr.leader == "g.atom") {
                 auto const lx = instr.operands.back().ingredients.front();
@@ -1429,9 +1457,9 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                         using viua::libs::errors::compile_time::Cause;
                         using viua::libs::errors::compile_time::Error;
 
-                        auto e = Error{label,
-                                       Cause::Unknown_label,
-                                       quote_fancy(label.text)};
+                        auto e = Error{ label,
+                                        Cause::Unknown_label,
+                                        quote_fancy(label.text) };
                         e.add(lx);
 
                         using viua::support::string::levenshtein_filter;
@@ -1454,7 +1482,7 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
 
-                    auto e = Error{lx, Cause::Invalid_operand}.aside(
+                    auto e = Error{ lx, Cause::Invalid_operand }.aside(
                         "expected string literal, atom literal, or a label "
                         "reference");
 
@@ -1475,7 +1503,8 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                         using viua::libs::errors::compile_time::Cause;
                         using viua::libs::errors::compile_time::Error;
 
-                        auto e = Error{label, Cause::Unknown_label, label.text};
+                        auto e =
+                            Error{ label, Cause::Unknown_label, label.text };
                         e.add(lx);
 
                         using viua::support::string::levenshtein_filter;
@@ -1498,9 +1527,9 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
 
-                    auto e = Error{lx,
-                                   Cause::Invalid_operand,
-                                   "expected a label reference"};
+                    auto e = Error{ lx,
+                                    Cause::Invalid_operand,
+                                    "expected a label reference" };
                     if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
                         did_you_mean(e, '@' + lx.text);
                     }
@@ -1517,7 +1546,8 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                         using viua::libs::errors::compile_time::Cause;
                         using viua::libs::errors::compile_time::Error;
 
-                        auto e = Error{label, Cause::Unknown_label, label.text};
+                        auto e =
+                            Error{ label, Cause::Unknown_label, label.text };
                         e.add(lx);
 
                         using viua::support::string::levenshtein_filter;
@@ -1540,9 +1570,9 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
 
-                    auto e = Error{lx,
-                                   Cause::Invalid_operand,
-                                   "expected a label reference"};
+                    auto e = Error{ lx,
+                                    Cause::Invalid_operand,
+                                    "expected a label reference" };
                     if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
                         did_you_mean(e, '@' + lx.text);
                     }
@@ -1552,7 +1582,7 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                 auto const lx = instr.operands.back().ingredients.front();
                 using enum viua::libs::lexer::TOKEN;
                 if (lx.token == LITERAL_FLOAT) {
-                    constexpr auto SIZE_OF_DOUBLE_PRECISION_FLOAT = size_t{8};
+                    constexpr auto SIZE_OF_DOUBLE_PRECISION_FLOAT = size_t{ 8 };
                     auto const f                                  = std::stod(
                         instr.operands.back().ingredients.front().text);
                     auto s = std::string(SIZE_OF_DOUBLE_PRECISION_FLOAT, '\0');
@@ -1593,7 +1623,8 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                         using viua::libs::errors::compile_time::Cause;
                         using viua::libs::errors::compile_time::Error;
 
-                        auto e = Error{label, Cause::Unknown_label, label.text};
+                        auto e =
+                            Error{ label, Cause::Unknown_label, label.text };
                         e.add(lx);
 
                         using viua::support::string::levenshtein_filter;
@@ -1616,7 +1647,7 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
 
-                    auto e = Error{lx, Cause::Invalid_operand}.aside(
+                    auto e = Error{ lx, Cause::Invalid_operand }.aside(
                         "expected double literal, or a label reference");
 
                     if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
@@ -1644,12 +1675,14 @@ auto save_objects(std::vector<std::unique_ptr<ast::Node>>& nodes,
     }
 }
 
-auto cache_function_labels(std::vector<std::unique_ptr<ast::Node>> const& nodes,
-                           std::vector<uint8_t>& string_table,
-                           std::vector<Elf64_Sym>& symbol_table,
-                           std::map<std::string, size_t>& symbol_map) -> void
+auto cache_function_labels(
+    std::vector<std::unique_ptr<ast::Node>> const& nodes,
+    std::vector<uint8_t>& string_table,
+    std::vector<Elf64_Sym>& symbol_table,
+    std::map<std::string, size_t>& symbol_map) -> void
 {
-    enum class SECTION {
+    enum class SECTION
+    {
         NONE,
         RODATA,
         TEXT,
@@ -1669,16 +1702,16 @@ auto cache_function_labels(std::vector<std::unique_ptr<ast::Node>> const& nodes,
             activator.reset(static_cast<ast::Section const*>(each.get()));
             auto const& sec = *activator;
             auto const name = sec.which();
-            if (name == std::string_view{".rodata"}) {
+            if (name == std::string_view{ ".rodata" }) {
                 active_section = SECTION::RODATA;
-            } else if (name == std::string_view{".text"}) {
+            } else if (name == std::string_view{ ".text" }) {
                 active_section = SECTION::TEXT;
             } else {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
-                throw Error{sec.name,
-                            Cause::None,
-                            "unknown section: " + quote_fancy(name)};
+                throw Error{ sec.name,
+                             Cause::None,
+                             "unknown section: " + quote_fancy(name) };
             }
             continue;
         }
@@ -1691,7 +1724,7 @@ auto cache_function_labels(std::vector<std::unique_ptr<ast::Node>> const& nodes,
         if (active_section == SECTION::NONE) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{each->leader, Cause::None, "no active section"};
+            throw Error{ each->leader, Cause::None, "no active section" };
         }
         if (active_section == SECTION::RODATA) {
             continue;
@@ -1723,21 +1756,22 @@ auto cache_function_labels(std::vector<std::unique_ptr<ast::Node>> const& nodes,
     }
 }
 
-auto operand_or_throw(ast::Instruction const& insn, size_t const index)
-    -> ast::Operand const&
+auto operand_or_throw(
+    ast::Instruction const& insn,
+    size_t const index) -> ast::Operand const&
 {
     try {
         return insn.operands.at(index);
     } catch (std::out_of_range const&) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{insn.leader,
-                    Cause::Too_few_operands,
-                    ("operand " + std::to_string(index) + " not found")};
+        throw Error{ insn.leader,
+                     Cause::Too_few_operands,
+                     ("operand " + std::to_string(index) + " not found") };
     }
 }
-auto emit_instruction(ast::Instruction const insn)
-    -> viua::arch::instruction_type
+auto emit_instruction(
+    ast::Instruction const insn) -> viua::arch::instruction_type
 {
     using viua::arch::opcode_type;
     using viua::arch::ops::FORMAT;
@@ -1752,127 +1786,141 @@ auto emit_instruction(ast::Instruction const insn)
 
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{e, Cause::Unknown_opcode, e.text};
+        throw Error{ e, Cause::Unknown_opcode, e.text };
     }
     auto format = static_cast<FORMAT>(opcode & FORMAT_MASK);
     switch (format) {
-    case FORMAT::N:
-        return static_cast<uint64_t>(opcode);
-    case FORMAT::T:
-        return viua::arch::ops::T{opcode,
-                                  operand_or_throw(insn, 0).make_access(),
-                                  operand_or_throw(insn, 1).make_access(),
-                                  operand_or_throw(insn, 2).make_access()}
-            .encode();
-    case FORMAT::D:
-        return viua::arch::ops::D{opcode,
-                                  operand_or_throw(insn, 0).make_access(),
-                                  operand_or_throw(insn, 1).make_access()}
-            .encode();
-    case FORMAT::S:
-        return viua::arch::ops::S{opcode,
-                                  operand_or_throw(insn, 0).make_access()}
-            .encode();
-    case FORMAT::F:
-    {
-        auto const raw = operand_or_throw(insn, 1).ingredients.front().text;
-        auto val       = static_cast<uint32_t>(std::stoul(raw, nullptr, 0));
-        if (static_cast<OPCODE>(opcode) == OPCODE::FLOAT) {
-            auto tmp = std::stof(raw);
-            memcpy(&val, &tmp, sizeof(val));
-        }
-        return viua::arch::ops::F{
-            opcode, operand_or_throw(insn, 0).make_access(), val}
-            .encode();
-    }
-    case FORMAT::E:
-        return viua::arch::ops::E{
-            opcode,
-            operand_or_throw(insn, 0).make_access(),
-            std::stoull(
-                operand_or_throw(insn, 1).ingredients.front().text, nullptr, 0)}
-            .encode();
-    case FORMAT::R:
-    {
-        auto const imm = insn.operands.at(2).ingredients.front();
-        auto const is_unsigned =
-            (static_cast<opcode_type>(opcode) & viua::arch::ops::UNSIGNED);
-        if (is_unsigned and imm.text.at(0) == '-'
-            and (imm.text != "-1" and imm.text != "-1u")) {
-            using viua::libs::errors::compile_time::Cause;
-            using viua::libs::errors::compile_time::Error;
-            throw Error{imm,
-                        Cause::Value_out_of_range,
-                        "signed integer used for unsigned immediate"}
-                .note("the only signed value allowed in this context "
-                      "is -1, and\n"
-                      "it is used a symbol for maximum unsigned "
-                      "immediate value");
-        }
-        if ((not is_unsigned) and imm.text.back() == 'u') {
-            using viua::libs::errors::compile_time::Cause;
-            using viua::libs::errors::compile_time::Error;
-            throw Error{imm,
-                        Cause::Value_out_of_range,
-                        "unsigned integer used for signed immediate"};
-        }
-        try {
-            auto val = uint32_t{};
-            if (is_unsigned) {
-                val = viua::support::ston<uint32_t>(imm.text);
-            } else {
-                auto const tmp = viua::support::ston<int32_t>(imm.text);
-                memcpy(&val, &tmp, sizeof(tmp));
-            }
-
-            auto const fits = is_unsigned ? fits_in_unsigned_r_immediate(val)
-                                          : fits_in_signed_r_immediate(val);
-            if (not fits) {
-                using viua::libs::errors::compile_time::Cause;
-                using viua::libs::errors::compile_time::Error;
-                throw Error{imm,
-                            Cause::Value_out_of_range,
-                            "value does not fit into 24-bit wide immediate"};
-            }
-
-            return viua::arch::ops::R{opcode,
-                                      insn.operands.at(0).make_access(),
-                                      insn.operands.at(1).make_access(),
-                                      val}
+        case FORMAT::N:
+            return static_cast<uint64_t>(opcode);
+        case FORMAT::T:
+            return viua::arch::ops::T{ opcode,
+                                       operand_or_throw(insn, 0).make_access(),
+                                       operand_or_throw(insn, 1).make_access(),
+                                       operand_or_throw(insn, 2).make_access() }
                 .encode();
-        } catch (std::invalid_argument const&) {
+        case FORMAT::D:
+            return viua::arch::ops::D{ opcode,
+                                       operand_or_throw(insn, 0).make_access(),
+                                       operand_or_throw(insn, 1).make_access() }
+                .encode();
+        case FORMAT::S:
+            return viua::arch::ops::S{ opcode,
+                                       operand_or_throw(insn, 0).make_access() }
+                .encode();
+        case FORMAT::F:
+            {
+                auto const raw =
+                    operand_or_throw(insn, 1).ingredients.front().text;
+                auto val = static_cast<uint32_t>(std::stoul(raw, nullptr, 0));
+                if (static_cast<OPCODE>(opcode) == OPCODE::FLOAT) {
+                    auto tmp = std::stof(raw);
+                    memcpy(&val, &tmp, sizeof(val));
+                }
+                return viua::arch::ops::F{
+                    opcode, operand_or_throw(insn, 0).make_access(), val
+                }
+                    .encode();
+            }
+        case FORMAT::E:
+            return viua::arch::ops::E{
+                opcode,
+                operand_or_throw(insn, 0).make_access(),
+                std::stoull(operand_or_throw(insn, 1).ingredients.front().text,
+                            nullptr,
+                            0)
+            }
+                .encode();
+        case FORMAT::R:
+            {
+                auto const imm = insn.operands.at(2).ingredients.front();
+                auto const is_unsigned = (static_cast<opcode_type>(opcode)
+                                          & viua::arch::ops::UNSIGNED);
+                if (is_unsigned and imm.text.at(0) == '-'
+                    and (imm.text != "-1" and imm.text != "-1u")) {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+                    throw Error{ imm,
+                                 Cause::Value_out_of_range,
+                                 "signed integer used for unsigned immediate" }
+                        .note(
+                            "the only signed value allowed in this context "
+                            "is -1, and\n"
+                            "it is used a symbol for maximum unsigned "
+                            "immediate value");
+                }
+                if ((not is_unsigned) and imm.text.back() == 'u') {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+                    throw Error{ imm,
+                                 Cause::Value_out_of_range,
+                                 "unsigned integer used for signed immediate" };
+                }
+                try {
+                    auto val = uint32_t{};
+                    if (is_unsigned) {
+                        val = viua::support::ston<uint32_t>(imm.text);
+                    } else {
+                        auto const tmp = viua::support::ston<int32_t>(imm.text);
+                        memcpy(&val, &tmp, sizeof(tmp));
+                    }
+
+                    auto const fits = is_unsigned
+                                          ? fits_in_unsigned_r_immediate(val)
+                                          : fits_in_signed_r_immediate(val);
+                    if (not fits) {
+                        using viua::libs::errors::compile_time::Cause;
+                        using viua::libs::errors::compile_time::Error;
+                        throw Error{
+                            imm,
+                            Cause::Value_out_of_range,
+                            "value does not fit into 24-bit wide immediate"
+                        };
+                    }
+
+                    return viua::arch::ops::R{
+                        opcode,
+                        insn.operands.at(0).make_access(),
+                        insn.operands.at(1).make_access(),
+                        val
+                    }
+                        .encode();
+                } catch (std::invalid_argument const&) {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+                    // FIXME make the error more precise, maybe encapsulate
+                    // just the immediate operand conversion
+                    throw Error{ imm,
+                                 Cause::Invalid_operand,
+                                 "expected integer as immediate operand" };
+                }
+            }
+        case FORMAT::M:
+            {
+                auto const unit = insn.operands.front().ingredients.front();
+                auto const off  = insn.operands.back().ingredients.front();
+
+                return viua::arch::ops::M{
+                    opcode,
+                    insn.operands.at(1).make_access(),
+                    insn.operands.at(2).make_access(),
+                    static_cast<uint16_t>(std::stoull(off.text)),
+                    static_cast<uint8_t>(std::stoull(unit.text))
+                }
+                    .encode();
+            }
+        default:
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            // FIXME make the error more precise, maybe encapsulate
-            // just the immediate operand conversion
-            throw Error{imm,
-                        Cause::Invalid_operand,
-                        "expected integer as immediate operand"};
-        }
-    }
-    case FORMAT::M:
-    {
-        auto const unit = insn.operands.front().ingredients.front();
-        auto const off  = insn.operands.back().ingredients.front();
-
-        return viua::arch::ops::M{opcode,
-                                  insn.operands.at(1).make_access(),
-                                  insn.operands.at(2).make_access(),
-                                  static_cast<uint16_t>(std::stoull(off.text)),
-                                  static_cast<uint8_t>(std::stoull(unit.text))}
-            .encode();
-    }
-    default:
-        using viua::libs::errors::compile_time::Cause;
-        using viua::libs::errors::compile_time::Error;
-        throw Error{
-            insn.leader, Cause::Unknown_opcode, "cannot emit instruction"};
+            throw Error{ insn.leader,
+                         Cause::Unknown_opcode,
+                         "cannot emit instruction" };
     }
 }
 
 using Text = std::vector<viua::arch::instruction_type>;
-auto expand_li(ast::Instruction const& raw, bool const force_full = false)
-    -> Text
+auto expand_li(
+    ast::Instruction const& raw,
+    bool const force_full = false) -> Text
 {
     auto const& raw_value  = raw.operands.at(1).ingredients.front();
     auto const is_unsigned = (raw_value.text.back() == 'u');
@@ -1880,11 +1928,12 @@ auto expand_li(ast::Instruction const& raw, bool const force_full = false)
         and raw_value.text != "-1u") {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{raw_value, Cause::Value_out_of_range, "negative unsigned"}
-            .note("the only signed value allowed in this context "
-                  "is -1, and\n"
-                  "it is used a symbol for maximum unsigned "
-                  "value");
+        throw Error{ raw_value, Cause::Value_out_of_range, "negative unsigned" }
+            .note(
+                "the only signed value allowed in this context "
+                "is -1, and\n"
+                "it is used a symbol for maximum unsigned "
+                "value");
     }
 
     auto value = uint64_t{};
@@ -1898,13 +1947,13 @@ auto expand_li(ast::Instruction const& raw, bool const force_full = false)
     } catch (std::out_of_range const&) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{raw_value, Cause::Invalid_operand, "value out of range"}
+        throw Error{ raw_value, Cause::Invalid_operand, "value out of range" }
             .add(raw.leader);
     } catch (std::invalid_argument const&) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{raw_value, Cause::Invalid_operand, "expected integer"}.add(
-            raw.leader);
+        throw Error{ raw_value, Cause::Invalid_operand, "expected integer" }
+            .add(raw.leader);
     }
 
     using viua::libs::assembler::to_loading_parts_unsigned;
@@ -1928,8 +1977,8 @@ auto expand_li(ast::Instruction const& raw, bool const force_full = false)
     std::cerr << "  LO " << std::setw(8) << lo << "\n";
     std::cerr << std::setfill(' ') << std::dec;
 
-    auto const important_hi = is_unsigned ? hi
-                                          : (hi != static_cast<uint32_t>(-1));
+    auto const important_hi =
+        is_unsigned ? hi : (hi != static_cast<uint32_t>(-1));
 
     auto const fits_in_addi = is_unsigned ? fits_in_unsigned_r_immediate(lo)
                                           : fits_in_signed_r_immediate(lo);
@@ -1974,11 +2023,11 @@ auto expand_li(ast::Instruction const& raw, bool const force_full = false)
             synth.leader.text += 'u';
         }
 
-        auto hi_literal = std::array<char, 2 + 8 + 1>{"0x"};
+        auto hi_literal = std::array<char, 2 + 8 + 1>{ "0x" };
         std::to_chars(hi_literal.begin() + 2, hi_literal.end(), hi, 16);
 
         synth.operands.at(1).ingredients.front().text =
-            std::string{hi_literal.data()};
+            std::string{ hi_literal.data() };
         cooked.push_back(emit_instruction(synth));
     }
 
@@ -2041,7 +2090,8 @@ auto expand_li(ast::Instruction const& raw, bool const force_full = false)
 
     return cooked;
 }
-auto expand_delete(ast::Instruction const& raw) -> Text
+auto expand_delete(
+    ast::Instruction const& raw) -> Text
 {
     using namespace std::string_literals;
     auto synth        = raw;
@@ -2055,18 +2105,19 @@ auto expand_delete(ast::Instruction const& raw) -> Text
     synth.operands.front().ingredients.front().text = "void";
     synth.operands.front().ingredients.resize(1);
 
-    return {emit_instruction(synth)};
+    return { emit_instruction(synth) };
 }
-auto expand_flow_control(ast::Instruction const& raw,
-                         std::vector<Elf64_Sym>& symbol_table,
-                         std::map<std::string, size_t> const& symbol_map,
-                         Decl_map const& decl_map) -> Text
+auto expand_flow_control(
+    ast::Instruction const& raw,
+    std::vector<Elf64_Sym>& symbol_table,
+    std::map<std::string, size_t> const& symbol_map,
+    Decl_map const& decl_map) -> Text
 {
     using viua::libs::lexer::TOKEN;
     auto const jump_addr_already_loaded =
         raw.operands.back().ingredients.front() == TOKEN::DOLLAR;
     if (jump_addr_already_loaded) {
-        return {emit_instruction(raw)};
+        return { emit_instruction(raw) };
     }
 
     auto cooked = Text{};
@@ -2106,7 +2157,7 @@ auto expand_flow_control(ast::Instruction const& raw,
                                    ? Cause::Jump_to_undefined_label
                                    : Cause::Call_to_undefined_function;
 
-            throw Error{sym_id, cause, quote_fancy(sym_name)}.add(raw.leader);
+            throw Error{ sym_id, cause, quote_fancy(sym_name) }.add(raw.leader);
         }
 
         auto const sym_off = symbol_map.at(sym_name);
@@ -2115,7 +2166,9 @@ auto expand_flow_control(ast::Instruction const& raw,
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
 
-            throw Error{sym_id, Cause::Invalid_reference, quote_fancy(sym_name)}
+            throw Error{ sym_id,
+                         Cause::Invalid_reference,
+                         quote_fancy(sym_name) }
                 .aside("label " + quote_fancy(sym_name)
                        + " does not point into .text section")
                 .add(raw.leader);
@@ -2127,19 +2180,19 @@ auto expand_flow_control(ast::Instruction const& raw,
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
 
-            auto const& [decl_sym, decl_sec] = *std::ranges::find_if(
-                decl_map, [&name = sym_name](auto const& dl) -> bool {
-                    return (dl.first.name.text == name);
-                });
+            auto const& [decl_sym, decl_sec] =
+                *std::ranges::find_if(decl_map,
+                                      [&name = sym_name](auto const& dl) -> bool
+                                      { return (dl.first.name.text == name); });
 
-            throw Error{
-                sym_id,
-                Cause::Invalid_reference,
-                quote_fancy(sym_name) + " cannot be used as a jump target"}
+            throw Error{ sym_id,
+                         Cause::Invalid_reference,
+                         quote_fancy(sym_name)
+                             + " cannot be used as a jump target" }
                 .aside("label " + quote_fancy(sym_name)
                        + " defined as callable")
                 .add(raw.leader)
-                .chain(Error{decl_sym.name, Cause::None}
+                .chain(Error{ decl_sym.name, Cause::None }
                            .note("declared here")
                            .add(decl_sym.leader));
         }
@@ -2163,15 +2216,16 @@ auto expand_flow_control(ast::Instruction const& raw,
 
     return cooked;
 }
-auto expand_call(ast::Instruction const& raw,
-                 std::vector<Elf64_Sym>& symbol_table,
-                 std::map<std::string, size_t> const& symbol_map) -> Text
+auto expand_call(
+    ast::Instruction const& raw,
+    std::vector<Elf64_Sym>& symbol_table,
+    std::map<std::string, size_t> const& symbol_map) -> Text
 {
     using viua::libs::lexer::TOKEN;
     auto const call_addr_already_loaded =
         raw.operands.back().ingredients.front() == TOKEN::DOLLAR;
     if (call_addr_already_loaded) {
-        return {emit_instruction(raw)};
+        return { emit_instruction(raw) };
     }
 
     auto cooked = Text{};
@@ -2247,7 +2301,7 @@ auto expand_call(ast::Instruction const& raw,
                                    ? Cause::Jump_to_undefined_label
                                    : Cause::Call_to_undefined_function;
 
-            throw Error{sym_id, cause, quote_fancy(sym_name)}.add(raw.leader);
+            throw Error{ sym_id, cause, quote_fancy(sym_name) }.add(raw.leader);
         }
 
         auto const sym_off = symbol_map.at(sym_name);
@@ -2256,7 +2310,9 @@ auto expand_call(ast::Instruction const& raw,
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
 
-            throw Error{sym_id, Cause::Invalid_reference, quote_fancy(sym_name)}
+            throw Error{ sym_id,
+                         Cause::Invalid_reference,
+                         quote_fancy(sym_name) }
                 .aside("label " + quote_fancy(sym_name)
                        + " does not point into .text section")
                 .add(raw.leader);
@@ -2268,9 +2324,10 @@ auto expand_call(ast::Instruction const& raw,
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
 
-            throw Error{sym_id,
-                        Cause::Invalid_reference,
-                        quote_fancy(sym_name) + " cannot be used as a callable"}
+            throw Error{ sym_id,
+                         Cause::Invalid_reference,
+                         quote_fancy(sym_name)
+                             + " cannot be used as a callable" }
                 .aside("label " + quote_fancy(sym_name)
                        + " defined as a jump target")
                 .add(raw.leader);
@@ -2306,7 +2363,8 @@ auto expand_call(ast::Instruction const& raw,
 
     return cooked;
 }
-auto expand_atom(ast::Instruction const& raw) -> Text
+auto expand_atom(
+    ast::Instruction const& raw) -> Text
 {
     auto cooked = Text{};
 
@@ -2343,7 +2401,8 @@ auto expand_atom(ast::Instruction const& raw) -> Text
 
     return cooked;
 }
-auto expand_double(ast::Instruction const& raw) -> Text
+auto expand_double(
+    ast::Instruction const& raw) -> Text
 {
     auto cooked = Text{};
 
@@ -2380,10 +2439,11 @@ auto expand_double(ast::Instruction const& raw) -> Text
 
     return cooked;
 }
-auto expand_return(ast::Instruction const& raw) -> Text
+auto expand_return(
+    ast::Instruction const& raw) -> Text
 {
     if (not raw.operands.empty()) {
-        return {emit_instruction(raw)};
+        return { emit_instruction(raw) };
     }
 
     using namespace std::string_literals;
@@ -2399,14 +2459,15 @@ auto expand_return(ast::Instruction const& raw) -> Text
     operand.ingredients.back().token = viua::libs::lexer::TOKEN::VOID;
     synth.operands.push_back(operand);
 
-    return {emit_instruction(synth)};
+    return { emit_instruction(synth) };
 }
-auto expand_memory_access(ast::Instruction const& raw) -> Text
+auto expand_memory_access(
+    ast::Instruction const& raw) -> Text
 {
     using namespace std::string_literals;
     auto synth = ast::Instruction{};
 
-    auto opcode_view = std::string_view{raw.leader.text};
+    auto opcode_view = std::string_view{ raw.leader.text };
     auto greedy      = opcode_view.starts_with("g.");
     if (greedy) {
         opcode_view.remove_prefix(2);
@@ -2417,14 +2478,14 @@ auto expand_memory_access(ast::Instruction const& raw) -> Text
     synth.leader.text[1] = 'm';
     if (opcode_view[0] == 'a') {
         switch (synth.leader.text.back()) {
-        case 'a':
-            synth.leader.text = "ama";
-            break;
-        case 'd':
-            synth.leader.text = "amd";
-            break;
-        default:
-            abort();
+            case 'a':
+                synth.leader.text = "ama";
+                break;
+            case 'd':
+                synth.leader.text = "amd";
+                break;
+            default:
+                abort();
         }
     }
 
@@ -2435,23 +2496,23 @@ auto expand_memory_access(ast::Instruction const& raw) -> Text
 
     auto const unit = opcode_view[0] == 'a' ? opcode_view[2] : opcode_view[1];
     switch (unit) {
-    case 'b':
-        synth.operands.front().ingredients.front().text = "0";
-        break;
-    case 'h':
-        synth.operands.front().ingredients.front().text = "1";
-        break;
-    case 'w':
-        synth.operands.front().ingredients.front().text = "2";
-        break;
-    case 'd':
-        synth.operands.front().ingredients.front().text = "3";
-        break;
-    case 'q':
-        synth.operands.front().ingredients.front().text = "4";
-        break;
-    default:
-        abort();
+        case 'b':
+            synth.operands.front().ingredients.front().text = "0";
+            break;
+        case 'h':
+            synth.operands.front().ingredients.front().text = "1";
+            break;
+        case 'w':
+            synth.operands.front().ingredients.front().text = "2";
+            break;
+        case 'd':
+            synth.operands.front().ingredients.front().text = "3";
+            break;
+        case 'q':
+            synth.operands.front().ingredients.front().text = "4";
+            break;
+        default:
+            abort();
     }
     synth.operands.front().ingredients.resize(1);
 
@@ -2459,17 +2520,19 @@ auto expand_memory_access(ast::Instruction const& raw) -> Text
         synth.leader.text = ("g." + synth.leader.text);
     }
 
-    return {emit_instruction(synth)};
+    return { emit_instruction(synth) };
 }
-auto expand_immediate_arithmetic(ast::Instruction const& raw) -> Text
+auto expand_immediate_arithmetic(
+    ast::Instruction const& raw) -> Text
 {
     auto synth = raw;
     if (synth.operands.back().ingredients.back().text.back() == 'u') {
         synth.leader.text += 'u';
     }
-    return {emit_instruction(synth)};
+    return { emit_instruction(synth) };
 }
-auto expand_cast(ast::Instruction const& raw) -> Text
+auto expand_cast(
+    ast::Instruction const& raw) -> Text
 {
     auto synth        = raw;
     auto& target_type = synth.operands.back().ingredients.back();
@@ -2480,8 +2543,8 @@ auto expand_cast(ast::Instruction const& raw) -> Text
         if (misspell_candidates.empty()) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{target_type, Cause::Invalid_cast, target_type.text}.add(
-                raw.leader);
+            throw Error{ target_type, Cause::Invalid_cast, target_type.text }
+                .add(raw.leader);
         }
 
         using viua::support::string::levenshtein_best;
@@ -2491,28 +2554,29 @@ auto expand_cast(ast::Instruction const& raw) -> Text
         if (best_candidate.second == target_type.text) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{target_type, Cause::Invalid_cast, target_type.text}.add(
-                raw.leader);
+            throw Error{ target_type, Cause::Invalid_cast, target_type.text }
+                .add(raw.leader);
         }
 
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw did_you_mean(Error{raw.operands.back().ingredients.front(),
-                                 Cause::Invalid_cast,
-                                 target_type.text},
+        throw did_you_mean(Error{ raw.operands.back().ingredients.front(),
+                                  Cause::Invalid_cast,
+                                  target_type.text },
                            best_candidate.second)
             .add(raw.leader);
     }
     target_type.text = std::to_string(
         static_cast<uintmax_t>(FUNDAMENTAL_TYPE_NAMES.at(target_type.text)));
 
-    return {emit_instruction(synth)};
+    return { emit_instruction(synth) };
 }
 
-auto expand_instruction(ast::Instruction const& raw,
-                        std::vector<Elf64_Sym>& symbol_table,
-                        std::map<std::string, size_t> const& symbol_map,
-                        Decl_map const& decl_map) -> Text
+auto expand_instruction(
+    ast::Instruction const& raw,
+    std::vector<Elf64_Sym>& symbol_table,
+    std::map<std::string, size_t> const& symbol_map,
+    Decl_map const& decl_map) -> Text
 {
     auto const memory_access = std::set<std::string_view>{
         /*
@@ -2555,17 +2619,11 @@ auto expand_instruction(ast::Instruction const& raw,
         "amqd",
     };
     auto const immediate_signed_arithmetic = std::set<std::string_view>{
-        "addi",
-        "g.addi",
-        "subi",
-        "g.subi",
-        "muli",
-        "g.muli",
-        "divi",
-        "g.divi",
+        "addi", "g.addi", "subi", "g.subi", "muli", "g.muli", "divi", "g.divi",
     };
 
-    auto const strip_greedy = [](std::string_view op) -> std::string_view {
+    auto const strip_greedy = [](std::string_view op) -> std::string_view
+    {
         if (op.starts_with("g.")) {
             op.remove_prefix(2);
         }
@@ -2594,18 +2652,20 @@ auto expand_instruction(ast::Instruction const& raw,
     } else if (immediate_signed_arithmetic.contains(opcode)) {
         return expand_immediate_arithmetic(raw);
     } else {
-        return {emit_instruction(raw)};
+        return { emit_instruction(raw) };
     }
 }
 
-auto cook_instructions(std::vector<std::unique_ptr<ast::Node>> const& nodes,
-                       std::vector<uint8_t> const& rodata_buf,
-                       std::vector<uint8_t> const& string_table,
-                       std::vector<Elf64_Sym>& symbol_table,
-                       std::map<std::string, size_t> const& symbol_map,
-                       Decl_map const& decl_map) -> Text
+auto cook_instructions(
+    std::vector<std::unique_ptr<ast::Node>> const& nodes,
+    std::vector<uint8_t> const& rodata_buf,
+    std::vector<uint8_t> const& string_table,
+    std::vector<Elf64_Sym>& symbol_table,
+    std::map<std::string, size_t> const& symbol_map,
+    Decl_map const& decl_map) -> Text
 {
-    enum class SECTION {
+    enum class SECTION
+    {
         NONE,
         RODATA,
         TEXT,
@@ -2626,27 +2686,28 @@ auto cook_instructions(std::vector<std::unique_ptr<ast::Node>> const& nodes,
         using viua::arch::ops::N;
         using viua::arch::ops::OPCODE;
         text.emplace_back(
-            N{static_cast<instruction_type>(OPCODE::HALT)}.encode());
+            N{ static_cast<instruction_type>(OPCODE::HALT) }.encode());
     }
 
     (void)rodata_buf;
     (void)string_table;
 
     auto const save_size_of_active_function =
-        [&text, &af = active_function, &function_label]() -> void {
+        [&text, &af = active_function, &function_label]() -> void
+    {
         if (af) {
             af->st_size = ((text.size() * sizeof(viua::arch::instruction_type))
                            - af->st_value);
 
             std::cerr << "  size of function " << function_label->name.text
                       << " is " << af->st_size << " bytes\n";
-            std::cerr << "  span of function " << function_label->name.text
-                      << " is "
-                      << "[.text+0x" << std::hex << std::setfill('0')
-                      << std::setw(16) << af->st_value << "..." << std::setw(16)
-                      << (af->st_value + af->st_size
-                          - sizeof(viua::arch::instruction_type))
-                      << std::dec << std::setfill(' ') << "]\n";
+            std::cerr
+                << "  span of function " << function_label->name.text << " is "
+                << "[.text+0x" << std::hex << std::setfill('0') << std::setw(16)
+                << af->st_value << "..." << std::setw(16)
+                << (af->st_value + af->st_size
+                    - sizeof(viua::arch::instruction_type))
+                << std::dec << std::setfill(' ') << "]\n";
         }
     };
 
@@ -2657,16 +2718,16 @@ auto cook_instructions(std::vector<std::unique_ptr<ast::Node>> const& nodes,
             activator.reset(static_cast<ast::Section const*>(each.get()));
             auto const& sec = *activator;
             auto const name = sec.which();
-            if (name == std::string_view{".rodata"}) {
+            if (name == std::string_view{ ".rodata" }) {
                 active_section = SECTION::RODATA;
-            } else if (name == std::string_view{".text"}) {
+            } else if (name == std::string_view{ ".text" }) {
                 active_section = SECTION::TEXT;
             } else {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
-                throw Error{sec.name,
-                            Cause::None,
-                            "unknown section: " + quote_fancy(name)};
+                throw Error{ sec.name,
+                             Cause::None,
+                             "unknown section: " + quote_fancy(name) };
             }
             continue;
         }
@@ -2681,7 +2742,7 @@ auto cook_instructions(std::vector<std::unique_ptr<ast::Node>> const& nodes,
         if (active_section == SECTION::NONE) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            throw Error{each->leader, Cause::None, "no active section"};
+            throw Error{ each->leader, Cause::None, "no active section" };
         }
         if (active_section == SECTION::RODATA) {
             continue;
@@ -2699,9 +2760,9 @@ auto cook_instructions(std::vector<std::unique_ptr<ast::Node>> const& nodes,
             } else {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
-                throw Error{lab.name,
-                            Cause::None,
-                            "text label without attached symbol"};
+                throw Error{ lab.name,
+                             Cause::None,
+                             "text label without attached symbol" };
             }
 
             /*
@@ -2768,15 +2829,16 @@ auto cook_instructions(std::vector<std::unique_ptr<ast::Node>> const& nodes,
         using viua::arch::ops::N;
         using viua::arch::ops::OPCODE;
         text.emplace_back(
-            N{static_cast<instruction_type>(OPCODE::HALT)}.encode());
+            N{ static_cast<instruction_type>(OPCODE::HALT) }.encode());
     }
 
     return text;
 }
 
-auto find_entry_point(std::vector<std::unique_ptr<ast::Node>> const& nodes,
-                      std::vector<Elf64_Sym>& symbol_table,
-                      std::map<std::string, size_t>& symbol_map)
+auto find_entry_point(
+    std::vector<std::unique_ptr<ast::Node>> const& nodes,
+    std::vector<Elf64_Sym>& symbol_table,
+    std::map<std::string, size_t>& symbol_map)
     -> std::optional<viua::libs::lexer::Lexeme>
 {
     auto entry_point_fn = std::optional<viua::libs::lexer::Lexeme>{};
@@ -2789,9 +2851,9 @@ auto find_entry_point(std::vector<std::unique_ptr<ast::Node>> const& nodes,
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
 
-            throw Error{each->leader,
-                        Cause::None,
-                        "only .symbol can be tagged as entry point"}
+            throw Error{ each->leader,
+                         Cause::None,
+                         "only .symbol can be tagged as entry point" }
                 .add(*each->attr("entry_point"));
         }
 
@@ -2801,8 +2863,9 @@ auto find_entry_point(std::vector<std::unique_ptr<ast::Node>> const& nodes,
                 using viua::libs::errors::compile_time::Error;
 
                 auto const dup = static_cast<ast::Symbol const&>(*each);
-                throw Error{
-                    dup.name, Cause::Duplicated_entry_point, dup.name.text}
+                throw Error{ dup.name,
+                             Cause::Duplicated_entry_point,
+                             dup.name.text }
                     .add(dup.attr("entry_point").value())
                     .note("first entry point was: " + entry_point_fn->text);
             }
@@ -2817,18 +2880,18 @@ auto find_entry_point(std::vector<std::unique_ptr<ast::Node>> const& nodes,
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
 
-                throw Error{*entry_point_fn,
-                            Cause::None,
-                            "entry point must be a function"}
+                throw Error{ *entry_point_fn,
+                             Cause::None,
+                             "entry point must be a function" }
                     .add(*each->attr("entry_point"));
             }
             if (not_global) {
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
 
-                auto e = Error{*each->attr("local"),
-                               Cause::None,
-                               "entry point must be global"};
+                auto e = Error{ *each->attr("local"),
+                                Cause::None,
+                                "entry point must be global" };
                 e.add(*each->attr("entry_point"));
                 e.add(*entry_point_fn, true);
                 e.aside("remove the " + quote_fancy("local")
@@ -2840,9 +2903,9 @@ auto find_entry_point(std::vector<std::unique_ptr<ast::Node>> const& nodes,
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
 
-                auto e = Error{*each->attr("hidden"),
-                               Cause::None,
-                               "entry point must not be hidden"};
+                auto e = Error{ *each->attr("hidden"),
+                                Cause::None,
+                                "entry point must not be hidden" };
                 e.add(*each->attr("entry_point"));
                 e.add(*entry_point_fn, true);
                 e.aside("remove the " + quote_fancy("hidden") + " tag");
@@ -2853,11 +2916,13 @@ auto find_entry_point(std::vector<std::unique_ptr<ast::Node>> const& nodes,
     return entry_point_fn;
 }
 
-auto make_reloc_table(Text const& text) -> std::vector<Elf64_Rel>
+auto make_reloc_table(
+    Text const& text) -> std::vector<Elf64_Rel>
 {
     auto reloc_table = std::vector<Elf64_Rel>{};
 
-    auto const push_reloc = [&text, &reloc_table](size_t const i) -> void {
+    auto const push_reloc = [&text, &reloc_table](size_t const i) -> void
+    {
         using viua::arch::ops::OPCODE;
         auto const op =
             static_cast<OPCODE>(text.at(i) & viua::arch::ops::OPCODE_MASK);
@@ -2869,8 +2934,8 @@ auto make_reloc_table(Text const& text) -> std::vector<Elf64_Rel>
 
         using viua::arch::ops::FORMAT_MASK;
         using viua::arch::ops::FORMAT_F;
-        auto const reloc_to_section_ptr = op == OPCODE::ARODP
-                                          or op == OPCODE::ATXTP;
+        auto const reloc_to_section_ptr =
+            op == OPCODE::ARODP or op == OPCODE::ATXTP;
         auto const reloc_to_long_addr =
             (text.at(i - 1) & FORMAT_MASK) == FORMAT_F;
 
@@ -2913,7 +2978,7 @@ auto make_reloc_table(Text const& text) -> std::vector<Elf64_Rel>
         reloc_table.push_back(rel);
     };
 
-    for (auto i = size_t{0}; i < text.size(); ++i) {
+    for (auto i = size_t{ 0 }; i < text.size(); ++i) {
         using viua::arch::opcode_type;
         using viua::arch::ops::OPCODE;
 
@@ -2923,29 +2988,30 @@ auto make_reloc_table(Text const& text) -> std::vector<Elf64_Rel>
             static_cast<OPCODE>(each & viua::arch::ops::OPCODE_MASK);
         switch (op) {
             using enum viua::arch::ops::OPCODE;
-        // FIXME ATOM and DOUBLE should rely on ARODP
-        case ATOM:
-        case DOUBLE:
-        case ARODP:
-        case ATXTP:
-            push_reloc(i);
-            break;
-        default:
-            break;
+            // FIXME ATOM and DOUBLE should rely on ARODP
+            case ATOM:
+            case DOUBLE:
+            case ARODP:
+            case ATXTP:
+                push_reloc(i);
+                break;
+            default:
+                break;
         }
     }
 
     return reloc_table;
 }
 
-auto emit_elf(std::filesystem::path const output_path,
-              bool const as_executable,
-              std::optional<uint64_t> const entry_point_fn,
-              Text const& text,
-              std::optional<std::vector<Elf64_Rel>> relocs,
-              std::vector<uint8_t> const& rodata_buf,
-              std::vector<uint8_t> const& string_table,
-              std::vector<Elf64_Sym>& symbol_table) -> void
+auto emit_elf(
+    std::filesystem::path const output_path,
+    bool const as_executable,
+    std::optional<uint64_t> const entry_point_fn,
+    Text const& text,
+    std::optional<std::vector<Elf64_Rel>> relocs,
+    std::vector<uint8_t> const& rodata_buf,
+    std::vector<uint8_t> const& string_table,
+    std::vector<Elf64_Sym>& symbol_table) -> void
 {
     auto const a_out = open(output_path.c_str(),
                             O_CREAT | O_TRUNC | O_WRONLY,
@@ -2956,8 +3022,8 @@ auto emit_elf(std::filesystem::path const output_path,
     }
 
     constexpr auto VIUA_MAGIC [[maybe_unused]] = "\x7fVIUA\x00\x00\x00";
-    auto const VIUAVM_INTERP                   = std::string{"viua-vm"};
-    auto const VIUA_COMMENT = std::string{VIUAVM_VERSION_FULL};
+    auto const VIUAVM_INTERP                   = std::string{ "viua-vm" };
+    auto const VIUA_COMMENT = std::string{ VIUAVM_VERSION_FULL };
 
     {
         // see elf(5)
@@ -2977,19 +3043,20 @@ auto emit_elf(std::filesystem::path const output_path,
         elf_header.e_flags  = 0;  // processor-specific flags, should be 0
         elf_header.e_ehsize = sizeof(elf_header);
 
-        auto shstr            = std::vector<char>{'\0'};
-        auto save_shstr_entry = [&shstr](std::string_view const sv) -> size_t {
+        auto shstr            = std::vector<char>{ '\0' };
+        auto save_shstr_entry = [&shstr](std::string_view const sv) -> size_t
+        {
             auto const saved_at = shstr.size();
             std::copy(sv.begin(), sv.end(), std::back_inserter(shstr));
             shstr.push_back('\0');
             return saved_at;
         };
 
-        auto text_section_ndx   = size_t{0};
-        auto rel_section_ndx    = size_t{0};
-        auto rodata_section_ndx = size_t{0};
-        auto symtab_section_ndx = size_t{0};
-        auto strtab_section_ndx = size_t{0};
+        auto text_section_ndx   = size_t{ 0 };
+        auto rel_section_ndx    = size_t{ 0 };
+        auto rodata_section_ndx = size_t{ 0 };
+        auto symtab_section_ndx = size_t{ 0 };
+        auto strtab_section_ndx = size_t{ 0 };
 
         using Header_pair = std::pair<std::optional<Elf64_Phdr>, Elf64_Shdr>;
         auto elf_headers  = std::vector<Header_pair>{};
@@ -3010,7 +3077,7 @@ auto emit_elf(std::filesystem::path const output_path,
             Elf64_Shdr void_section{};
             void_section.sh_type = SHT_NULL;
 
-            elf_headers.push_back({seg, void_section});
+            elf_headers.push_back({ seg, void_section });
         }
         {
             /*
@@ -3034,7 +3101,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_size   = 8;
             sec.sh_flags  = 0;
 
-            elf_headers.push_back({seg, sec});
+            elf_headers.push_back({ seg, sec });
         }
         {
             /*
@@ -3059,7 +3126,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_size   = VIUAVM_INTERP.size() + 1;
             sec.sh_flags  = 0;
 
-            elf_headers.push_back({seg, sec});
+            elf_headers.push_back({ seg, sec });
         }
         if (relocs.has_value()) {
             /*
@@ -3091,7 +3158,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_info = 0;
 
             rel_section_ndx = elf_headers.size();
-            elf_headers.push_back({std::nullopt, sec});
+            elf_headers.push_back({ std::nullopt, sec });
         }
         {
             /*
@@ -3119,7 +3186,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_flags  = SHF_ALLOC | SHF_EXECINSTR;
 
             text_section_ndx = elf_headers.size();
-            elf_headers.push_back({seg, sec});
+            elf_headers.push_back({ seg, sec });
         }
         {
             /*
@@ -3152,7 +3219,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_flags  = SHF_ALLOC;
 
             rodata_section_ndx = elf_headers.size();
-            elf_headers.push_back({seg, sec});
+            elf_headers.push_back({ seg, sec });
         }
         {
             /*
@@ -3165,7 +3232,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_size   = VIUA_COMMENT.size() + 1;
             sec.sh_flags  = 0;
 
-            elf_headers.push_back({std::nullopt, sec});
+            elf_headers.push_back({ std::nullopt, sec });
         }
         {
             /*
@@ -3194,7 +3261,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_info    = 0;
 
             symtab_section_ndx = elf_headers.size();
-            elf_headers.push_back({std::nullopt, sec});
+            elf_headers.push_back({ std::nullopt, sec });
         }
         {
             /*
@@ -3208,7 +3275,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_flags  = SHF_STRINGS;
 
             strtab_section_ndx = elf_headers.size();
-            elf_headers.push_back({std::nullopt, sec});
+            elf_headers.push_back({ std::nullopt, sec });
         }
         {
             /*
@@ -3229,7 +3296,7 @@ auto emit_elf(std::filesystem::path const output_path,
             sec.sh_size   = shstr.size();
             sec.sh_flags  = SHF_STRINGS;
 
-            elf_headers.push_back({std::nullopt, sec});
+            elf_headers.push_back({ std::nullopt, sec });
         }
 
         /*
@@ -3246,10 +3313,10 @@ auto emit_elf(std::filesystem::path const output_path,
             elf_headers.at(rel_section_ndx).second.sh_info = text_section_ndx;
         }
 
-        auto elf_pheaders = std::count_if(
-            elf_headers.begin(),
-            elf_headers.end(),
-            [](auto const& each) -> bool { return each.first.has_value(); });
+        auto elf_pheaders = std::count_if(elf_headers.begin(),
+                                          elf_headers.end(),
+                                          [](auto const& each) -> bool
+                                          { return each.first.has_value(); });
         auto elf_sheaders = elf_headers.size();
 
         auto const elf_size = sizeof(Elf64_Ehdr)
@@ -3257,7 +3324,7 @@ auto emit_elf(std::filesystem::path const output_path,
                               + (elf_sheaders * sizeof(Elf64_Shdr));
         auto text_offset = std::optional<size_t>{};
         {
-            auto offset_accumulator = size_t{0};
+            auto offset_accumulator = size_t{ 0 };
             for (auto& [segment, section] : elf_headers) {
                 if (segment.has_value() and (segment->p_type != PT_NULL)) {
                     if (segment->p_type == PT_NULL) {
@@ -3368,14 +3435,16 @@ auto emit_elf(std::filesystem::path const output_path,
 
         for (auto& each : symbol_table) {
             switch (ELF64_ST_TYPE(each.st_info)) {
-            case STT_FUNC:
-                each.st_shndx = static_cast<Elf64_Section>(text_section_ndx);
-                break;
-            case STT_OBJECT:
-                each.st_shndx = static_cast<Elf64_Section>(rodata_section_ndx);
-                break;
-            default:
-                break;
+                case STT_FUNC:
+                    each.st_shndx =
+                        static_cast<Elf64_Section>(text_section_ndx);
+                    break;
+                case STT_OBJECT:
+                    each.st_shndx =
+                        static_cast<Elf64_Section>(rodata_section_ndx);
+                    break;
+                default:
+                    break;
             }
             viua::support::posix::whole_write(
                 a_out, &each, sizeof(std::decay_t<decltype(symbol_table)>));
@@ -3391,7 +3460,9 @@ auto emit_elf(std::filesystem::path const output_path,
 }
 }  // namespace
 
-auto main(int argc, char* argv[]) -> int
+auto main(
+    int argc,
+    char* argv[]) -> int
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_CYAN;
@@ -3402,7 +3473,7 @@ auto main(int argc, char* argv[]) -> int
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    auto const args = std::vector<std::string>{(argv + 1), (argv + argc)};
+    auto const args = std::vector<std::string>{ (argv + 1), (argv + argc) };
     if (args.empty()) {
         std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
                   << ": no file to assemble\n";
@@ -3425,7 +3496,7 @@ auto main(int argc, char* argv[]) -> int
          * Tool-specific options.
          */
         else if (each == "-o") {
-            preferred_output_path = std::filesystem::path{args.at(++i)};
+            preferred_output_path = std::filesystem::path{ args.at(++i) };
         }
         /*
          * Common options.
@@ -3474,7 +3545,7 @@ auto main(int argc, char* argv[]) -> int
      *    be linked with other object files to produce a final executable or
      *    shared object
      */
-    auto const source_path = std::filesystem::path{args.back()};
+    auto const source_path = std::filesystem::path{ args.back() };
     auto source_text       = std::string{};
     {
         auto const source_fd = open(source_path.c_str(), O_RDONLY);
@@ -3493,7 +3564,7 @@ auto main(int argc, char* argv[]) -> int
             return 1;
         }
 
-        struct stat source_stat {};
+        struct stat source_stat{};
         if (fstat(source_fd, &source_stat) == -1) {
             using viua::support::tty::ATTR_RESET;
             using viua::support::tty::COLOR_FG_RED;
@@ -3528,7 +3599,8 @@ auto main(int argc, char* argv[]) -> int
     }
 
     auto const output_path = preferred_output_path.value_or(
-        [source_path]() -> std::filesystem::path {
+        [source_path]() -> std::filesystem::path
+        {
             auto o = source_path;
             o.replace_extension("o");
             return o;
@@ -3674,18 +3746,20 @@ auto main(int argc, char* argv[]) -> int
             auto e = Error{
                 decl_sym.name,
                 Cause::None,
-                "symbol declared [[extern]], but a definition was provided"};
+                "symbol declared [[extern]], but a definition was provided"
+            };
             viua::libs::stage::display_error_and_exit(
                 source_path, source_text, e);
         } else if ((not was_declared_extern) and (not was_defined)) {
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
 
-            auto e = Error{decl_sym.name,
-                           Cause::None,
-                           "symbol declared, but no definition was provided"};
-            e.note("add [[extern]] if the symbol is defined in another "
-                   "compilation unit or module");
+            auto e = Error{ decl_sym.name,
+                            Cause::None,
+                            "symbol declared, but no definition was provided" };
+            e.note(
+                "add [[extern]] if the symbol is defined in another "
+                "compilation unit or module");
             viua::libs::stage::display_error_and_exit(
                 source_path, source_text, e);
         }
@@ -3695,19 +3769,19 @@ auto main(int argc, char* argv[]) -> int
      * ELF emission.
      */
     auto const reloc_table = make_reloc_table(text);
-    emit_elf(
-        output_path,
-        false,
-        (entry_point_fn.has_value()
-             ? std::optional{symbol_table
-                                 .at(symbol_map.at(entry_point_fn.value().text))
-                                 .st_value}
-             : std::nullopt),
-        text,
-        reloc_table,
-        rodata_contents,
-        string_table,
-        symbol_table);
+    emit_elf(output_path,
+             false,
+             (entry_point_fn.has_value()
+                  ? std::optional{ symbol_table
+                                       .at(symbol_map.at(
+                                           entry_point_fn.value().text))
+                                       .st_value }
+                  : std::nullopt),
+             text,
+             reloc_table,
+             rodata_contents,
+             string_table,
+             symbol_table);
 
     return 0;
 }

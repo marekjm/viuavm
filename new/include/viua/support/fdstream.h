@@ -26,7 +26,6 @@
 
 #include <viua/support/fdio.h>
 
-
 namespace viua::support {
 struct fdstream {
     using fd_type = int;
@@ -35,20 +34,25 @@ struct fdstream {
     } endl{};
     using endl_type = decltype(endl);
 
-  private:
-    fd_type fd{-1};
+    private:
+    fd_type fd{ -1 };
     std::ostringstream buffer;
 
-  public:
-    inline fdstream(fd_type const d) : fd{d}
+    public:
+    inline fdstream(
+        fd_type const d)
+        : fd{ d }
     {}
 
-    template<typename T> auto operator<<(T const& v) -> fdstream&
+    template<typename T>
+    auto operator<<(
+        T const& v) -> fdstream&
     {
         buffer << v;
         return *this;
     }
-    inline auto operator<<(endl_type const) -> fdstream&
+    inline auto operator<<(
+        endl_type const) -> fdstream&
     {
         buffer << "\n";
         auto const buf = buffer.str();
@@ -56,7 +60,8 @@ struct fdstream {
         buffer.str("");
         return *this;
     }
-    inline auto operator<<(char const c) -> fdstream&
+    inline auto operator<<(
+        char const c) -> fdstream&
     {
         if (c == '\n') {
             return operator<<(endl);

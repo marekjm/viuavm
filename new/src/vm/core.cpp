@@ -27,9 +27,10 @@ extern viua::support::fdstream TRACE_STREAM;
 }
 
 namespace viua::vm {
-auto IO_scheduler::schedule(int const fd,
-                            opcode_type const opcode,
-                            buffer_type buffer) -> IO_request::id_type
+auto IO_scheduler::schedule(
+    int const fd,
+    opcode_type const opcode,
+    buffer_type buffer) -> IO_request::id_type
 {
     auto const req_id = next_id.fetch_add(1);
     auto req          = std::make_unique<IO_request>(
@@ -52,10 +53,11 @@ auto IO_scheduler::schedule(int const fd,
 
     return req_id;
 }
-auto IO_scheduler::schedule(uint8_t* const req_ptr,
-                            int const fd,
-                            opcode_type const opcode,
-                            io::buffer_view buffer) -> IO_request::id_type
+auto IO_scheduler::schedule(
+    uint8_t* const req_ptr,
+    int const fd,
+    opcode_type const opcode,
+    io::buffer_view buffer) -> IO_request::id_type
 {
     auto const req_id = next_id.fetch_add(1);
     auto req          = std::make_unique<IO_request>(
@@ -79,13 +81,16 @@ auto IO_scheduler::schedule(uint8_t* const req_ptr,
     return req_id;
 }
 
-auto Core::find(pid_type const p) -> std::experimental::observer_ptr<Process>
+auto Core::find(
+    pid_type const p) -> std::experimental::observer_ptr<Process>
 {
     using std::experimental::make_observer;
     return flock.count(p) ? make_observer<Process>(flock.at(p).get()) : nullptr;
 }
 
-auto Core::spawn(std::string mod_name, uint64_t const entry) -> pid_type
+auto Core::spawn(
+    std::string mod_name,
+    uint64_t const entry) -> pid_type
 {
     auto const& mod = modules.at(mod_name);
 
@@ -94,7 +99,7 @@ auto Core::spawn(std::string mod_name, uint64_t const entry) -> pid_type
     proc->push_frame(256, (mod.ip_base + entry), nullptr);
 
     run_queue.push(std::experimental::make_observer<Process>(proc.get()));
-    flock.insert({pid, std::move(proc)});
+    flock.insert({ pid, std::move(proc) });
 
     return pid;
 }
@@ -136,7 +141,8 @@ auto Register::as_memory() const -> undefined_type
     return raw;
 }
 
-auto Process::memory_at(size_t const ptr) -> uint8_t*
+auto Process::memory_at(
+    size_t const ptr) -> uint8_t*
 {
     if (ptr < stack_break) {
         return nullptr;
@@ -150,15 +156,18 @@ auto Process::memory_at(size_t const ptr) -> uint8_t*
     auto& page = memory.front();
     return (page.data() + page.size() - 1) - offset;
 }
-auto Process::record_pointer(Pointer ptr) -> void
+auto Process::record_pointer(
+    Pointer ptr) -> void
 {
     pointers[ptr.id()] = ptr;
 }
-auto Process::forget_pointer(Pointer ptr) -> void
+auto Process::forget_pointer(
+    Pointer ptr) -> void
 {
     pointers.erase(ptr.id());
 }
-auto Process::get_pointer(uint64_t addr) const -> std::optional<Pointer>
+auto Process::get_pointer(
+    uint64_t addr) const -> std::optional<Pointer>
 {
     if (pointers.contains(addr)) {
         return pointers.at(addr);

@@ -40,11 +40,10 @@
 #include <variant>
 #include <vector>
 
-#include <viua/support/number.h>
 #include <viua/arch/arch.h>
 #include <viua/runtime/pid.h>
+#include <viua/support/number.h>
 #include <viua/vm/elf.h>
-
 
 namespace viua::vm {
 struct Module {
@@ -60,35 +59,41 @@ struct Module {
     text_type const text;
     text_type::value_type const* ip_base;
 
-    inline Module(std::filesystem::path const ep, viua::vm::elf::Loaded_elf le)
-            : elf_path{std::move(ep)}
-            , elf{std::move(le)}
-            , strings_table{elf.find_fragment(".rodata")->get().data}
-            , text{elf.make_text_from(elf.find_fragment(".text")->get().data)}
-            , ip_base{text.data()}
+    inline Module(
+        std::filesystem::path const ep,
+        viua::vm::elf::Loaded_elf le)
+        : elf_path{ std::move(ep) }
+        , elf{ std::move(le) }
+        , strings_table{ elf.find_fragment(".rodata")->get().data }
+        , text{ elf.make_text_from(elf.find_fragment(".text")->get().data) }
+        , ip_base{ text.data() }
     {}
     inline Module(Module const&) = delete;
-    inline Module(Module&& m) : Module{std::move(m.elf_path), std::move(m.elf)}
+    inline Module(
+        Module&& m)
+        : Module{ std::move(m.elf_path), std::move(m.elf) }
     {}
     auto operator=(Module const&) -> Module& = delete;
     auto operator=(Module&&) -> Module&      = delete;
 
-    inline auto function_at(size_t const off) const
-        -> std::pair<std::string, size_t>
+    inline auto function_at(
+        size_t const off) const -> std::pair<std::string, size_t>
     {
         auto const sym  = elf.symtab.at(off);
-        auto name       = std::string{elf.strtab.at(sym.st_name)};
+        auto name       = std::string{ elf.strtab.at(sym.st_name) };
         auto const addr = sym.st_value;
-        return {name, addr};
+        return { name, addr };
     }
 
-    inline auto ip_in_valid_range(text_type::value_type const* ip) const -> bool
+    inline auto ip_in_valid_range(
+        text_type::value_type const* ip) const -> bool
     {
         return (ip > ip_base) and (ip < (ip_base + text.size()));
     }
 };
 
-template<typename> inline constexpr bool always_false_v = false;
+template<typename>
+inline constexpr bool always_false_v = false;
 
 struct Register {
     using void_type   = std::monostate;
@@ -120,7 +125,8 @@ struct Register {
     std::optional<uint8_t> loaded_size;
 
     auto as_memory() const -> undefined_type;
-    template<typename T> auto convert_undefined_to() -> void
+    template<typename T>
+    auto convert_undefined_to() -> void
     {
         auto const raw = std::get<undefined_type>(value);
         if constexpr (std::is_same_v<T, int_type>) {
@@ -182,7 +188,8 @@ struct Register {
         loaded_size.reset();
     }
 
-    template<typename T> auto holds() const -> bool
+    template<typename T>
+    auto holds() const -> bool
     {
         if constexpr (std::is_same_v<T, void>) {
             return is_void();
@@ -199,7 +206,8 @@ struct Register {
         value = void_type{};
     }
 
-    template<typename T> auto get() const -> std::optional<T>
+    template<typename T>
+    auto get() const -> std::optional<T>
     {
         if (not std::holds_alternative<T>(value)) {
             return {};
@@ -207,7 +215,8 @@ struct Register {
         return std::get<T>(value);
     }
 
-    template<typename T> auto cast_to() const -> std::optional<T>
+    template<typename T>
+    auto cast_to() const -> std::optional<T>
     {
         if (holds<void_type>()) {
             return {};
@@ -244,26 +253,34 @@ struct Register {
     }
 
     Register() = default;
-    explicit Register(value_type v) : value{v}
+    explicit Register(
+        value_type v)
+        : value{ v }
     {}
     Register(Register const&) = delete;
     Register(Register&&)      = default;
-    auto operator=(Register const& v) -> Register&
+    auto operator=(
+        Register const& v) -> Register&
     {
         value = v.value;
         return *this;
     }
-    auto operator=(Register&& v) -> Register&
+    auto operator=(
+        Register&& v) -> Register&
     {
         value = std::move(v.value);
         return *this;
     }
-    template<typename T> auto operator=(T const& v) -> Register&
+    template<typename T>
+    auto operator=(
+        T const& v) -> Register&
     {
         value = v;
         return *this;
     }
-    template<typename T> auto operator=(T&& v) -> Register&
+    template<typename T>
+    auto operator=(
+        T&& v) -> Register&
     {
         if constexpr (std::is_same_v<T, bool>) {
             value = static_cast<uint_type>(v);
@@ -307,7 +324,8 @@ struct Register {
  * distinguish origin pointers from subobjects of an area allocated at address
  * zero.
  */
-inline constexpr auto MEM_FIRST_STACK_BREAK = size_t{0xbfff'ffff'ffff'fff0};
+inline constexpr auto MEM_FIRST_STACK_BREAK =
+    size_t{ 0xbf'ff'ff'ff'ff'ff'ff'f0 };
 
 struct Frame {
     using addr_type = viua::arch::instruction_type const*;
@@ -321,12 +339,17 @@ struct Frame {
     viua::arch::Register_access result_to;
 
     struct {
-        uint64_t fp{MEM_FIRST_STACK_BREAK};
-        uint64_t sbrk{MEM_FIRST_STACK_BREAK};
+        uint64_t fp{ MEM_FIRST_STACK_BREAK };
+        uint64_t sbrk{ MEM_FIRST_STACK_BREAK };
     } saved;
 
-    inline Frame(size_t const sz, addr_type const e, addr_type const r)
-            : registers(sz), entry_address{e}, return_address{r}
+    inline Frame(
+        size_t const sz,
+        addr_type const e,
+        addr_type const r)
+        : registers(sz)
+        , entry_address{ e }
+        , return_address{ r }
     {}
 };
 
@@ -344,33 +367,42 @@ struct IO_request {
     using buffer_type = std::string;
     std::variant<io::buffer_view, buffer_type> buffer;
 
-    uint8_t* const req_ptr{nullptr};
+    uint8_t* const req_ptr{ nullptr };
 
-    enum class Status {
+    enum class Status
+    {
         In_flight,
         Executing,
         Success,
         Error,
         Cancel,
     };
-    Status status{Status::In_flight};
+    Status status{ Status::In_flight };
 
-    inline IO_request(uint8_t* const rp,
-                      id_type const i,
-                      opcode_type const o,
-                      buffer_type b)
-            : id{i}, opcode{o}, buffer{b}, req_ptr{rp}
+    inline IO_request(
+        uint8_t* const rp,
+        id_type const i,
+        opcode_type const o,
+        buffer_type b)
+        : id{ i }
+        , opcode{ o }
+        , buffer{ b }
+        , req_ptr{ rp }
     {}
-    inline IO_request(uint8_t* const rp,
-                      id_type const i,
-                      opcode_type const o,
-                      io::buffer_view b)
-            : id{i}, opcode{o}, buffer{b}, req_ptr{rp}
+    inline IO_request(
+        uint8_t* const rp,
+        id_type const i,
+        opcode_type const o,
+        io::buffer_view b)
+        : id{ i }
+        , opcode{ o }
+        , buffer{ b }
+        , req_ptr{ rp }
     {}
 };
 
 struct IO_scheduler {
-    inline static constexpr auto IO_URING_ENTRIES = size_t{4096};
+    inline static constexpr auto IO_URING_ENTRIES = size_t{ 4'096 };
     io_uring ring;
 
     using id_type = std::atomic<IO_request::id_type>;
@@ -399,8 +431,8 @@ struct IO_scheduler {
 
 struct Performance_counters {
     using counter_type = uint64_t;
-    counter_type total_ops_executed{0};
-    counter_type total_us_elapsed{0};
+    counter_type total_ops_executed{ 0 };
+    counter_type total_us_elapsed{ 0 };
 
     using time_point_type = std::chrono::time_point<std::chrono::steady_clock>;
     time_point_type bang{};
@@ -442,8 +474,8 @@ struct Core {
         run_queue.pop();
         return proc;
     }
-    inline auto push_ready(std::experimental::observer_ptr<Process> proc)
-        -> void
+    inline auto push_ready(
+        std::experimental::observer_ptr<Process> proc) -> void
     {
         run_queue.push(std::move(proc));
     }
@@ -457,12 +489,14 @@ struct Stack {
 
     Process* proc;
 
-    addr_type ip{nullptr};
+    addr_type ip{ nullptr };
 
     std::vector<Frame> frames;
     std::vector<Register> args;
 
-    explicit inline Stack(Process& p) : proc{&p}
+    explicit inline Stack(
+        Process& p)
+        : proc{ &p }
     {}
 
     Stack(Stack const&)                      = delete;
@@ -470,8 +504,10 @@ struct Stack {
     auto operator=(Stack const&) -> Stack&   = delete;
     inline auto operator=(Stack&&) -> Stack& = default;
 
-    inline auto push(size_t const sz, addr_type const e, addr_type const r)
-        -> void
+    inline auto push(
+        size_t const sz,
+        addr_type const e,
+        addr_type const r) -> void
     {
         frames.emplace_back(sz, e, r);
     }
@@ -490,7 +526,7 @@ struct Stack {
  * Why 16?
  * Because it means that line addresses in hexadecimal are 0, 10, 20, etc.
  */
-inline constexpr auto MEM_LINE_SIZE = size_t{16};
+inline constexpr auto MEM_LINE_SIZE = size_t{ 16 };
 inline constexpr auto MEM_PAGE_SIZE = MEM_LINE_SIZE * 16;
 
 struct Page {
@@ -508,11 +544,13 @@ struct Page {
         return storage.data();
     }
 
-    inline constexpr auto at(size_t const i) -> uint8_t&
+    inline constexpr auto at(
+        size_t const i) -> uint8_t&
     {
         return storage.at(i);
     }
-    inline constexpr auto at(size_t const i) const -> uint8_t
+    inline constexpr auto at(
+        size_t const i) const -> uint8_t
     {
         return storage.at(i);
     }
@@ -529,13 +567,13 @@ struct Pointer {
      * process' stack and heap managed by the VM.
      * These are pointers to host OS structures, objects received from FFI, etc.
      */
-    bool foreign{false};
+    bool foreign{ false };
 
     /*
      * For foreign pointers: host OS pointer.
      * For VM pointers: offset from stack break 0.
      */
-    uintptr_t ptr{0};
+    uintptr_t ptr{ 0 };
 
     /*
      * The page() and offset() functions only make sense for VM pointers, where
@@ -555,7 +593,7 @@ struct Pointer {
      * For foreign pointers: 0.
      * For VM pointers: size of the area pointed to.
      */
-    size_t size{0};
+    size_t size{ 0 };
 
     /*
      * This member is only non-zero for VM pointers which were created by
@@ -577,7 +615,7 @@ struct Pointer {
      * instruction to which the lhs operand was a pointer to the OBJECT. Its
      * parent field will be set to address of OBJECT.
      */
-    uintptr_t parent{0};
+    uintptr_t parent{ 0 };
 
     using id_type = decltype(ptr);
     inline auto id() const -> id_type
@@ -621,8 +659,8 @@ struct Process {
 
     std::vector<Page> memory;
     std::map<Pointer::id_type, Pointer> pointers;
-    uint64_t frame_pointer{MEM_FIRST_STACK_BREAK + 1};
-    uint64_t stack_break{MEM_FIRST_STACK_BREAK + 1};
+    uint64_t frame_pointer{ MEM_FIRST_STACK_BREAK + 1 };
+    uint64_t stack_break{ MEM_FIRST_STACK_BREAK + 1 };
 
     auto memory_at(size_t const ptr) -> uint8_t*;
     auto record_pointer(Pointer ptr) -> void;
@@ -630,15 +668,23 @@ struct Process {
     auto get_pointer(uint64_t addr) const -> std::optional<Pointer>;
     auto prune_pointers() -> void;
 
-    explicit inline Process(pid_type const p, Core* c, Module const& m)
-            : pid{p}, core{c}, module{m}, strtab{&m.strings_table}, stack{*this}
+    explicit inline Process(
+        pid_type const p,
+        Core* c,
+        Module const& m)
+        : pid{ p }
+        , core{ c }
+        , module{ m }
+        , strtab{ &m.strings_table }
+        , stack{ *this }
     {
         memory.emplace_back();
     }
 
-    inline auto push_frame(size_t const locals,
-                           stack_type::addr_type const entry_ip,
-                           stack_type::addr_type const return_ip) -> void
+    inline auto push_frame(
+        size_t const locals,
+        stack_type::addr_type const entry_ip,
+        stack_type::addr_type const return_ip) -> void
     {
         stack.push(locals, entry_ip, return_ip);
         stack.ip = entry_ip;
@@ -650,8 +696,11 @@ struct abort_execution {
     stack_type const& stack;
     std::string message;
 
-    inline abort_execution(stack_type const& s, std::string m = "")
-            : stack{s}, message{std::move(m)}
+    inline abort_execution(
+        stack_type const& s,
+        std::string m = "")
+        : stack{ s }
+        , message{ std::move(m) }
     {}
 
     inline auto what() const -> std::string_view

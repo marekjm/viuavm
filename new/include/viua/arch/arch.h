@@ -26,7 +26,6 @@
 #include <sstream>
 #include <string>
 
-
 namespace viua::arch {
 /*
  * Operation codes are encoded on 16 bits.
@@ -47,10 +46,11 @@ using opcode_type = uint16_t;
  */
 using instruction_type = uint64_t;
 
-constexpr auto REGISTER_WIDTH = size_t{64};
+constexpr auto REGISTER_WIDTH = size_t{ 64 };
 using register_type           = uint64_t;
 
-enum class REGISTER_SET {
+enum class REGISTER_SET
+{
     /*
      * Void register used as an input register means that the instruction
      * should use a default value for an operand. For example:
@@ -99,7 +99,7 @@ enum class REGISTER_SET {
 };
 
 using register_index_type         = uint8_t;
-constexpr auto MAX_REGISTER_INDEX = register_index_type{255};
+constexpr auto MAX_REGISTER_INDEX = register_index_type{ 255 };
 
 struct Register_access {
     using set_type = viua::arch::REGISTER_SET;
@@ -114,7 +114,8 @@ struct Register_access {
     static auto decode(uint16_t const) -> Register_access;
     auto encode() const -> uint16_t;
 
-    auto operator==(Register_access const& other) const -> bool
+    auto operator==(
+        Register_access const& other) const -> bool
     {
         return (set == other.set) and (direct == other.direct)
                and (index == other.index);
@@ -143,7 +144,8 @@ struct Register_access {
     auto to_string() const -> std::string;
 };
 
-enum class FUNDAMENTAL_TYPES : uint8_t {
+enum class FUNDAMENTAL_TYPES : uint8_t
+{
     VOID,
     INT,
     UINT,

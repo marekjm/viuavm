@@ -23,170 +23,172 @@
 
 #include <viua/arch/ops.h>
 
-
 namespace viua::arch::ops {
-auto to_string(FORMAT const raw) -> std::string
+auto to_string(
+    FORMAT const raw) -> std::string
 {
     switch (raw) {
-    case FORMAT::N:
-        return "N";
-    case FORMAT::T:
-        return "T";
-    case FORMAT::D:
-        return "D";
-    case FORMAT::S:
-        return "S";
-    case FORMAT::F:
-        return "F";
-    case FORMAT::E:
-        return "E";
-    case FORMAT::R:
-        return "R";
-    case FORMAT::M:
-        return "M";
+        case FORMAT::N:
+            return "N";
+        case FORMAT::T:
+            return "T";
+        case FORMAT::D:
+            return "D";
+        case FORMAT::S:
+            return "S";
+        case FORMAT::F:
+            return "F";
+        case FORMAT::E:
+            return "E";
+        case FORMAT::R:
+            return "R";
+        case FORMAT::M:
+            return "M";
     }
 
     return "<unknown>";
 }
 
-auto to_string(opcode_type const raw) -> std::string
+auto to_string(
+    opcode_type const raw) -> std::string
 {
     auto const greedy =
-        std::string{static_cast<bool>(raw & GREEDY) ? "g." : ""};
+        std::string{ static_cast<bool>(raw & GREEDY) ? "g." : "" };
     auto const opcode = static_cast<OPCODE>(raw & OPCODE_MASK);
 
     switch (opcode) {
-    case OPCODE::NOOP:
-        return greedy + "noop";
-    case OPCODE::HALT:
-        return greedy + "halt";
-    case OPCODE::EBREAK:
-        return greedy + "ebreak";
-    case OPCODE::ECALL:
-        return greedy + "ecall";
-    case OPCODE::RETURN:
-        return greedy + "return";
-    case OPCODE::ADD:
-        return greedy + "add";
-    case OPCODE::SUB:
-        return greedy + "sub";
-    case OPCODE::MUL:
-        return greedy + "mul";
-    case OPCODE::DIV:
-        return greedy + "div";
-    case OPCODE::MOD:
-        return greedy + "mod";
-    case OPCODE::BITSHL:
-        return greedy + "bitshl";
-    case OPCODE::BITSHR:
-        return greedy + "bitshr";
-    case OPCODE::BITASHR:
-        return greedy + "bitashr";
-    case OPCODE::BITROL:
-        return greedy + "bitrol";
-    case OPCODE::BITROR:
-        return greedy + "bitror";
-    case OPCODE::BITAND:
-        return greedy + "bitand";
-    case OPCODE::BITOR:
-        return greedy + "bitor";
-    case OPCODE::BITXOR:
-        return greedy + "bitxor";
-    case OPCODE::EQ:
-        return "eq";
-    case OPCODE::LT:
-        return "lt";
-    case OPCODE::GT:
-        return "gt";
-    case OPCODE::CMP:
-        return "cmp";
-    case OPCODE::AND:
-        return "and";
-    case OPCODE::OR:
-        return "or";
-    case OPCODE::CALL:
-        return "call";
-    case OPCODE::BITNOT:
-        return greedy + "bitnot";
-    case OPCODE::NOT:
-        return greedy + "not";
-    case OPCODE::ATOM:
-        return greedy + "atom";
-    case OPCODE::FRAME:
-        return greedy + "frame";
-    case OPCODE::LUI:
-        return greedy + "lui";
-    case OPCODE::LUIU:
-        return greedy + "luiu";
-    case OPCODE::LLI:
-        return greedy + "lli";
-    case OPCODE::ADDI:
-        return greedy + "addi";
-    case OPCODE::ADDIU:
-        return greedy + "addiu";
-    case OPCODE::SUBI:
-        return greedy + "subi";
-    case OPCODE::SUBIU:
-        return greedy + "subiu";
-    case OPCODE::MULI:
-        return greedy + "muli";
-    case OPCODE::MULIU:
-        return greedy + "muliu";
-    case OPCODE::DIVI:
-        return greedy + "divi";
-    case OPCODE::DIVIU:
-        return greedy + "diviu";
-    case OPCODE::FLOAT:
-        return greedy + "float";
-    case OPCODE::DOUBLE:
-        return greedy + "double";
-    case OPCODE::COPY:
-        return greedy + "copy";
-    case OPCODE::MOVE:
-        return greedy + "move";
-    case OPCODE::SWAP:
-        return greedy + "swap";
-    case OPCODE::IF:
-        return greedy + "if";
-    case OPCODE::IO_SUBMIT:
-        return greedy + "io_submit";
-    case OPCODE::IO_WAIT:
-        return greedy + "io_wait";
-    case OPCODE::IO_SHUTDOWN:
-        return greedy + "io_shutdown";
-    case OPCODE::IO_CTL:
-        return greedy + "io_ctl";
-    case OPCODE::IO_PEEK:
-        return greedy + "io_peek";
-    case OPCODE::ACTOR:
-        return greedy + "actor";
-    case OPCODE::SELF:
-        return greedy + "self";
-    case OPCODE::GTS:
-        return greedy + "gts";
-    case OPCODE::GTL:
-        return greedy + "gtl";
-    case OPCODE::CAST:
-        return greedy + "cast";
-    case OPCODE::ARODP:
-        return greedy + "arodp";
-    case OPCODE::ATXTP:
-        return greedy + "atxtp";
-    case OPCODE::SM:
-        return greedy + "sm";
-    case OPCODE::LM:
-        return greedy + "lm";
-    case OPCODE::AA:
-        return greedy + "ama";
-    case OPCODE::AD:
-        return greedy + "amd";
-    case OPCODE::PTR:
-        return greedy + "ptr";
+        case OPCODE::NOOP:
+            return greedy + "noop";
+        case OPCODE::HALT:
+            return greedy + "halt";
+        case OPCODE::EBREAK:
+            return greedy + "ebreak";
+        case OPCODE::ECALL:
+            return greedy + "ecall";
+        case OPCODE::RETURN:
+            return greedy + "return";
+        case OPCODE::ADD:
+            return greedy + "add";
+        case OPCODE::SUB:
+            return greedy + "sub";
+        case OPCODE::MUL:
+            return greedy + "mul";
+        case OPCODE::DIV:
+            return greedy + "div";
+        case OPCODE::MOD:
+            return greedy + "mod";
+        case OPCODE::BITSHL:
+            return greedy + "bitshl";
+        case OPCODE::BITSHR:
+            return greedy + "bitshr";
+        case OPCODE::BITASHR:
+            return greedy + "bitashr";
+        case OPCODE::BITROL:
+            return greedy + "bitrol";
+        case OPCODE::BITROR:
+            return greedy + "bitror";
+        case OPCODE::BITAND:
+            return greedy + "bitand";
+        case OPCODE::BITOR:
+            return greedy + "bitor";
+        case OPCODE::BITXOR:
+            return greedy + "bitxor";
+        case OPCODE::EQ:
+            return "eq";
+        case OPCODE::LT:
+            return "lt";
+        case OPCODE::GT:
+            return "gt";
+        case OPCODE::CMP:
+            return "cmp";
+        case OPCODE::AND:
+            return "and";
+        case OPCODE::OR:
+            return "or";
+        case OPCODE::CALL:
+            return "call";
+        case OPCODE::BITNOT:
+            return greedy + "bitnot";
+        case OPCODE::NOT:
+            return greedy + "not";
+        case OPCODE::ATOM:
+            return greedy + "atom";
+        case OPCODE::FRAME:
+            return greedy + "frame";
+        case OPCODE::LUI:
+            return greedy + "lui";
+        case OPCODE::LUIU:
+            return greedy + "luiu";
+        case OPCODE::LLI:
+            return greedy + "lli";
+        case OPCODE::ADDI:
+            return greedy + "addi";
+        case OPCODE::ADDIU:
+            return greedy + "addiu";
+        case OPCODE::SUBI:
+            return greedy + "subi";
+        case OPCODE::SUBIU:
+            return greedy + "subiu";
+        case OPCODE::MULI:
+            return greedy + "muli";
+        case OPCODE::MULIU:
+            return greedy + "muliu";
+        case OPCODE::DIVI:
+            return greedy + "divi";
+        case OPCODE::DIVIU:
+            return greedy + "diviu";
+        case OPCODE::FLOAT:
+            return greedy + "float";
+        case OPCODE::DOUBLE:
+            return greedy + "double";
+        case OPCODE::COPY:
+            return greedy + "copy";
+        case OPCODE::MOVE:
+            return greedy + "move";
+        case OPCODE::SWAP:
+            return greedy + "swap";
+        case OPCODE::IF:
+            return greedy + "if";
+        case OPCODE::IO_SUBMIT:
+            return greedy + "io_submit";
+        case OPCODE::IO_WAIT:
+            return greedy + "io_wait";
+        case OPCODE::IO_SHUTDOWN:
+            return greedy + "io_shutdown";
+        case OPCODE::IO_CTL:
+            return greedy + "io_ctl";
+        case OPCODE::IO_PEEK:
+            return greedy + "io_peek";
+        case OPCODE::ACTOR:
+            return greedy + "actor";
+        case OPCODE::SELF:
+            return greedy + "self";
+        case OPCODE::GTS:
+            return greedy + "gts";
+        case OPCODE::GTL:
+            return greedy + "gtl";
+        case OPCODE::CAST:
+            return greedy + "cast";
+        case OPCODE::ARODP:
+            return greedy + "arodp";
+        case OPCODE::ATXTP:
+            return greedy + "atxtp";
+        case OPCODE::SM:
+            return greedy + "sm";
+        case OPCODE::LM:
+            return greedy + "lm";
+        case OPCODE::AA:
+            return greedy + "ama";
+        case OPCODE::AD:
+            return greedy + "amd";
+        case OPCODE::PTR:
+            return greedy + "ptr";
     }
 
     return "<unknown>";
 }
-auto parse_opcode(std::string_view const raw) -> opcode_type
+auto parse_opcode(
+    std::string_view const raw) -> opcode_type
 {
     auto sv = raw;
 
@@ -323,8 +325,8 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
     } else if (sv == "ptr") {
         return (op | static_cast<opcode_type>(OPCODE::PTR));
     } else {
-        throw std::invalid_argument{"viua::arch::ops::parse_opcode: "
-                                    + std::string{raw}};
+        throw std::invalid_argument{ "viua::arch::ops::parse_opcode: "
+                                     + std::string{ raw } };
     }
 }
 }  // namespace viua::arch::ops

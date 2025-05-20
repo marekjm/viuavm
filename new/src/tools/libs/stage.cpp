@@ -35,8 +35,9 @@
 using viua::support::string::quote_fancy;
 
 namespace viua::libs::stage {
-auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
-    -> std::string_view
+auto view_line_of(
+    std::string_view sv,
+    viua::libs::lexer::Location loc) -> std::string_view
 {
     /*
      * We want to get a view of a single line out of a view of the entire source
@@ -51,7 +52,7 @@ auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
          * nothing to do because the line we want to view is the last line of
          * the source code.
          */
-        auto line_end = size_t{0};
+        auto line_end = size_t{ 0 };
         line_end      = sv.find('\n', loc.offset);
 
         if (line_end != std::string::npos) {
@@ -64,7 +65,7 @@ auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
          * then it means that the line we want to view is the very fist line of
          * the source code...
          */
-        auto line_begin = size_t{0};
+        auto line_begin = size_t{ 0 };
         line_begin      = sv.rfind('\n', (loc.offset ? (loc.offset - 1) : 0));
 
         /*
@@ -81,11 +82,12 @@ auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
     return sv;
 }
 
-auto view_line_before(std::string_view sv, viua::libs::lexer::Location loc)
-    -> std::string_view
+auto view_line_before(
+    std::string_view sv,
+    viua::libs::lexer::Location loc) -> std::string_view
 {
-    auto line_end   = size_t{0};
-    auto line_begin = size_t{0};
+    auto line_end   = size_t{ 0 };
+    auto line_begin = size_t{ 0 };
 
     line_end = sv.rfind('\n', (loc.offset ? (loc.offset - 1) : 0));
     if (line_end != std::string::npos) {
@@ -100,11 +102,12 @@ auto view_line_before(std::string_view sv, viua::libs::lexer::Location loc)
     return sv;
 }
 
-auto view_line_after(std::string_view sv, viua::libs::lexer::Location loc)
-    -> std::string_view
+auto view_line_after(
+    std::string_view sv,
+    viua::libs::lexer::Location loc) -> std::string_view
 {
-    auto line_end   = size_t{0};
-    auto line_begin = size_t{0};
+    auto line_end   = size_t{ 0 };
+    auto line_begin = size_t{ 0 };
 
     line_begin = sv.find('\n', loc.offset);
     if (line_begin != std::string::npos) {
@@ -196,9 +199,10 @@ auto cook_spans(
     return cooked;
 }
 
-auto display_error(std::filesystem::path source_path,
-                   std::string_view source_text,
-                   viua::libs::errors::compile_time::Error const& e) -> void
+auto display_error(
+    std::filesystem::path source_path,
+    std::string_view source_text,
+    viua::libs::errors::compile_time::Error const& e) -> void
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_CYAN;
@@ -209,9 +213,9 @@ auto display_error(std::filesystem::path source_path,
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    constexpr auto SEPARATOR_SOURCE = std::string_view{" | "};
-    constexpr auto SEPARATOR_ASIDE  = std::string_view{" . "};
-    constexpr auto ERROR_MARKER     = std::string_view{" => "};
+    constexpr auto SEPARATOR_SOURCE = std::string_view{ " | " };
+    constexpr auto SEPARATOR_ASIDE  = std::string_view{ " . " };
+    constexpr auto ERROR_MARKER     = std::string_view{ " => " };
     auto const LINE_NO_WIDTH =
         std::to_string(std::max(e.line(), e.line() + 1)).size();
 
@@ -240,7 +244,7 @@ auto display_error(std::filesystem::path source_path,
         highlight_line << std::string(ERROR_MARKER.size(), ' ')
                        << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR_SOURCE;
 
-        source_line << std::string_view{line.data(), e.character()};
+        source_line << std::string_view{ line.data(), e.character() };
         highlight_line << std::string(e.character(), ' ');
         line.remove_prefix(e.character());
 
@@ -361,7 +365,7 @@ auto display_error(std::filesystem::path source_path,
                 + 2  // for ":" after source path and line number
                 ;
 
-            auto sv = std::string_view{each};
+            auto sv = std::string_view{ each };
             std::cerr << sv.substr(0, sv.find('\n')) << '\n';
 
             do {
@@ -372,10 +376,10 @@ auto display_error(std::filesystem::path source_path,
         }
     }
 }
-auto display_error_and_exit
-    [[noreturn]] (std::filesystem::path source_path,
-                  std::string_view source_text,
-                  viua::libs::errors::compile_time::Error const& e) -> void
+auto display_error_and_exit [[noreturn]] (
+    std::filesystem::path source_path,
+    std::string_view source_text,
+    viua::libs::errors::compile_time::Error const& e) -> void
 {
     display_error(source_path, source_text, e);
     for (auto const& each : e.fallout) {
@@ -384,9 +388,10 @@ auto display_error_and_exit
     exit(1);
 }
 
-auto display_error_in_function(std::filesystem::path const source_path,
-                               viua::libs::errors::compile_time::Error const& e,
-                               std::string_view const fn_name) -> void
+auto display_error_in_function(
+    std::filesystem::path const source_path,
+    viua::libs::errors::compile_time::Error const& e,
+    std::string_view const fn_name) -> void
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_CYAN;
@@ -406,20 +411,22 @@ auto display_error_in_function(std::filesystem::path const source_path,
         << fn_name << esc(2, ATTR_RESET) << ":\n";
 }
 
-auto record_symbol(std::string name,
-                   Elf64_Sym const symbol,
-                   std::vector<Elf64_Sym>& symbol_table,
-                   std::map<std::string, size_t>& symbol_map) -> size_t
+auto record_symbol(
+    std::string name,
+    Elf64_Sym const symbol,
+    std::vector<Elf64_Sym>& symbol_table,
+    std::map<std::string, size_t>& symbol_map) -> size_t
 {
     auto const sym_ndx          = symbol_table.size();
     symbol_map[std::move(name)] = sym_ndx;
     symbol_table.push_back(symbol);
     return sym_ndx;
 }
-auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
-                          std::vector<uint8_t>& rodata_buf,
-                          std::vector<Elf64_Sym>& symbol_table,
-                          std::map<std::string, size_t>& symbol_map)
+auto cook_long_immediates(
+    viua::libs::parser::ast::Instruction insn,
+    std::vector<uint8_t>& rodata_buf,
+    std::vector<Elf64_Sym>& symbol_table,
+    std::map<std::string, size_t>& symbol_map)
     -> std::vector<viua::libs::parser::ast::Instruction>
 {
     auto cooked = std::vector<viua::libs::parser::ast::Instruction>{};
@@ -431,7 +438,7 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
     if (insn.opcode == "atom" or insn.opcode == "g.atom") {
         auto const lx = insn.operands.back().ingredients.front();
         auto s        = lx.text;
-        auto saved_at = size_t{0};
+        auto saved_at = size_t{ 0 };
         if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
             s = s.substr(1, s.size() - 2);
             s = viua::support::string::unescape(s);
@@ -488,7 +495,7 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
 
-                auto e = Error{label, Cause::Unknown_label, label.text};
+                auto e = Error{ label, Cause::Unknown_label, label.text };
                 e.add(lx);
 
                 using viua::support::string::levenshtein_filter;
@@ -512,7 +519,7 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
 
-            auto e = Error{lx, Cause::Invalid_operand}.aside(
+            auto e = Error{ lx, Cause::Invalid_operand }.aside(
                 "expected string literal, atom literal, or a label "
                 "reference");
 
@@ -540,7 +547,7 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
         cooked.push_back(std::move(insn));
     } else if (insn.opcode == "arodp" or insn.opcode == "g.arodp") {
         auto const lx = insn.operands.back().ingredients.front();
-        auto saved_at = size_t{0};
+        auto saved_at = size_t{ 0 };
         if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
             auto s = lx.text;
             s      = s.substr(1, s.size() - 2);
@@ -557,7 +564,7 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
 
-                auto e = Error{label, Cause::Unknown_label, label.text};
+                auto e = Error{ label, Cause::Unknown_label, label.text };
                 e.add(lx);
 
                 using viua::support::string::levenshtein_filter;
@@ -581,7 +588,7 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
 
-            auto e = Error{lx, Cause::Invalid_operand}.aside(
+            auto e = Error{ lx, Cause::Invalid_operand }.aside(
                 "expected string literal, or a label reference");
 
             if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
@@ -602,7 +609,7 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
 
         cooked.push_back(synth);
     } else if (insn.opcode == "double" or insn.opcode == "g.double") {
-        constexpr auto SIZE_OF_DOUBLE_PRECISION_FLOAT = size_t{8};
+        constexpr auto SIZE_OF_DOUBLE_PRECISION_FLOAT = size_t{ 8 };
         auto f = std::stod(insn.operands.back().ingredients.front().text);
         auto s = std::string(SIZE_OF_DOUBLE_PRECISION_FLOAT, '\0');
         memcpy(s.data(), &f, SIZE_OF_DOUBLE_PRECISION_FLOAT);
@@ -631,19 +638,13 @@ auto cook_long_immediates(viua::libs::parser::ast::Instruction insn,
 }
 
 using namespace viua::libs::parser;
-auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
-                               std::map<std::string, size_t> const& symbol_map)
+auto expand_pseudoinstructions(
+    std::vector<ast::Instruction> raw,
+    std::map<std::string, size_t> const& symbol_map)
     -> std::vector<ast::Instruction>
 {
     auto const immediate_signed_arithmetic = std::set<std::string>{
-        "addi",
-        "g.addi",
-        "subi",
-        "g.subi",
-        "muli",
-        "g.muli",
-        "divi",
-        "g.divi",
+        "addi", "g.addi", "subi", "g.subi", "muli", "g.muli", "divi", "g.divi",
     };
     auto const memory_access = std::set<std::string>{
         /*
@@ -698,9 +699,9 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
      * li -- Loading Integer constants. It is used to store integers in
      * registers, as well as addresses for calls, jumps, and ifs.
      */
-    auto physical_ops       = size_t{0};
-    auto logical_ops        = size_t{0};
-    auto branch_ops_baggage = size_t{0};
+    auto physical_ops       = size_t{ 0 };
+    auto logical_ops        = size_t{ 0 };
+    auto branch_ops_baggage = size_t{ 0 };
     auto l2p                = std::map<size_t, size_t>{};
 
     /*
@@ -722,7 +723,7 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
     auto cooked = std::vector<ast::Instruction>{};
     for (auto& each : raw) {
         physical_ops = each.physical_index;
-        l2p.insert({physical_ops, logical_ops + branch_ops_baggage});
+        l2p.insert({ physical_ops, logical_ops + branch_ops_baggage });
 
         // FIXME remove checking for "g.li" here to test errors with synthesized
         // instructions
@@ -803,9 +804,9 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
                 if (symbol_map.count(fn_name) == 0) {
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
-                    throw Error{fn_id,
-                                Cause::Call_to_undefined_function,
-                                quote_fancy(fn_name)};
+                    throw Error{ fn_id,
+                                 Cause::Call_to_undefined_function,
+                                 quote_fancy(fn_name) };
                 }
 
                 auto const fn_off = symbol_map.at(fn_name);
@@ -874,8 +875,8 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
 
-                auto e = Error{each.operands.back().ingredients.front(),
-                               Cause::Invalid_operand};
+                auto e = Error{ each.operands.back().ingredients.front(),
+                                Cause::Invalid_operand };
                 std::for_each(each.operands.back().ingredients.begin() + 1,
                               each.operands.back().ingredients.end(),
                               [&e](auto const& ing) -> void { e.add(ing); });
@@ -939,21 +940,22 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
     return baked;
 }
 
-auto operand_or_throw(viua::libs::parser::ast::Instruction const& insn,
-                      size_t const index)
-    -> viua::libs::parser::ast::Operand const&
+auto operand_or_throw(
+    viua::libs::parser::ast::Instruction const& insn,
+    size_t const index) -> viua::libs::parser::ast::Operand const&
 {
     try {
         return insn.operands.at(index);
     } catch (std::out_of_range const&) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{insn.opcode,
-                    Cause::Too_few_operands,
-                    ("operand " + std::to_string(index) + " not found")};
+        throw Error{ insn.opcode,
+                     Cause::Too_few_operands,
+                     ("operand " + std::to_string(index) + " not found") };
     }
 }
-auto emit_instruction(viua::libs::parser::ast::Instruction const insn)
+auto emit_instruction(
+    viua::libs::parser::ast::Instruction const insn)
     -> viua::arch::instruction_type
 {
     using viua::arch::opcode_type;
@@ -969,105 +971,115 @@ auto emit_instruction(viua::libs::parser::ast::Instruction const insn)
 
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{e, Cause::Unknown_opcode, e.text};
+        throw Error{ e, Cause::Unknown_opcode, e.text };
     }
     auto format = static_cast<FORMAT>(opcode & FORMAT_MASK);
     switch (format) {
-    case FORMAT::N:
-        return static_cast<uint64_t>(opcode);
-    case FORMAT::T:
-        return viua::arch::ops::T{opcode,
-                                  operand_or_throw(insn, 0).make_access(),
-                                  operand_or_throw(insn, 1).make_access(),
-                                  operand_or_throw(insn, 2).make_access()}
-            .encode();
-    case FORMAT::D:
-        return viua::arch::ops::D{opcode,
-                                  operand_or_throw(insn, 0).make_access(),
-                                  operand_or_throw(insn, 1).make_access()}
-            .encode();
-    case FORMAT::S:
-        return viua::arch::ops::S{opcode,
-                                  operand_or_throw(insn, 0).make_access()}
-            .encode();
-    case FORMAT::F:
-    {
-        auto const raw = operand_or_throw(insn, 1).ingredients.front().text;
-        auto val       = static_cast<uint32_t>(std::stoul(raw, nullptr, 0));
-        if (static_cast<OPCODE>(opcode) == OPCODE::FLOAT) {
-            auto tmp = std::stof(raw);
-            memcpy(&val, &tmp, sizeof(val));
-        }
-        return viua::arch::ops::F{
-            opcode, operand_or_throw(insn, 0).make_access(), val}
-            .encode();
-    }
-    case FORMAT::E:
-        return viua::arch::ops::E{
-            opcode,
-            operand_or_throw(insn, 0).make_access(),
-            std::stoull(
-                operand_or_throw(insn, 1).ingredients.front().text, nullptr, 0)}
-            .encode();
-    case FORMAT::R:
-    {
-        auto const imm = insn.operands.back().ingredients.front();
-        auto const is_unsigned =
-            (static_cast<opcode_type>(opcode) & viua::arch::ops::UNSIGNED);
-        if (is_unsigned and imm.text.at(0) == '-'
-            and (imm.text != "-1" and imm.text != "-1u")) {
-            using viua::libs::errors::compile_time::Cause;
-            using viua::libs::errors::compile_time::Error;
-            throw Error{imm,
-                        Cause::Value_out_of_range,
-                        "signed integer used for unsigned immediate"}
-                .note("the only signed value allowed in this context "
-                      "is -1, and\n"
-                      "it is used a symbol for maximum unsigned "
-                      "immediate value");
-        }
-        if ((not is_unsigned) and imm.text.back() == 'u') {
-            using viua::libs::errors::compile_time::Cause;
-            using viua::libs::errors::compile_time::Error;
-            throw Error{imm,
-                        Cause::Value_out_of_range,
-                        "unsigned integer used for signed immediate"};
-        }
-        try {
-            return viua::arch::ops::R{
-                opcode,
-                insn.operands.at(0).make_access(),
-                insn.operands.at(1).make_access(),
-                (is_unsigned ? static_cast<uint32_t>(std::stoul(imm.text))
-                             : static_cast<uint32_t>(std::stoi(imm.text)))}
+        case FORMAT::N:
+            return static_cast<uint64_t>(opcode);
+        case FORMAT::T:
+            return viua::arch::ops::T{ opcode,
+                                       operand_or_throw(insn, 0).make_access(),
+                                       operand_or_throw(insn, 1).make_access(),
+                                       operand_or_throw(insn, 2).make_access() }
                 .encode();
-        } catch (std::invalid_argument const&) {
+        case FORMAT::D:
+            return viua::arch::ops::D{ opcode,
+                                       operand_or_throw(insn, 0).make_access(),
+                                       operand_or_throw(insn, 1).make_access() }
+                .encode();
+        case FORMAT::S:
+            return viua::arch::ops::S{ opcode,
+                                       operand_or_throw(insn, 0).make_access() }
+                .encode();
+        case FORMAT::F:
+            {
+                auto const raw =
+                    operand_or_throw(insn, 1).ingredients.front().text;
+                auto val = static_cast<uint32_t>(std::stoul(raw, nullptr, 0));
+                if (static_cast<OPCODE>(opcode) == OPCODE::FLOAT) {
+                    auto tmp = std::stof(raw);
+                    memcpy(&val, &tmp, sizeof(val));
+                }
+                return viua::arch::ops::F{
+                    opcode, operand_or_throw(insn, 0).make_access(), val
+                }
+                    .encode();
+            }
+        case FORMAT::E:
+            return viua::arch::ops::E{
+                opcode,
+                operand_or_throw(insn, 0).make_access(),
+                std::stoull(operand_or_throw(insn, 1).ingredients.front().text,
+                            nullptr,
+                            0)
+            }
+                .encode();
+        case FORMAT::R:
+            {
+                auto const imm = insn.operands.back().ingredients.front();
+                auto const is_unsigned = (static_cast<opcode_type>(opcode)
+                                          & viua::arch::ops::UNSIGNED);
+                if (is_unsigned and imm.text.at(0) == '-'
+                    and (imm.text != "-1" and imm.text != "-1u")) {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+                    throw Error{ imm,
+                                 Cause::Value_out_of_range,
+                                 "signed integer used for unsigned immediate" }
+                        .note(
+                            "the only signed value allowed in this context "
+                            "is -1, and\n"
+                            "it is used a symbol for maximum unsigned "
+                            "immediate value");
+                }
+                if ((not is_unsigned) and imm.text.back() == 'u') {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+                    throw Error{ imm,
+                                 Cause::Value_out_of_range,
+                                 "unsigned integer used for signed immediate" };
+                }
+                try {
+                    return viua::arch::ops::R{
+                        opcode,
+                        insn.operands.at(0).make_access(),
+                        insn.operands.at(1).make_access(),
+                        (is_unsigned
+                             ? static_cast<uint32_t>(std::stoul(imm.text))
+                             : static_cast<uint32_t>(std::stoi(imm.text)))
+                    }
+                        .encode();
+                } catch (std::invalid_argument const&) {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+                    // FIXME make the error more precise, maybe encapsulate
+                    // just the immediate operand conversion
+                    throw Error{ imm,
+                                 Cause::Invalid_operand,
+                                 "expected integer as immediate operand" };
+                }
+            }
+        case FORMAT::M:
+            {
+                auto const unit = insn.operands.front().ingredients.front();
+                auto const off  = insn.operands.back().ingredients.front();
+
+                return viua::arch::ops::M{
+                    opcode,
+                    insn.operands.at(1).make_access(),
+                    insn.operands.at(2).make_access(),
+                    static_cast<uint16_t>(std::stoull(off.text)),
+                    static_cast<uint8_t>(std::stoull(unit.text))
+                }
+                    .encode();
+            }
+        default:
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
-            // FIXME make the error more precise, maybe encapsulate
-            // just the immediate operand conversion
-            throw Error{imm,
-                        Cause::Invalid_operand,
-                        "expected integer as immediate operand"};
-        }
-    }
-    case FORMAT::M:
-    {
-        auto const unit = insn.operands.front().ingredients.front();
-        auto const off  = insn.operands.back().ingredients.front();
-
-        return viua::arch::ops::M{opcode,
-                                  insn.operands.at(1).make_access(),
-                                  insn.operands.at(2).make_access(),
-                                  static_cast<uint16_t>(std::stoull(off.text)),
-                                  static_cast<uint8_t>(std::stoull(unit.text))}
-            .encode();
-    }
-    default:
-        using viua::libs::errors::compile_time::Cause;
-        using viua::libs::errors::compile_time::Error;
-        throw Error{
-            insn.opcode, Cause::Unknown_opcode, "cannot emit instruction"};
+            throw Error{ insn.opcode,
+                         Cause::Unknown_opcode,
+                         "cannot emit instruction" };
     }
 }
 }  // namespace viua::libs::stage

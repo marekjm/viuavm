@@ -23,9 +23,10 @@
 #include <stdint.h>
 #include <string.h>
 
-
 namespace viua::support {
-template<typename T> auto memload(void const* const src) -> T
+template<typename T>
+auto memload(
+    void const* const src) -> T
 {
     auto tmp = T{};
     memcpy(&tmp, src, sizeof(T));

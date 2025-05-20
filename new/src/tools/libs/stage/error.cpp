@@ -34,8 +34,9 @@
 using viua::support::string::quote_fancy;
 
 namespace viua::libs::stage {
-auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
-    -> std::string_view
+auto view_line_of(
+    std::string_view sv,
+    viua::libs::lexer::Location loc) -> std::string_view
 {
     /*
      * We want to get a view of a single line out of a view of the entire source
@@ -50,7 +51,7 @@ auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
          * nothing to do because the line we want to view is the last line of
          * the source code.
          */
-        auto line_end = size_t{0};
+        auto line_end = size_t{ 0 };
         line_end      = sv.find('\n', loc.offset);
 
         if (line_end != std::string::npos) {
@@ -63,7 +64,7 @@ auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
          * then it means that the line we want to view is the very fist line of
          * the source code...
          */
-        auto line_begin = size_t{0};
+        auto line_begin = size_t{ 0 };
         line_begin      = sv.rfind('\n', (loc.offset ? (loc.offset - 1) : 0));
 
         /*
@@ -80,11 +81,12 @@ auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
     return sv;
 }
 
-auto view_line_before(std::string_view sv, viua::libs::lexer::Location loc)
-    -> std::string_view
+auto view_line_before(
+    std::string_view sv,
+    viua::libs::lexer::Location loc) -> std::string_view
 {
-    auto line_end   = size_t{0};
-    auto line_begin = size_t{0};
+    auto line_end   = size_t{ 0 };
+    auto line_begin = size_t{ 0 };
 
     line_end = sv.rfind('\n', (loc.offset ? (loc.offset - 1) : 0));
     if (line_end != std::string::npos) {
@@ -99,11 +101,12 @@ auto view_line_before(std::string_view sv, viua::libs::lexer::Location loc)
     return sv;
 }
 
-auto view_line_after(std::string_view sv, viua::libs::lexer::Location loc)
-    -> std::string_view
+auto view_line_after(
+    std::string_view sv,
+    viua::libs::lexer::Location loc) -> std::string_view
 {
-    auto line_end   = size_t{0};
-    auto line_begin = size_t{0};
+    auto line_end   = size_t{ 0 };
+    auto line_begin = size_t{ 0 };
 
     line_begin = sv.find('\n', loc.offset);
     if (line_begin != std::string::npos) {
@@ -201,10 +204,11 @@ auto cook_spans(
     return cooked;
 }
 
-auto display_error(std::filesystem::path source_path,
-                   std::string_view source_text,
-                   size_t const line_no_width,
-                   viua::libs::errors::compile_time::Error const& e) -> void
+auto display_error(
+    std::filesystem::path source_path,
+    std::string_view source_text,
+    size_t const line_no_width,
+    viua::libs::errors::compile_time::Error const& e) -> void
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_CYAN;
@@ -215,11 +219,11 @@ auto display_error(std::filesystem::path source_path,
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    constexpr auto SEPARATOR_SOURCE = std::string_view{" | "};
-    constexpr auto SEPARATOR_ASIDE  = std::string_view{" . "};
-    constexpr auto ERROR_MARKER     = std::string_view{" => "};
-    constexpr auto BOX_DRAWINGS_BLACK_RIGHT_POINTING_TRIANGLE
-        [[maybe_unused]]             = std::string_view{"▶"};  // u+25b6
+    constexpr auto SEPARATOR_SOURCE = std::string_view{ " | " };
+    constexpr auto SEPARATOR_ASIDE  = std::string_view{ " . " };
+    constexpr auto ERROR_MARKER     = std::string_view{ " => " };
+    constexpr auto BOX_DRAWINGS_BLACK_RIGHT_POINTING_TRIANGLE [[maybe_unused]] =
+        std::string_view{ "▶" };  // u+25b6
     constexpr auto ERROR_MARKER_SIZE = ERROR_MARKER.size();
 
     if (auto const msg = e.str(); not msg.empty()) {
@@ -247,7 +251,7 @@ auto display_error(std::filesystem::path source_path,
                 + 2  // for ":" after source path and line number
                 ;
 
-            auto sv = std::string_view{each};
+            auto sv = std::string_view{ each };
             std::cerr << sv.substr(0, sv.find('\n')) << '\n';
 
             do {
@@ -283,7 +287,7 @@ auto display_error(std::filesystem::path source_path,
         highlight_line << std::string(ERROR_MARKER_SIZE, ' ')
                        << std::string(line_no_width, ' ') << SEPARATOR_SOURCE;
 
-        source_line << std::string_view{line.data(), e.character()};
+        source_line << std::string_view{ line.data(), e.character() };
         highlight_line << std::string(e.character(), ' ');
         line.remove_prefix(e.character());
 
@@ -356,7 +360,7 @@ auto display_error(std::filesystem::path source_path,
              * matter *what* the value of the token is, just that it is this
              * particular one.
              */
-            constexpr auto COLOR_ADVISORY = std::string_view{"\x1b[38;5;26m"};
+            constexpr auto COLOR_ADVISORY = std::string_view{ "\x1b[38;5;26m" };
 
             if (hl and offset == e.character()) {
                 source_line << esc(2, COLOR_MAIN);
@@ -388,14 +392,14 @@ auto display_error(std::filesystem::path source_path,
     std::cerr << source_line.str() << "\n";
     std::cerr << highlight_line.str() << "\n";
 
-    constexpr auto BOX_DRAWINGS_LIGHT_VERTICAL
-        [[maybe_unused]] = std::string_view{"│"};  // u+2502
-    constexpr auto BOX_DRAWINGS_LIGHT_UP_AND_RIGHT
-        [[maybe_unused]] = std::string_view{"└"};  // u+2514
-    constexpr auto BOX_DRAWINGS_LIGHT_ARC_UP_AND_RIGHT
-        [[maybe_unused]] = std::string_view{"╰"};  // u+2570
-    constexpr auto BOX_DRAWINGS_LIGHT_LEFT
-        [[maybe_unused]] = std::string_view{"╴"};  // u+2574
+    constexpr auto BOX_DRAWINGS_LIGHT_VERTICAL [[maybe_unused]] =
+        std::string_view{ "│" };  // u+2502
+    constexpr auto BOX_DRAWINGS_LIGHT_UP_AND_RIGHT [[maybe_unused]] =
+        std::string_view{ "└" };  // u+2514
+    constexpr auto BOX_DRAWINGS_LIGHT_ARC_UP_AND_RIGHT [[maybe_unused]] =
+        std::string_view{ "╰" };  // u+2570
+    constexpr auto BOX_DRAWINGS_LIGHT_LEFT [[maybe_unused]] =
+        std::string_view{ "╴" };  // u+2574
 
     if (not e.aside().empty()) {
         std::cerr << std::string(ERROR_MARKER_SIZE, ' ')
@@ -426,10 +430,10 @@ auto display_error(std::filesystem::path source_path,
     std::cerr << std::string(ERROR_MARKER_SIZE, ' ')
               << std::string(line_no_width, ' ') << SEPARATOR_SOURCE << "\n";
 }
-auto display_error_and_exit
-    [[noreturn]] (std::filesystem::path source_path,
-                  std::string_view source_text,
-                  viua::libs::errors::compile_time::Error const& e) -> void
+auto display_error_and_exit [[noreturn]] (
+    std::filesystem::path source_path,
+    std::string_view source_text,
+    viua::libs::errors::compile_time::Error const& e) -> void
 {
     auto line_no_width = std::max(e.line(), e.line() + 1);
     for (auto const& each : e.fallout) {
@@ -445,9 +449,10 @@ auto display_error_and_exit
     exit(1);
 }
 
-auto display_error_in_function(std::filesystem::path const source_path,
-                               viua::libs::errors::compile_time::Error const& e,
-                               std::string_view const fn_name) -> void
+auto display_error_in_function(
+    std::filesystem::path const source_path,
+    viua::libs::errors::compile_time::Error const& e,
+    std::string_view const fn_name) -> void
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_CYAN;

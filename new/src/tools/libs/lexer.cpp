@@ -31,22 +31,25 @@
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
 
-
 namespace viua::libs::lexer {
-auto Lexeme::operator==(TOKEN const tk) const -> bool
+auto Lexeme::operator==(
+    TOKEN const tk) const -> bool
 {
     return (token == tk);
 }
-auto Lexeme::operator==(std::string_view const sv) const -> bool
+auto Lexeme::operator==(
+    std::string_view const sv) const -> bool
 {
     return (text == sv);
 }
-auto Lexeme::make_synth(std::string sv, TOKEN const tk) const -> Lexeme
+auto Lexeme::make_synth(
+    std::string sv,
+    TOKEN const tk) const -> Lexeme
 {
     auto sy             = *this;
     sy.text             = std::move(sv);
     sy.token            = tk;
-    sy.synthesized_from = {text, token, location};
+    sy.synthesized_from = { text, token, location };
     return sy;
 }
 auto Lexeme::is_synth() const -> bool
@@ -62,85 +65,86 @@ auto Lexeme::synthed_from() const -> Lexeme
     return l;
 }
 
-auto to_string(TOKEN const token) -> std::string
+auto to_string(
+    TOKEN const token) -> std::string
 {
     switch (token) {
         using enum TOKEN;
-    case INVALID:
-        return "INVALID";
-    case WHITESPACE:
-        return "WHITESPACE";
-    case COMMENT:
-        return "COMMENT";
-    case SWITCH_TO_TEXT:
-        return "SWITCH_TO_TEXT";
-    case SWITCH_TO_RODATA:
-        return "SWITCH_TO_RODATA";
-    case SWITCH_TO_SECTION:
-        return "SWITCH_TO_SECTION";
-    case DECLARE_SYMBOL:
-        return "DECLARE_SYMBOL";
-    case DEFINE_LABEL:
-        return "DEFINE_LABEL";
-    case BEGIN:
-        return "BEGIN";
-    case END:
-        return "END";
-    case ALLOCATE_OBJECT:
-        return "ALLOCATE_OBJECT";
-    case OPCODE:
-        return "OPCODE";
-    case VOID:
-        return "VOID";
-    case LITERAL_ATOM:
-        return "LITERAL_ATOM";
-    case LITERAL_INTEGER:
-        return "LITERAL_INTEGER";
-    case LITERAL_FLOAT:
-        return "LITERAL_FLOAT";
-    case LITERAL_STRING:
-        return "LITERAL_STRING";
-    case COMMA:
-        return "COMMA";
-    case ELLIPSIS:
-        return "ELLIPSIS";
-    case DOT:
-        return "DOT";
-    case EQ:
-        return "EQ";
-    case AT:
-        return "AT";
-    case DOLLAR:
-        return "DOLLAR";
-    case STAR:
-        return "STAR";
-    case TERMINATOR:
-        return "TERMINATOR";
-    case ATTR_LIST_OPEN:
-        return "ATTR_LIST_OPEN";
-    case ATTR_LIST_CLOSE:
-        return "ATTR_LIST_CLOSE";
+        case INVALID:
+            return "INVALID";
+        case WHITESPACE:
+            return "WHITESPACE";
+        case COMMENT:
+            return "COMMENT";
+        case SWITCH_TO_TEXT:
+            return "SWITCH_TO_TEXT";
+        case SWITCH_TO_RODATA:
+            return "SWITCH_TO_RODATA";
+        case SWITCH_TO_SECTION:
+            return "SWITCH_TO_SECTION";
+        case DECLARE_SYMBOL:
+            return "DECLARE_SYMBOL";
+        case DEFINE_LABEL:
+            return "DEFINE_LABEL";
+        case BEGIN:
+            return "BEGIN";
+        case END:
+            return "END";
+        case ALLOCATE_OBJECT:
+            return "ALLOCATE_OBJECT";
+        case OPCODE:
+            return "OPCODE";
+        case VOID:
+            return "VOID";
+        case LITERAL_ATOM:
+            return "LITERAL_ATOM";
+        case LITERAL_INTEGER:
+            return "LITERAL_INTEGER";
+        case LITERAL_FLOAT:
+            return "LITERAL_FLOAT";
+        case LITERAL_STRING:
+            return "LITERAL_STRING";
+        case COMMA:
+            return "COMMA";
+        case ELLIPSIS:
+            return "ELLIPSIS";
+        case DOT:
+            return "DOT";
+        case EQ:
+            return "EQ";
+        case AT:
+            return "AT";
+        case DOLLAR:
+            return "DOLLAR";
+        case STAR:
+            return "STAR";
+        case TERMINATOR:
+            return "TERMINATOR";
+        case ATTR_LIST_OPEN:
+            return "ATTR_LIST_OPEN";
+        case ATTR_LIST_CLOSE:
+            return "ATTR_LIST_CLOSE";
     }
 
     // impossible, because all cases are handled in the enumeration above
     assert(0);
 }
 
-const auto COMMENT = std::regex{"^[;#].*"};
+const auto COMMENT = std::regex{ "^[;#].*" };
 
-const auto WHITESPACE = std::regex{"^[ \t]+"};
+const auto WHITESPACE = std::regex{ "^[ \t]+" };
 
-const auto DIR_TEXT    = std::regex{"^\\.text\\b"};
-const auto DIR_RODATA  = std::regex{"^\\.rodata\\b"};
-const auto DIR_SECTION = std::regex{"^\\.section\\b"};
+const auto DIR_TEXT    = std::regex{ "^\\.text\\b" };
+const auto DIR_RODATA  = std::regex{ "^\\.rodata\\b" };
+const auto DIR_SECTION = std::regex{ "^\\.section\\b" };
 
-const auto DIR_SYMBOL = std::regex{"^\\.symbol\\b"};
-const auto DIR_LABEL  = std::regex{"^\\.label\\b"};
-const auto DIR_BEGIN  = std::regex{"^\\.begin\\b"};
-const auto DIR_END    = std::regex{"^\\.end\\b"};
-const auto DIR_OBJECT = std::regex{"^\\.object\\b"};
+const auto DIR_SYMBOL = std::regex{ "^\\.symbol\\b" };
+const auto DIR_LABEL  = std::regex{ "^\\.label\\b" };
+const auto DIR_BEGIN  = std::regex{ "^\\.begin\\b" };
+const auto DIR_END    = std::regex{ "^\\.end\\b" };
+const auto DIR_OBJECT = std::regex{ "^\\.object\\b" };
 
-const auto SECTION_NAME = std::regex{"^(\\.[A-Za-z][A-Za-z0-9_]+)+\\b"};
+const auto SECTION_NAME = std::regex{ "^(\\.[A-Za-z][A-Za-z0-9_]+)+\\b" };
 
 /*
  * The regex for register indexes will catch ANYTHING up until word boundary,
@@ -149,29 +153,29 @@ const auto SECTION_NAME = std::regex{"^(\\.[A-Za-z][A-Za-z0-9_]+)+\\b"};
  * accepted valid names the errors could get weird, and it would be much more
  * difficult to provide sane diagnostics.
  */
-const auto VOID = std::regex{"^\\bvoid\\b"};
+const auto VOID = std::regex{ "^\\bvoid\\b" };
 
-const auto LITERAL_ATOM = std::regex{pattern::LITERAL_ATOM};
+const auto LITERAL_ATOM = std::regex{ pattern::LITERAL_ATOM };
 const auto LITERAL_INTEGER =
-    std::regex{"^[-+]?(?:0x[a-f0-9]+|0o[0-7]+|0b[01]+|0|[1-9][0-9]*)u?"};
-const auto LITERAL_FLOAT = std::regex{"^-?(?:0|[1-9][0-9]*)?\\.[0-9]+"};
+    std::regex{ "^[-+]?(?:0x[a-f0-9]+|0o[0-7]+|0b[01]+|0|[1-9][0-9]*)u?" };
+const auto LITERAL_FLOAT = std::regex{ "^-?(?:0|[1-9][0-9]*)?\\.[0-9]+" };
 
-const auto COMMA           = std::regex{"^,"};
-const auto ELLIPSIS        = std::regex{"^\\.\\.\\."};
-const auto DOT             = std::regex{"^\\."};
-const auto EQ              = std::regex{"^="};
-const auto AT              = std::regex{"^@"};
-const auto DOLLAR          = std::regex{"^\\$"};
-const auto STAR            = std::regex{"^\\*"};
-const auto ATTR_LIST_OPEN  = std::regex{"^\\[\\["};
-const auto ATTR_LIST_CLOSE = std::regex{"^\\]\\]"};
+const auto COMMA           = std::regex{ "^," };
+const auto ELLIPSIS        = std::regex{ "^\\.\\.\\." };
+const auto DOT             = std::regex{ "^\\." };
+const auto EQ              = std::regex{ "^=" };
+const auto AT              = std::regex{ "^@" };
+const auto DOLLAR          = std::regex{ "^\\$" };
+const auto STAR            = std::regex{ "^\\*" };
+const auto ATTR_LIST_OPEN  = std::regex{ "^\\[\\[" };
+const auto ATTR_LIST_CLOSE = std::regex{ "^\\]\\]" };
 
-const auto OPCODE = std::regex{"^(?:g.)?[a-z_]+(?:.[stw])?\\b"};
+const auto OPCODE = std::regex{ "^(?:g.)?[a-z_]+(?:.[stw])?\\b" };
 
 namespace {
-auto match_lookbehind [[maybe_unused]] (std::vector<Lexeme> const& lexemes,
-                                        std::vector<TOKEN> const pattern)
--> bool
+auto match_lookbehind [[maybe_unused]] (
+    std::vector<Lexeme> const& lexemes,
+    std::vector<TOKEN> const pattern) -> bool
 {
     if (pattern.empty()) {
         return true;
@@ -181,7 +185,7 @@ auto match_lookbehind [[maybe_unused]] (std::vector<Lexeme> const& lexemes,
     }
 
     using size_type = decltype(pattern)::size_type;
-    for (auto i = size_type{0}; i < pattern.size(); ++i) {
+    for (auto i = size_type{ 0 }; i < pattern.size(); ++i) {
         auto const pi = pattern.size() - 1 - i;
         auto const li = lexemes.size() - 1 - i;
         if (pattern.at(pi) != lexemes.at(li).token) {
@@ -192,8 +196,9 @@ auto match_lookbehind [[maybe_unused]] (std::vector<Lexeme> const& lexemes,
     return true;
 }
 
-auto synth_lookbehind [[maybe_unused]] (std::vector<Lexeme> const& lexemes,
-                                        size_t const n) -> Lexeme
+auto synth_lookbehind [[maybe_unused]] (
+    std::vector<Lexeme> const& lexemes,
+    size_t const n) -> Lexeme
 {
     if (n > lexemes.size()) {
         std::cerr
@@ -205,15 +210,16 @@ auto synth_lookbehind [[maybe_unused]] (std::vector<Lexeme> const& lexemes,
     auto const token    = lexemes.at(lexemes.size() - n).token;
 
     auto text = std::string{};
-    for (auto i = size_t{0}; i < n; ++i) {
+    for (auto i = size_t{ 0 }; i < n; ++i) {
         text += lexemes.at(lexemes.size() - n + i).text;
     }
 
-    return Lexeme{text, token, location};
+    return Lexeme{ text, token, location };
 }
 }  // namespace
 
-auto lex(std::string_view source_text) -> std::vector<Lexeme>
+auto lex(
+    std::string_view source_text) -> std::vector<Lexeme>
 {
     auto lexemes = std::vector<Lexeme>{};
 
@@ -222,11 +228,12 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
     auto offset    = size_t{};
 
     auto const try_match = [&lexemes, &source_text, &line, &character, &offset](
-                               std::regex const& re, TOKEN const tt) -> bool {
+                               std::regex const& re, TOKEN const tt) -> bool
+    {
         std::cmatch m;
         if (regex_search(source_text.data(), m, re)) {
             lexemes.emplace_back(
-                m.str(), tt, Location{line, character, offset});
+                m.str(), tt, Location{ line, character, offset });
 
             character += lexemes.back().text.size();
             offset += lexemes.back().text.size();
@@ -238,7 +245,7 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
     while (not source_text.empty()) {
         if (source_text[0] == '\n') {
             lexemes.emplace_back(
-                "\n", TOKEN::TERMINATOR, Location{line, character, offset});
+                "\n", TOKEN::TERMINATOR, Location{ line, character, offset });
 
             line += 1;
             character = 0;
@@ -252,11 +259,12 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
 
-                auto const lexeme = Lexeme{std::string{1, source_text[0]},
-                                           TOKEN::INVALID,
-                                           Location{line, character, offset}};
+                auto const lexeme =
+                    Lexeme{ std::string{ 1, source_text[0] },
+                            TOKEN::INVALID,
+                            Location{ line, character, offset } };
 
-                throw Error{lexeme, Cause::Unexpected_token}.aside(
+                throw Error{ lexeme, Cause::Unexpected_token }.aside(
                     "line continuation not immediately followed by \\n "
                     "character");
             }
@@ -273,7 +281,8 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
                 auto ss = std::stringstream{};
                 ss << std::string_view{
                     source_text.begin(),
-                    std::find(source_text.begin(), source_text.end(), '\n')};
+                    std::find(source_text.begin(), source_text.end(), '\n')
+                };
 
                 /*
                  * Use a null byte as an "escape character" because it should
@@ -300,9 +309,10 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
                  */
                 auto const shift_by = (extracted_string.size() + 2);
 
-                lexemes.emplace_back(Lexeme{std::move(extracted_string),
-                                            TOKEN::LITERAL_STRING,
-                                            Location{line, character, offset}});
+                lexemes.emplace_back(
+                    Lexeme{ std::move(extracted_string),
+                            TOKEN::LITERAL_STRING,
+                            Location{ line, character, offset } });
 
                 character += shift_by;
                 offset += shift_by;
@@ -310,11 +320,11 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
             }
 
             auto ss                  = std::ostringstream{};
-            auto escaped             = bool{false};
+            auto escaped             = bool{ false };
             constexpr auto DELIMITER = '"';
 
             ss << source_text.front();
-            for (auto i = size_t{1}; i < source_text.size(); ++i) {
+            for (auto i = size_t{ 1 }; i < source_text.size(); ++i) {
                 auto const c = source_text[i];
                 ss << c;
 
@@ -330,7 +340,7 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
 
             lexemes.emplace_back(std::move(extracted_string),
                                  TOKEN::LITERAL_STRING,
-                                 Location{line, character, offset});
+                                 Location{ line, character, offset });
 
             character += shift_by;
             offset += shift_by;
@@ -384,7 +394,8 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
         if (try_match(OPCODE, TOKEN::OPCODE)) {
             auto const not_really_an_opcode =
                 not OPCODE_NAMES.contains(lexemes.back().text);
-            auto const looks_atomish = [&lexemes]() -> bool {
+            auto const looks_atomish = [&lexemes]() -> bool
+            {
                 std::smatch m;
                 return std::regex_match(lexemes.back().text, m, LITERAL_ATOM);
             }();
@@ -432,19 +443,20 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
 
-        auto const lexeme = Lexeme{std::string(1, source_text[0]),
-                                   TOKEN::INVALID,
-                                   Location{line, character, offset}};
+        auto const lexeme = Lexeme{ std::string(1, source_text[0]),
+                                    TOKEN::INVALID,
+                                    Location{ line, character, offset } };
 
-        throw Error{lexeme, Cause::Illegal_character};
+        throw Error{ lexeme, Cause::Illegal_character };
     }
 
     return lexemes;
 }
 
 namespace stage {
-auto lex(std::filesystem::path const source_path,
-         std::string_view const source_text) -> std::vector<Lexeme>
+auto lex(
+    std::filesystem::path const source_path,
+    std::string_view const source_text) -> std::vector<Lexeme>
 {
     try {
         return viua::libs::lexer::lex(source_text);
@@ -453,7 +465,8 @@ auto lex(std::filesystem::path const source_path,
     }
 }
 
-auto remove_noise(std::vector<Lexeme>&& raw) -> std::vector<Lexeme>
+auto remove_noise(
+    std::vector<Lexeme>&& raw) -> std::vector<Lexeme>
 {
     using viua::libs::lexer::TOKEN;
 

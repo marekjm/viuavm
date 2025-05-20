@@ -22,64 +22,72 @@
 
 #include <viua/libs/errors/compile_time.h>
 
-
 namespace viua::libs::errors::compile_time {
-auto to_string(Cause const ce) -> std::string_view
+auto to_string(
+    Cause const ce) -> std::string_view
 {
     switch (ce) {
-    case Cause::Unknown:
-        return "unknown error";
-    case Cause::None:
-        return "";
-    case Cause::Illegal_character:
-        return "illegal character";
-    case Cause::Invalid_token:
-        return "invalid token";
-    case Cause::Unexpected_token:
-        return "unexpected token";
-    case Cause::Unknown_directive:
-        return "unknown directive";
-    case Cause::Unknown_opcode:
-        return "unknown opcode";
-    case Cause::Invalid_register_access:
-        return "invalid register access";
-    case Cause::Too_few_operands:
-        return "too few operands";
-    case Cause::Reference_to_undefined_symbol:
-        return "reference to undefined symbol";
-    case Cause::Call_to_undefined_function:
-        return "call to undefined function";
-    case Cause::Jump_to_undefined_label:
-        return "jump to undefined label";
-    case Cause::Invalid_reference:
-        return "invalid reference";
-    case Cause::Value_out_of_range:
-        return "value out of range";
-    case Cause::Invalid_operand:
-        return "invalid operand";
-    case Cause::Duplicated_entry_point:
-        return "duplicated entry point";
-    case Cause::Unknown_type:
-        return "unknown type";
-    case Cause::Unknown_label:
-        return "unknown label";
-    case Cause::Invalid_cast:
-        return "invalid cast";
+        case Cause::Unknown:
+            return "unknown error";
+        case Cause::None:
+            return "";
+        case Cause::Illegal_character:
+            return "illegal character";
+        case Cause::Invalid_token:
+            return "invalid token";
+        case Cause::Unexpected_token:
+            return "unexpected token";
+        case Cause::Unknown_directive:
+            return "unknown directive";
+        case Cause::Unknown_opcode:
+            return "unknown opcode";
+        case Cause::Invalid_register_access:
+            return "invalid register access";
+        case Cause::Too_few_operands:
+            return "too few operands";
+        case Cause::Reference_to_undefined_symbol:
+            return "reference to undefined symbol";
+        case Cause::Call_to_undefined_function:
+            return "call to undefined function";
+        case Cause::Jump_to_undefined_label:
+            return "jump to undefined label";
+        case Cause::Invalid_reference:
+            return "invalid reference";
+        case Cause::Value_out_of_range:
+            return "value out of range";
+        case Cause::Invalid_operand:
+            return "invalid operand";
+        case Cause::Duplicated_entry_point:
+            return "duplicated entry point";
+        case Cause::Unknown_type:
+            return "unknown type";
+        case Cause::Unknown_label:
+            return "unknown label";
+        case Cause::Invalid_cast:
+            return "invalid cast";
     }
     return "illegal error";
 }
 
-Error::Error(viua::libs::lexer::Lexeme lx, Cause const ce, std::string m)
-        : cause{ce}, message{std::move(m)}, main_lexeme{lx}
+Error::Error(
+    viua::libs::lexer::Lexeme lx,
+    Cause const ce,
+    std::string m)
+    : cause{ ce }
+    , message{ std::move(m) }
+    , main_lexeme{ lx }
 {}
 
-auto Error::chain(Error&& e) -> Error&
+auto Error::chain(
+    Error&& e) -> Error&
 {
     fallout.emplace_back(std::move(e));
     return *this;
 }
 
-auto Error::aside(std::string s, std::optional<Lexeme> l) -> Error&
+auto Error::aside(
+    std::string s,
+    std::optional<Lexeme> l) -> Error&
 {
     aside_note   = std::move(s);
     aside_lexeme = l;
@@ -93,12 +101,14 @@ auto Error::aside() const -> std::string_view
     return aside_note;
 }
 
-auto Error::note(std::string s) & -> Error&
+auto Error::note(
+    std::string s) & -> Error&
 {
     attached_notes.emplace_back(std::move(s));
     return *this;
 }
-auto Error::note(std::string s) && -> Error
+auto Error::note(
+    std::string s) && -> Error
 {
     attached_notes.emplace_back(std::move(s));
     return std::move(*this);
@@ -108,12 +118,16 @@ auto Error::notes() const -> std::vector<std::string> const&
     return attached_notes;
 }
 
-auto Error::add(Lexeme lx, bool const advisory) & -> Error&
+auto Error::add(
+    Lexeme lx,
+    bool const advisory) & -> Error&
 {
     detail_lexemes.emplace_back(lx, advisory);
     return *this;
 }
-auto Error::add(Lexeme lx, bool const advisory) && -> Error
+auto Error::add(
+    Lexeme lx,
+    bool const advisory) && -> Error
 {
     detail_lexemes.emplace_back(lx, advisory);
     return std::move(*this);

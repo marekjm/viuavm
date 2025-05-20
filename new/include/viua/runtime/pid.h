@@ -26,17 +26,16 @@
 
 #include <string>
 
-
 namespace viua::runtime {
 class Process;
 
 struct PID {
     using pid_type = in6_addr;
 
-  private:
+    private:
     pid_type const value;
 
-  public:
+    public:
     auto operator<=>(PID const&) const -> std::strong_ordering;
 
     auto get() const -> pid_type;
@@ -54,6 +53,5 @@ struct Pid_emitter {
     auto emit() -> PID;
 };
 }  // namespace viua::runtime
-
 
 #endif

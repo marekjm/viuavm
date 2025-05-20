@@ -26,16 +26,15 @@
 
 #include <viua/arch/arch.h>
 
-
 namespace viua::arch::ops {
-constexpr auto FORMAT_N = opcode_type{0x0000};
-constexpr auto FORMAT_T = opcode_type{0x1000};
-constexpr auto FORMAT_D = opcode_type{0x2000};
-constexpr auto FORMAT_S = opcode_type{0x3000};
-constexpr auto FORMAT_F = opcode_type{0x4000};
-constexpr auto FORMAT_E = opcode_type{0x5000};
-constexpr auto FORMAT_R = opcode_type{0x6000};
-constexpr auto FORMAT_M = opcode_type{0x7000};
+constexpr auto FORMAT_N = opcode_type{ 0x00'00 };
+constexpr auto FORMAT_T = opcode_type{ 0x10'00 };
+constexpr auto FORMAT_D = opcode_type{ 0x20'00 };
+constexpr auto FORMAT_S = opcode_type{ 0x30'00 };
+constexpr auto FORMAT_F = opcode_type{ 0x40'00 };
+constexpr auto FORMAT_E = opcode_type{ 0x50'00 };
+constexpr auto FORMAT_R = opcode_type{ 0x60'00 };
+constexpr auto FORMAT_M = opcode_type{ 0x70'00 };
 
 /*
  * Create an enum to make use of switch statement's exhaustiveness checks.
@@ -47,7 +46,8 @@ constexpr auto FORMAT_M = opcode_type{0x7000};
  *
  * static_cast between them as appropriate.
  */
-enum class FORMAT : opcode_type {
+enum class FORMAT : opcode_type
+{
     N = FORMAT_N,
     T = FORMAT_T,
     D = FORMAT_D,
@@ -149,14 +149,15 @@ struct F {
       uint32_t const i);
 
     template<typename T>
-    static auto make(viua::arch::opcode_type const op,
-                     Register_access const o,
-                     T const v) -> F
+    static auto make(
+        viua::arch::opcode_type const op,
+        Register_access const o,
+        T const v) -> F
     {
         static_assert(sizeof(T) == sizeof(uint32_t));
         auto imm = uint32_t{};
         memcpy(&imm, &v, sizeof(imm));
-        return F{op, o, imm};
+        return F{ op, o, imm };
     }
 
     static auto decode(instruction_type const) -> F;
@@ -219,82 +220,83 @@ struct N {
     auto to_string() const -> std::string;
 };
 
-constexpr auto GREEDY      = opcode_type{0x8000};
-constexpr auto UNSIGNED    = opcode_type{0x0800};
-constexpr auto OPCODE_MASK = opcode_type{0x7fff};
-constexpr auto FORMAT_MASK = opcode_type{0x7000};
+constexpr auto GREEDY      = opcode_type{ 0x80'00 };
+constexpr auto UNSIGNED    = opcode_type{ 0x08'00 };
+constexpr auto OPCODE_MASK = opcode_type{ 0x7f'ff };
+constexpr auto FORMAT_MASK = opcode_type{ 0x70'00 };
 
-enum class OPCODE : opcode_type {
-    NOOP   = (FORMAT_N | 0x0000),
-    HALT   = (FORMAT_N | 0x0001),
-    EBREAK = (FORMAT_N | 0x0002),
-    ECALL  = (FORMAT_N | 0x0003),
+enum class OPCODE : opcode_type
+{
+    NOOP   = (FORMAT_N | 0x00'00),
+    HALT   = (FORMAT_N | 0x00'01),
+    EBREAK = (FORMAT_N | 0x00'02),
+    ECALL  = (FORMAT_N | 0x00'03),
 
-    ADD         = (FORMAT_T | 0x0001),
-    SUB         = (FORMAT_T | 0x0002),
-    MUL         = (FORMAT_T | 0x0003),
-    DIV         = (FORMAT_T | 0x0004),
-    MOD         = (FORMAT_T | 0x0005),
-    BITSHL      = (FORMAT_T | 0x0006),
-    BITSHR      = (FORMAT_T | 0x0007),
-    BITASHR     = (FORMAT_T | 0x0008),
-    BITROL      = (FORMAT_T | 0x0009),
-    BITROR      = (FORMAT_T | 0x000a),
-    BITAND      = (FORMAT_T | 0x000b),
-    BITOR       = (FORMAT_T | 0x000c),
-    BITXOR      = (FORMAT_T | 0x000d),
-    EQ          = (FORMAT_T | 0x000e),
-    LT          = (FORMAT_T | 0x000f),
-    GT          = (FORMAT_T | 0x0010),
-    CMP         = (FORMAT_T | 0x0011),
-    AND         = (FORMAT_T | 0x0012),
-    OR          = (FORMAT_T | 0x0013),
-    IO_SUBMIT   = (FORMAT_T | 0x0014),
-    IO_WAIT     = (FORMAT_T | 0x0015),
-    IO_SHUTDOWN = (FORMAT_T | 0x0016),
-    IO_CTL      = (FORMAT_T | 0x0017),
+    ADD         = (FORMAT_T | 0x00'01),
+    SUB         = (FORMAT_T | 0x00'02),
+    MUL         = (FORMAT_T | 0x00'03),
+    DIV         = (FORMAT_T | 0x00'04),
+    MOD         = (FORMAT_T | 0x00'05),
+    BITSHL      = (FORMAT_T | 0x00'06),
+    BITSHR      = (FORMAT_T | 0x00'07),
+    BITASHR     = (FORMAT_T | 0x00'08),
+    BITROL      = (FORMAT_T | 0x00'09),
+    BITROR      = (FORMAT_T | 0x00'0a),
+    BITAND      = (FORMAT_T | 0x00'0b),
+    BITOR       = (FORMAT_T | 0x00'0c),
+    BITXOR      = (FORMAT_T | 0x00'0d),
+    EQ          = (FORMAT_T | 0x00'0e),
+    LT          = (FORMAT_T | 0x00'0f),
+    GT          = (FORMAT_T | 0x00'10),
+    CMP         = (FORMAT_T | 0x00'11),
+    AND         = (FORMAT_T | 0x00'12),
+    OR          = (FORMAT_T | 0x00'13),
+    IO_SUBMIT   = (FORMAT_T | 0x00'14),
+    IO_WAIT     = (FORMAT_T | 0x00'15),
+    IO_SHUTDOWN = (FORMAT_T | 0x00'16),
+    IO_CTL      = (FORMAT_T | 0x00'17),
 
-    CALL    = (FORMAT_D | 0x0001),
-    BITNOT  = (FORMAT_D | 0x0002),
-    NOT     = (FORMAT_D | 0x0003),
-    COPY    = (FORMAT_D | 0x0004),
-    MOVE    = (FORMAT_D | 0x0005),
-    SWAP    = (FORMAT_D | 0x0006),
-    IF      = (FORMAT_D | 0x0007),
-    IO_PEEK = (FORMAT_D | 0x0008),
-    ACTOR   = (FORMAT_D | 0x0009),
-    GTS     = (FORMAT_D | 0x000a),
-    GTL     = (FORMAT_D | 0x000b),
+    CALL    = (FORMAT_D | 0x00'01),
+    BITNOT  = (FORMAT_D | 0x00'02),
+    NOT     = (FORMAT_D | 0x00'03),
+    COPY    = (FORMAT_D | 0x00'04),
+    MOVE    = (FORMAT_D | 0x00'05),
+    SWAP    = (FORMAT_D | 0x00'06),
+    IF      = (FORMAT_D | 0x00'07),
+    IO_PEEK = (FORMAT_D | 0x00'08),
+    ACTOR   = (FORMAT_D | 0x00'09),
+    GTS     = (FORMAT_D | 0x00'0a),
+    GTL     = (FORMAT_D | 0x00'0b),
 
-    FRAME  = (FORMAT_S | 0x0001),
-    RETURN = (FORMAT_S | 0x0002),
-    ATOM   = (FORMAT_S | 0x0003),
-    DOUBLE = (FORMAT_S | 0x0004),
-    SELF   = (FORMAT_S | 0x0005),
+    FRAME  = (FORMAT_S | 0x00'01),
+    RETURN = (FORMAT_S | 0x00'02),
+    ATOM   = (FORMAT_S | 0x00'03),
+    DOUBLE = (FORMAT_S | 0x00'04),
+    SELF   = (FORMAT_S | 0x00'05),
 
-    LUI   = (FORMAT_F | 0x0001),
-    LUIU  = (FORMAT_F | 0x0001 | UNSIGNED),
-    LLI   = (FORMAT_F | 0x0002),
-    FLOAT = (FORMAT_F | 0x0003),
+    LUI   = (FORMAT_F | 0x00'01),
+    LUIU  = (FORMAT_F | 0x00'01 | UNSIGNED),
+    LLI   = (FORMAT_F | 0x00'02),
+    FLOAT = (FORMAT_F | 0x00'03),
 
-    CAST  = (FORMAT_E | 0x0001),
-    ARODP = (FORMAT_E | 0x0002),
-    ATXTP = (FORMAT_E | 0x0003),
+    CAST  = (FORMAT_E | 0x00'01),
+    ARODP = (FORMAT_E | 0x00'02),
+    ATXTP = (FORMAT_E | 0x00'03),
 
-    ADDI  = (FORMAT_R | 0x0001),
-    ADDIU = (FORMAT_R | 0x0001 | UNSIGNED),
-    SUBI  = (FORMAT_R | 0x0002),
-    SUBIU = (FORMAT_R | 0x0002 | UNSIGNED),
-    MULI  = (FORMAT_R | 0x0003),
-    MULIU = (FORMAT_R | 0x0003 | UNSIGNED),
-    DIVI  = (FORMAT_R | 0x0004),
-    DIVIU = (FORMAT_R | 0x0004 | UNSIGNED),
+    ADDI  = (FORMAT_R | 0x00'01),
+    ADDIU = (FORMAT_R | 0x00'01 | UNSIGNED),
+    SUBI  = (FORMAT_R | 0x00'02),
+    SUBIU = (FORMAT_R | 0x00'02 | UNSIGNED),
+    MULI  = (FORMAT_R | 0x00'03),
+    MULIU = (FORMAT_R | 0x00'03 | UNSIGNED),
+    DIVI  = (FORMAT_R | 0x00'04),
+    DIVIU = (FORMAT_R | 0x00'04 | UNSIGNED),
 
-    SM  = (FORMAT_M | 0x0001), /* Store Memory */
-    LM  = (FORMAT_M | 0x0002), /* Load Memory */
-    AA  = (FORMAT_M | 0x0003), /* Allocate Automatic */
-    AD  = (FORMAT_M | 0x0004), /* Allocate Dynamic */
-    PTR = (FORMAT_M | 0x0005), /* PoinTeR */
+    SM  = (FORMAT_M | 0x00'01), /* Store Memory */
+    LM  = (FORMAT_M | 0x00'02), /* Load Memory */
+    AA  = (FORMAT_M | 0x00'03), /* Allocate Automatic */
+    AD  = (FORMAT_M | 0x00'04), /* Allocate Dynamic */
+    PTR = (FORMAT_M | 0x00'05), /* PoinTeR */
 };
 auto to_string(opcode_type const) -> std::string;
 auto parse_opcode(std::string_view) -> opcode_type;
@@ -304,7 +306,8 @@ auto parse_opcode(std::string_view) -> opcode_type;
  * statements on opcodes of one format.
  */
 #define Make_entry(OP) OP = static_cast<opcode_type>(OPCODE::OP)
-enum class OPCODE_T : opcode_type {
+enum class OPCODE_T : opcode_type
+{
     Make_entry(ADD),
     Make_entry(SUB),
     Make_entry(MUL),
@@ -329,7 +332,8 @@ enum class OPCODE_T : opcode_type {
     Make_entry(IO_SHUTDOWN),
     Make_entry(IO_CTL),
 };
-enum class OPCODE_D : opcode_type {
+enum class OPCODE_D : opcode_type
+{
     Make_entry(CALL),
     Make_entry(BITNOT),
     Make_entry(NOT),
@@ -342,25 +346,29 @@ enum class OPCODE_D : opcode_type {
     Make_entry(GTS),
     Make_entry(GTL),
 };
-enum class OPCODE_S : opcode_type {
+enum class OPCODE_S : opcode_type
+{
     Make_entry(FRAME),
     Make_entry(RETURN),
     Make_entry(ATOM),
     Make_entry(DOUBLE),
     Make_entry(SELF),
 };
-enum class OPCODE_F : opcode_type {
+enum class OPCODE_F : opcode_type
+{
     Make_entry(LUI),
     Make_entry(LUIU),
     Make_entry(LLI),
     Make_entry(FLOAT),
 };
-enum class OPCODE_E : opcode_type {
+enum class OPCODE_E : opcode_type
+{
     Make_entry(CAST),
     Make_entry(ARODP),
     Make_entry(ATXTP),
 };
-enum class OPCODE_R : opcode_type {
+enum class OPCODE_R : opcode_type
+{
     Make_entry(ADDI),
     Make_entry(ADDIU),
     Make_entry(SUBI),
@@ -370,13 +378,15 @@ enum class OPCODE_R : opcode_type {
     Make_entry(DIVI),
     Make_entry(DIVIU),
 };
-enum class OPCODE_N : opcode_type {
+enum class OPCODE_N : opcode_type
+{
     Make_entry(NOOP),
     Make_entry(HALT),
     Make_entry(EBREAK),
     Make_entry(ECALL),
 };
-enum class OPCODE_M : opcode_type {
+enum class OPCODE_M : opcode_type
+{
     Make_entry(SM),
     Make_entry(LM),
     Make_entry(AA),
