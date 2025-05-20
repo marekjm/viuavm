@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2022-2023 Marek Marecki
+ *  Copyright (C) 2022-2023, 2025 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -18,9 +18,14 @@
  */
 
 #include <endian.h>
+#include <stdint.h>
 
-#include <iomanip>
-#include <iostream>
+#include <map>
+#include <optional>
+#include <print>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <viua/support/fdio.h>
 #include <viua/vm/elf.h>
@@ -246,12 +251,12 @@ auto Loaded_elf::fn_at(std::vector<uint8_t> const& function_table,
     memcpy(&addr, (function_table.data() + offset + sz), sizeof(addr));
     addr = le64toh(addr);
 
-    /*
-    std::cout << "Offset:     " << offset << "\n";
-    std::cout << "Label size: " << sz << "\n";
-    std::cout << "Label:      " << name << "\n";
-    std::cout << "Address:    " << addr << "\n";
-    */
+    if constexpr (false) {
+        std::println("Offset:     {}", offset);
+        std::println("Label size: {}", sz);
+        std::println("Label:      {}", name);
+        std::println("Address:    {}", addr);
+    }
 
     return {name, addr};
 }

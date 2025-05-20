@@ -30,9 +30,8 @@
 #include <chrono>
 #include <filesystem>
 #include <functional>
-#include <iomanip>
-#include <iostream>
 #include <map>
+#include <print>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -47,10 +46,11 @@
 #include <viua/arch/ops.h>
 #include <viua/support/errno.h>
 #include <viua/support/fdstream.h>
+#include <viua/support/print.hh>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
-#include <viua/vm/core.h>
 #include <viua/vm/backtrace.h>
+#include <viua/vm/core.h>
 #include <viua/vm/elf.h>
 #include <viua/vm/ins.h>
 
@@ -147,10 +147,10 @@ auto run(viua::vm::Process& proc) -> bool
         return false;
     }
     if (not ip_ok()) {
-        std::cerr << "[vm] ip " << std::hex << std::setw(8) << std::setfill('0')
-                  << ((proc.stack.ip - proc.module.ip_base)
-                      * sizeof(viua::arch::instruction_type))
-                  << std::dec << " outside of valid range\n";
+        auto const bad_address = ((proc.stack.ip - proc.module.ip_base)
+                                  * sizeof(viua::arch::instruction_type));
+        std::println(
+            stderr, "[vm] ip {:08x} outside of valid range", bad_address);
         return false;
     }
 
@@ -215,8 +215,10 @@ auto main(int argc, char* argv[]) -> int
 
     auto const args = std::vector<std::string>{(argv + 1), (argv + argc)};
     if (args.empty()) {
-        std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                  << ": no executable to run\n";
+        std::println(stderr,
+                     "{}error{}: no executable to run",
+                     esc(2, COLOR_FG_RED),
+                     esc(2, ATTR_RESET));
         return 1;
     }
 
@@ -243,8 +245,7 @@ auto main(int argc, char* argv[]) -> int
         } else if (each == "--help") {
             show_help = true;
         } else if (each.front() == '-') {
-            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                      << ": unknown option: " << each << "\n";
+            viua::support::errorln("unknown option: {}", each);
             return 1;
         } else {
             // input files start here
@@ -253,24 +254,19 @@ auto main(int argc, char* argv[]) -> int
     }
 
     if (show_version) {
-        if (verbosity_level) {
-            std::cout << "Viua VM ";
-        }
-        std::cout << (verbosity_level ? VIUAVM_VERSION_FULL : VIUAVM_VERSION)
-                  << "\n";
+        std::println("viua vm {}",
+                     (verbosity_level ? VIUAVM_VERSION_FULL : VIUAVM_VERSION));
     }
     if (show_built_with) {
-        std::cout << "compiler: " << CXX << " " << CXXVERSION << "\n";
-        std::cout << "standard: " << CXXSTD << "\n";
+        std::println("compiler: {} {}", CXX, CXXVERSION);
+        std::println("standard: {}", CXXSTD);
     }
     if (show_version or show_built_with) {
         return 0;
     }
     if (show_help) {
         if (execlp("man", "man", "1", "viua-vm", nullptr) == -1) {
-            perror("WTF");
-            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                      << ": man(1) page not installed or not found\n";
+            viua::support::errorln("man(1) page not installed or not found");
             return 1;
         }
     }
@@ -283,29 +279,24 @@ auto main(int argc, char* argv[]) -> int
      */
     auto const elf_path = std::filesystem::path{args.back()};
     if (not std::filesystem::exists(elf_path)) {
-        std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                  << ": file does not exist: " << esc(2, COLOR_FG_WHITE)
-                  << elf_path.native() << esc(2, ATTR_RESET) << "\n";
+        viua::support::errorln("file does not exist: {}{}{}",
+                               esc(2, COLOR_FG_WHITE),
+                               elf_path.native(),
+                               esc(2, ATTR_RESET));
         return 1;
     }
     {
-        struct stat statbuf {};
+        struct stat statbuf{};
         if (stat(elf_path.c_str(), &statbuf) == -1) {
             auto const saved_errno = errno;
             auto const errname     = viua::support::errno_name(saved_errno);
             auto const errdesc     = viua::support::errno_desc(saved_errno);
 
-            std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                      << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                      << esc(2, ATTR_RESET) << ": " << errname << ": "
-                      << errdesc << "\n";
+            viua::support::errorln(elf_path, "{}: {}", errname, errdesc);
             return 1;
         }
         if ((statbuf.st_mode & S_IFMT) != S_IFREG) {
-            std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                      << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                      << esc(2, ATTR_RESET);
-            std::cerr << ": not a regular file\n";
+            viua::support::errorln(elf_path, "not a regular file");
             return 1;
         }
     }
@@ -320,10 +311,7 @@ auto main(int argc, char* argv[]) -> int
         auto const errname     = viua::support::errno_name(saved_errno);
         auto const errdesc     = viua::support::errno_desc(saved_errno);
 
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET) << ": " << errname << ": " << errdesc
-                  << "\n";
+        viua::support::errorln(elf_path, "{}: {}", errname, errdesc);
         return 1;
     }
 
@@ -331,56 +319,31 @@ auto main(int argc, char* argv[]) -> int
     auto const main_module = Module::load(elf_fd);
 
     if (main_module.header.e_type != ET_EXEC) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": not an executable file\n";
+        viua::support::errorln(elf_path, "not an executable file");
         return 1;
     }
 
     if (auto const f = main_module.find_fragment(".rodata");
         not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no strings fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .rodata section found\n";
+        viua::support::errorln(elf_path, "no strings fragment found");
+        viua::support::noteln(elf_path, "no .rodata section found");
         return 1;
     }
     if (auto const f = main_module.find_fragment(".symtab");
         not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no function table fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
-                  << "note" << esc(2, ATTR_RESET)
-                  << ": no .symtab section found\n";
+        viua::support::errorln(elf_path, "no function table fragment found");
+        viua::support::noteln(elf_path, "no .symtab section found");
         return 1;
     }
     if (auto const f = main_module.find_fragment(".strtab");
         not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no function table fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
-                  << "note" << esc(2, ATTR_RESET)
-                  << ": no .strtab section found\n";
+        viua::support::errorln(elf_path, "no string table fragment found");
+        viua::support::noteln(elf_path, "no .strtab section found");
         return 1;
     }
     if (auto const f = main_module.find_fragment(".text"); not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no text fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .text section found\n";
+        viua::support::errorln(elf_path, "no text fragment found");
+        viua::support::noteln(elf_path, "no .text section found");
         return 1;
     }
 
@@ -388,10 +351,7 @@ auto main(int argc, char* argv[]) -> int
     if (auto const ep = main_module.entry_point(); ep.has_value()) {
         entry_addr = (*ep / sizeof(viua::arch::instruction_type));
     } else {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no entry point defined\n";
+        viua::support::errorln(elf_path, "no entry point defined");
         return 1;
     }
 
@@ -421,15 +381,14 @@ auto main(int argc, char* argv[]) -> int
     try {
         run(core);
     } catch (viua::vm::abort_execution const& e) {
-        std::cerr << "Aborted: " << e.what() << "\n";
-        std::cerr << "Aborted IP: " << std::hex << std::setfill('0') << "0x"
-                  << std::setw(16)
-                  << ((e.stack.ip - e.stack.proc->module.ip_base)
-                      * sizeof(viua::arch::instruction_type))
-                  << std::dec << "\n";
-        std::cerr << "Aborted instruction: " << std::hex << std::setfill('0')
-                  << "0x" << std::setw(16) << *e.stack.ip << std::dec << "\n";
+        auto const aborted_ip = ((e.stack.ip - e.stack.proc->module.ip_base)
+                                 * sizeof(viua::arch::instruction_type));
+
+        std::println(stderr, "Aborted: {}", e.what());
+        std::println(stderr, "Aborted IP: 0x{:016x}", aborted_ip);
+        std::println(stderr, "Aborted instruction: 0x{:016x}", *e.stack.ip);
         viua::vm::backtrace::print_backtrace(e.stack);
+
         if constexpr (true) {
             throw;
         } else {
