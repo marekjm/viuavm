@@ -1,33 +1,35 @@
-#!/usr/bin/env sh
+#!/bin/sh
 
 set -e
 
-function show_help {
-    local WHAT_FOR=${1:-viua}
-    exec man viua-${WHAT_FOR}
-}
-
 PREFIX=$(realpath $(dirname $(realpath "${0}"))/../../../build)
+
 LIBDIR=${PREFIX}/lib
 EXEDIR=${PREFIX}/libexec/viua
 BINDIR=${PREFIX}/bin
 
-function main {
-    local TOOL=${1}
+viua_invoke_tool () {
+    exec ${EXEDIR}/${@}
+}
+
+main () {
+    TOOL=${1}
     case ${TOOL} in
         asm|dis|vm|readelf|repl)
-            exec ${EXEDIR}/${TOOL} "${@:2}"
+            viua_invoke_tool ${@}
             ;;
         help)
-            show_help "${@:2}"
-            exit 0
+            SUBJECT=${2:-viua}
+            exec man viua-${SUBJECT}
             ;;
         --help|'')
-            show_help
-            exit 0
+            exec man viua-viua
             ;;
         --version)
-            exec ${EXEDIR}/vm ${@:1} | sed 's/ vm//'
+            exec ${EXEDIR}/vm ${@} | sed 's/ vm//'
+            ;;
+        --built-with)
+            exec ${EXEDIR}/vm ${@} | sed 's/ vm//'
             ;;
         --prefix)
             echo "PREFIX=${PREFIX}"
@@ -43,4 +45,4 @@ function main {
     esac
 }
 
-main "${@}"
+main ${@}

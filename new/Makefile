@@ -136,6 +136,7 @@ install: dist
 		--mode 644 \
 		--target-directory $(MANDIR)/man1 \
 		docs/man/*.1
+	ln -sf $(MANDIR)/man1/viua.1 $(MANDIR)/man1/viua-viua.1
 	install \
 		--mode 644 \
 		--target-directory $(MANDIR)/man7 \

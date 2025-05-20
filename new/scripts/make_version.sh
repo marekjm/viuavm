@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 set -e
 
@@ -8,7 +8,7 @@ COMMITS_SINCE=$(git log --oneline ${TAG}..HEAD | wc -l)
 
 GIT_HEAD=$(git rev-parse HEAD)
 GIT_DIRTY=''
-if [[ $(git ls-files -m | wc -l) -ne 0 ]]; then
+if [ $(git ls-files -m | wc -l) -ne 0 ]; then
     GIT_DIRTY='-dirty'
 fi
 
