@@ -2,47 +2,53 @@
 
 set -e
 
-PREFIX=$(realpath $(dirname $(realpath "${0}"))/../../build)
+# See https://www.gnu.org/prep/standards/html_node/Directory-Variables.html for
+# more information.
+prefix=$(realpath $(dirname $(realpath "${0}"))/../../build)
+libdir=${prefix}/lib
+libexecdir=${prefix}/libexec
+bindir=${prefix}/bin
 
-LIBDIR=${PREFIX}/lib
-EXEDIR=${PREFIX}/libexec/viua
-BINDIR=${PREFIX}/bin
+# See the explanation for "exedir" in the Makefile in Viua's repository for more
+# information.
+exedir=${libexecdir}/viua
+
 
 viua_invoke_tool () {
-    exec ${EXEDIR}/${@}
+    exec ${exedir}/"${@}"
 }
 
 main () {
-    TOOL=${1}
-    case ${TOOL} in
+    local tool=${1}
+    case ${tool} in
         asm|dis|vm|readelf|repl)
-            viua_invoke_tool ${@}
+            viua_invoke_tool "${@}"
             ;;
         help)
-            SUBJECT=${2:-viua}
-            exec man viua-${SUBJECT}
+            local subject=${2:-viua}
+            exec man viua-${subject}
             ;;
         --help|'')
             exec man viua-viua
             ;;
         --version)
-            exec ${EXEDIR}/vm ${@} | sed 's/ vm//'
+            exec ${exedir}/vm ${@} | sed 's/ vm//'
             ;;
         --built-with)
-            exec ${EXEDIR}/vm ${@} | sed 's/ vm//'
+            exec ${exedir}/vm ${@} | sed 's/ vm//'
             ;;
         --prefix)
-            echo "PREFIX=${PREFIX}"
+            echo "${prefix}"
             ;;
         -*)
-            2>&1 echo "viua: error: unknown option \`${TOOL}'"
+            2>&1 echo "viua: error: unknown option \`${tool}'"
             exit 1
             ;;
         *)
-            2>&1 echo "viua: error: not a part of the viua toolchain: \`${TOOL}'"
+            2>&1 echo "viua: error: not a part of the viua toolchain: \`${tool}'"
             exit 1
             ;;
     esac
 }
 
-main ${@}
+main "${@}"

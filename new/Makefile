@@ -1,26 +1,45 @@
 ################################################################################
 # Base directories
+#
+# See https://www.gnu.org/prep/standards/html_node/Directory-Variables.html for
+# more information.
+#
+# See https://www.gnu.org/prep/standards/html_node/DESTDIR.html for explanation
+# of how DESTDIR is used in this Makefile.
+prefix=/usr/local
+exec_prefix=$(prefix)
+libdir=$(prefix)/lib
+libexecdir=$(prefix)/libexec
+bindir=$(prefix)/bin
+sharedir=$(prefix)/share
+mandir=$(sharedir)/man
+
+# exedir is a non-standard variable. It is used to avoid having to repeat the
+#
+# 	$(libexecdir)/viua
+#
+# path everywhere. Instead, one can just write $(exedir) for the internal
+# executables. The basic idea for a Viua installation is this:
+#
+#  - the frontend script ie, the "viua" command, is installed in a directory
+#    which exists on PATH and is the entry point for everything else (think
+#    something like Git, with the main command driving all the subcommands).
+#
+#  - the internal executables (asm, vm, and others) are installed in libexec,
+#    which tends not to be present in PATH. Users can still access them directly
+#    by specifying the full path to the commands.
+#
+# This way we do not have to pollute the main "namespace" with viua-foos and
+# viua-bars.
+exedir=$(libexecdir)/viua
+
+
+################################################################################
+# Build directories
 BUILD=./build
 BUILD_LIBDIR=$(BUILD)/lib
 BUILD_EXEDIR=$(BUILD)/libexec/viua
 BUILD_BINDIR=$(BUILD)/bin
-
-PREFIX=~/.local
-LIBDIR=$(PREFIX)/lib
-EXEDIR=$(PREFIX)/libexec/viua
-BINDIR=$(PREFIX)/bin
-SHAREDIR=$(PREFIX)/share
-MANDIR=$(SHAREDIR)/man
-
-VIUAVM_VERSION=$(shell sh ./scripts/make_version.sh short)
-VIUAVM_VERSION_FULL=$(shell sh ./scripts/make_version.sh full)
-
-OPTNAME=$(VIUAVM_VERSION)
-VIUA_OPT_PREFIX=$(PREFIX)/opt/viua
-VIUA_OPT_ROOT=$(VIUA_OPT_PREFIX)/$(OPTNAME)
-VIUA_OPT_LIB_DIR=$(VIUA_OPT_ROOT)/lib
-VIUA_OPT_CORE_DIR=$(VIUA_OPT_LIB_DIR)/viua-core
-VIUA_OPT_ETC_DIR=$(VIUA_OPT_ROOT)/etc
 
 
 ################################################################################
@@ -45,6 +64,9 @@ CXXFLAGS_INCLUDE=\
 FEATURE_DETECT_FLAGS=\
 					 $(shell CXX=$(CXX) bash ./feature-tests/test.sh ./feature-tests/strerrorname_np.c)
 
+# To change version, edit the VERSION file in the repository's root directory.
+VIUAVM_VERSION=$(shell sh ./scripts/make_version.sh short)
+VIUAVM_VERSION_FULL=$(shell sh ./scripts/make_version.sh full)
 VERSION_FLAGS=\
 			  -DVIUAVM_VERSION='"$(VIUAVM_VERSION)"' \
 			  -DVIUAVM_VERSION_FULL='"$(VIUAVM_VERSION_FULL)"' \
@@ -77,11 +99,17 @@ CXXLIBS=\
 
 ################################################################################
 # High-level targets
-all: dist
-	@echo "Built version $(VIUAVM_VERSION_FULL)"
+#
+# See https://www.gnu.org/prep/standards/html_node/Standard-Targets.html for
+# more information about the standard targets intended for user consumption.
+#
+# This Makefile deviates from the standard by having a "test" target instead of
+# a "check" target.
+all: all-silent
+	@echo "version: viua $(VIUAVM_VERSION_FULL)"
 	@$(BUILD_EXEDIR)/vm --built-with
 
-dist: \
+all-silent: \
 	$(BUILD_EXEDIR)/readelf \
 	$(BUILD_EXEDIR)/dis \
 	$(BUILD_EXEDIR)/asm \
@@ -89,7 +117,20 @@ dist: \
 	$(BUILD_EXEDIR)/vm \
 	$(BUILD_BINDIR)/viua
 
-test: dist
+dist: all
+	mkdir -p viua-$(VIUAVM_VERSION)
+	make DESTDIR=viua-$(VIUAVM_VERSION) install
+	tar -cf viua-$(VIUAVM_VERSION).tar viua-$(VIUAVM_VERSION)
+	zstd \
+		--compress \
+		--threads 0 \
+		-9 \
+		--force \
+		--quiet \
+		viua-$(VIUAVM_VERSION).tar \
+		-o viua-$(VIUAVM_VERSION).tar.zstd
+
+test: all
 	@python3 ./tests/suite.py $(TESTS)
 
 clean-bin:
@@ -112,57 +153,38 @@ VIUA_TAG_DATESTAMP=$(shell git show --date=short HEAD |\
 VIUA_TAG_VERSION=$(VIUAVM_VERSION)
 
 uninstall:
-	rm -rf $(EXEDIR)
-	rm -rf $(BINDIR)/viua
-	rm -rf $(MANDIR)/man1/viua*
-	rm -rf $(MANDIR)/man7/viua*
+	rm -r $(DESTDIR)$(exedir)
+	rm -r $(DESTDIR)$(bindir)/viua
+	rm -v $(DESTDIR)$(mandir)/man*/viua*
 
-install: dist
-	mkdir -p $(EXEDIR)
+install: all-silent
 	install \
 		--mode 755 \
-		--target-directory $(EXEDIR) \
+		-D --target-directory $(DESTDIR)$(exedir) \
 		$(BUILD_EXEDIR)/*
-	mkdir -p $(BINDIR)
 	install \
 		--mode 755 \
-		--target-directory $(BINDIR) \
+		-D --target-directory $(DESTDIR)$(bindir) \
 		$(BUILD_BINDIR)/viua
-	sed -i -e "s#^PREFIX=.*#PREFIX=$(PREFIX)#" $(BINDIR)/viua
-	mkdir -p \
-		$(MANDIR)/man1 \
-		$(MANDIR)/man7
+	sed -i -e "s#^prefix=.*#prefix=$(prefix)#" $(DESTDIR)$(bindir)/viua
 	install \
 		--mode 644 \
-		--target-directory $(MANDIR)/man1 \
+		-D --target-directory $(DESTDIR)$(mandir)/man1 \
 		docs/man/*.1
-	ln -sf $(MANDIR)/man1/viua.1 $(MANDIR)/man1/viua-viua.1
+	ln -sf $(mandir)/man1/viua.1 $(DESTDIR)$(mandir)/man1/viua-viua.1
 	install \
 		--mode 644 \
-		--target-directory $(MANDIR)/man7 \
+		-D --target-directory $(DESTDIR)$(mandir)/man7 \
 		docs/man/*.7
-	find $(MANDIR) -type f -name 'viua*' -print0 |\
+	find $(DESTDIR)$(mandir) -type f -name 'viua*' -print0 |\
 		xargs -P 0 -0 sed -i \
 		-e "s#PUT_VIUAVM_TAG_DATESTAMP_HERE#$(VIUA_TAG_DATESTAMP)#g" \
 		-e "s#PUT_VIUAVM_VERSION_HERE#$(VIUA_TAG_VERSION)#g"
 
-erase:
-	rm $(BINDIR)/viua
-	rm -r $(VIUA_LIB_DIR)
-	rm -v $(MANDIR)/man*/viua*
-
-install-opt:
-	make PREFIX=$(VIUA_OPT_ROOT) install
-	mkdir -p $(VIUA_OPT_ETC_DIR)/viua
-	echo "$(VIUAVM_VERSION_FULL)" > $(VIUA_OPT_ETC_DIR)/viua/version
-
-erase-opt:
-	rm -r $(VIUA_OPT_ROOT)
-
 install-binfmt:
-	mkdir -p $(PREFIX)/lib/binfmt.d
-	cp -v ./binfmt.d/viua-exec.conf $(PREFIX)/lib/binfmt.d
-	if [[ -f /proc/sys/fs/binfmt_misc/viua-exec ]]; then \
+	mkdir -p $(libdir)/binfmt.d
+	cp -v ./binfmt.d/viua-exec.conf $(libdir)/binfmt.d
+	if [ -f /proc/sys/fs/binfmt_misc/viua-exec ]; then \
 		echo -1 > /proc/sys/fs/binfmt_misc/viua-exec ; \
 	fi
 	cat ./binfmt.d/viua-exec.conf > /proc/sys/fs/binfmt_misc/register
