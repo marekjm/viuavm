@@ -1,7 +1,7 @@
 ---
 image: nixos/latest
 packages:
-  - nixos.llvmPackages_16.libcxxClang
+  - nixos.llvmPackages_20.libcxxClang
   - nixos.gnumake
   - nixos.python3Minimal
   - nixos.liburing

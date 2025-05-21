@@ -1,7 +1,7 @@
 ---
 image: nixos/latest
 packages:
-  - nixos.gcc13
+  - nixos.gcc14
   - nixos.gnumake
   - nixos.python3Minimal
   - nixos.liburing
