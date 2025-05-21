@@ -690,18 +690,8 @@ def run_and_capture(interpreter, executable, *, args=(), stdin=None):
     stdin_written = 0
     stdout = b""
     stderr = b""
-    BUF_SIZE = 4096
+    BUF_SIZE = 4096 // 8
 
-    WORM = (
-        "*    ",
-        "**   ",
-        "***  ",
-        "**** ",
-        " ****",
-        "  ***",
-        "   **",
-        "    *",
-    )
     SPINNER = (
         "-",
         "\\",
@@ -711,55 +701,59 @@ def run_and_capture(interpreter, executable, *, args=(), stdin=None):
 
     stdin = stdin.encode(ENCODING) if stdin else None
 
-    # n = 0
-    while fds := monitor.poll(timeout=0.016):
-        # print("\b" * 79)
-        # print("[{}] {} in={:<4} ot={:<4} er={:<4} tr={:<4}".format(
-        #     WORM[n % len(WORM)],
-        #     SPINNER[n % len(SPINNER)],
-        #     stdin_written,
-        #     len(stdout),
-        #     len(stderr),
-        #     len(trace),
-        #     ), end="")
-        # n += 1
-        # time.sleep(0.016)
+    MONITOR_IO = False
+    if MONITOR_IO and False:
+        print(f"trace_fd = {read_fd}")
+        print(f"stdout_fd = {stdout_fd}")
+        print(f"stderr_fd = {stderr_fd}")
+        print(f"stdin_fd = {stdin_fd}")
+        print(f"EPOLLIN = {select.EPOLLIN}")
+        print(f"EPOLLOUT = {select.EPOLLOUT}")
+        print(f"EPOLLERR = {select.EPOLLERR}")
+        print(f"EPOLLHUP = {select.EPOLLHUP}")
+        print("start monitoring...")
 
-        if not fds:
-            break
+    n = 0
+    eof = False
+    while not eof:
+        fds = monitor.poll(timeout=0.016)
+        if MONITOR_IO:
+            if n:
+                print("\b" * 79)
+            print(" {} in={:<4} ot={:<4} er={:<4} tr={:<4} {}".format(
+                SPINNER[n % len(SPINNER)],
+                stdin_written,
+                len(stdout),
+                len(stderr),
+                len(trace),
+                fds,
+                ), end="")
+            n += 1
+            time.sleep(0.016 * 2)
 
-        activity = False
         for fd, events in fds:
             if fd == read_fd and events & select.EPOLLIN:
                 chunk = os.read(fd, BUF_SIZE)
-                if not chunk:
-                    continue
                 trace += chunk
-                activity = True
+            elif fd == read_fd and events & select.EPOLLHUP:
+                # We are done with trace output.
+                eof = True
             elif fd == stdout_fd and events & select.EPOLLIN:
                 chunk = os.read(fd, BUF_SIZE)
-                if not chunk:
-                    continue
                 stdout += chunk
-                activity = True
             elif fd == stderr_fd and events & select.EPOLLIN:
                 chunk = os.read(fd, BUF_SIZE)
-                if not chunk:
-                    continue
                 stderr += chunk
-                activity = True
-            elif fd == stdin_fd and events & select.EPOLLERR:
+            elif fd == stdin_fd and events & select.EPOLLHUP:
                 pass
             elif fd == stdin_fd and events & select.EPOLLOUT:
-                activity = True
                 if stdin_written >= len(stdin):
                     continue
                 chunk = os.write(fd, stdin[stdin_written:])
                 stdin_written += chunk
 
-        if not activity:
-            break
-
+    if MONITOR_IO:
+        print("end monitoring")
     result = proc.wait()
 
     stdout = stdout.decode(ENCODING)
@@ -831,6 +825,7 @@ def run_and_capture(interpreter, executable, *, args=(), stdin=None):
             "fd": {
                 "stdout": stdout,
                 "stderr": stderr,
+                "trace": buffer,
                 1: stdout,
                 2: stderr,
             },
