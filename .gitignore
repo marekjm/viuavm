@@ -42,3 +42,4 @@ docs/manual/*.json
 !.gitignore
 !.travis.yml
 !.clang-format
+!.yamlfmt

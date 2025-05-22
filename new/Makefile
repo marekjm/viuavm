@@ -194,11 +194,12 @@ install-binfmt:
 	cat ./binfmt.d/viua-exec.conf > /proc/sys/fs/binfmt_misc/register
 
 format:
-	@(\
+	(\
 		find ./include -type f -name '*.h' ;\
 		find ./src -type f -name '*.cpp'\
 	) | xargs --max-args 1 --max-procs 0 clang-format -i
-	@black tests/suite.py
+	black --quiet tests/suite.py
+	yamlfmt $(shell git rev-parse --show-toplevel)/.builds/*
 
 
 ################################################################################

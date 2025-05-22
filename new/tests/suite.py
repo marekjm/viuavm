@@ -82,10 +82,12 @@ def format_freq(hz):
 ENCODING = "utf-8"
 
 DEFAULT_PREFIX = "./build"
-PREFIX = os.path.abspath(os.path.expanduser(os.environ.get("test_prefix",
-                                                           DEFAULT_PREFIX)))
-EXEC_PREFIX = os.path.abspath(os.path.expanduser(os.environ.get("test_exec_prefix",
-                                                                PREFIX)))
+PREFIX = os.path.abspath(
+    os.path.expanduser(os.environ.get("test_prefix", DEFAULT_PREFIX))
+)
+EXEC_PREFIX = os.path.abspath(
+    os.path.expanduser(os.environ.get("test_exec_prefix", PREFIX))
+)
 LIBEXECDIR = os.path.join(EXEC_PREFIX, "libexec")
 EXEDIR = os.path.join(LIBEXECDIR, "viua")
 
@@ -97,13 +99,17 @@ DISASSEMBLER = exe("dis")
 
 DIS_EXTENSION = "~"
 
+
 def env_is_truthy(v):
-    return v.lower() in { "true", "1", }
+    return v.lower() in {
+        "true",
+        "1",
+    }
+
 
 def getenv_bool(name, *, default):
     return env_is_truthy(os.environ.get(name, default))
 
-print(os.environ)
 
 SKIP_DISASSEMBLER_TESTS = getenv_bool("SKIP_DISASSEMBLER_TESTS", default="false")
 
@@ -114,6 +120,7 @@ PROGRESS_INDICATOR_ERASER = "\b" * (len("[ ~~ ]") + 1 + 10)
 PAUSE_60_FPS = 0.016
 PROGRESS_INDICATOR_PAUSE = 0
 IO_MONITORING_INDICATOR_PAUSE = PAUSE_60_FPS
+
 
 def indicate_progress(start_timepoint, message, *, erase=True):
     if not PROGRESS_INDICATORS:
@@ -751,14 +758,17 @@ def run_and_capture(start_timepoint, interpreter, executable, *, args=(), stdin=
         if MONITOR_IO:
             if n:
                 print("\b" * 79)
-            print(" {} in={:<4} ot={:<4} er={:<4} tr={:<4} {}".format(
-                SPINNER[n % len(SPINNER)],
-                stdin_written,
-                len(stdout),
-                len(stderr),
-                len(trace),
-                fds,
-                ), end="")
+            print(
+                " {} in={:<4} ot={:<4} er={:<4} tr={:<4} {}".format(
+                    SPINNER[n % len(SPINNER)],
+                    stdin_written,
+                    len(stdout),
+                    len(stderr),
+                    len(trace),
+                    fds,
+                ),
+                end="",
+            )
             time.sleep(IO_MONITORING_INDICATOR_PAUSE * 2)
 
         sp = SPINNER[n % len(SPINNER)]
@@ -899,16 +909,18 @@ def test_case_impl_asm(case_log, out_path, asm_path, start_timepoint):
     case_log.write(" ".join(asm_args))
     case_log.write("\n")
     proc = subprocess.Popen(
-        args = asm_args,
+        args=asm_args,
         stdin=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
+
     def wait():
         try:
-            return proc.wait(timeout = PAUSE_60_FPS)
+            return proc.wait(timeout=PAUSE_60_FPS)
         except subprocess.TimeoutExpired:
             return None
+
     while (r := wait()) is None:
         indicate_progress(start_timepoint, "as")
     return None if r == 0 else asm_args
@@ -1151,8 +1163,9 @@ def test_case_impl(case_log, case_name, test_program, errors):
     case_log.write("First run\n")
     indicate_progress(start_timepoint, "r1")
 
-    asm = lambda out_reloc, in_asm: test_case_impl_asm(case_log, out_reloc,
-                                                       in_asm, start_timepoint)
+    asm = lambda out_reloc, in_asm: test_case_impl_asm(
+        case_log, out_reloc, in_asm, start_timepoint
+    )
 
     # Some tests (usually for the linker) have their source split over several
     # files. Gather and assemble them all here, before the main file is
@@ -1369,7 +1382,8 @@ def prepare_dependencies(cases_dir):
                 dep_sources.add(f"{dep}.asm")
 
     print("preparing dependencies for:")
-    print("  {} (found {})".format(
+    print(
+        "  {} (found {})".format(
             cases_dir,
             (len(dep_sources) or "none"),
         )
@@ -1448,7 +1462,8 @@ def main(args):
     print(f"  exec_prefix={EXEC_PREFIX}")
 
     print("looking for test programs in:")
-    print("  {} (found {} test program{})".format(
+    print(
+        "  {} (found {} test program{})".format(
             CASES_DIR,
             (len(cases) or "no"),
             ("s" if len(cases) != 1 else ""),

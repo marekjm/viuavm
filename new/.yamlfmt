@@ -1,0 +1,5 @@
+# vim:ft=yaml:
+---
+formatter:
+  include_document_start: true
+  pad_line_comments: 2
