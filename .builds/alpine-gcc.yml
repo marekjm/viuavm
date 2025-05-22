@@ -15,6 +15,7 @@ environment:
   CXX: g++
   CXXSTD: c++23
   CXXFLAGS_SANITISER:
+  PROGRESS_INDICATORS: false  # do not pollute output in CI
 tasks:
   - build: |
       cd viuavm/new
