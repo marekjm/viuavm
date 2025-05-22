@@ -30,7 +30,8 @@ mandir=$(sharedir)/man
 #    by specifying the full path to the commands.
 #
 # This way we do not have to pollute the main "namespace" with viua-foos and
-# viua-bars.
+# viua-bars. See https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch04s07.html
+# for more information about the libexec directory.
 exedir=$(libexecdir)/viua
 
 
