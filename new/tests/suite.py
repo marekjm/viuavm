@@ -97,7 +97,32 @@ DISASSEMBLER = exe("dis")
 
 DIS_EXTENSION = "~"
 
-SKIP_DISASSEMBLER_TESTS = False
+def env_is_truthy(v):
+    return v.lower() in { "true", "1", }
+
+def getenv_bool(name, *, default):
+    return env_is_truthy(os.environ.get(name, default))
+
+print(os.environ)
+
+SKIP_DISASSEMBLER_TESTS = getenv_bool("SKIP_DISASSEMBLER_TESTS", default="false")
+
+PROGRESS_INDICATORS = getenv_bool("PROGRESS_INDICATORS", default="true")
+print(f"PROGRESS_INDICATORS={PROGRESS_INDICATORS}")
+PROGRESS_INDICATOR_ERASER = "\b" * (len("[ ~~ ]") + 1 + 10)
+
+PAUSE_60_FPS = 0.016
+PROGRESS_INDICATOR_PAUSE = 0
+IO_MONITORING_INDICATOR_PAUSE = PAUSE_60_FPS
+
+def indicate_progress(start_timepoint, message, *, erase=True):
+    if not PROGRESS_INDICATORS:
+        return
+    erase = PROGRESS_INDICATOR_ERASER if erase else ""
+    run_time = format_run_time(datetime.datetime.now() - start_timepoint)
+    print(f"{erase}[ {message} ] {run_time:10s}", end="", flush=True)
+    time.sleep(PROGRESS_INDICATOR_PAUSE)
+
 
 EBREAK_LINE_PRIMITIVE = re.compile(
     r"\[(\d+)\.([lap])\] (is|iu|fl|db|atom|pid|raw) (.*)"
@@ -664,8 +689,7 @@ def consume_live_ebreak_lines(ebreak_lines):
     return ebreak
 
 
-IO_MONITORING_INDICATOR_PAUSE = 0.016
-def run_and_capture(interpreter, executable, *, args=(), stdin=None):
+def run_and_capture(start_timepoint, interpreter, executable, *, args=(), stdin=None):
     (
         read_fd,
         write_fd,
@@ -738,8 +762,7 @@ def run_and_capture(interpreter, executable, *, args=(), stdin=None):
             time.sleep(IO_MONITORING_INDICATOR_PAUSE * 2)
 
         sp = SPINNER[n % len(SPINNER)]
-        print(("\b" * 6) + f"[ {sp}{sp} ]", end="", flush=True)
-        time.sleep(IO_MONITORING_INDICATOR_PAUSE)
+        indicate_progress(start_timepoint, f"{sp}{sp}")
         n += 1
 
         for fd, events in fds:
@@ -866,7 +889,7 @@ def detect_check_kind(test_path):
     raise No_check_file_for(test_path)
 
 
-def test_case_impl_asm(case_log, out_path, asm_path):
+def test_case_impl_asm(case_log, out_path, asm_path, start_timepoint):
     asm_args = (
         ASSEMBLER,
         "-o",
@@ -875,11 +898,19 @@ def test_case_impl_asm(case_log, out_path, asm_path):
     )
     case_log.write(" ".join(asm_args))
     case_log.write("\n")
-    r = subprocess.call(
-        args=asm_args,
-        stderr=subprocess.DEVNULL,
+    proc = subprocess.Popen(
+        args = asm_args,
+        stdin=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
+    def wait():
+        try:
+            return proc.wait(timeout = PAUSE_60_FPS)
+        except subprocess.TimeoutExpired:
+            return None
+    while (r := wait()) is None:
+        indicate_progress(start_timepoint, "as")
     return None if r == 0 else asm_args
 
 
@@ -1079,13 +1110,11 @@ def test_case_impl_checks(
     return None
 
 
-CASE_PROGRESS_INDICATOR_PAUSE = 0
 def test_case_impl(case_log, case_name, test_program, errors):
     start_timepoint = datetime.datetime.now()
     count_runtime = lambda: (datetime.datetime.now() - start_timepoint)
 
-    print("[ su ]", end="", flush=True)
-    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
+    indicate_progress(start_timepoint, "su", erase=False)
 
     # Detect what kind of check the test requires. Some programs need to have
     # their register or memory contents checked, others must produce something
@@ -1120,10 +1149,10 @@ def test_case_impl(case_log, case_name, test_program, errors):
     test_executable = f"{base_path}.elf"
 
     case_log.write("First run\n")
-    print(("\b" * 6) + "[ r1 ]", end="", flush=True)
-    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
+    indicate_progress(start_timepoint, "r1")
 
-    asm = lambda out_reloc, in_asm: test_case_impl_asm(case_log, out_reloc, in_asm)
+    asm = lambda out_reloc, in_asm: test_case_impl_asm(case_log, out_reloc,
+                                                       in_asm, start_timepoint)
 
     # Some tests (usually for the linker) have their source split over several
     # files. Gather and assemble them all here, before the main file is
@@ -1175,6 +1204,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
         case_log, out_exec, in_reloc, extras
     )
     run_test = lambda: run_and_capture(
+        start_timepoint,
         INTERPRETER,
         test_executable,
         stdin=test_stdin,
@@ -1187,8 +1217,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
     #
     # The first run should assemble, link, and execute the test program, and
     # then ensure that it produced the expected result.
-    print(("\b" * 6) + "[ as ]", end="", flush=True)
-    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
+    indicate_progress(start_timepoint, "as")
     match asm(test_relocatable, test_program):
         case None:
             pass
@@ -1205,8 +1234,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
     # passed to the linker during the first run, because during the second one
     # all the necessary code will be present in the single disassembled source
     # file (due to static linking).
-    print(("\b" * 6) + "[ ld ]", end="", flush=True)
-    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
+    indicate_progress(start_timepoint, "ld")
     match ld(test_executable, test_relocatable, extra_relocatable_files):
         case None:
             pass
@@ -1219,12 +1247,10 @@ def test_case_impl(case_log, case_name, test_program, errors):
                 None,
             )
 
-    print(("\b" * 6) + "[ ex ]", end="", flush=True)
-    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
+    indicate_progress(start_timepoint, "ex")
     result, ebreak, abort_report, perf = run_test()
 
-    print(("\b" * 6) + "[ ch ]", end="", flush=True)
-    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
+    indicate_progress(start_timepoint, "ch")
     if (fail := run_checks(result, ebreak, abort_report)) is not None:
         return fail
 
@@ -1240,8 +1266,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
         return make_good_report()
 
     case_log.write("Second run\n")
-    print(("\b" * 6) + "[ r2 ]", end="", flush=True)
-    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
+    indicate_progress(start_timepoint, "r2")
 
     # SECOND RUN
     #
@@ -1278,8 +1303,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
             None,
         )
 
-    print(("\b" * 6) + "[ as ]", end="", flush=True)
-    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
+    indicate_progress(start_timepoint, "as")
     match asm(test_relocatable, test_disassembled_program):
         case None:
             pass
@@ -1292,8 +1316,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
                 None,
             )
 
-    print(("\b" * 6) + "[ ld ]", end="", flush=True)
-    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
+    indicate_progress(start_timepoint, "ld")
     match ld(test_executable, test_relocatable):
         case None:
             pass
@@ -1306,12 +1329,10 @@ def test_case_impl(case_log, case_name, test_program, errors):
                 None,
             )
 
-    print(("\b" * 6) + "[ ex ]", end="", flush=True)
-    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
+    indicate_progress(start_timepoint, "ex")
     result, ebreak, abort_report, _ = run_test()
 
-    print(("\b" * 6) + "[ ch ]", end="", flush=True)
-    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
+    indicate_progress(start_timepoint, "ch")
     if (fail := run_checks(result, ebreak, abort_report)) is not None:
         return fail
 
@@ -1553,7 +1574,7 @@ def main(args):
 
         print(
             "{}[{}] {}  {}".format(
-                ("\b" * 6),
+                (PROGRESS_INDICATOR_ERASER if PROGRESS_INDICATORS else ""),
                 colorise(tag_color, f"{tag:^4s}")
                 + ((" => " + colorise("light_red", symptom)) if symptom else ""),
                 (
