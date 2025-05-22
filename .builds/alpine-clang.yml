@@ -17,12 +17,33 @@ environment:
   CXXFLAGS_SANITISER:
   PROGRESS_INDICATORS: false  # do not pollute output in CI
 tasks:
-  - build: |
+  - build-preset-debug: |
       cd viuavm/new
+      make clean
+      make PRESET=debug -j
+  - install-preset-debug: |
+      cd viuavm/new
+      make prefix=ci-debug install
+  - test-preset-debug: |
+      cd viuavm/new
+      make test_prefix=ci-debug test
+  - build-preset-test: |
+      cd viuavm/new
+      make clean
       make PRESET=test -j
-  - install: |
+  - install-preset-test: |
       cd viuavm/new
       make prefix=ci-test install
-  - test: |
+  - test-preset-test: |
       cd viuavm/new
       make test_prefix=ci-test test
+  - build-preset-release: |
+      cd viuavm/new
+      make clean
+      make PRESET=release -j
+  - install-preset-release: |
+      cd viuavm/new
+      make prefix=ci-release install
+  - test-preset-release: |
+      cd viuavm/new
+      make test_prefix=ci-release test
