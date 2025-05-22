@@ -15,7 +15,7 @@ exedir=${libexecdir}/viua
 
 
 viua_invoke_tool () {
-    exec ${exedir}/"${@}"
+    exec "${exedir}/${@}"
 }
 
 main () {
@@ -32,10 +32,10 @@ main () {
             exec man viua-viua
             ;;
         --version)
-            exec ${exedir}/vm ${@} | sed 's/ vm//'
+            exec "${exedir}/vm" "${@}" | sed 's/ vm//'
             ;;
         --built-with)
-            exec ${exedir}/vm ${@} | sed 's/ vm//'
+            exec "${exedir}/vm" "${@}" | sed 's/ vm//'
             ;;
         --prefix)
             echo "${prefix}"
