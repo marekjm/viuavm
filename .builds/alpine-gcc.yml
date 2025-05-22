@@ -18,7 +18,10 @@ environment:
 tasks:
   - build: |
       cd viuavm/new
-      make -j
+      make PRESET=test -j
+  - install: |
+      cd viuavm/new
+      make prefix=ci-test install
   - test: |
       cd viuavm/new
-      make test
+      make test_prefix=ci-test test
