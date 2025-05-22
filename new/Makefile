@@ -130,8 +130,11 @@ dist: all
 		viua-$(VIUAVM_VERSION).tar \
 		-o viua-$(VIUAVM_VERSION).tar.zstd
 
+test_prefix?=$(BUILD_PREFIX)
+test_exec_prefix?=$(test_prefix)
 test: all
-	@python3 ./tests/suite.py $(TESTS)
+	test_prefix=$(test_prefix) test_exec_prefix=$(test_exec_prefix) \
+		python3 ./tests/suite.py $(TESTS)
 
 clean-bin:
 	find $(BUILD_PREFIX) -type f -delete 2>/dev/null || true

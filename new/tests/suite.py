@@ -81,8 +81,14 @@ def format_freq(hz):
 
 ENCODING = "utf-8"
 
-PREFIX = os.path.expanduser(os.environ.get("PREFIX", "./build"))
-EXEDIR = os.path.join(PREFIX, "libexec", "viua")
+DEFAULT_PREFIX = "./build"
+PREFIX = os.path.abspath(os.path.expanduser(os.environ.get("test_prefix",
+                                                           DEFAULT_PREFIX)))
+EXEC_PREFIX = os.path.abspath(os.path.expanduser(os.environ.get("test_exec_prefix",
+                                                                PREFIX)))
+LIBEXECDIR = os.path.join(EXEC_PREFIX, "libexec")
+EXEDIR = os.path.join(LIBEXECDIR, "viua")
+
 exe = lambda what: os.path.join(EXEDIR, what)
 INTERPRETER = exe("vm")
 ASSEMBLER = exe("asm")
@@ -1415,6 +1421,10 @@ def main(args):
             )
         )
     cases.sort()
+
+    print("using toolchain in:")
+    print(f"  prefix={PREFIX}")
+    print(f"  exec_prefix={EXEC_PREFIX}")
 
     print("looking for test programs in:")
     print("  {} (found {} test program{})".format(
