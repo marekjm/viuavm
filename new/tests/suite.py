@@ -658,6 +658,7 @@ def consume_live_ebreak_lines(ebreak_lines):
     return ebreak
 
 
+IO_MONITORING_INDICATOR_PAUSE = 0.016
 def run_and_capture(interpreter, executable, *, args=(), stdin=None):
     (
         read_fd,
@@ -728,8 +729,12 @@ def run_and_capture(interpreter, executable, *, args=(), stdin=None):
                 len(trace),
                 fds,
                 ), end="")
-            n += 1
-            time.sleep(0.016 * 2)
+            time.sleep(IO_MONITORING_INDICATOR_PAUSE * 2)
+
+        sp = SPINNER[n % len(SPINNER)]
+        print(("\b" * 6) + f"[ {sp}{sp} ]", end="", flush=True)
+        time.sleep(IO_MONITORING_INDICATOR_PAUSE)
+        n += 1
 
         for fd, events in fds:
             if fd == read_fd and events & select.EPOLLIN:
@@ -1068,9 +1073,13 @@ def test_case_impl_checks(
     return None
 
 
+CASE_PROGRESS_INDICATOR_PAUSE = 0
 def test_case_impl(case_log, case_name, test_program, errors):
     start_timepoint = datetime.datetime.now()
     count_runtime = lambda: (datetime.datetime.now() - start_timepoint)
+
+    print("[ su ]", end="", flush=True)
+    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
 
     # Detect what kind of check the test requires. Some programs need to have
     # their register or memory contents checked, others must produce something
@@ -1105,6 +1114,8 @@ def test_case_impl(case_log, case_name, test_program, errors):
     test_executable = f"{base_path}.elf"
 
     case_log.write("First run\n")
+    print(("\b" * 6) + "[ r1 ]", end="", flush=True)
+    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
 
     asm = lambda out_reloc, in_asm: test_case_impl_asm(case_log, out_reloc, in_asm)
 
@@ -1170,6 +1181,8 @@ def test_case_impl(case_log, case_name, test_program, errors):
     #
     # The first run should assemble, link, and execute the test program, and
     # then ensure that it produced the expected result.
+    print(("\b" * 6) + "[ as ]", end="", flush=True)
+    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
     match asm(test_relocatable, test_program):
         case None:
             pass
@@ -1186,6 +1199,8 @@ def test_case_impl(case_log, case_name, test_program, errors):
     # passed to the linker during the first run, because during the second one
     # all the necessary code will be present in the single disassembled source
     # file (due to static linking).
+    print(("\b" * 6) + "[ ld ]", end="", flush=True)
+    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
     match ld(test_executable, test_relocatable, extra_relocatable_files):
         case None:
             pass
@@ -1198,7 +1213,12 @@ def test_case_impl(case_log, case_name, test_program, errors):
                 None,
             )
 
+    print(("\b" * 6) + "[ ex ]", end="", flush=True)
+    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
     result, ebreak, abort_report, perf = run_test()
+
+    print(("\b" * 6) + "[ ch ]", end="", flush=True)
+    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
     if (fail := run_checks(result, ebreak, abort_report)) is not None:
         return fail
 
@@ -1214,6 +1234,8 @@ def test_case_impl(case_log, case_name, test_program, errors):
         return make_good_report()
 
     case_log.write("Second run\n")
+    print(("\b" * 6) + "[ r2 ]", end="", flush=True)
+    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
 
     # SECOND RUN
     #
@@ -1250,6 +1272,8 @@ def test_case_impl(case_log, case_name, test_program, errors):
             None,
         )
 
+    print(("\b" * 6) + "[ as ]", end="", flush=True)
+    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
     match asm(test_relocatable, test_disassembled_program):
         case None:
             pass
@@ -1262,6 +1286,8 @@ def test_case_impl(case_log, case_name, test_program, errors):
                 None,
             )
 
+    print(("\b" * 6) + "[ ld ]", end="", flush=True)
+    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
     match ld(test_executable, test_relocatable):
         case None:
             pass
@@ -1274,7 +1300,12 @@ def test_case_impl(case_log, case_name, test_program, errors):
                 None,
             )
 
+    print(("\b" * 6) + "[ ex ]", end="", flush=True)
+    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
     result, ebreak, abort_report, _ = run_test()
+
+    print(("\b" * 6) + "[ ch ]", end="", flush=True)
+    time.sleep(CASE_PROGRESS_INDICATOR_PAUSE)
     if (fail := run_checks(result, ebreak, abort_report)) is not None:
         return fail
 
@@ -1509,7 +1540,8 @@ def main(args):
         run_list[tag].append(case_name)
 
         print(
-            "[{}] {}  {}".format(
+            "{}[{}] {}  {}".format(
+                ("\b" * 6),
                 colorise(tag_color, f"{tag:^4s}")
                 + ((" => " + colorise("light_red", symptom)) if symptom else ""),
                 (
