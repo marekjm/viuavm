@@ -1341,8 +1341,9 @@ def prepare_dependencies(cases_dir):
                 dep = dep.strip()
                 dep_sources.add(f"{dep}.asm")
 
-    print(
-        "  preparing dependencies (found {})".format(
+    print("preparing dependencies for:")
+    print("  {} (found {})".format(
+            cases_dir,
             (len(dep_sources) or "none"),
         )
     )
@@ -1415,8 +1416,8 @@ def main(args):
         )
     cases.sort()
 
-    print(
-        "looking for test programs in: {} (found {} test program{})".format(
+    print("looking for test programs in:")
+    print("  {} (found {} test program{})".format(
             CASES_DIR,
             (len(cases) or "no"),
             ("s" if len(cases) != 1 else ""),
@@ -1456,7 +1457,8 @@ def main(args):
         "bork": list_of_bork,
     }
 
-    print("  running cases")
+    print("running cases")
+    print(f"  from {CASES_DIR}")
     for case_no, (
         case_name,
         test_program,
