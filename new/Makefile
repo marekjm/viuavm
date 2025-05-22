@@ -8,9 +8,9 @@
 # of how DESTDIR is used in this Makefile.
 prefix=/usr/local
 exec_prefix=$(prefix)
-libdir=$(prefix)/lib
-libexecdir=$(prefix)/libexec
-bindir=$(prefix)/bin
+libdir=$(exec_prefix)/lib
+libexecdir=$(exec_prefix)/libexec
+bindir=$(exec_prefix)/bin
 sharedir=$(prefix)/share
 mandir=$(sharedir)/man
 
