@@ -899,7 +899,9 @@ def detect_check_kind(test_path):
     raise No_check_file_for(test_path)
 
 
-def test_case_impl_asm(case_log, out_path, asm_path, start_timepoint):
+def test_case_impl_asm(reporting, out_path, asm_path):
+    start_timepoint, case_log = reporting
+
     asm_args = (
         ASSEMBLER,
         "-o",
@@ -926,7 +928,9 @@ def test_case_impl_asm(case_log, out_path, asm_path, start_timepoint):
     return None if r == 0 else asm_args
 
 
-def test_case_impl_ld(case_log, exe_path, reloc_path, extras=()):
+def test_case_impl_ld(reporting, exe_path, reloc_path, extras=()):
+    start_timepoint, case_log = reporting
+
     ld_args = (
         LINKER,
         "-o",
@@ -936,17 +940,37 @@ def test_case_impl_ld(case_log, exe_path, reloc_path, extras=()):
     )
     case_log.write(" ".join(ld_args))
     case_log.write("\n")
-    r = subprocess.call(
+    proc = subprocess.Popen(
         args=ld_args,
-        stderr=subprocess.DEVNULL,
+        stdin=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
+
+    def wait():
+        try:
+            return proc.wait(timeout=PAUSE_60_FPS)
+        except subprocess.TimeoutExpired:
+            return None
+
+    while (r := wait()) is None:
+        indicate_progress(start_timepoint, "as")
+
     return None if r == 0 else ld_args
 
 
 def test_case_impl_checks(
-    case_log, errors, count_runtime, base_path, check_kind, result, ebreak, abort_report
+    reporting,
+    errors,
+    count_runtime,
+    base_path,
+    check_kind,
+    result,
+    ebreak,
+    abort_report,
 ):
+    start_timepoint, case_log = reporting
+
     r_exit = result["exit"]
 
     if r_exit == -6 and check_kind == "abort":
@@ -1164,7 +1188,9 @@ def test_case_impl(case_log, case_name, test_program, errors):
     indicate_progress(start_timepoint, "r1")
 
     asm = lambda out_reloc, in_asm: test_case_impl_asm(
-        case_log, out_reloc, in_asm, start_timepoint
+        (start_timepoint, case_log),
+        out_reloc,
+        in_asm,
     )
 
     # Some tests (usually for the linker) have their source split over several
@@ -1214,7 +1240,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
     random.shuffle(extra_relocatable_files)
 
     ld = lambda out_exec, in_reloc, extras=(): test_case_impl_ld(
-        case_log, out_exec, in_reloc, extras
+        (start_timepoint, case_log), out_exec, in_reloc, extras
     )
     run_test = lambda: run_and_capture(
         start_timepoint,
@@ -1223,7 +1249,14 @@ def test_case_impl(case_log, case_name, test_program, errors):
         stdin=test_stdin,
     )
     run_checks = lambda r, e, a: test_case_impl_checks(
-        case_log, errors, count_runtime, base_path, check_kind, r, e, a
+        (start_timepoint, case_log),
+        errors,
+        count_runtime,
+        base_path,
+        check_kind,
+        r,
+        e,
+        a,
     )
 
     # FIRST RUN
