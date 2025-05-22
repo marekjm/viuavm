@@ -36,10 +36,10 @@ exedir=$(libexecdir)/viua
 
 ################################################################################
 # Build directories
-BUILD=./build
-BUILD_LIBDIR=$(BUILD)/lib
-BUILD_EXEDIR=$(BUILD)/libexec/viua
-BUILD_BINDIR=$(BUILD)/bin
+BUILD_PREFIX=./build
+BUILD_LIBDIR=$(BUILD_PREFIX)/lib
+BUILD_EXEDIR=$(BUILD_PREFIX)/libexec/viua
+BUILD_BINDIR=$(BUILD_PREFIX)/bin
 
 
 ################################################################################
@@ -134,8 +134,8 @@ test: all
 	@python3 ./tests/suite.py $(TESTS)
 
 clean-bin:
-	find $(BUILD) -type f -delete 2>/dev/null || true
-	find $(BUILD) -mindepth 1 -type d -delete 2>/dev/null || true
+	find $(BUILD_PREFIX) -type f -delete 2>/dev/null || true
+	find $(BUILD_PREFIX) -mindepth 1 -type d -delete 2>/dev/null || true
 
 clean-test:
 	find ./tests -type f -name '*.elf' -delete
@@ -222,7 +222,7 @@ watch-tests:
 
 ################################################################################
 # Template rules
-$(BUILD)/%: $(BUILD)/%.o
+$(BUILD_PREFIX)/%: $(BUILD_PREFIX)/%.o
 ifeq ($(VERBOSE),true)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
 else
@@ -230,7 +230,7 @@ else
 	@$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
 endif
 
-$(BUILD_EXEDIR)/%: $(BUILD)/tools/exec/%.o
+$(BUILD_EXEDIR)/%: $(BUILD_PREFIX)/tools/exec/%.o
 	@mkdir -p $(shell dirname $@)
 ifeq ($(VERBOSE),true)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
@@ -243,7 +243,7 @@ $(BUILD_BINDIR)/%: ./src/tools/exec/%.sh
 	@mkdir -p $(BUILD_BINDIR)
 	@cp -v $^ $@
 
-$(BUILD)/%.o: ./src/%.cpp
+$(BUILD_PREFIX)/%.o: ./src/%.cpp
 	@mkdir -p $(shell dirname $@)
 ifeq ($(VERBOSE),true)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -252,7 +252,7 @@ else
 	@$(CXX) $(CXXFLAGS) -c -o $@ $<
 endif
 
-$(BUILD)/%.o: ./src/%.cc
+$(BUILD_PREFIX)/%.o: ./src/%.cc
 	@mkdir -p $(shell dirname $@)
 ifeq ($(VERBOSE),true)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -265,94 +265,94 @@ endif
 ################################################################################
 # Explicit dependencies
 $(BUILD_EXEDIR)/readelf: \
-	$(BUILD)/vm/elf.o \
-	$(BUILD)/support/errno.o \
-	$(BUILD)/support/fdio.o \
-	$(BUILD)/support/tty.o
+	$(BUILD_PREFIX)/vm/elf.o \
+	$(BUILD_PREFIX)/support/errno.o \
+	$(BUILD_PREFIX)/support/fdio.o \
+	$(BUILD_PREFIX)/support/tty.o
 
 VM_OPERATION_TYPE_IMPL=\
-	$(BUILD)/arch/ra.o \
-	$(BUILD)/arch/ops/n.o \
-	$(BUILD)/arch/ops/t.o \
-	$(BUILD)/arch/ops/d.o \
-	$(BUILD)/arch/ops/s.o \
-	$(BUILD)/arch/ops/f.o \
-	$(BUILD)/arch/ops/e.o \
-	$(BUILD)/arch/ops/r.o \
-	$(BUILD)/arch/ops/m.o \
-	$(BUILD)/arch/ops.o
+	$(BUILD_PREFIX)/arch/ra.o \
+	$(BUILD_PREFIX)/arch/ops/n.o \
+	$(BUILD_PREFIX)/arch/ops/t.o \
+	$(BUILD_PREFIX)/arch/ops/d.o \
+	$(BUILD_PREFIX)/arch/ops/s.o \
+	$(BUILD_PREFIX)/arch/ops/f.o \
+	$(BUILD_PREFIX)/arch/ops/e.o \
+	$(BUILD_PREFIX)/arch/ops/r.o \
+	$(BUILD_PREFIX)/arch/ops/m.o \
+	$(BUILD_PREFIX)/arch/ops.o
 
 $(BUILD_EXEDIR)/dis: \
-	$(BUILD)/tools/libs/assembler.o \
-	$(BUILD)/support/errno.o \
-	$(BUILD)/support/fdio.o \
-	$(BUILD)/support/string.o \
-	$(BUILD)/support/tty.o \
-	$(BUILD)/vm/elf.o \
+	$(BUILD_PREFIX)/tools/libs/assembler.o \
+	$(BUILD_PREFIX)/support/errno.o \
+	$(BUILD_PREFIX)/support/fdio.o \
+	$(BUILD_PREFIX)/support/string.o \
+	$(BUILD_PREFIX)/support/tty.o \
+	$(BUILD_PREFIX)/vm/elf.o \
 	$(VM_OPERATION_TYPE_IMPL)
 
 $(BUILD_EXEDIR)/asm: \
-	$(BUILD)/support/errno.o \
-	$(BUILD)/support/fdio.o \
-	$(BUILD)/support/string.o \
-	$(BUILD)/support/tty.o \
-	$(BUILD)/tools/libs/errors/compile_time.o \
-	$(BUILD)/tools/libs/lexer.o \
-	$(BUILD)/tools/libs/stage/error.o \
-	$(BUILD)/tools/libs/stage/save.o \
-	$(BUILD)/tools/libs/assembler.o \
+	$(BUILD_PREFIX)/support/errno.o \
+	$(BUILD_PREFIX)/support/fdio.o \
+	$(BUILD_PREFIX)/support/string.o \
+	$(BUILD_PREFIX)/support/tty.o \
+	$(BUILD_PREFIX)/tools/libs/errors/compile_time.o \
+	$(BUILD_PREFIX)/tools/libs/lexer.o \
+	$(BUILD_PREFIX)/tools/libs/stage/error.o \
+	$(BUILD_PREFIX)/tools/libs/stage/save.o \
+	$(BUILD_PREFIX)/tools/libs/assembler.o \
 	$(VM_OPERATION_TYPE_IMPL)
 
 $(BUILD_EXEDIR)/ld: \
-	$(BUILD)/arch/ra.o \
-	$(BUILD)/arch/ops.o \
-	$(BUILD)/arch/ops/f.o \
-	$(BUILD)/arch/ops/e.o \
-	$(BUILD)/vm/elf.o \
-	$(BUILD)/tools/libs/errors/compile_time.o \
-	$(BUILD)/tools/libs/stage/save.o \
-	$(BUILD)/support/errno.o \
-	$(BUILD)/support/fdio.o \
-	$(BUILD)/support/string.o \
-	$(BUILD)/support/tty.o
+	$(BUILD_PREFIX)/arch/ra.o \
+	$(BUILD_PREFIX)/arch/ops.o \
+	$(BUILD_PREFIX)/arch/ops/f.o \
+	$(BUILD_PREFIX)/arch/ops/e.o \
+	$(BUILD_PREFIX)/vm/elf.o \
+	$(BUILD_PREFIX)/tools/libs/errors/compile_time.o \
+	$(BUILD_PREFIX)/tools/libs/stage/save.o \
+	$(BUILD_PREFIX)/support/errno.o \
+	$(BUILD_PREFIX)/support/fdio.o \
+	$(BUILD_PREFIX)/support/string.o \
+	$(BUILD_PREFIX)/support/tty.o
 
 VM_INSTRUCTION_IMPL=\
-	$(BUILD)/vm/ins/impl/aa.o \
-	$(BUILD)/vm/ins/impl/ebreak.o \
-	$(BUILD)/vm/ins/impl/ecall.o \
-	$(BUILD)/vm/ins/impl/io.o
+	$(BUILD_PREFIX)/vm/ins/impl/aa.o \
+	$(BUILD_PREFIX)/vm/ins/impl/ebreak.o \
+	$(BUILD_PREFIX)/vm/ins/impl/ecall.o \
+	$(BUILD_PREFIX)/vm/ins/impl/io.o
 
 $(BUILD_EXEDIR)/vm: \
-	$(BUILD)/support/errno.o \
-	$(BUILD)/support/fdio.o \
-	$(BUILD)/support/tty.o \
-	$(BUILD)/support/string.o \
-	$(BUILD)/vm/backtrace.o \
-	$(BUILD)/vm/core.o \
-	$(BUILD)/vm/elf.o \
-	$(BUILD)/vm/ins.o \
-	$(BUILD)/vm/ins/proxy.o \
-	$(BUILD)/vm/ins/exec.o \
+	$(BUILD_PREFIX)/support/errno.o \
+	$(BUILD_PREFIX)/support/fdio.o \
+	$(BUILD_PREFIX)/support/tty.o \
+	$(BUILD_PREFIX)/support/string.o \
+	$(BUILD_PREFIX)/vm/backtrace.o \
+	$(BUILD_PREFIX)/vm/core.o \
+	$(BUILD_PREFIX)/vm/elf.o \
+	$(BUILD_PREFIX)/vm/ins.o \
+	$(BUILD_PREFIX)/vm/ins/proxy.o \
+	$(BUILD_PREFIX)/vm/ins/exec.o \
 	$(VM_INSTRUCTION_IMPL) \
-	$(BUILD)/runtime/pid.o \
+	$(BUILD_PREFIX)/runtime/pid.o \
 	$(VM_OPERATION_TYPE_IMPL)
 
 $(BUILD_EXEDIR)/repl: \
-	$(BUILD)/arch/ra.o \
-	$(BUILD)/arch/ops.o \
-	$(BUILD)/vm/backtrace.o \
-	$(BUILD)/vm/core.o \
-	$(BUILD)/vm/elf.o \
-	$(BUILD)/vm/ins.o \
+	$(BUILD_PREFIX)/arch/ra.o \
+	$(BUILD_PREFIX)/arch/ops.o \
+	$(BUILD_PREFIX)/vm/backtrace.o \
+	$(BUILD_PREFIX)/vm/core.o \
+	$(BUILD_PREFIX)/vm/elf.o \
+	$(BUILD_PREFIX)/vm/ins.o \
 	$(VM_INSTRUCTION_IMPL) \
-	$(BUILD)/support/fdio.o \
-	$(BUILD)/support/string.o \
-	$(BUILD)/support/tty.o \
-	$(BUILD)/tools/libs/errors/compile_time.o \
-	$(BUILD)/tools/libs/stage.o \
-	$(BUILD)/tools/libs/assembler.o \
-	$(BUILD)/tools/libs/lexer.o \
-	$(BUILD)/tools/libs/parser.o \
-	$(BUILD)/runtime/pid.o \
+	$(BUILD_PREFIX)/support/fdio.o \
+	$(BUILD_PREFIX)/support/string.o \
+	$(BUILD_PREFIX)/support/tty.o \
+	$(BUILD_PREFIX)/tools/libs/errors/compile_time.o \
+	$(BUILD_PREFIX)/tools/libs/stage.o \
+	$(BUILD_PREFIX)/tools/libs/assembler.o \
+	$(BUILD_PREFIX)/tools/libs/lexer.o \
+	$(BUILD_PREFIX)/tools/libs/parser.o \
+	$(BUILD_PREFIX)/runtime/pid.o \
 	3rd-party/linenoise/linenoise.o \
 	3rd-party/linenoise/encodings/utf8.o
