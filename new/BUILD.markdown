@@ -11,18 +11,25 @@ looks like this:
 
 There are several presets:
 
+ - `debug`: a build optimised for debugging, with sanitisers disabled to avoid
+   them interfering with GDB or Valgrind
  - `default`: an unoptimised build, with sanitisers and plenty of compiler
    warnings enabled
- - `debug`: an unoptimised build, with plenty of compiler warnings, but without
-   sanitisers -- use this if you want to use Valgrind or GDB
- - `release`: an optimised build, with sanitisers and plenty of compiler
-   warnings enabled
+ - `release`: an optimised build, with sanitisers disabled
+ - `test`: a build with basic optimisations enabled, and with sanitisers also
+   enabled
 
 The presets are defined in `Makefile.d/Preset/` directory.
 
 How to choose a preset?
 
     ]$ make PRESET=preset -j
+
+The `default` preset is intended for day to day development work and manual
+testing; the `test` preset should be used in CI environments.
+Use the `debug` preset when inspecting problems with the VM.
+The `release` preset is intended to be used for deployment and end-user
+installations.
 
 --------------------------------------------------------------------------------
 

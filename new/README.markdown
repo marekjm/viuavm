@@ -24,26 +24,28 @@ Actor Model.
 .end
 ```
 
-The above code can be assembler and run using the following commands:
+The above code can be assembled and run using the following commands:
 
 ```
-]$ ./build/bin/asm -o readme.elf readme.asm
-]$ ./build/bin/vm readme.elf
+]$ ./build/libexec/viua/asm -o readme.o readme.asm
+]$ ./build/libexec/viua/ld -o readme.elf readme.o
+]$ ./build/libexec/viua/vm readme.elf
 ```
 
 ...and inspected using the following commands:
 
 ```
+]$ file readme.*
 ]$ readelf readme.elf
-]$ ./build/bin/readelf readme.elf
-]$ ./build/bin/dis readme.elf
+]$ ./build/libexec/viua/readelf readme.elf
+]$ ./build/libexec/viua/dis readme.elf
 ```
 
 In case of bugs, or when step by step execution is useful, a simple debugger is
 also available:
 
 ```
-]$ ./build/bin/repl
+]$ ./build/libexec/viua/repl
 ```
 
 ## Tools
@@ -53,7 +55,8 @@ are:
 
 - `vm`: the actual VM implementation used to run executable ELF files containing
   Viua bytecode
-- `asm` and `dis`: assembler and disassembler
+- `asm` and `dis`: the assembler and the disassembler
+- `ld`: the linker
 - `readelf`: a `readelf(1)` specific to Viua ELFs (the usual one is still useful
   as Viua ELFs are valid ELF files)
 - `repl`: a primitive debugger
@@ -67,10 +70,28 @@ using GNU Make:
 
 ```
 ]$ make -j      # or make VERBOSE=true -j to see full compiler invocations
-]$ ./build/bin/vm --version -v
+]$ ./build/libexec/viua/vm --version
+]$ ./build/libexec/viua/vm --version --verbose
 ```
 
 See [BUILD](./BUILD.markdown) for more information.
+
+--------------------------------------------------------------------------------
+
+## Installation
+
+After having built the toolchain, you can install it with the following command:
+
+```
+]$ make install
+```
+
+If you need to install into a directory different than /usr/local, you must
+override the default prefix with:
+
+```
+]$ make prefix=~/.local install
+```
 
 --------------------------------------------------------------------------------
 
