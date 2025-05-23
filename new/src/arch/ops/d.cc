@@ -26,24 +26,28 @@
 
 
 namespace viua::arch::ops {
-D::D(viua::arch::opcode_type const op,
-     Register_access const o,
-     Register_access const i)
-        : opcode{op}, out{o}, in{i}
+D::D(
+    viua::arch::opcode_type const op,
+    Register_access const o,
+    Register_access const i)
+    : opcode{ op }
+    , out{ o }
+    , in{ i }
 {}
-auto D::decode(instruction_type const raw) -> D
+auto D::decode(
+    instruction_type const raw) -> D
 {
     auto opcode =
-        static_cast<viua::arch::opcode_type>(raw & 0x000000000000ffff);
-    auto out = Register_access::decode((raw & 0x00000000ffff0000) >> 16);
-    auto in  = Register_access::decode((raw & 0x0000ffff00000000) >> 32);
-    return D{opcode, out, in};
+        static_cast<viua::arch::opcode_type>(raw & 0x00'00'00'00'00'00'ff'ff);
+    auto out = Register_access::decode((raw & 0x00'00'00'00'ff'ff'00'00) >> 16);
+    auto in  = Register_access::decode((raw & 0x00'00'ff'ff'00'00'00'00) >> 32);
+    return D{ opcode, out, in };
 }
 auto D::encode() const -> instruction_type
 {
-    auto base            = uint64_t{opcode};
-    auto output_register = uint64_t{out.encode()};
-    auto input_register  = uint64_t{in.encode()};
+    auto base            = uint64_t{ opcode };
+    auto output_register = uint64_t{ out.encode() };
+    auto input_register  = uint64_t{ in.encode() };
     return base | (output_register << 16) | (input_register << 32);
 }
 auto D::to_string() const -> std::string

@@ -17,54 +17,65 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string>
 #include <sstream>
+#include <string>
 
 #include <viua/arch/arch.h>
 
 
 namespace viua::arch {
 Register_access::Register_access()
-        : set{viua::arch::REGISTER_SET::VOID}, direct{true}, index{0}
+    : set{ viua::arch::REGISTER_SET::VOID }
+    , direct{ true }
+    , index{ 0 }
 {}
-Register_access::Register_access(viua::arch::REGISTER_SET const s,
-                                 bool const d,
-                                 uint8_t const i)
-        : set{s}, direct{d}, index{i}
+Register_access::Register_access(
+    viua::arch::REGISTER_SET const s,
+    bool const d,
+    uint8_t const i)
+    : set{ s }
+    , direct{ d }
+    , index{ i }
 {}
-auto Register_access::decode(uint16_t const raw) -> Register_access
+auto Register_access::decode(
+    uint16_t const raw) -> Register_access
 {
-    auto set    = static_cast<viua::arch::REGISTER_SET>((raw & 0x0e00) >> 9);
-    auto direct = static_cast<bool>(raw & 0x0100);
-    auto index  = static_cast<uint8_t>(raw & 0x00ff);
-    return Register_access{set, direct, index};
+    auto set    = static_cast<viua::arch::REGISTER_SET>((raw & 0x0e'00) >> 9);
+    auto direct = static_cast<bool>(raw & 0x01'00);
+    auto index  = static_cast<uint8_t>(raw & 0x00'ff);
+    return Register_access{ set, direct, index };
 }
 auto Register_access::encode() const -> uint16_t
 {
-    auto base = uint16_t{index};
+    auto base = uint16_t{ index };
     auto mode = static_cast<uint16_t>(direct);
     auto rset = static_cast<uint16_t>(set);
     return static_cast<uint16_t>(base | (mode << 8) | (rset << 9));
 }
 
-auto Register_access::make_local(uint8_t const index, bool const direct)
-    -> Register_access
+auto Register_access::make_local(
+    uint8_t const index,
+    bool const direct) -> Register_access
 {
-    return Register_access{viua::arch::REGISTER_SET::LOCAL, direct, index};
+    return Register_access{ viua::arch::REGISTER_SET::LOCAL, direct, index };
 }
-auto Register_access::make_argument(uint8_t const index, bool const direct)
-    -> Register_access
+auto Register_access::make_argument(
+    uint8_t const index,
+    bool const direct) -> Register_access
 {
-    return Register_access{viua::arch::REGISTER_SET::ARGUMENT, direct, index};
+    return Register_access{ viua::arch::REGISTER_SET::ARGUMENT, direct, index };
 }
-auto Register_access::make_parameter(uint8_t const index, bool const direct)
-    -> Register_access
+auto Register_access::make_parameter(
+    uint8_t const index,
+    bool const direct) -> Register_access
 {
-    return Register_access{viua::arch::REGISTER_SET::PARAMETER, direct, index};
+    return Register_access{ viua::arch::REGISTER_SET::PARAMETER,
+                            direct,
+                            index };
 }
 auto Register_access::make_void() -> Register_access
 {
-    return Register_access{viua::arch::REGISTER_SET::VOID, true, 0};
+    return Register_access{ viua::arch::REGISTER_SET::VOID, true, 0 };
 }
 
 auto Register_access::to_string() const -> std::string
@@ -79,17 +90,17 @@ auto Register_access::to_string() const -> std::string
     out << '.';
     switch (set) {
         using enum viua::arch::REGISTER_SET;
-    case VOID:
-        return "void";
-    case LOCAL:
-        out << 'l';
-        break;
-    case ARGUMENT:
-        out << 'a';
-        break;
-    case PARAMETER:
-        out << 'p';
-        break;
+        case VOID:
+            return "void";
+        case LOCAL:
+            out << 'l';
+            break;
+        case ARGUMENT:
+            out << 'a';
+            break;
+        case PARAMETER:
+            out << 'p';
+            break;
     }
     return out.str();
 }

@@ -31,58 +31,62 @@
 
 namespace viua::support {
 template<typename... Ts>
-auto errorln(std::format_string<Ts...> fmt, Ts&&... args) -> void
+auto errorln(
+    std::format_string<Ts...> fmt,
+    Ts&&... args) -> void
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_RED;
     using viua::support::tty::send_escape_seq;
 
-    std::println(
-        stderr
-        , "{}error{}: {}"
-        , send_escape_seq(2, COLOR_FG_RED)
-        , send_escape_seq(2, ATTR_RESET)
-        , std::format(std::move(fmt), std::forward<Ts>(args)...));
+    std::println(stderr,
+                 "{}error{}: {}",
+                 send_escape_seq(2, COLOR_FG_RED),
+                 send_escape_seq(2, ATTR_RESET),
+                 std::format(std::move(fmt), std::forward<Ts>(args)...));
 }
 
 template<typename... Ts>
-auto errorln(std::filesystem::path const path, std::format_string<Ts...> fmt, Ts&&... args) -> void
+auto errorln(
+    std::filesystem::path const path,
+    std::format_string<Ts...> fmt,
+    Ts&&... args) -> void
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_RED;
     using viua::support::tty::COLOR_FG_WHITE;
     using viua::support::tty::send_escape_seq;
 
-    std::println(
-        stderr
-        , "{}{}{}: {}error{}: {}"
-        , send_escape_seq(2, COLOR_FG_WHITE)
-        , path.native()
-        , send_escape_seq(2, ATTR_RESET)
-        , send_escape_seq(2, COLOR_FG_RED)
-        , send_escape_seq(2, ATTR_RESET)
-        , std::format(std::move(fmt), std::forward<Ts>(args)...));
+    std::println(stderr,
+                 "{}{}{}: {}error{}: {}",
+                 send_escape_seq(2, COLOR_FG_WHITE),
+                 path.native(),
+                 send_escape_seq(2, ATTR_RESET),
+                 send_escape_seq(2, COLOR_FG_RED),
+                 send_escape_seq(2, ATTR_RESET),
+                 std::format(std::move(fmt), std::forward<Ts>(args)...));
 }
 
 template<typename... Ts>
-auto noteln(std::filesystem::path const path, std::format_string<Ts...> fmt, Ts&&... args) -> void
+auto noteln(
+    std::filesystem::path const path,
+    std::format_string<Ts...> fmt,
+    Ts&&... args) -> void
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_CYAN;
     using viua::support::tty::COLOR_FG_WHITE;
     using viua::support::tty::send_escape_seq;
 
-    std::println(
-        stderr
-        , "{}{}{}: {}note{}: {}"
-        , send_escape_seq(2, COLOR_FG_WHITE)
-        , path.native()
-        , send_escape_seq(2, ATTR_RESET)
-        , send_escape_seq(2, COLOR_FG_CYAN)
-        , send_escape_seq(2, ATTR_RESET)
-        , std::format(std::move(fmt), std::forward<Ts>(args)...));
+    std::println(stderr,
+                 "{}{}{}: {}note{}: {}",
+                 send_escape_seq(2, COLOR_FG_WHITE),
+                 path.native(),
+                 send_escape_seq(2, ATTR_RESET),
+                 send_escape_seq(2, COLOR_FG_CYAN),
+                 send_escape_seq(2, ATTR_RESET),
+                 std::format(std::move(fmt), std::forward<Ts>(args)...));
 }
 }  // namespace viua::support
 
 #endif
-

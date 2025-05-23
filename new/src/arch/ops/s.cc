@@ -26,20 +26,24 @@
 
 
 namespace viua::arch::ops {
-S::S(viua::arch::opcode_type const op, Register_access const o)
-        : opcode{op}, out{o}
+S::S(
+    viua::arch::opcode_type const op,
+    Register_access const o)
+    : opcode{ op }
+    , out{ o }
 {}
-auto S::decode(instruction_type const raw) -> S
+auto S::decode(
+    instruction_type const raw) -> S
 {
     auto opcode =
-        static_cast<viua::arch::opcode_type>(raw & 0x000000000000ffff);
-    auto out = Register_access::decode((raw & 0x00000000ffff0000) >> 16);
-    return S{opcode, out};
+        static_cast<viua::arch::opcode_type>(raw & 0x00'00'00'00'00'00'ff'ff);
+    auto out = Register_access::decode((raw & 0x00'00'00'00'ff'ff'00'00) >> 16);
+    return S{ opcode, out };
 }
 auto S::encode() const -> instruction_type
 {
-    auto base            = uint64_t{opcode};
-    auto output_register = uint64_t{out.encode()};
+    auto base            = uint64_t{ opcode };
+    auto output_register = uint64_t{ out.encode() };
     return base | (output_register << 16);
 }
 auto S::to_string() const -> std::string

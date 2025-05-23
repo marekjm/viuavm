@@ -19,8 +19,8 @@
 
 #include <string.h>
 
-#include <viua/support/fdstream.h>
 #include <viua/arch/arch.h>
+#include <viua/support/fdstream.h>
 #include <viua/vm/ins.h>
 
 
@@ -32,13 +32,16 @@ namespace viua::vm::ins {
 using namespace viua::arch::ins;
 using viua::vm::Stack;
 
-auto execute(IO_SUBMIT const op, Stack& stack, ip_type const) -> void
+auto execute(
+    IO_SUBMIT const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto const dst     = mutable_proxy(stack, op.instruction.out);
     auto const io_desc = immutable_proxy(stack, op.instruction.lhs);
 
     if (not io_desc.holds<register_type::pointer_type>()) {
-        throw abort_execution{stack, "invalid I/O request description"};
+        throw abort_execution{ stack, "invalid I/O request description" };
     }
 
     auto const req_ptr_raw = io_desc.get<register_type::pointer_type>()->ptr;
@@ -53,45 +56,48 @@ auto execute(IO_SUBMIT const op, Stack& stack, ip_type const) -> void
     io_port = le64toh(io_port);
 
     auto const size_ptr = req_ptr + (sizeof(uint64_t) * 2);
-    auto buffer_size    = uint64_t{0};
+    auto buffer_size    = uint64_t{ 0 };
     memcpy(&buffer_size, size_ptr, sizeof(buffer_size));
     buffer_size = le64toh(buffer_size);
 
-    auto data_ptr_raw = uintptr_t{0};
+    auto data_ptr_raw = uintptr_t{ 0 };
     memcpy(
         &data_ptr_raw, req_ptr + (sizeof(uint64_t) * 3), sizeof(data_ptr_raw));
     auto const data_ptr = stack.proc->memory_at(data_ptr_raw);
 
     switch (io_op) {
-    case 0:
-    {
-        auto buffer   = io::buffer_view{data_ptr, buffer_size};
-        auto const rd = stack.proc->core->io.schedule(
-            reinterpret_cast<uint8_t*>(req_ptr_raw),
-            io_port,
-            IORING_OP_READ,
-            std::move(buffer));
-        dst = rd;
-        break;
-    }
-    case 1:
-    {
-        auto buffer =
-            std::string{reinterpret_cast<char*>(data_ptr), buffer_size};
-        auto const rd = stack.proc->core->io.schedule(
-            io_port, IORING_OP_WRITE, std::move(buffer));
-        dst = rd;
-        break;
-    }
+        case 0:
+            {
+                auto buffer   = io::buffer_view{ data_ptr, buffer_size };
+                auto const rd = stack.proc->core->io.schedule(
+                    reinterpret_cast<uint8_t*>(req_ptr_raw),
+                    io_port,
+                    IORING_OP_READ,
+                    std::move(buffer));
+                dst = rd;
+                break;
+            }
+        case 1:
+            {
+                auto buffer   = std::string{ reinterpret_cast<char*>(data_ptr),
+                                           buffer_size };
+                auto const rd = stack.proc->core->io.schedule(
+                    io_port, IORING_OP_WRITE, std::move(buffer));
+                dst = rd;
+                break;
+            }
     }
 }
-auto execute(IO_WAIT const op, Stack& stack, ip_type const) -> void
+auto execute(
+    IO_WAIT const op,
+    Stack& stack,
+    ip_type const) -> void
 {
     auto dst = mutable_proxy(stack, op.instruction.out);
     auto req = mutable_proxy(stack, op.instruction.lhs);
 
     if (not req.holds<uint64_t>()) {
-        throw abort_execution{stack, "invalid I/O request ID"};
+        throw abort_execution{ stack, "invalid I/O request ID" };
     }
 
     auto const want_id = *req.get<uint64_t>();
@@ -116,7 +122,8 @@ auto execute(IO_WAIT const op, Stack& stack, ip_type const) -> void
                     memcpy(size_ptr, &buffer_size, sizeof(buffer_size));
 
                     dst = register_type::pointer_type{
-                        reinterpret_cast<uint64_t>(rd.req_ptr)};
+                        reinterpret_cast<uint64_t>(rd.req_ptr)
+                    };
                 } else if (rd.opcode == IORING_OP_WRITE) {
                     /* ignore */
                 }
@@ -128,10 +135,19 @@ auto execute(IO_WAIT const op, Stack& stack, ip_type const) -> void
 
     stack.proc->core->io.requests.erase(want_id);
 }
-auto execute(IO_SHUTDOWN const, Stack&, ip_type const) -> void
+auto execute(
+    IO_SHUTDOWN const,
+    Stack&,
+    ip_type const) -> void
 {}
-auto execute(IO_CTL const, Stack&, ip_type const) -> void
+auto execute(
+    IO_CTL const,
+    Stack&,
+    ip_type const) -> void
 {}
-auto execute(IO_PEEK const, Stack&, ip_type const) -> void
+auto execute(
+    IO_PEEK const,
+    Stack&,
+    ip_type const) -> void
 {}
 }  // namespace viua::vm::ins

@@ -26,27 +26,32 @@
 
 
 namespace viua::arch::ops {
-E::E(viua::arch::opcode_type const op,
-     Register_access const o,
-     uint64_t const i)
-        : opcode{op}, out{o}, immediate{i}
+E::E(
+    viua::arch::opcode_type const op,
+    Register_access const o,
+    uint64_t const i)
+    : opcode{ op }
+    , out{ o }
+    , immediate{ i }
 {}
-auto E::decode(instruction_type const raw) -> E
+auto E::decode(
+    instruction_type const raw) -> E
 {
     auto const opcode =
-        static_cast<viua::arch::opcode_type>(raw & 0x000000000000ffff);
-    auto const out  = Register_access::decode((raw & 0x00000000ffff0000) >> 16);
-    auto const high = (((raw >> 28) & 0xf) << 32);
-    auto const low  = ((raw >> 32) & 0x00000000ffffffff);
+        static_cast<viua::arch::opcode_type>(raw & 0x00'00'00'00'00'00'ff'ff);
+    auto const out =
+        Register_access::decode((raw & 0x00'00'00'00'ff'ff'00'00) >> 16);
+    auto const high  = (((raw >> 28) & 0xf) << 32);
+    auto const low   = ((raw >> 32) & 0x00'00'00'00'ff'ff'ff'ff);
     auto const value = (high | low);
-    return E{opcode, out, value};
+    return E{ opcode, out, value };
 }
 auto E::encode() const -> instruction_type
 {
-    auto base            = uint64_t{opcode};
-    auto output_register = uint64_t{out.encode()};
-    auto high            = ((immediate & 0x0000000f00000000) >> 32);
-    auto low             = (immediate & 0x00000000ffffffff);
+    auto base            = uint64_t{ opcode };
+    auto output_register = uint64_t{ out.encode() };
+    auto high            = ((immediate & 0x00'00'00'0f'00'00'00'00) >> 32);
+    auto low             = (immediate & 0x00'00'00'00'ff'ff'ff'ff);
     return base | (output_register << 16) | (high << 28) | (low << 32);
 }
 auto E::to_string() const -> std::string

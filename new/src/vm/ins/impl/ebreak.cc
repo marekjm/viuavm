@@ -22,8 +22,8 @@
 
 #include <iostream>
 
-#include <viua/support/fdstream.h>
 #include <viua/arch/arch.h>
+#include <viua/support/fdstream.h>
 #include <viua/vm/backtrace.h>
 #include <viua/vm/ins.h>
 
@@ -36,7 +36,8 @@ namespace viua::vm::ins {
 using namespace viua::arch::ins;
 using viua::vm::Stack;
 
-auto dump_globals(Stack const& stack) -> void
+auto dump_globals(
+    Stack const& stack) -> void
 {
     viua::TRACE_STREAM << "  globals:" << viua::TRACE_STREAM.endl;
 
@@ -85,12 +86,15 @@ auto dump_globals(Stack const& stack) -> void
         } else if (auto const v = each.get<register_type::atom_type>(); v) {
             TRACE_STREAM << "atom " << atoms.at(v->key) << '\n';
         } else if (auto const v = each.get<register_type::pid_type>(); v) {
-            TRACE_STREAM << "pid " << viua::runtime::PID{*v}.to_string()
+            TRACE_STREAM << "pid " << viua::runtime::PID{ *v }.to_string()
                          << '\n';
         }
     }
 }
-auto execute(EBREAK const, Stack& stack, ip_type const) -> void
+auto execute(
+    EBREAK const,
+    Stack& stack,
+    ip_type const) -> void
 {
     viua::TRACE_STREAM << "begin ebreak in process "
                        << stack.proc->pid.to_string()
@@ -100,7 +104,7 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
     viua::vm::backtrace::print_backtrace(stack);
 
     viua::TRACE_STREAM << "  register contents:" << viua::TRACE_STREAM.endl;
-    for (auto i = size_t{0}; i < stack.frames.size(); ++i) {
+    for (auto i = size_t{ 0 }; i < stack.frames.size(); ++i) {
         auto const& each = stack.frames.at(i);
 
         viua::TRACE_STREAM << "    of #" << i << viua::TRACE_STREAM.endl;
@@ -114,8 +118,10 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
                      << "iu " << std::hex << std::setw(16) << std::setfill('0')
                      << sbrk << " " << std::dec << sbrk << '\n';
 
-        viua::vm::backtrace::dump_registers(each.parameters, stack.proc->atoms, "p");
-        viua::vm::backtrace::dump_registers(each.registers, stack.proc->atoms, "l");
+        viua::vm::backtrace::dump_registers(
+            each.parameters, stack.proc->atoms, "p");
+        viua::vm::backtrace::dump_registers(
+            each.registers, stack.proc->atoms, "l");
     }
     viua::vm::backtrace::dump_registers(stack.args, stack.proc->atoms, "a");
 
@@ -128,4 +134,3 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
                        << viua::TRACE_STREAM.endl;
 }
 }  // namespace viua::vm::ins
-

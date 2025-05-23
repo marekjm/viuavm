@@ -28,39 +28,46 @@
 
 
 namespace viua::arch::ops {
-R::R(viua::arch::opcode_type const op,
-     Register_access const o,
-     Register_access const i,
-     uint32_t const im)
-        : opcode{op}, out{o}, in{i}, immediate{im}
+R::R(
+    viua::arch::opcode_type const op,
+    Register_access const o,
+    Register_access const i,
+    uint32_t const im)
+    : opcode{ op }
+    , out{ o }
+    , in{ i }
+    , immediate{ im }
 {}
-auto R::decode(instruction_type const raw) -> R
+auto R::decode(
+    instruction_type const raw) -> R
 {
     auto const opcode =
-        static_cast<viua::arch::opcode_type>(raw & 0x000000000000ffff);
-    auto const out = Register_access::decode((raw & 0x00000000ffff0000) >> 16);
-    auto const in  = Register_access::decode((raw & 0x0000ffff00000000) >> 32);
+        static_cast<viua::arch::opcode_type>(raw & 0x00'00'00'00'00'00'ff'ff);
+    auto const out =
+        Register_access::decode((raw & 0x00'00'00'00'ff'ff'00'00) >> 16);
+    auto const in =
+        Register_access::decode((raw & 0x00'00'ff'ff'00'00'00'00) >> 32);
 
     auto const low_short =
-        static_cast<uint32_t>((raw & 0xffff000000000000) >> 48);
+        static_cast<uint32_t>((raw & 0xff'ff'00'00'00'00'00'00) >> 48);
     auto const low_nibble =
-        static_cast<uint32_t>((raw & 0x0000f00000000000) >> 44);
+        static_cast<uint32_t>((raw & 0x00'00'f0'00'00'00'00'00) >> 44);
     auto const high_nibble =
-        static_cast<uint32_t>((raw & 0x00000000f0000000) >> 28);
+        static_cast<uint32_t>((raw & 0x00'00'00'00'f0'00'00'00) >> 28);
 
     auto const immediate = low_short | (low_nibble << 16) | (high_nibble << 20);
 
-    return R{opcode, out, in, immediate};
+    return R{ opcode, out, in, immediate };
 }
 auto R::encode() const -> instruction_type
 {
-    auto base            = uint64_t{opcode};
-    auto output_register = uint64_t{out.encode()};
-    auto input_register  = uint64_t{in.encode()};
+    auto base            = uint64_t{ opcode };
+    auto output_register = uint64_t{ out.encode() };
+    auto input_register  = uint64_t{ in.encode() };
 
-    auto const high_nibble = uint64_t{(immediate & 0x00f00000) >> 20};
-    auto const low_nibble  = uint64_t{(immediate & 0x000f0000) >> 16};
-    auto const low_short   = uint64_t{(immediate & 0x0000ffff) >> 0};
+    auto const high_nibble = uint64_t{ (immediate & 0x00'f0'00'00) >> 20 };
+    auto const low_nibble  = uint64_t{ (immediate & 0x00'0f'00'00) >> 16 };
+    auto const low_short   = uint64_t{ (immediate & 0x00'00'ff'ff) >> 0 };
 
     return base | (output_register << 16) | (input_register << 32)
            | (low_short << 48) | (high_nibble << 28) | (low_nibble << 44);
@@ -68,7 +75,7 @@ auto R::encode() const -> instruction_type
 auto R::to_string() const -> std::string
 {
     auto imm_str = std::to_string(immediate);
-    if (not(opcode & viua::arch::ops::UNSIGNED)) {
+    if (not (opcode & viua::arch::ops::UNSIGNED)) {
         auto tmp = int32_t{};
         memcpy(&tmp, &immediate, sizeof(immediate));
         tmp     = ((tmp << 8) >> 8);  // sign extend

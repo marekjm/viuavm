@@ -26,27 +26,32 @@
 
 
 namespace viua::arch::ops {
-T::T(viua::arch::opcode_type const op,
-     Register_access const o,
-     Register_access const l,
-     Register_access const r)
-        : opcode{op}, out{o}, lhs{l}, rhs{r}
+T::T(
+    viua::arch::opcode_type const op,
+    Register_access const o,
+    Register_access const l,
+    Register_access const r)
+    : opcode{ op }
+    , out{ o }
+    , lhs{ l }
+    , rhs{ r }
 {}
-auto T::decode(instruction_type const raw) -> T
+auto T::decode(
+    instruction_type const raw) -> T
 {
     auto opcode =
-        static_cast<viua::arch::opcode_type>(raw & 0x000000000000ffff);
-    auto out = Register_access::decode((raw & 0x00000000ffff0000) >> 16);
-    auto lhs = Register_access::decode((raw & 0x0000ffff00000000) >> 32);
-    auto rhs = Register_access::decode((raw & 0xffff000000000000) >> 48);
-    return T{opcode, out, lhs, rhs};
+        static_cast<viua::arch::opcode_type>(raw & 0x00'00'00'00'00'00'ff'ff);
+    auto out = Register_access::decode((raw & 0x00'00'00'00'ff'ff'00'00) >> 16);
+    auto lhs = Register_access::decode((raw & 0x00'00'ff'ff'00'00'00'00) >> 32);
+    auto rhs = Register_access::decode((raw & 0xff'ff'00'00'00'00'00'00) >> 48);
+    return T{ opcode, out, lhs, rhs };
 }
 auto T::encode() const -> instruction_type
 {
-    auto base                = uint64_t{opcode};
-    auto output_register     = uint64_t{out.encode()};
-    auto left_hand_register  = uint64_t{lhs.encode()};
-    auto right_hand_register = uint64_t{rhs.encode()};
+    auto base                = uint64_t{ opcode };
+    auto output_register     = uint64_t{ out.encode() };
+    auto left_hand_register  = uint64_t{ lhs.encode() };
+    auto right_hand_register = uint64_t{ rhs.encode() };
     return base | (output_register << 16) | (left_hand_register << 32)
            | (right_hand_register << 48);
 }

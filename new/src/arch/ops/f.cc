@@ -28,24 +28,28 @@
 
 
 namespace viua::arch::ops {
-F::F(viua::arch::opcode_type const op,
-     Register_access const o,
-     uint32_t const i)
-        : opcode{op}, out{o}, immediate{i}
+F::F(
+    viua::arch::opcode_type const op,
+    Register_access const o,
+    uint32_t const i)
+    : opcode{ op }
+    , out{ o }
+    , immediate{ i }
 {}
-auto F::decode(instruction_type const raw) -> F
+auto F::decode(
+    instruction_type const raw) -> F
 {
     auto opcode =
-        static_cast<viua::arch::opcode_type>(raw & 0x000000000000ffff);
-    auto out   = Register_access::decode((raw & 0x00000000ffff0000) >> 16);
+        static_cast<viua::arch::opcode_type>(raw & 0x00'00'00'00'00'00'ff'ff);
+    auto out = Register_access::decode((raw & 0x00'00'00'00'ff'ff'00'00) >> 16);
     auto value = le32toh(static_cast<uint32_t>(raw >> 32));
-    return F{opcode, out, value};
+    return F{ opcode, out, value };
 }
 auto F::encode() const -> instruction_type
 {
-    auto base            = uint64_t{opcode};
-    auto output_register = uint64_t{out.encode()};
-    auto value           = uint64_t{htole32(immediate)};
+    auto base            = uint64_t{ opcode };
+    auto output_register = uint64_t{ out.encode() };
+    auto value           = uint64_t{ htole32(immediate) };
     return base | (output_register << 16) | (value << 32);
 }
 auto F::to_string() const -> std::string

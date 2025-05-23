@@ -43,6 +43,9 @@ using namespace viua::arch::ins;
 using viua::vm::Stack;
 using ip_type = viua::arch::instruction_type const*;
 
-auto execute(ECALL const, Stack&, ip_type const) -> void
+auto execute(
+    ECALL const,
+    Stack&,
+    ip_type const) -> void
 {}
 }  // namespace viua::vm::ins

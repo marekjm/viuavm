@@ -30,17 +30,20 @@
 
 
 namespace viua::arch::ops {
-N::N(viua::arch::opcode_type const op) : opcode{op}
+N::N(
+    viua::arch::opcode_type const op)
+    : opcode{ op }
 {}
-auto N::decode(instruction_type const raw) -> N
+auto N::decode(
+    instruction_type const raw) -> N
 {
     auto const opcode =
-        static_cast<viua::arch::opcode_type>(raw & 0x000000000000ffff);
+        static_cast<viua::arch::opcode_type>(raw & 0x00'00'00'00'00'00'ff'ff);
 
-    return N{opcode};
+    return N{ opcode };
 }
 auto N::encode() const -> instruction_type
 {
-    return uint64_t{opcode};
+    return uint64_t{ opcode };
 }
 }  // namespace viua::arch::ops

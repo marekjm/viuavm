@@ -28,68 +28,77 @@ namespace viua::vm::ins {
 using namespace viua::arch::ins;
 using viua::vm::Stack;
 
-auto mutable_proxy(Stack& stack, access_type const a) -> Mutable_proxy
+auto mutable_proxy(
+    Stack& stack,
+    access_type const a) -> Mutable_proxy
 {
     if (not a.direct) {
-        throw abort_execution{stack, "dereferences are not implemented"};
+        throw abort_execution{ stack, "dereferences are not implemented" };
     }
 
     switch (a.set) {
         using enum viua::arch::REGISTER_SET;
-    case VOID:
-        return {nullptr};
-    case LOCAL:
-        return {&stack.frames.back().registers.at(a.index)};
-    case PARAMETER:
-        return {&stack.frames.back().parameters.at(a.index)};
-    case ARGUMENT:
-        return {&stack.args.at(a.index)};
-    default:
-        throw abort_execution{
-            stack, "illegal write access to register " + a.to_string()};
+        case VOID:
+            return { nullptr };
+        case LOCAL:
+            return { &stack.frames.back().registers.at(a.index) };
+        case PARAMETER:
+            return { &stack.frames.back().parameters.at(a.index) };
+        case ARGUMENT:
+            return { &stack.args.at(a.index) };
+        default:
+            throw abort_execution{
+                stack, "illegal write access to register " + a.to_string()
+            };
     }
 }
-auto immutable_proxy(Stack& stack, access_type const a) -> Immutable_proxy
+auto immutable_proxy(
+    Stack& stack,
+    access_type const a) -> Immutable_proxy
 {
     if (not a.direct) {
-        throw abort_execution{stack, "dereferences are not implemented"};
+        throw abort_execution{ stack, "dereferences are not implemented" };
     }
 
     static register_type const void_placeholder;
     switch (a.set) {
         using enum viua::arch::REGISTER_SET;
-    case VOID:
-        return void_placeholder;
-    case LOCAL:
-        return stack.frames.back().registers.at(a.index);
-    case PARAMETER:
-        return stack.frames.back().parameters.at(a.index);
-    case ARGUMENT:
-        return stack.args.at(a.index);
-    default:
-        throw abort_execution{
-            stack, "illegal read access to register " + a.to_string()};
+        case VOID:
+            return void_placeholder;
+        case LOCAL:
+            return stack.frames.back().registers.at(a.index);
+        case PARAMETER:
+            return stack.frames.back().parameters.at(a.index);
+        case ARGUMENT:
+            return stack.args.at(a.index);
+        default:
+            throw abort_execution{
+                stack, "illegal read access to register " + a.to_string()
+            };
     }
 }
-auto immutable_proxy(Frame& frame, access_type const a, Stack const& stack)
-    -> Immutable_proxy
+auto immutable_proxy(
+    Frame& frame,
+    access_type const a,
+    Stack const& stack) -> Immutable_proxy
 {
     if (not a.direct) {
-        throw abort_execution{stack, "dereferences are not implemented"};
+        throw abort_execution{ stack, "dereferences are not implemented" };
     }
 
     static register_type const void_placeholder;
     switch (a.set) {
         using enum viua::arch::REGISTER_SET;
-    case VOID:
-        return void_placeholder;
-    case LOCAL:
-        return frame.registers.at(a.index);
-    case PARAMETER:
-        return frame.parameters.at(a.index);
-    default:
-        throw abort_execution{
-            stack, "illegal read access to register " + a.to_string()};
+        case VOID:
+            return void_placeholder;
+        case LOCAL:
+            return frame.registers.at(a.index);
+        case PARAMETER:
+            return frame.parameters.at(a.index);
+        default:
+            throw abort_execution{
+                stack, "illegal read access to register " + a.to_string()
+            };
     }
 }
 }  // namespace viua::vm::ins

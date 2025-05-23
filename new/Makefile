@@ -195,8 +195,8 @@ install-binfmt:
 
 format:
 	(\
-		find ./include -type f -name '*.h' ;\
-		find ./src -type f -name '*.cpp'\
+		find ./include -type f -name '*.h' -or -name '*.hh' ;\
+		find ./src -type f -name '*.cpp' -or -name '*.cc' \
 	) | xargs --max-args 1 --max-procs 0 clang-format -i
 	black --quiet tests/suite.py
 	yamlfmt $(shell git rev-parse --show-toplevel)/.builds/*
