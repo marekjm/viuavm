@@ -296,8 +296,8 @@ auto parse_instruction(
 
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw did_you_mean(Error{ e, Cause::Unknown_opcode, e.text },
-                           best_candidate.second);
+        throw did_you_mean(
+            Error{ e, Cause::Unknown_opcode, e.text }, best_candidate.second);
     }
 
     /*
@@ -361,8 +361,8 @@ auto parse_instruction(
         if (lexemes.front() == TOKEN::RA_VOID) {
             operand.ingredients.push_back(
                 consume_token_of(TOKEN::RA_VOID, lexemes));
-        } else if (look_ahead({ TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF },
-                              lexemes)) {
+        } else if (look_ahead(
+                       { TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF }, lexemes)) {
             auto const access = consume_token_of(
                 { TOKEN::RA_DIRECT, TOKEN::RA_PTR_DEREF }, lexemes);
             auto index = viua::libs::lexer::Lexeme{};

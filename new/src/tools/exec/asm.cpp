@@ -662,8 +662,8 @@ auto consume_label(
     using viua::libs::lexer::TOKEN;
     auto ss    = std::make_unique<ast::Label>();
     ss->leader = consume_token_of(TOKEN::DEFINE_LABEL, lexemes);
-    ss->name = consume_token_of({ TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING },
-                                lexemes);
+    ss->name   = consume_token_of(
+        { TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING }, lexemes);
     consume_token_of(TOKEN::TERMINATOR, lexemes);
     return ss;
 }
@@ -774,8 +774,8 @@ auto consume_instruction(
 
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw did_you_mean(Error{ e, Cause::Unknown_opcode, e.text },
-                           best_candidate.second);
+        throw did_you_mean(
+            Error{ e, Cause::Unknown_opcode, e.text }, best_candidate.second);
     }
 
     /*
@@ -856,8 +856,8 @@ auto consume_instruction(
                  * register set, so let's consider the only other valid
                  * following tokens.
                  */
-                if (not look_ahead({ TOKEN::COMMA, TOKEN::TERMINATOR },
-                                   lexemes)) {
+                if (not look_ahead(
+                        { TOKEN::COMMA, TOKEN::TERMINATOR }, lexemes)) {
                     /*
                      * Yeah, the token stream did not match expectations. Abort.
                      */
@@ -1371,8 +1371,8 @@ auto save_objects(
                         using viua::support::ston;
                         auto const r = std::ranges::iota_view<size_t>(0ul)
                                        | std::views::take(ston<size_t>(n.text));
-                        std::ranges::for_each(r,
-                                              [&s, &tmp](auto) { s += tmp; });
+                        std::ranges::for_each(
+                            r, [&s, &tmp](auto) { s += tmp; });
                     } else {
                         using viua::libs::errors::compile_time::Cause;
                         using viua::libs::errors::compile_time::Error;

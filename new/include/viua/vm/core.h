@@ -181,8 +181,8 @@ struct Register {
         } else if constexpr (std::is_same_v<T, undefined_type>) {
             /* do nothing */
         } else {
-            static_assert(always_false_v<T>,
-                          "invalid type convert to from undefined");
+            static_assert(
+                always_false_v<T>, "invalid type convert to from undefined");
         }
 
         loaded_size.reset();

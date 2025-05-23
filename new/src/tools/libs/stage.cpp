@@ -508,8 +508,8 @@ auto cook_long_immediates(
                                          misspell_candidates,
                                          (label.text.size() / 2));
                     if (best_candidate.second != label.text) {
-                        viua::libs::parser::did_you_mean(e,
-                                                         best_candidate.second);
+                        viua::libs::parser::did_you_mean(
+                            e, best_candidate.second);
                     }
                 }
 
@@ -577,8 +577,8 @@ auto cook_long_immediates(
                                          misspell_candidates,
                                          (label.text.size() / 2));
                     if (best_candidate.second != label.text) {
-                        viua::libs::parser::did_you_mean(e,
-                                                         best_candidate.second);
+                        viua::libs::parser::did_you_mean(
+                            e, best_candidate.second);
                     }
                 }
 
