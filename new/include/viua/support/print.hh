@@ -68,6 +68,27 @@ auto errorln(
 }
 
 template<typename... Ts>
+auto warningln(
+    std::filesystem::path const path,
+    std::format_string<Ts...> fmt,
+    Ts&&... args) -> void
+{
+    using viua::support::tty::ATTR_RESET;
+    using viua::support::tty::COLOR_FG_ORANGE_RED_1;
+    using viua::support::tty::COLOR_FG_WHITE;
+    using viua::support::tty::send_escape_seq;
+
+    std::println(stderr,
+                 "{}{}{}: {}warning{}: {}",
+                 send_escape_seq(2, COLOR_FG_WHITE),
+                 path.native(),
+                 send_escape_seq(2, ATTR_RESET),
+                 send_escape_seq(2, COLOR_FG_ORANGE_RED_1),
+                 send_escape_seq(2, ATTR_RESET),
+                 std::format(std::move(fmt), std::forward<Ts>(args)...));
+}
+
+template<typename... Ts>
 auto noteln(
     std::filesystem::path const path,
     std::format_string<Ts...> fmt,
