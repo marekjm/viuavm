@@ -3710,7 +3710,15 @@ auto main(
 
     auto nodes = std::vector<std::unique_ptr<ast::Node>>{};
     try {
-        nodes = parse(lexemes);
+        /*
+         * Only parse when there is something to work with; skip the parsing
+         * stage if there are no lexemes. This avoids constructing empty
+         * vector_view and all the associated problems with empty views, null
+         * pointers, etc.
+         */
+        if (not lexemes.empty()) {
+            nodes = parse(lexemes);
+        }
     } catch (viua::libs::errors::compile_time::Error const& e) {
         viua::libs::stage::display_error_and_exit(source_path, source_text, e);
     }

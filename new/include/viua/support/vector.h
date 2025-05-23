@@ -45,10 +45,22 @@ struct vector_view {
     const_pointer finish{ nullptr };
 
     public:
+    /*
+     * Empty vectors are special cased here to avoid binding to a nullptr in the
+     *
+     *      &v[0]
+     *
+     * expression. This was detected by UBSAN, and assigning a nullptr
+     * explicitly silences the error.
+     *
+     * However, trying to access any data through the view will still result in
+     * an error. The only reasonable thing to do with an empty view is to check
+     * its size and iterate over it.
+     */
     vector_view(
         std::vector<T> const& v)
-        : base{ &v[0] }
-        , finish{ base + v.size() }
+        : base{ v.empty() ? nullptr : &v[0] }
+        , finish{ v.empty() ? nullptr : base + v.size() }
     {}
     vector_view(
         vector_view<T> const& v)
@@ -74,6 +86,9 @@ struct vector_view {
     constexpr auto operator[](
         size_type const i) const noexcept -> const_reference
     {
+        if (i >= size()) {
+            throw std::out_of_range{ "viua::support::vector_view::operator[]" };
+        }
         return *(base + i);
     }
     constexpr auto at(
@@ -99,6 +114,16 @@ struct vector_view {
 
     constexpr auto size() const noexcept -> size_type
     {
+        /*
+         * See the special-casing of empty vectors in the constructor. To avoid
+         * undefined behaviour let's explicitly check for this special case here
+         * and just return 0.
+         *
+         * Better safe than sorry.
+         */
+        if (base == nullptr) {
+            return 0;
+        }
         return std::distance(base, finish);
     }
     constexpr auto length() const noexcept -> size_type
