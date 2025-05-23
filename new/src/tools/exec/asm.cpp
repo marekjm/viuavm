@@ -3465,21 +3465,10 @@ auto main(
     int argc,
     char* argv[]) -> int
 {
-    using viua::support::tty::ATTR_RESET;
-    using viua::support::tty::COLOR_FG_CYAN;
-    using viua::support::tty::COLOR_FG_ORANGE_RED_1;
-    using viua::support::tty::COLOR_FG_RED;
-    using viua::support::tty::COLOR_FG_RED_1;
-    using viua::support::tty::COLOR_FG_WHITE;
-    using viua::support::tty::send_escape_seq;
-    constexpr auto esc = send_escape_seq;
-
     using viua::libexec::Args;
     auto args = Args{ argc, argv };
-    // args.argv = std::vector<std::string>{ (argv + 1), (argv + argc) };
     if (args.argv.empty()) {
-        std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                  << ": no file to assemble\n";
+        viua::support::errorln("no file to assemble");
         return 1;
     }
 
@@ -3629,46 +3618,21 @@ auto main(
     {
         auto const source_fd = open(source_path.c_str(), O_RDONLY);
         if (source_fd == -1) {
-            using viua::support::tty::ATTR_RESET;
-            using viua::support::tty::COLOR_FG_RED;
-            using viua::support::tty::COLOR_FG_WHITE;
-            using viua::support::tty::send_escape_seq;
-            constexpr auto esc = send_escape_seq;
-
-            auto const error_message = viua::support::errno_desc(errno);
-            std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                      << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                      << "error" << esc(2, ATTR_RESET) << ": " << error_message
-                      << "\n";
+            viua::support::errorln(source_path, "can't open(2) the source file: {}", viua::support::errno_desc(errno));
             return 1;
         }
 
         struct stat source_stat{};
         if (fstat(source_fd, &source_stat) == -1) {
-            using viua::support::tty::ATTR_RESET;
-            using viua::support::tty::COLOR_FG_RED;
-            using viua::support::tty::COLOR_FG_WHITE;
-            using viua::support::tty::send_escape_seq;
-            constexpr auto esc = send_escape_seq;
-
-            auto const error_message = viua::support::errno_desc(errno);
-            std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                      << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                      << "error" << esc(2, ATTR_RESET) << ": " << error_message
-                      << "\n";
+            viua::support::errorln(source_path, "can't fstat(2) the source file: {}", viua::support::errno_desc(errno));
+            return 1;
+        }
+        if ((source_stat.st_mode & S_IFMT) != S_IFREG) {
+            viua::support::errorln(source_path, "the source file not a regular file");
             return 1;
         }
         if (source_stat.st_size == 0) {
-            using viua::support::tty::ATTR_RESET;
-            using viua::support::tty::COLOR_FG_RED;
-            using viua::support::tty::COLOR_FG_WHITE;
-            using viua::support::tty::send_escape_seq;
-            constexpr auto esc = send_escape_seq;
-
-            std::cerr << esc(2, COLOR_FG_WHITE) << source_path.native()
-                      << esc(2, ATTR_RESET) << ": "
-                      << esc(2, COLOR_FG_ORANGE_RED_1) << "warning"
-                      << esc(2, ATTR_RESET) << ": empty source file\n";
+            viua::support::warningln(source_path, "the source file is empty");
         }
 
         source_text.resize(source_stat.st_size);
