@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2023 Marek Marecki
+ *  Copyright (C) 2023-2025 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -32,12 +32,15 @@
 
 #include <viua/arch/arch.h>
 #include <viua/arch/ops.h>
+#include <viua/libexec/common.hh>
 #include <viua/libs/stage.h>
 #include <viua/support/errno.h>
 #include <viua/support/fdio.h>
+#include <viua/support/print.hh>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
 #include <viua/vm/elf.h>
+
 
 using Text = std::vector<viua::arch::instruction_type>;
 
@@ -665,18 +668,15 @@ auto main(
         return 1;
     }
 
+    auto options               = viua::libexec::Common_options{ "ld" };
     auto preferred_output_path = std::optional<std::filesystem::path>{};
     auto as_executable         = true;
     auto as_static_lib [[maybe_unused]] = false;
     auto as_shared_lib                  = false;
     auto as_object_lib                  = false;
     auto link_static [[maybe_unused]]   = false;
-    auto verbosity_level                = 0;
-    auto show_version                   = false;
-    auto show_help                      = false;
     auto input_files                    = std::vector<std::filesystem::path>{};
-
-    auto dump_strtab = false;
+    auto dump_strtab                    = false;
 
     for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
         auto const& each = args.at(i);
@@ -707,43 +707,29 @@ auto main(
          * Common options.
          */
         else if (each == "-v" or each == "--verbose") {
-            ++verbosity_level;
+            ++options.verbosity;
         } else if (each == "--version") {
-            show_version = true;
+            options.show.version = true;
+        } else if (each == "--built-with") {
+            options.show.built_with = true;
         } else if (each == "--help") {
-            show_help = true;
+            options.show.help = true;
         } else if (each.front() == '-') {
-            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                      << ": unknown option: " << each << "\n";
+            viua::support::errorln("unknown option: {}", each);
             return 1;
         } else {
-            /*
-             * Input files start here.
-             */
+            // input files start here
             std::copy(
                 args.begin() + i, args.end(), std::back_inserter(input_files));
             break;
         }
     }
+    if (auto const r = viua::libexec::maybe_show_info_and_exit(options); r) {
+        return *r;
+    }
 
     if (as_static_lib or as_shared_lib or as_object_lib) {
         as_executable = false;
-    }
-
-    if (show_version) {
-        if (verbosity_level) {
-            std::cout << "Viua VM ";
-        }
-        std::cout << (verbosity_level ? VIUAVM_VERSION_FULL : VIUAVM_VERSION)
-                  << "\n";
-        return 0;
-    }
-    if (show_help) {
-        if (execlp("man", "man", "1", "viua-ld", nullptr) == -1) {
-            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                      << ": man(1) page not installed or not found\n";
-            return 1;
-        }
     }
 
     auto const source_path = input_files.front();
@@ -938,7 +924,7 @@ auto main(
         auto lnk_module = Module::load(lnk_elf_fd);
         close(lnk_elf_fd);
 
-        if (verbosity_level) {
+        if (options.verbosity) {
             std::cerr << "linking: " << lnk_path << "\n";
         }
 
@@ -987,7 +973,7 @@ auto main(
                 reinterpret_cast<char const*>(lnk_strtab.data()) + sym.st_name
             };
             auto const sym_type = ELF64_ST_TYPE(sym.st_info);
-            if (verbosity_level) {
+            if (options.verbosity) {
                 std::cerr << "  " << sym_ndx++ << ": symbol: ";
                 switch (sym_type) {
                     case STT_NOTYPE:
@@ -1017,7 +1003,7 @@ auto main(
             auto const sym_name =
                 std::string_view{ reinterpret_cast<char const*>(strtab.data())
                                   + sym.st_name };
-            if (verbosity_level and sym.st_name) {
+            if (options.verbosity and sym.st_name) {
                 std::cerr << "    global sym name: " << sym_name << "\n";
                 std::cerr << "    global .st_name: " << sym.st_name << "\n";
             }
@@ -1042,7 +1028,7 @@ auto main(
              * over again.
              */
             if (not sym.st_value) {
-                if (verbosity_level) {
+                if (options.verbosity) {
                     std::cerr << "    undefined in this module\n";
                     if (symtab_cache.count(sym_name)) {
                         auto const [def_sym_ndx, def_sym_module] =
@@ -1100,7 +1086,7 @@ auto main(
             }
 
             auto const sym_ndx = record_symbol(sym_name, sym, lnk_path);
-            if (verbosity_level) {
+            if (options.verbosity) {
                 std::cerr << "    defined as symbol " << sym_ndx << "\n";
                 std::cerr << "    address: ";
                 switch (ELF64_ST_TYPE(sym.st_info)) {
@@ -1127,7 +1113,7 @@ auto main(
                 std::string_view{ reinterpret_cast<char const*>(strtab.data())
                                   + lnk_sym.st_name };
 
-            if (verbosity_level) {
+            if (options.verbosity) {
                 std::cerr << "  rel at " << rel.r_offset
                           << " for symbol: " << sym_ndx << ": "
                           << show_or_anonymous(sym_name)
@@ -1137,7 +1123,7 @@ auto main(
 
             if (is_defined(lnk_sym)) {
                 auto const patched_ndx = get_symtab_index(lnk_sym);
-                if (verbosity_level) {
+                if (options.verbosity) {
                     std::cerr << "    defined\n";
                     std::cerr << "    translate .symtab index: " << sym_ndx
                               << " => " << patched_ndx << "\n";
@@ -1152,7 +1138,7 @@ auto main(
                  */
                 relocate(lnk_text, rel, patched_ndx);
             } else {
-                if (verbosity_level) {
+                if (options.verbosity) {
                     std::cerr << "    undefined\n";
                     std::cerr << "    record as by-name relocation at [.text+0x"
                               << std::hex << std::setfill('0') << std::setw(16)
@@ -1199,12 +1185,12 @@ auto main(
      */
     strtab.push_back('\0');
 
-    if (verbosity_level) {
+    if (options.verbosity) {
         std::cerr << "applying relocations (" << relocations.size() << ")\n";
     }
     auto rel_i = size_t{ 0 };
     for (auto const& rel : relocations) {
-        if (verbosity_level) {
+        if (options.verbosity) {
             std::cerr << "  " << rel_i++ << ": relocation at [.text+0x"
                       << std::hex << std::setfill('0') << std::setw(16)
                       << rel.r_offset << std::dec << std::setfill(' ') << "]"
@@ -1226,7 +1212,7 @@ auto main(
             auto const sym_ndx = symtab_cache.at(sym_name).first;
             auto const sym     = symtab.at(sym_ndx);
 
-            if (verbosity_level) {
+            if (options.verbosity) {
                 std::cerr << "    symbol: " << show_or_anonymous(sym_name)
                           << "\n";
                 std::cerr << "    rel-kind: by-name\n";
@@ -1260,7 +1246,7 @@ auto main(
                 std::string_view{ reinterpret_cast<char const*>(strtab.data())
                                   + sym.st_name };
 
-            if (verbosity_level) {
+            if (options.verbosity) {
                 std::cerr << "    symbol: " << show_or_anonymous(sym_name)
                           << "\n";
                 std::cerr << "    rel-kind: by-index\n";

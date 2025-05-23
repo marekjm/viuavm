@@ -288,6 +288,7 @@ VM_OPERATION_TYPE_IMPL=\
 	$(BUILD_PREFIX)/arch/ops.o
 
 $(BUILD_EXEDIR)/dis: \
+	$(BUILD_PREFIX)/libexec/common.o \
 	$(BUILD_PREFIX)/tools/libs/assembler.o \
 	$(BUILD_PREFIX)/support/errno.o \
 	$(BUILD_PREFIX)/support/fdio.o \
@@ -297,6 +298,7 @@ $(BUILD_EXEDIR)/dis: \
 	$(VM_OPERATION_TYPE_IMPL)
 
 $(BUILD_EXEDIR)/asm: \
+	$(BUILD_PREFIX)/libexec/common.o \
 	$(BUILD_PREFIX)/support/errno.o \
 	$(BUILD_PREFIX)/support/fdio.o \
 	$(BUILD_PREFIX)/support/string.o \
@@ -309,6 +311,7 @@ $(BUILD_EXEDIR)/asm: \
 	$(VM_OPERATION_TYPE_IMPL)
 
 $(BUILD_EXEDIR)/ld: \
+	$(BUILD_PREFIX)/libexec/common.o \
 	$(BUILD_PREFIX)/arch/ra.o \
 	$(BUILD_PREFIX)/arch/ops.o \
 	$(BUILD_PREFIX)/arch/ops/f.o \
@@ -328,6 +331,7 @@ VM_INSTRUCTION_IMPL=\
 	$(BUILD_PREFIX)/vm/ins/impl/io.o
 
 $(BUILD_EXEDIR)/vm: \
+	$(BUILD_PREFIX)/libexec/common.o \
 	$(BUILD_PREFIX)/support/errno.o \
 	$(BUILD_PREFIX)/support/fdio.o \
 	$(BUILD_PREFIX)/support/tty.o \
@@ -343,6 +347,7 @@ $(BUILD_EXEDIR)/vm: \
 	$(VM_OPERATION_TYPE_IMPL)
 
 $(BUILD_EXEDIR)/repl: \
+	$(BUILD_PREFIX)/libexec/common.o \
 	$(BUILD_PREFIX)/arch/ra.o \
 	$(BUILD_PREFIX)/arch/ops.o \
 	$(BUILD_PREFIX)/vm/backtrace.o \

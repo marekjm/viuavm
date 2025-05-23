@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021-2023 Marek Marecki
+ *  Copyright (C) 2021-2025 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -53,6 +53,7 @@
 #include <viua/arch/arch.h>
 #include <viua/arch/elf.h>
 #include <viua/arch/ops.h>
+#include <viua/libexec/common.hh>
 #include <viua/libs/assembler.h>
 #include <viua/libs/errors/compile_time.h>
 #include <viua/libs/lexer.h>
@@ -60,9 +61,11 @@
 #include <viua/support/errno.h>
 #include <viua/support/fdio.h>
 #include <viua/support/number.h>
+#include <viua/support/print.hh>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
 #include <viua/support/vector.h>
+
 
 constexpr auto DEBUG_LEX                        = true;
 constexpr auto DEBUG_PARSE                      = true;
@@ -3480,10 +3483,8 @@ auto main(
         return 1;
     }
 
+    auto options               = viua::libexec::Common_options{ "asm" };
     auto preferred_output_path = std::optional<std::filesystem::path>{};
-    auto verbosity_level       = 0;
-    auto show_version          = false;
-    auto show_help             = false;
 
     for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
         auto const& each = args.at(i);
@@ -3502,49 +3503,25 @@ auto main(
          * Common options.
          */
         else if (each == "-v" or each == "--verbose") {
-            ++verbosity_level;
+            ++options.verbosity;
         } else if (each == "--version") {
-            show_version = true;
+            options.show.version = true;
+        } else if (each == "--built-with") {
+            options.show.built_with = true;
         } else if (each == "--help") {
-            show_help = true;
+            options.show.help = true;
         } else if (each.front() == '-') {
-            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                      << ": unknown option: " << each << "\n";
+            viua::support::errorln("unknown option: {}", each);
             return 1;
         } else {
             // input files start here
-            ++i;
             break;
         }
     }
-
-    if (show_version) {
-        if (verbosity_level) {
-            std::cout << "Viua VM ";
-        }
-        std::cout << (verbosity_level ? VIUAVM_VERSION_FULL : VIUAVM_VERSION)
-                  << "\n";
-        return 0;
-    }
-    if (show_help) {
-        if (execlp("man", "man", "1", "viua-asm", nullptr) == -1) {
-            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                      << ": man(1) page not installed or not found\n";
-            return 1;
-        }
+    if (auto const r = viua::libexec::maybe_show_info_and_exit(options); r) {
+        return *r;
     }
 
-    /*
-     * If invoked *with* some arguments, find the path to the source file and
-     * assemble it - converting assembly source code into binary. Produced
-     * binary may be:
-     *
-     *  - executable (default): an ELF executable, suitable to be run by Viua VM
-     *    kernel
-     *  - linkable (with -c flag): an ELF relocatable object file, which should
-     *    be linked with other object files to produce a final executable or
-     *    shared object
-     */
     auto const source_path = std::filesystem::path{ args.back() };
     auto source_text       = std::string{};
     {

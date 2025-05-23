@@ -32,10 +32,12 @@
 #include <regex>
 
 #include <viua/arch/ops.h>
+#include <viua/libexec/common.hh>
 #include <viua/libs/assembler.h>
 #include <viua/libs/lexer.h>
 #include <viua/support/errno.h>
 #include <viua/support/memory.h>
+#include <viua/support/print.hh>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
 #include <viua/vm/core.h>
@@ -827,14 +829,12 @@ auto main(
         return 1;
     }
 
+    auto options               = viua::libexec::Common_options{ "dis" };
     auto preferred_output_path = std::optional<std::filesystem::path>{};
-    auto verbosity_level       = 0;
-    auto show_version          = false;
-    auto show_help             = false;
     auto singles               = std::vector<viua::arch::instruction_type>{};
+    auto demangle_li           = true;
+    auto demangle_mem          = true;
 
-    auto demangle_li  = true;
-    auto demangle_mem = true;
 
     for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
         auto const& each = args.at(i);
@@ -861,35 +861,23 @@ auto main(
          * Common options.
          */
         else if (each == "-v" or each == "--verbose") {
-            ++verbosity_level;
+            ++options.verbosity;
         } else if (each == "--version") {
-            show_version = true;
+            options.show.version = true;
+        } else if (each == "--built-with") {
+            options.show.built_with = true;
         } else if (each == "--help") {
-            show_help = true;
+            options.show.help = true;
         } else if (each.front() == '-') {
-            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                      << ": unknown option: " << each << "\n";
+            viua::support::errorln("unknown option: {}", each);
             return 1;
         } else {
             // input files start here
             break;
         }
     }
-
-    if (show_version) {
-        if (verbosity_level) {
-            std::cout << "Viua VM ";
-        }
-        std::cout << (verbosity_level ? VIUAVM_VERSION_FULL : VIUAVM_VERSION)
-                  << "\n";
-        return 0;
-    }
-    if (show_help) {
-        if (execlp("man", "man", "1", "viua-dis", nullptr) == -1) {
-            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                      << ": man(1) page not installed or not found\n";
-            return 1;
-        }
+    if (auto const r = viua::libexec::maybe_show_info_and_exit(options); r) {
+        return *r;
     }
 
     if (singles.size()) {

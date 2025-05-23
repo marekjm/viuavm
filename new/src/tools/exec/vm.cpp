@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021-2022 Marek Marecki
+ *  Copyright (C) 2021-2025 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -25,7 +25,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
 
 #include <chrono>
 #include <filesystem>
@@ -44,6 +43,7 @@
 #include <viua/arch/arch.h>
 #include <viua/arch/ins.h>
 #include <viua/arch/ops.h>
+#include <viua/libexec/common.hh>
 #include <viua/support/errno.h>
 #include <viua/support/fdstream.h>
 #include <viua/support/print.hh>
@@ -225,28 +225,25 @@ auto main(
         return 1;
     }
 
-    auto verbosity_level = 0;
-    auto show_version    = false;
-    auto show_built_with = false;
-    auto show_help       = false;
-
+    auto options = viua::libexec::Common_options{ "vm" };
     for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
         auto const& each = args.at(i);
         if (each == "--") {
             // explicit separator of options and operands
             break;
         }
+
         /*
          * Common options.
          */
         else if (each == "-v" or each == "--verbose") {
-            ++verbosity_level;
+            ++options.verbosity;
         } else if (each == "--version") {
-            show_version = true;
+            options.show.version = true;
         } else if (each == "--built-with") {
-            show_built_with = true;
+            options.show.built_with = true;
         } else if (each == "--help") {
-            show_help = true;
+            options.show.help = true;
         } else if (each.front() == '-') {
             viua::support::errorln("unknown option: {}", each);
             return 1;
@@ -255,25 +252,8 @@ auto main(
             break;
         }
     }
-
-    if (show_version) {
-        std::println("viua vm {}",
-                     (verbosity_level ? VIUAVM_VERSION_FULL : VIUAVM_VERSION));
-    }
-    if (show_built_with) {
-        std::println("compiler: {} {}", CXX, CXXVERSION);
-        std::println("standard: {}", CXXSTD);
-        std::println("preset:   {}", VIUAVM_CXX_PRESET);
-        std::println("options:  {}", VIUAVM_CXX_OPTIONS);
-    }
-    if (show_version or show_built_with) {
-        return 0;
-    }
-    if (show_help) {
-        if (execlp("man", "man", "1", "viua-vm", nullptr) == -1) {
-            viua::support::errorln("man(1) page not installed or not found");
-            return 1;
-        }
+    if (auto const r = viua::libexec::maybe_show_info_and_exit(options); r) {
+        return *r;
     }
 
     /*
