@@ -220,7 +220,12 @@ watch-impl:
 watch-tests:
 	(\
 		find $(BUILD_EXEDIR) -type f ;\
-		find ./tests/asm -type f ;\
+		find ./tests/asm -type f -name '*.deps' ;\
+		find ./tests/asm -type f -name '*.asm' ;\
+		find ./tests/asm -type f -name '*.ebreak' ;\
+		find ./tests/asm -type f -name '*.abort' ;\
+		find ./tests/asm -type f -name '*.stdin' ;\
+		find ./tests/asm -type f -name '*.stdout' ;\
 		ls -1 tests/suite.py \
 	) | entr -c python3 ./tests/suite.py
 
