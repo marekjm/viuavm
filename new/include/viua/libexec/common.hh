@@ -22,8 +22,12 @@
 
 #include <stdint.h>
 
+#include <map>
 #include <optional>
+#include <stdexcept>
 #include <string_view>
+#include <variant>
+#include <vector>
 
 
 namespace viua {
@@ -41,6 +45,91 @@ struct Common_options {
     explicit Common_options(std::string_view);
 };
 
+struct Args {
+    /*
+     * A more convenient way of accessing argv.
+     */
+    std::vector<std::string> argv;
+
+    /*
+     * Only the arguments ie, non-option elements found on the command line.
+     */
+    std::vector<std::string_view> args;
+
+    /*
+     * Map from --option to its value.
+     */
+    enum class Kind
+    {
+        Switch,
+        Level,
+        List,
+        Single,
+    };
+    using value_type = std::variant<
+        /*
+         * Used for yes-or-no switches eg, --version or --help. They have
+         * meaning just due to being present on the command line.
+         */
+        bool,
+
+        /*
+         * Used for "countable" switches eg, --verbose where how many times an
+         * option appears changes its meaning. Think
+         *
+         *      ]$ ssh user@example.com
+         *
+         * vs
+         *
+         *      ]$ ssh -vvv user@example.com
+         *
+         * which increases the verbosity level.
+         */
+        size_t,
+
+        /*
+         * Used for "list" switches eg, -I or -l in GCC where the user can
+         * create a list of values. Think
+         *
+         *      ]$ gcc -I /foo/include -I /bar/include
+         *
+         * which adds /foo/include and /bar/include to the include search list.
+         */
+        std::vector<std::string_view>,
+
+        /*
+         * Used for "option" switches eg, --message in Git where the user can
+         * supply a single non-default value to the program.
+         */
+        std::string_view>;
+    std::map<std::string_view, value_type> options;
+
+    Args(int const, char* const[]);
+
+    auto get_printable(std::string_view const) const
+        -> std::optional<std::string>;
+
+    template<typename T>
+    auto get(
+        std::string_view const label) const -> std::optional<T>
+    {
+        if (not options.contains(label)) {
+            return std::nullopt;
+        }
+
+        auto const& value = options.at(label);
+        if (not std::holds_alternative<T>(value)) {
+            throw std::logic_error{
+                "option present, but bad type was requested"
+            };
+        }
+
+        return std::get<T>(value);
+    }
+};
+
+auto maybe_show_info_and_exit(std::string_view const tool, Args const&)
+    -> std::optional<int>;
 auto maybe_show_info_and_exit(Common_options const&) -> std::optional<int>;
 }  // namespace libexec
 }  // namespace viua

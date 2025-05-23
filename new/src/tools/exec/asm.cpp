@@ -1314,12 +1314,11 @@ auto save_objects(
                             using viua::libs::errors::compile_time::Cause;
                             using viua::libs::errors::compile_time::Error;
 
-                            throw Error{
-                                each,
-                                Cause::Invalid_operand,
-                                "an integer must be followed by a star "
-                                "in string concatenation"
-                            }
+                            throw Error{ each,
+                                         Cause::Invalid_operand,
+                                         "an integer must be followed by a "
+                                         "star "
+                                         "in string concatenation" }
                                 .add(star)
                                 .add(alc.type);
                         }
@@ -1873,11 +1872,10 @@ auto emit_instruction(
                     if (not fits) {
                         using viua::libs::errors::compile_time::Cause;
                         using viua::libs::errors::compile_time::Error;
-                        throw Error{
-                            imm,
-                            Cause::Value_out_of_range,
-                            "value does not fit into 24-bit wide immediate"
-                        };
+                        throw Error{ imm,
+                                     Cause::Value_out_of_range,
+                                     "value does not fit into 24-bit wide "
+                                     "immediate" };
                     }
 
                     return viua::arch::ops::R{
@@ -3476,53 +3474,157 @@ auto main(
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    auto const args = std::vector<std::string>{ (argv + 1), (argv + argc) };
-    if (args.empty()) {
+    using viua::libexec::Args;
+    auto args = Args{ argc, argv };
+    // args.argv = std::vector<std::string>{ (argv + 1), (argv + argc) };
+    if (args.argv.empty()) {
         std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
                   << ": no file to assemble\n";
         return 1;
     }
 
-    auto options               = viua::libexec::Common_options{ "asm" };
-    auto preferred_output_path = std::optional<std::filesystem::path>{};
+    auto const ui = std::map<std::tuple<std::string, std::string>, Args::Kind>{
+        { { "v", "verbose" }, Args::Kind::Switch },
+        { { "", "version" }, Args::Kind::Switch },
+        { { "h", "help" }, Args::Kind::Switch },
+        { { "", "built-with" }, Args::Kind::Switch },
+        { { "o", "out" }, Args::Kind::Single },
+        { { "I", "include" }, Args::Kind::List },
+    };
+    {
+        auto i = size_t{ 0 };
+        for (; i < args.argv.size(); ++i) {
+            auto a = std::string_view{ args.argv.at(i) };
 
-    for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
-        auto const& each = args.at(i);
-        if (each == "--") {
-            // explicit separator of options and operands
-            ++i;
+            if (a == "--") {
+                ++i;
+                break;
+            }
+
+            if (a.starts_with("--")) {
+                a.remove_prefix(2);
+
+                auto valid = false;
+                for (auto const& [opt, kind] : ui) {
+                    auto const& [_, label] = opt;
+                    if ((valid = (a == label))) {
+                        switch (kind) {
+                            using enum Args::Kind;
+                            case Switch:
+                                args.options[label] = true;
+                                break;
+                            case Level:
+                                ++std::get<size_t>(args.options[label]);
+                                break;
+                            case List:
+                                if (not args.options.contains(label)) {
+                                    auto dummy =
+                                        std::vector<std::string_view>{};
+                                    args.options[label] = std::move(dummy);
+                                }
+                                std::get<std::vector<std::string_view>>(
+                                    args.options[label])
+                                    .push_back(args.argv.at(++i));
+                                break;
+                            case Single:
+                                args.options[label] = args.argv.at(++i);
+                                break;
+                        }
+
+                        /*
+                         * We found the match, so let's not continue uselessly
+                         * iterating over all other options.
+                         */
+                        break;
+                    }
+                }
+
+                if (not valid) {
+                    viua::support::errorln("unknown option: --{}", a);
+                    return 1;
+                }
+
+                continue;
+            }
+
+            if (a.starts_with("-")) {
+                a.remove_prefix(1);
+
+                auto valid = false;
+                for (auto const& [opt, kind] : ui) {
+                    auto const& [shortcut, label] = opt;
+                    if ((valid = (a == shortcut))) {
+                        switch (kind) {
+                            using enum Args::Kind;
+                            case Switch:
+                                args.options[label] = true;
+                                break;
+                            case Level:
+                                ++std::get<size_t>(args.options[label]);
+                                break;
+                            case List:
+                                if (not args.options.contains(label)) {
+                                    auto dummy =
+                                        std::vector<std::string_view>{};
+                                    args.options[label] = std::move(dummy);
+                                }
+                                std::get<std::vector<std::string_view>>(
+                                    args.options[label])
+                                    .push_back(args.argv.at(++i));
+                                break;
+                            case Single:
+                                args.options[label] = args.argv.at(++i);
+                                break;
+                        }
+
+                        /*
+                         * We found the match, so let's not continue uselessly
+                         * iterating over all other options.
+                         */
+                        break;
+                    }
+                }
+
+                if (not valid) {
+                    viua::support::errorln("unknown option: -{}", a);
+                    return 1;
+                }
+
+                continue;
+            }
+
+            /*
+             * Not an option, so it must be an operand. Finish iterating through
+             * argv and gather whatever is left into the args.
+             */
             break;
         }
-        /*
-         * Tool-specific options.
-         */
-        else if (each == "-o") {
-            preferred_output_path = std::filesystem::path{ args.at(++i) };
-        }
-        /*
-         * Common options.
-         */
-        else if (each == "-v" or each == "--verbose") {
-            ++options.verbosity;
-        } else if (each == "--version") {
-            options.show.version = true;
-        } else if (each == "--built-with") {
-            options.show.built_with = true;
-        } else if (each == "--help") {
-            options.show.help = true;
-        } else if (each.front() == '-') {
-            viua::support::errorln("unknown option: {}", each);
-            return 1;
-        } else {
-            // input files start here
-            break;
-        }
+        std::copy(args.argv.begin() + i,
+                  args.argv.end(),
+                  std::back_inserter(args.args));
     }
-    if (auto const r = viua::libexec::maybe_show_info_and_exit(options); r) {
+
+    for (auto const& a : args.args) {
+        std::println("argv[] = {}", a);
+    }
+    for (auto const& [o, v] : args.options) {
+        std::println("{} = {}", o, args.get_printable(o).value());
+    }
+
+    auto preferred_output_path = std::optional<std::filesystem::path>{
+        args.options.contains("out")
+            ? std::optional<std::filesystem::path>{ args.get<std::string_view>(
+                                                            "out")
+                                                        .value() }
+            : std::nullopt
+    };
+
+    if (auto const r = viua::libexec::maybe_show_info_and_exit("asm", args);
+        r) {
         return *r;
     }
 
-    auto const source_path = std::filesystem::path{ args.back() };
+    auto const source_path = std::filesystem::path{ args.args.back() };
     auto source_text       = std::string{};
     {
         auto const source_fd = open(source_path.c_str(), O_RDONLY);
@@ -3720,11 +3822,10 @@ auto main(
             using viua::libs::errors::compile_time::Cause;
             using viua::libs::errors::compile_time::Error;
 
-            auto e = Error{
-                decl_sym.name,
-                Cause::None,
-                "symbol declared [[extern]], but a definition was provided"
-            };
+            auto e = Error{ decl_sym.name,
+                            Cause::None,
+                            "symbol declared [[extern]], but a definition was "
+                            "provided" };
             viua::libs::stage::display_error_and_exit(
                 source_path, source_text, e);
         } else if ((not was_declared_extern) and (not was_defined)) {
