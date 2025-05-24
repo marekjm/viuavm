@@ -24,6 +24,7 @@
 
 #include <map>
 #include <optional>
+#include <set>
 #include <stdexcept>
 #include <string_view>
 #include <variant>
@@ -102,6 +103,7 @@ struct Args {
          * supply a single non-default value to the program.
          */
         std::string_view>;
+    std::set<std::string> labels;
     std::map<std::string_view, value_type> options;
 
     Args(int const, char* const[]);
@@ -126,7 +128,12 @@ struct Args {
 
         return std::get<T>(value);
     }
+
+    using ui_type = std::map<std::tuple<std::string, std::string>, Kind>;
+    auto parse_with(ui_type const&) -> std::optional<std::string_view>;
 };
+
+auto parse_with_or_exit(Args&, Args::ui_type const&) -> void;
 
 auto maybe_show_info_and_exit(std::string_view const tool, Args const&)
     -> std::optional<int>;

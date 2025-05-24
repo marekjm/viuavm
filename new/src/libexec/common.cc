@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
 #include <unistd.h>
 
 #include <numeric>
@@ -80,6 +81,137 @@ auto Args::get_printable(
             }
         },
         value);
+}
+
+auto Args::parse_with(
+    ui_type const& ui) -> std::optional<std::string_view>
+{
+    args.clear();
+    labels.clear();
+    options.clear();
+
+    auto i = size_t{ 0 };
+    for (; i < argv.size(); ++i) {
+        auto a = std::string_view{ argv.at(i) };
+
+        if (a == "--") {
+            ++i;
+            break;
+        }
+
+        if (a.starts_with("--")) {
+            a.remove_prefix(2);
+
+            auto valid = false;
+            for (auto const& [opt, kind] : ui) {
+                auto const& [_, label] = opt;
+                if ((valid = (a == label))) {
+                    auto const saved_label =
+                        std::string_view{ *labels.insert(label).first };
+
+                    switch (kind) {
+                        using enum Args::Kind;
+                        case Switch:
+                            options[saved_label] = true;
+                            break;
+                        case Level:
+                            ++std::get<size_t>(options[saved_label]);
+                            break;
+                        case List:
+                            if (not options.contains(saved_label)) {
+                                auto dummy = std::vector<std::string_view>{};
+                                options[saved_label] = std::move(dummy);
+                            }
+                            std::get<std::vector<std::string_view>>(
+                                options[saved_label])
+                                .push_back(argv.at(++i));
+                            break;
+                        case Single:
+                            options[saved_label] = argv.at(++i);
+                            break;
+                    }
+
+                    /*
+                     * We found the match, so let's not continue uselessly
+                     * iterating over all other options.
+                     */
+                    break;
+                }
+            }
+
+            if (not valid) {
+                return argv.at(i);
+            }
+
+            continue;
+        }
+
+        if (a.starts_with("-")) {
+            a.remove_prefix(1);
+
+            auto valid = false;
+            for (auto const& [opt, kind] : ui) {
+                auto const& [shortcut, label] = opt;
+                if ((valid = (a == shortcut))) {
+                    auto const saved_label =
+                        std::string_view{ *labels.insert(label).first };
+
+                    switch (kind) {
+                        using enum Args::Kind;
+                        case Switch:
+                            options[saved_label] = true;
+                            break;
+                        case Level:
+                            ++std::get<size_t>(options[saved_label]);
+                            break;
+                        case List:
+                            if (not options.contains(saved_label)) {
+                                auto dummy = std::vector<std::string_view>{};
+                                options[saved_label] = std::move(dummy);
+                            }
+                            std::get<std::vector<std::string_view>>(
+                                options[saved_label])
+                                .push_back(argv.at(++i));
+                            break;
+                        case Single:
+                            options[saved_label] = argv.at(++i);
+                            break;
+                    }
+
+                    /*
+                     * We found the match, so let's not continue uselessly
+                     * iterating over all other options.
+                     */
+                    break;
+                }
+            }
+
+            if (not valid) {
+                return argv.at(i);
+            }
+
+            continue;
+        }
+
+        /*
+         * Not an option, so it must be an operand. Finish iterating through
+         * argv and gather whatever is left into the
+         */
+        break;
+    }
+    std::copy(argv.begin() + i, argv.end(), std::back_inserter(args));
+
+    return std::nullopt;
+}
+
+auto parse_with_or_exit(
+    Args& args,
+    Args::ui_type const& ui) -> void
+{
+    if (auto const uo = args.parse_with(ui); uo.has_value()) {
+        viua::support::errorln("unknown option: {}", *uo);
+        exit(1);
+    }
 }
 
 auto maybe_show_info_and_exit(
