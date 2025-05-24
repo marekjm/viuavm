@@ -214,6 +214,26 @@ auto parse_with_or_exit(
     }
 }
 
+auto pass_or_exit(
+    Args& args,
+    std::string_view const tool,
+    Args::ui_type const& ui) -> void
+{
+    parse_with_or_exit(args, ui);
+    maybe_show_info_and_exit(tool, args);
+}
+
+auto args_or_exit(
+    std::string_view const tool,
+    int const ac,
+    char* const av[],
+    Args::ui_type const& ui) -> Args
+{
+    auto args = Args{ ac, av };
+    viua::libexec::pass_or_exit(args, tool, ui);
+    return args;
+}
+
 auto maybe_show_info_and_exit(
     Common_options const& o) -> std::optional<int>
 {
@@ -247,7 +267,7 @@ auto maybe_show_info_and_exit(
 
 auto maybe_show_info_and_exit(
     std::string_view const tool,
-    Args const& a) -> std::optional<int>
+    Args const& a) -> void
 {
     auto const show_version    = a.get<bool>("version").value_or(false);
     auto const show_built_with = a.get<bool>("built-with").value_or(false);
@@ -266,7 +286,7 @@ auto maybe_show_info_and_exit(
         std::println("options:  {}", VIUAVM_CXX_OPTIONS);
     }
     if (show_version or show_built_with) {
-        return 0;
+        exit(0);
     }
 
     if (show_help) {
@@ -274,12 +294,10 @@ auto maybe_show_info_and_exit(
         if (execlp("man", "man", "1", man_page.c_str(), nullptr) == -1) {
             viua::support::errorln(
                 "man(1) page for {} not installed or not found", man_page);
-            return 1;
+            exit(1);
         }
-        return 0;
+        exit(0);
     }
-
-    return std::nullopt;
 }
 }  // namespace libexec
 }  // namespace viua

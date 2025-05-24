@@ -134,9 +134,13 @@ struct Args {
 };
 
 auto parse_with_or_exit(Args&, Args::ui_type const&) -> void;
+auto pass_or_exit(Args&, std::string_view const, Args::ui_type const&) -> void;
+auto args_or_exit(std::string_view const,
+                  int const,
+                  char* const[],
+                  Args::ui_type const&) -> Args;
 
-auto maybe_show_info_and_exit(std::string_view const tool, Args const&)
-    -> std::optional<int>;
+auto maybe_show_info_and_exit(std::string_view const tool, Args const&) -> void;
 auto maybe_show_info_and_exit(Common_options const&) -> std::optional<int>;
 }  // namespace libexec
 }  // namespace viua

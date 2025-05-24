@@ -3466,9 +3466,10 @@ auto main(
     char* argv[]) -> int
 {
     using viua::libexec::Args;
-    auto args = Args{ argc, argv };
-    viua::libexec::parse_with_or_exit(
-        args,
+    auto const args = viua::libexec::args_or_exit(
+        "asm",
+        argc,
+        argv,
         {
             { { "v", "verbose" }, Args::Kind::Switch },
             { { "", "version" }, Args::Kind::Switch },
@@ -3477,10 +3478,6 @@ auto main(
             { { "o", "out" }, Args::Kind::Single },
             { { "I", "include" }, Args::Kind::List },
         });
-    using viua::libexec::maybe_show_info_and_exit;
-    if (auto const r = maybe_show_info_and_exit("asm", args); r) {
-        return *r;
-    }
     if (args.args.empty()) {
         viua::support::errorln("no file to assemble");
         return 1;
