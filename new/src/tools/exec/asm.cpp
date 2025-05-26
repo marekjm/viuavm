@@ -3477,6 +3477,7 @@ auto main(
             { { "", "built-with" }, Args::Kind::Switch },
             { { "o", "out" }, Args::Kind::Single },
             { { "I", "include" }, Args::Kind::List },
+            { { " ", "dump" }, Args::Kind::Set },
         });
     if (args.args.empty()) {
         viua::support::errorln("no file to assemble");
@@ -3490,6 +3491,8 @@ auto main(
                                                         .value() }
             : std::nullopt
     };
+    auto const requested_dumps =
+        args.get<std::set<std::string_view>>("dump").value_or({});
 
     auto const source_path = std::filesystem::path{ args.args.back() };
     auto source_text       = std::string{};
@@ -3540,13 +3543,13 @@ auto main(
      * illegal characters are used, strings are unclosed, etc.
      */
     auto lexemes = viua::libs::lexer::stage::lex(source_path, source_text);
-    if constexpr (false and DEBUG_LEX) {
+    if (DEBUG_LEX and requested_dumps.contains("lex-raw")) {
         std::cerr << lexemes.size() << " raw lexeme(s)\n";
         dump_lexemes(lexemes);
     }
 
     lexemes = viua::libs::lexer::stage::remove_noise(std::move(lexemes));
-    if constexpr (DEBUG_LEX) {
+    if (DEBUG_LEX and requested_dumps.contains("lex-cooked")) {
         std::cerr << lexemes.size() << " cooked lexeme(s)\n";
         dump_lexemes(lexemes);
     }
@@ -3569,7 +3572,7 @@ auto main(
     } catch (viua::libs::errors::compile_time::Error const& e) {
         viua::libs::stage::display_error_and_exit(source_path, source_text, e);
     }
-    if constexpr (DEBUG_PARSE) {
+    if (DEBUG_PARSE and requested_dumps.contains("ast")) {
         std::cerr << nodes.size() << " AST nodes(s)\n";
         dump_nodes(nodes);
     }
