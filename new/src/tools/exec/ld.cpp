@@ -568,73 +568,34 @@ auto is_usable_module(
     std::filesystem::path const path,
     viua::vm::elf::Loaded_elf const& module) -> bool
 {
-    using viua::support::tty::ATTR_RESET;
-    using viua::support::tty::COLOR_FG_CYAN;
-    using viua::support::tty::COLOR_FG_ORANGE_RED_1;
-    using viua::support::tty::COLOR_FG_RED;
-    using viua::support::tty::COLOR_FG_RED_1;
-    using viua::support::tty::COLOR_FG_WHITE;
-    using viua::support::tty::send_escape_seq;
-    constexpr auto esc = send_escape_seq;
-
     if (module.header.e_type != ET_REL) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": not an relocatable file\n";
+        viua::support::errorln(path, "not a relocatable file");
         return false;
     }
 
     if (auto const f = module.find_fragment(".rodata"); not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no strings fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .rodata section found\n";
+        viua::support::errorln(path, "no strings fragment found");
+        viua::support::noteln(path, "no .rodata section found");
         return false;
     }
     if (auto const f = module.find_fragment(".symtab"); not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no function table fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
-                  << "note" << esc(2, ATTR_RESET)
-                  << ": no .symtab section found\n";
+        viua::support::errorln(path, "no function table fragment found");
+        viua::support::noteln(path, "no .symtab section found");
         return false;
     }
     if (auto const f = module.find_fragment(".strtab"); not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no function table fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
-                  << "note" << esc(2, ATTR_RESET)
-                  << ": no .strtab section found\n";
+        viua::support::errorln(path, "no strings table fragment found");
+        viua::support::noteln(path, "no .strtab section found");
         return false;
     }
     if (auto const f = module.find_fragment(".text"); not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no text fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .text section found\n";
+        viua::support::errorln(path, "no text fragment found");
+        viua::support::noteln(path, "no .text section found");
         return false;
     }
     if (auto const f = module.find_fragment(".rel"); not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no relocation fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .rel section found\n";
+        viua::support::errorln(path, "no relocation fragment found");
+        viua::support::noteln(path, "no .rel section found");
         return false;
     }
 
@@ -652,15 +613,6 @@ auto main(
     int argc,
     char** argv) -> int
 {
-    using viua::support::tty::ATTR_RESET;
-    using viua::support::tty::COLOR_FG_CYAN;
-    using viua::support::tty::COLOR_FG_ORANGE_RED_1;
-    using viua::support::tty::COLOR_FG_RED;
-    using viua::support::tty::COLOR_FG_RED_1;
-    using viua::support::tty::COLOR_FG_WHITE;
-    using viua::support::tty::send_escape_seq;
-    constexpr auto esc = send_escape_seq;
-
     using viua::libexec::Args;
     auto const args = viua::libexec::args_or_exit(
         "ld",
@@ -765,10 +717,7 @@ auto main(
                 auto const errname     = viua::support::errno_name(saved_errno);
                 auto const errdesc     = viua::support::errno_desc(saved_errno);
 
-                std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
-                          << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                          << "error" << esc(2, ATTR_RESET) << ": " << errname
-                          << ": " << errdesc << "\n";
+                viua::support::errorln(lnk_path, "{}: {}", errname, errdesc);
                 return 1;
             }
 
@@ -787,8 +736,9 @@ auto main(
         strtab.reserve(needed_strtab_size);
 
         if (dump_strtab) {
-            std::cerr << "[.strtab] reserved size: " << needed_strtab_size
-                      << " bytes\n";
+            std::println(stderr,
+                         "[.strtab] reserved size: {} bytes",
+                         needed_strtab_size);
         }
     }
     strtab.push_back('\0');
@@ -892,10 +842,7 @@ auto main(
             auto const errname     = viua::support::errno_name(saved_errno);
             auto const errdesc     = viua::support::errno_desc(saved_errno);
 
-            std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
-                      << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                      << "error" << esc(2, ATTR_RESET) << ": " << errname
-                      << ": " << errdesc << "\n";
+            viua::support::errorln(lnk_path, "{}: {}", errname, errdesc);
             return 1;
         }
 
@@ -904,7 +851,7 @@ auto main(
         close(lnk_elf_fd);
 
         if (verbosity) {
-            std::cerr << "linking: " << lnk_path << "\n";
+            std::println(stderr, "linking: {}", lnk_path.native());
         }
 
         auto lnk_text = lnk_module.make_text_from(
@@ -924,11 +871,9 @@ auto main(
 
         if (auto const ep = lnk_module.entry_point(); ep.has_value()) {
             if (entry_addr.has_value()) {
-                std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
-                          << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                          << "error" << esc(2, ATTR_RESET)
-                          << ": entry point already defined by "
-                          << entry_addr->second.native() << "\n";
+                viua::support::errorln(lnk_path,
+                                       "entry point already defined by {}",
+                                       entry_addr->second.native());
                 return 1;
             }
             entry_addr = { *ep + text_addend, lnk_path };
@@ -953,25 +898,29 @@ auto main(
             };
             auto const sym_type = ELF64_ST_TYPE(sym.st_info);
             if (verbosity) {
-                std::cerr << "  " << sym_ndx++ << ": symbol: ";
+                auto sym_type_human_readable = std::string_view{};
                 switch (sym_type) {
                     case STT_NOTYPE:
-                        std::cerr << "STT_NOTYPE";
+                        sym_type_human_readable = "STT_NOTYPE";
                         break;
                     case STT_FUNC:
-                        std::cerr << "STT_FUNC";
+                        sym_type_human_readable = "STT_FUNC";
                         break;
                     case STT_OBJECT:
-                        std::cerr << "STT_OBJECT";
+                        sym_type_human_readable = "STT_OBJECT";
                         break;
                     case STT_FILE:
-                        std::cerr << "STT_FILE";
+                        sym_type_human_readable = "STT_FILE";
                         break;
                     default:
-                        std::cerr << "<unknown type>";
+                        sym_type_human_readable = "<unknown type>";
                         break;
                 }
-                std::cerr << ": " << show_or_anonymous(lnk_sym_name) << "\n";
+                std::println(stderr,
+                             "{}: symbol: {}: {}",
+                             sym_ndx++,
+                             sym_type_human_readable,
+                             show_or_anonymous(lnk_sym_name));
             }
 
             if (ELF64_ST_TYPE(sym.st_info) == STT_NOTYPE) {
@@ -983,8 +932,8 @@ auto main(
                 std::string_view{ reinterpret_cast<char const*>(strtab.data())
                                   + sym.st_name };
             if (verbosity) {
-                std::cerr << "    global sym name: " << sym_name << "\n";
-                std::cerr << "    global .st_name: " << sym.st_name << "\n";
+                std::println(stderr, "    global sym name: {}", sym_name);
+                std::println(stderr, "    global .st_name: {}", sym.st_name);
             }
 
             strtab_cache.emplace(sym_name, sym.st_name);
@@ -1008,31 +957,32 @@ auto main(
              */
             if (not sym.st_value) {
                 if (verbosity) {
-                    std::cerr << "    undefined in this module\n";
+                    std::println(stderr, "    undefined in this module");
                     if (symtab_cache.count(sym_name)) {
                         auto const [def_sym_ndx, def_sym_module] =
                             symtab_cache.at(sym_name);
-                        std::cerr << "    defined as symbol " << def_sym_ndx
-                                  << " (by module " << def_sym_module.native()
-                                  << ")"
-                                  << "\n";
+                        std::println(stderr,
+                                     "    defined as symbol {} (by module {})",
+                                     def_sym_ndx,
+                                     def_sym_module.native());
 
-                        auto const def_sym = symtab.at(def_sym_ndx);
-                        std::cerr << "    address: ";
+                        auto const def_sym    = symtab.at(def_sym_ndx);
+                        auto in_which_section = std::string_view{};
                         switch (ELF64_ST_TYPE(def_sym.st_info)) {
                             case STT_FUNC:
-                                std::cerr << "[.text+0x";
+                                in_which_section = "text";
                                 break;
                             case STT_OBJECT:
-                                std::cerr << "[.rodata+0x";
+                                in_which_section = "rodata";
                                 break;
                             default:
-                                std::cerr << "[<invalid>+0x";
+                                in_which_section = "<invalid>";
                                 break;
                         }
-                        std::cout << std::hex << std::setfill('0')
-                                  << std::setw(16) << def_sym.st_value
-                                  << std::dec << std::setfill(' ') << "]\n";
+                        std::println(stderr,
+                                     "    address: [.{}+0x{:016x}]",
+                                     in_which_section,
+                                     def_sym.st_value);
                     }
                 }
                 continue;
@@ -1041,17 +991,12 @@ auto main(
             if ((not sym_name.empty()) and symtab_cache.count(sym_name)) {
                 auto const [prev_sym_ndx, prev_sym_module] =
                     symtab_cache.at(sym_name);
-                std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
-                          << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                          << "error" << esc(2, ATTR_RESET)
-                          << ": duplicate definition of symbol "
-                          << quote_fancy(sym_name) << "\n";
-                std::cerr << esc(2, COLOR_FG_WHITE) << lnk_path.native()
-                          << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
-                          << "note" << esc(2, ATTR_RESET)
-                          << ": previously defined in module "
-                          << esc(2, COLOR_FG_WHITE) << prev_sym_module.native()
-                          << esc(2, ATTR_RESET) << "\n";
+                viua::support::errorln(lnk_path,
+                                       "duplicate definition of symbol {}",
+                                       quote_fancy(sym_name));
+                viua::support::noteln(lnk_path,
+                                      "previously defined in module {}",
+                                      prev_sym_module.native());
                 return 1;
             }
 
@@ -1066,22 +1011,23 @@ auto main(
 
             auto const sym_ndx = record_symbol(sym_name, sym, lnk_path);
             if (verbosity) {
-                std::cerr << "    defined as symbol " << sym_ndx << "\n";
-                std::cerr << "    address: ";
+                auto in_which_section = std::string_view{};
                 switch (ELF64_ST_TYPE(sym.st_info)) {
                     case STT_FUNC:
-                        std::cerr << "[.text+0x";
+                        in_which_section = "text";
                         break;
                     case STT_OBJECT:
-                        std::cerr << "[.rodata+0x";
+                        in_which_section = "rodata";
                         break;
                     default:
-                        std::cerr << "[<invalid>+0x";
+                        in_which_section = "<invalid>";
                         break;
                 }
-                std::cout << std::hex << std::setfill('0') << std::setw(16)
-                          << sym.st_value << std::dec << std::setfill(' ')
-                          << "]\n";
+                std::println(stderr, "    defined as symbol {}", sym_ndx);
+                std::println(stderr,
+                             "    address: [.{}+0x{:016x}]",
+                             in_which_section,
+                             sym.st_value);
             }
         }
 
@@ -1093,19 +1039,22 @@ auto main(
                                   + lnk_sym.st_name };
 
             if (verbosity) {
-                std::cerr << "  rel at " << rel.r_offset
-                          << " for symbol: " << sym_ndx << ": "
-                          << show_or_anonymous(sym_name)
-                          << " (.st_name = " << lnk_sym.st_name << ")"
-                          << "\n";
+                std::println(stderr,
+                             "  rel at {} for symbol: {}: (.st_name = {})",
+                             rel.r_offset,
+                             sym_ndx,
+                             show_or_anonymous(sym_name),
+                             lnk_sym.st_name);
             }
 
             if (is_defined(lnk_sym)) {
                 auto const patched_ndx = get_symtab_index(lnk_sym);
-                if (options.verbosity) {
-                    std::cerr << "    defined\n";
-                    std::cerr << "    translate .symtab index: " << sym_ndx
-                              << " => " << patched_ndx << "\n";
+                if (verbosity) {
+                    std::println(stderr, "    defined");
+                    std::println(stderr,
+                                 "    translate .symtab index: {} => {}",
+                                 sym_ndx,
+                                 patched_ndx);
                 }
 
                 rel.r_info =
@@ -1118,11 +1067,12 @@ auto main(
                 relocate(lnk_text, rel, patched_ndx);
             } else {
                 if (verbosity) {
-                    std::cerr << "    undefined\n";
-                    std::cerr << "    record as by-name relocation at [.text+0x"
-                              << std::hex << std::setfill('0') << std::setw(16)
-                              << rel.r_offset << std::dec << std::setfill(' ')
-                              << "] for " << sym_name << "\n";
+                    std::println(stderr, "    undefined");
+                    std::println(stderr,
+                                 "    record as by-name relocation at "
+                                 "[.text+0x{:016x}] for {}",
+                                 rel.r_offset,
+                                 sym_name);
                 }
 
                 /*
@@ -1165,15 +1115,16 @@ auto main(
     strtab.push_back('\0');
 
     if (verbosity) {
-        std::cerr << "applying relocations (" << relocations.size() << ")\n";
+        std::println(stderr, "applying {} relocations", relocations.size());
     }
     auto rel_i = size_t{ 0 };
     for (auto const& rel : relocations) {
         if (verbosity) {
-            std::cerr << "  " << rel_i++ << ": relocation at [.text+0x"
-                      << std::hex << std::setfill('0') << std::setw(16)
-                      << rel.r_offset << std::dec << std::setfill(' ') << "]"
-                      << "\n";
+            std::println(stderr,
+                         "  {}: relocation at [.text+0x{:016x}]",
+                         rel_i,
+                         rel.r_offset);
+            ++rel_i;
         }
 
         auto invalid_relocation = false;
@@ -1181,37 +1132,35 @@ auto main(
         if (rel_by_name.count(rel.r_offset)) {
             auto const sym_name = rel_by_name.at(rel.r_offset);
             if (not symtab_cache.count(sym_name)) {
-                std::cerr << esc(2, COLOR_FG_WHITE) << output_path.native()
-                          << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                          << "error" << esc(2, ATTR_RESET)
-                          << ": undefined reference to symbol "
-                          << quote_fancy(sym_name) << "\n";
+                viua::support::errorln(
+                    "undefined reference to symbol {}", quote_fancy(sym_name));
                 return 1;
             }
             auto const sym_ndx = symtab_cache.at(sym_name).first;
             auto const sym     = symtab.at(sym_ndx);
 
             if (verbosity) {
-                std::cerr << "    symbol: " << show_or_anonymous(sym_name)
-                          << "\n";
-                std::cerr << "    rel-kind: by-name\n";
-
-                std::cerr << "    .st_value: ";
+                auto in_which_section = std::string_view{};
                 switch (ELF64_ST_TYPE(sym.st_info)) {
                     case STT_FUNC:
-                        std::cerr << "[.text+0x";
+                        in_which_section = "text";
                         break;
                     case STT_OBJECT:
-                        std::cerr << "[.rodata+0x";
+                        in_which_section = "rodata";
                         break;
                     default:
-                        std::cerr << "[<invalid>+0x";
+                        in_which_section   = "<invalid>";
                         invalid_relocation = true;
                         break;
                 }
-                std::cout << std::hex << std::setfill('0') << std::setw(16)
-                          << sym.st_value << std::dec << std::setfill(' ')
-                          << "]\n";
+
+                std::println(
+                    stderr, "    symbol: {}", show_or_anonymous(sym_name));
+                std::println(stderr, "    rel-kind: by-name");
+                std::println(stderr,
+                             "    .st_value: [{}+0x{:016x}]",
+                             in_which_section,
+                             sym.st_value);
             }
 
             if (invalid_relocation) {
@@ -1226,26 +1175,27 @@ auto main(
                                   + sym.st_name };
 
             if (verbosity) {
-                std::cerr << "    symbol: " << show_or_anonymous(sym_name)
-                          << "\n";
-                std::cerr << "    rel-kind: by-index\n";
-
-                std::cerr << "    .st_value: ";
+                auto in_which_section = std::string_view{};
                 switch (ELF64_ST_TYPE(sym.st_info)) {
                     case STT_FUNC:
-                        std::cerr << "[.text+0x";
+                        in_which_section = "text";
                         break;
                     case STT_OBJECT:
-                        std::cerr << "[.rodata+0x";
+                        in_which_section = "rodata";
                         break;
                     default:
-                        std::cerr << "[<invalid>+0x";
+                        in_which_section   = "<invalid>";
                         invalid_relocation = true;
                         break;
                 }
-                std::cout << std::hex << std::setfill('0') << std::setw(16)
-                          << sym.st_value << std::dec << std::setfill(' ')
-                          << "]\n";
+
+                std::println(
+                    stderr, "    symbol: {}", show_or_anonymous(sym_name));
+                std::println(stderr, "    rel-kind: by-index");
+                std::println(stderr,
+                             "    .st_value: [{}+0x{:016x}]",
+                             in_which_section,
+                             sym.st_value);
             }
 
             if (invalid_relocation) {
@@ -1256,31 +1206,28 @@ auto main(
     }
 
     if ((not entry_addr.has_value()) and as_executable) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << output_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no entry point defined, but requested output is an "
-                     "executable\n";
+        viua::support::errorln(
+            output_path,
+            "no entry point defined, but requested --type {}",
+            output_type);
         return 1;
     }
     if (entry_addr.has_value() and not as_executable) {
-        std::cerr
-            << esc(2, COLOR_FG_WHITE) << output_path.native()
-            << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED) << "error"
-            << esc(2, ATTR_RESET)
-            << ": entry point defined, but requested output is a library\n";
+        viua::support::errorln(output_path,
+                               "entry point defined, but requested --type {}",
+                               output_type);
         return 1;
     }
 
     if (dump_strtab) {
-        std::cerr << "[.strtab] allocated size: " << strtab.size()
-                  << " bytes\n";
+        std::println(
+            stderr, "[.strtab] allocated size: {} bytes", strtab.size());
         for (auto i = size_t{ 0 }; i < strtab.size(); ++i) {
             auto const sv = std::string_view{ reinterpret_cast<char const*>(
                 strtab.data() + i) };
-            std::cout << "[.strtab+0x" << std::hex << std::setfill('0')
-                      << std::setw(16) << i << std::dec << std::setfill(' ')
-                      << "] = " << quote_fancy(sv) << "\n";
+
+            std::println(
+                stderr, "[.strtab+0x{:016x}] = {}", i, quote_fancy(sv));
             i += sv.size();
         }
     }
