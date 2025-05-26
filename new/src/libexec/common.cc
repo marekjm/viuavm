@@ -74,6 +74,15 @@ auto Args::get_printable(
                            [](auto const acc, auto const el) -> std::string
                            { return std::format("{} {}", acc, el); })
                        + " ]";
+            } else if constexpr (std::is_same_v<T,
+                                                std::set<std::string_view>>) {
+                return std::reduce(
+                           v.begin(),
+                           v.end(),
+                           std::string{ "{" },
+                           [](auto const acc, auto const el) -> std::string
+                           { return std::format("{} {}", acc, el); })
+                       + " }";
             } else if constexpr (std::is_same_v<T, std::string_view>) {
                 return std::string{ v };
             } else {
@@ -118,14 +127,25 @@ auto Args::parse_with(
                             ++std::get<size_t>(options[saved_label]);
                             break;
                         case List:
-                            if (not options.contains(saved_label)) {
-                                auto dummy = std::vector<std::string_view>{};
-                                options[saved_label] = std::move(dummy);
+                            {
+                                using T = std::vector<std::string_view>;
+                                if (not options.contains(saved_label)) {
+                                    options[saved_label] = T{};
+                                }
+                                std::get<T>(options[saved_label])
+                                    .push_back(argv.at(++i));
+                                break;
                             }
-                            std::get<std::vector<std::string_view>>(
-                                options[saved_label])
-                                .push_back(argv.at(++i));
-                            break;
+                        case Set:
+                            {
+                                using T = std::set<std::string_view>;
+                                if (not options.contains(saved_label)) {
+                                    options[saved_label] = T{};
+                                }
+                                std::get<T>(options[saved_label])
+                                    .insert(argv.at(++i));
+                                break;
+                            }
                         case Single:
                             options[saved_label] = argv.at(++i);
                             break;
@@ -165,14 +185,25 @@ auto Args::parse_with(
                             ++std::get<size_t>(options[saved_label]);
                             break;
                         case List:
-                            if (not options.contains(saved_label)) {
-                                auto dummy = std::vector<std::string_view>{};
-                                options[saved_label] = std::move(dummy);
+                            {
+                                using T = std::vector<std::string_view>;
+                                if (not options.contains(saved_label)) {
+                                    options[saved_label] = T{};
+                                }
+                                std::get<T>(options[saved_label])
+                                    .push_back(argv.at(++i));
+                                break;
                             }
-                            std::get<std::vector<std::string_view>>(
-                                options[saved_label])
-                                .push_back(argv.at(++i));
-                            break;
+                        case Set:
+                            {
+                                using T = std::set<std::string_view>;
+                                if (not options.contains(saved_label)) {
+                                    options[saved_label] = T{};
+                                }
+                                std::get<T>(options[saved_label])
+                                    .insert(argv.at(++i));
+                                break;
+                            }
                         case Single:
                             options[saved_label] = argv.at(++i);
                             break;

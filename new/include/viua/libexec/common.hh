@@ -65,6 +65,7 @@ struct Args {
         Switch,
         Level,
         List,
+        Set,
         Single,
     };
     using value_type = std::variant<
@@ -97,6 +98,12 @@ struct Args {
          * which adds /foo/include and /bar/include to the include search list.
          */
         std::vector<std::string_view>,
+
+        /*
+         * Same as list, except used for options where the ordering of the
+         * sequence does not really matter.
+         */
+        std::set<std::string_view>,
 
         /*
          * Used for "option" switches eg, --message in Git where the user can
