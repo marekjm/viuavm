@@ -28,6 +28,7 @@
 #include <filesystem>
 #include <iostream>
 #include <optional>
+#include <print>
 #include <vector>
 
 #include <viua/arch/arch.h>
