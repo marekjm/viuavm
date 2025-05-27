@@ -16,7 +16,7 @@ Link ELF files containing Viua bytecode.
 
 include(common/tool-options.scdoc)
 
-*-o*, *--out* _output_
+*-o*, *--out*=_output_
 	Write produced file into _output_ file instead of the default output path.
 	The default output path depends on the type of the produced ELF:
 	- *a.out* for executable files
@@ -24,7 +24,7 @@ include(common/tool-options.scdoc)
 	- _baseobj_.a for static libraries
 	- _baseobj_.o for object files
 
-*--type* _type_
+*--type*=_type_
 	Produce an ELF of the requested type. The _type_ may be one of:
 	- *exec* (the default) to produce an executable file
 	- *shared* to produce a shared library
@@ -34,7 +34,7 @@ include(common/tool-options.scdoc)
 *-c*, *--object*
 	A shortcut for *--type object*.
 
-*--dump* _what_
+*--dump*=_what_
 	Dump results of the intermediate stages of the linking process. The _what_
 	argument may be:
 	- *strtab* to dump the string table

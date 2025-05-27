@@ -99,7 +99,50 @@ auto Args::parse_with(
     labels.clear();
     options.clear();
 
-    auto i = size_t{ 0 };
+    auto i          = size_t{ 0 };
+    auto const save = [this, &i](std::string label,
+                                 Kind const kind,
+                                 std::optional<std::string_view> const value =
+                                     std::nullopt) -> void
+    {
+        auto const saved_label =
+            std::string_view{ *labels.insert(label).first };
+
+        switch (kind) {
+            using enum Args::Kind;
+            case Switch:
+                options[saved_label] = true;
+                break;
+            case Level:
+                ++std::get<size_t>(options[saved_label]);
+                break;
+            case List:
+                {
+                    using T = std::vector<std::string_view>;
+                    if (not options.contains(saved_label)) {
+                        options[saved_label] = T{};
+                    }
+                    std::get<T>(options[saved_label])
+                        .push_back(value.has_value() ? *value : argv.at(++i));
+                    break;
+                }
+            case Set:
+                {
+                    using T = std::set<std::string_view>;
+                    if (not options.contains(saved_label)) {
+                        options[saved_label] = T{};
+                    }
+                    std::get<T>(options[saved_label])
+                        .insert(value.has_value() ? *value : argv.at(++i));
+                    break;
+                }
+            case Single:
+                options[saved_label] =
+                    value.has_value() ? *value : argv.at(++i);
+                break;
+        }
+    };
+
     for (; i < argv.size(); ++i) {
         auto a = std::string_view{ argv.at(i) };
 
@@ -115,41 +158,26 @@ auto Args::parse_with(
             for (auto const& [opt, kind] : ui) {
                 auto const& [_, label] = opt;
                 if ((valid = (a == label))) {
-                    auto const saved_label =
-                        std::string_view{ *labels.insert(label).first };
+                    save(label, kind);
 
-                    switch (kind) {
-                        using enum Args::Kind;
-                        case Switch:
-                            options[saved_label] = true;
-                            break;
-                        case Level:
-                            ++std::get<size_t>(options[saved_label]);
-                            break;
-                        case List:
-                            {
-                                using T = std::vector<std::string_view>;
-                                if (not options.contains(saved_label)) {
-                                    options[saved_label] = T{};
-                                }
-                                std::get<T>(options[saved_label])
-                                    .push_back(argv.at(++i));
-                                break;
-                            }
-                        case Set:
-                            {
-                                using T = std::set<std::string_view>;
-                                if (not options.contains(saved_label)) {
-                                    options[saved_label] = T{};
-                                }
-                                std::get<T>(options[saved_label])
-                                    .insert(argv.at(++i));
-                                break;
-                            }
-                        case Single:
-                            options[saved_label] = argv.at(++i);
-                            break;
-                    }
+                    /*
+                     * We found the match, so let's not continue uselessly
+                     * iterating over all other options.
+                     */
+                    break;
+                }
+
+                auto const maybe_with_equals = std::string{ label } + '=';
+                if ((valid = a.starts_with(maybe_with_equals))) {
+                    /*
+                     * The option was passed as "--foo=bar". Let's skip the
+                     * "foo=" part so that our a views only the "bar" part. This
+                     * can then be supplied as the value to use by the saver
+                     * function.
+                     */
+                    a.remove_prefix(maybe_with_equals.size());
+
+                    save(label, kind, a);
 
                     /*
                      * We found the match, so let's not continue uselessly
@@ -173,41 +201,26 @@ auto Args::parse_with(
             for (auto const& [opt, kind] : ui) {
                 auto const& [shortcut, label] = opt;
                 if ((valid = (a == shortcut))) {
-                    auto const saved_label =
-                        std::string_view{ *labels.insert(label).first };
+                    save(label, kind);
 
-                    switch (kind) {
-                        using enum Args::Kind;
-                        case Switch:
-                            options[saved_label] = true;
-                            break;
-                        case Level:
-                            ++std::get<size_t>(options[saved_label]);
-                            break;
-                        case List:
-                            {
-                                using T = std::vector<std::string_view>;
-                                if (not options.contains(saved_label)) {
-                                    options[saved_label] = T{};
-                                }
-                                std::get<T>(options[saved_label])
-                                    .push_back(argv.at(++i));
-                                break;
-                            }
-                        case Set:
-                            {
-                                using T = std::set<std::string_view>;
-                                if (not options.contains(saved_label)) {
-                                    options[saved_label] = T{};
-                                }
-                                std::get<T>(options[saved_label])
-                                    .insert(argv.at(++i));
-                                break;
-                            }
-                        case Single:
-                            options[saved_label] = argv.at(++i);
-                            break;
-                    }
+                    /*
+                     * We found the match, so let's not continue uselessly
+                     * iterating over all other options.
+                     */
+                    break;
+                }
+
+                auto const maybe_with_equals = std::string{ shortcut } + '=';
+                if ((valid = a.starts_with(maybe_with_equals))) {
+                    /*
+                     * The option was passed as "-f=bar". Let's skip the "f="
+                     * part so that our a views only the "bar" part. This can
+                     * then be supplied as the value to use by the saver
+                     * function.
+                     */
+                    a.remove_prefix(maybe_with_equals.size());
+
+                    save(label, kind, a);
 
                     /*
                      * We found the match, so let's not continue uselessly

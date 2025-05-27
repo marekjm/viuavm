@@ -17,11 +17,11 @@ ELF files to be consumed by the virtual machine's linker ie, *viua-ld*(1).
 
 include(common/tool-options.scdoc)
 
-*-o*, *--out* _output_
+*-o*, *--out*=_output_
 	Write produced ELF file into _output_ file instead of the default _source_.o
 	file.
 
-*--dump* _what_
+*--dump*=_what_
 	Dump results of intermediate stages of the assembler's work.
 	The _what_ argument can be either of:
 

@@ -17,15 +17,15 @@ Disassemble ELF files produced by the Viua toolchain.
 
 include(common/tool-options.scdoc)
 
-*-o*, *--out* _output_
+*-o*, *--out*=_output_
 	Put the disassembly in the _output_ file instead of writing it to the
 	standard output stream.
 
-*-i* _instruction_
+*-i*, *--instruction*=_instruction_
 	Disassemble a single _instruction_ instead of a file. This option may be
 	specified more than once to disassemble more single instructions.
 
-*-N*, *--no-demangle* _kind_
+*-N*, *--no-demangle*=_kind_
 	The following table describes what _kind_ of instructions will not be
 	demangled for each value of _kind_:
 
