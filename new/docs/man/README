@@ -1,0 +1,13 @@
+# man pages for Viua VM
+
+Use the following command to render and view them without installation:
+
+    ]$ bash ./see-scdoc.sh man1/viua.1.scdoc | less -R
+
+After installation, the man pages are available by invoking each tool with the
+--help option, invoking the frontend's help subcommand with a tool's name, or by
+requesting the man page directly eg,
+
+    ]$ viua asm --help
+    ]$ viua help asm
+    ]$ man 1 viua-asm

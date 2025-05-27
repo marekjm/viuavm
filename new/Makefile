@@ -41,6 +41,8 @@ BUILD_PREFIX=./build
 BUILD_LIBDIR=$(BUILD_PREFIX)/lib
 BUILD_EXEDIR=$(BUILD_PREFIX)/libexec/viua
 BUILD_BINDIR=$(BUILD_PREFIX)/bin
+BUILD_SHAREDIR=$(BUILD_PREFIX)/share
+BUILD_MANDIR=$(BUILD_SHAREDIR)/man
 
 
 ################################################################################
@@ -175,12 +177,12 @@ install: all-silent
 	install \
 		--mode 644 \
 		-D --target-directory $(DESTDIR)$(mandir)/man1 \
-		$(BUILD_PREFIX)/docs/man/*.1
+		$(BUILD_MANDIR)/man1/*.1
 	ln -sf $(mandir)/man1/viua.1 $(DESTDIR)$(mandir)/man1/viua-viua.1
 	install \
 		--mode 644 \
 		-D --target-directory $(DESTDIR)$(mandir)/man7 \
-		$(BUILD_PREFIX)/docs/man/*.7
+		$(BUILD_MANDIR)/man7/*.7
 
 install-binfmt:
 	mkdir -p $(libdir)/binfmt.d
@@ -199,15 +201,15 @@ format:
 	yamlfmt $(shell git rev-parse --show-toplevel)/.builds/*
 
 man: \
-	$(BUILD_PREFIX)/docs/man/viua-asm.7 \
-	$(BUILD_PREFIX)/docs/man/viua-asm.1 \
-	$(BUILD_PREFIX)/docs/man/viua-ld.1 \
-	$(BUILD_PREFIX)/docs/man/viua-dis.1 \
-	$(BUILD_PREFIX)/docs/man/viua-readelf.1 \
-	$(BUILD_PREFIX)/docs/man/viua-vm.1 \
-	$(BUILD_PREFIX)/docs/man/viua.1
+	$(BUILD_MANDIR)/man7/viua-asm.7 \
+	$(BUILD_MANDIR)/man1/viua-asm.1 \
+	$(BUILD_MANDIR)/man1/viua-ld.1 \
+	$(BUILD_MANDIR)/man1/viua-dis.1 \
+	$(BUILD_MANDIR)/man1/viua-readelf.1 \
+	$(BUILD_MANDIR)/man1/viua-vm.1 \
+	$(BUILD_MANDIR)/man1/viua.1
 
-$(BUILD_PREFIX)/docs/man/%: docs/man/%.scdoc docs/man/common/*.scdoc
+$(BUILD_MANDIR)/%: docs/man/%.scdoc docs/man/common/*.scdoc
 	@mkdir -p $(shell dirname $@)
 	m4 -I docs/man -D "PUT_VIUAVM_VERSION_HERE=$(VIUA_TAG_VERSION)" $< |\
 		scdoc > $@
