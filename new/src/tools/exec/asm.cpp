@@ -3476,7 +3476,6 @@ auto main(
             { { "h", "help" }, Args::Kind::Switch },
             { { "", "built-with" }, Args::Kind::Switch },
             { { "o", "out" }, Args::Kind::Single },
-            { { "I", "include" }, Args::Kind::List },
             { { " ", "dump" }, Args::Kind::Set },
         });
     if (args.args.empty()) {
