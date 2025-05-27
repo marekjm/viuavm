@@ -199,6 +199,7 @@ format:
 	yamlfmt $(shell git rev-parse --show-toplevel)/.builds/*
 
 man: \
+	$(BUILD_PREFIX)/docs/man/viua-asm.7 \
 	$(BUILD_PREFIX)/docs/man/viua-asm.1 \
 	$(BUILD_PREFIX)/docs/man/viua-ld.1 \
 	$(BUILD_PREFIX)/docs/man/viua-dis.1 \

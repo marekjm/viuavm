@@ -1,0 +1,36 @@
+VIUA-ASM(7) "Viua VM PUT_VIUAVM_VERSION_HERE" "Viua VM Manual"
+
+# NAME
+
+viua-asm - Viua VM assembly language reference
+
+# SYNOPSIS
+
+*.directive*++
+*.directive:* _argument_
+
+*instruction* [_argument_...]
+
+# DESCRIPTION
+
+Viua assembly language is used to compose the source code of programs to be
+executed by the Viua virtual machine.
+The language consists of *directives* and *instructions*;
+the former directing the assembler, and the latter being encoded into the binary
+form that, after further processing by *viua-ld*(1), the virtual machine can
+understand.
+
+# FILES
+
+*.s*, *.asm*
+	By convention, the files containing Viua assembly language source code have
+	either *.s* or *.asm* suffix.
+
+# SEE ALSO
+
+*viua-asm*(1),
+*viua-ld*(1).
+
+include(common/footer.scdoc)
+
+; vim:ft=scdoc:
