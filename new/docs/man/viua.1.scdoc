@@ -1,0 +1,76 @@
+VIUA(1) "Viua VM PUT_VIUAVM_VERSION_HERE" "Viua VM Manual"
+
+# NAME
+
+viua - the entry point of the Viua VM toolchain
+
+# SYNOPSIS
+
+*viua* _tool_ [_options_...] [_operands_...]
+
+*viua* [_tool_] *--version* [*--verbose*]++
+*viua* [_tool_] *--built-with*
+
+*viua* *--help* [_tool_]++
+*viua* [_tool_] *--help*++
+*viua* *help* [_tool_]
+
+*viua* *--prefix*
+
+# DESCRIPTION
+
+The frontend script for the Viua toolchain, dispatching commands to internal
+executables. For example, the following command
+
+	\]$ viua asm --out foo.o foo.asm
+
+will execute
+
+	/usr/local/libexec/viua/asm --out foo.o foo.asm
+
+if the toolchain has been installed into the /usr/local prefix. The internal
+executables can be used directly, but using them through the *viua* frontend is
+more convenient.
+
+Why even use a frontend script? To avoit polluting *PATH* with viua-foo,
+viua-bar, viua-baz, etc commands; and to allow having multiple Viua versions
+installed in parallel.
+
+The following tools are available:
+
+- *asm* - the assembler
+- *ld* - the linker
+- *vm* - the interpreter
+- *dis* - the disassembler
+- *readelf* - the ELF inspector
+
+See their respective man pages eg, *viua-asm*(1), for more information.
+
+# OPTIONS
+
+include(common/tool-options.scdoc)
+
+*--prefix*
+	Display the currently used prefix.
+
+# EXIT STATUS
+
+|[ 0
+:< Successful program execution
+|  1
+:  Error during program execution
+
+The internal tools report different exit codes and to signal specific
+conditions. See their respective man pages for more information.
+
+# SEE ALSO
+
+*viua-asm*(1),
+*viua-dis*(1),
+*viua-ld*(1),
+*viua-readelf*(1),
+*viua-vm*(1).
+
+include(common/footer.scdoc)
+
+; vim:ft=scdoc:

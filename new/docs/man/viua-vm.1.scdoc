@@ -1,0 +1,74 @@
+VIUA-VM(1) "Viua VM PUT_VIUAVM_VERSION_HERE" "Viua VM Manual"
+
+# NAME
+
+viua-vm - the Viua virtual machine
+
+# SYNOPSIS
+
+*viua vm* [_options_] [--] _executable_ [_args_...]++
+*viua vm* [_options_]
+
+# DESCRIPTION
+
+*viua vm* is the interpreter for ELF files containing Viua bytecode.
+
+If any _args_ are present they are forwarded to the main function defined by the
+_executable_, and made available as a string vector.
+
+Standard input and standard output streams are not used by the VM.
+The program being executed has direct, uninterrupted, and unfiltered access to
+both of them.
+
+Standard error stream _is_ used by the virtual machine, unless the
+*VIUA_VM_TRACE_FD* environment variable is defined (see the *ENVIRONMENT*
+section).
+By default, the virtual machine uses the standard error stream for its
+diagnostic and error messages, and execution trace recording.
+
+# OPTIONS
+
+include(common/tool-options.scdoc)
+The VM has no options specific to itself, but see the *ENVIRONMENT* section.
+
+# EXIT STATUS
+
+|[ 0
+:< Successful program execution
+|  1
+:  Error during execution
+|  other
+:  The _executable_ may set any exit code. The exit code's meaning depends on
+   the executed program.
+
+# ENVIRONMENT
+
+*VIUA_VM_TRACE_FD*=_fd_
+	The file descriptor to be used for trace output instead of the standard
+	error stream.
+	Trace output contains a human-readable stream of all executed instructions,
+	as well as the output of *ebreak* instructions.
+
+*VIUA_VM_PID_SEED*=_seed_
+	Set seed of PIDs to be _seed_, which must be a valid IPv6 address. The
+	high 64 bits identify a virtual machine instance, and the low 64 bits are
+	used as a counter to assign PIDs to processes.
+
+	By default, the seed is *[fe80::]*.
+
+# FILES
+
+_executable_ is open read-only, and must be a valid executable ELF file
+containing Viua bytecode.
+
+# SEE ALSO
+
+*viua-asm*(1),
+*viua-ld*(1),
+*viua-dis*(1).
+
+*readelf*(1).
+
+include(common/footer.scdoc)
+
+; vim:ft=scdoc:

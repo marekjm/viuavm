@@ -1,0 +1,17 @@
+; vim:ft=scdoc:
+
+## Common options
+
+*-h*, *--help*
+	Show the man page.
+
+*--version*
+	Show version information.
+
+*-v*, *--verbose*
+	Show verbose output.
+
+*--built-with*
+	Show what the toolchain has been built with.
+
+## Tool options

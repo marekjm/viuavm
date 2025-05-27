@@ -1,0 +1,62 @@
+VIUA-DIS(1) "Viua VM PUT_VIUAVM_VERSION_HERE" "Viua VM Manual"
+
+# NAME
+
+viua-dis - the Viua VM disassembler
+
+# SYNOPSIS
+
+*viua dis* *-i* _instruction_++
+*viua dis* [*--no-demangle=all*]++
+         [*--no-demangle=li*]++
+         [*--no-demangle=mem*]++
+         [*--out* _output_] _input_
+
+# DESCRIPTION
+
+Disassemble ELF files produced by the Viua toolchain.
+
+# OPTIONS
+
+include(common/tool-options.scdoc)
+
+*-o*, *--out* _output_
+	Put the disassembly in the _output_ file instead of writing it to the
+	standard output stream.
+
+*-i* _instruction_
+	Disassemble a single _instruction_ instead of a file. This option may be
+	specified more than once to disassemble more single instructions.
+
+*--no-demangle=li*
+	Do not demangle integer loads into a single *li* pseudoinstruction.
+
+*--no-demangle=mem*
+	Do not demangle memory loads.
+
+*--no-demangle=all*
+	Do not demangle any pseudoinstructions.
+
+# EXIT STATUS
+
+|[ 0
+:< Successful program execution
+|  1
+:  Invalid input
+
+# FILES
+
+|[ _input_
+:< An ELF file containing Viua bytecode. The _input_ file is open read-only.
+|  _output_
+:  The _output_ file will contain Viua assembly language source code if the
+   disassembler ran successfully.
+
+# SEE ALSO
+
+*viua-asm*(1),
+*viua-readelf*(1).
+
+include(common/footer.scdoc)
+
+; vim:ft=scdoc:

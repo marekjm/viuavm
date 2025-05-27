@@ -1,0 +1,70 @@
+VIUA-ASM(1) "Viua VM PUT_VIUAVM_VERSION_HERE" "Viua VM Manual"
+
+# NAME
+
+viua-asm - the Viua VM assembler
+
+# SYNOPSIS
+
+*viua asm* [_options_] [*--out* _output_] [--] _source_
+
+# DESCRIPTION
+
+*viua asm* is a tool that converts Viua assembly source code into relocatable
+ELF files to be consumed by the virtual machine's linker ie, *viua-ld*(1).
+
+# OPTIONS
+
+include(common/tool-options.scdoc)
+
+*-o*, *--out* _output_
+	Write produced ELF file into _output_ file instead of the default _source_.o
+	file.
+
+*--dump* _what_
+	Dump results of intermediate stages of the assembler's work.
+	The _what_ argument can be either of:
+
+	- *lex-raw* to dump raw token stream
+	- *lex-cooked* to dump processed token stream
+	- *ast* to dump the abstract syntax tree of the source code
+
+	The *--dump* option may be specified multiple times to request the dump of
+	more than one stage.
+
+# EXIT STATUS
+
+|[ 0
+:< Successful program execution
+|  1
+:  Error during assembly
+
+# FILES
+
+|[ _source_
+:< The assembler opens its input file read-only. The file must contain valid
+   Viua VM assembly source code.
+|  _output_
+:  The assembler outputs a single relocatable ELF file.
+
+## Note on ELF files produced by Viua
+
+The _output_ is a valid ELF file and as such can be inspected using the regular
+*readelf*(1) program.
+
+Viua toolchain also includes *viua-readelf*(1) ie, a version of *readelf*(1)
+specialised for Viua ELFs and capable of displaying the information in them with
+more detail.
+
+# SEE ALSO
+
+*viua-dis*(1),
+*viua-ld*(1),
+*viua-readelf*(1).
+
+*readelf*(1),
+*elf*(5).
+
+include(common/footer.scdoc)
+
+; vim:ft=scdoc:

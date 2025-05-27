@@ -1,0 +1,71 @@
+VIUA-LD(1) "Viua VM PUT_VIUAVM_VERSION_HERE" "Viua VM Manual"
+
+# NAME
+
+viua-ld - the Viua VM linker
+
+# SYNOPSIS
+
+*viua ld* [*--out* _output_] [*--type* _type_] _baseobj_ [_objfile_...]
+
+# DESCRIPTION
+
+Link ELF files containing Viua bytecode.
+
+# OPTIONS
+
+include(common/tool-options.scdoc)
+
+*-o*, *--out* _output_
+	Write produced file into _output_ file instead of the default output path.
+	The default output path depends on the type of the produced ELF:
+	- *a.out* for executable files
+	- _baseobj_.so for shared libraries
+	- _baseobj_.a for static libraries
+	- _baseobj_.o for object files
+
+*--type* _type_
+	Produce an ELF of the requested type. The _type_ may be one of:
+	- *exec* (the default) to produce an executable file
+	- *shared* to produce a shared library
+	- *static* to produce a static library
+	- *object* to produce an object file
+
+*-c*, *--object*
+	A shortcut for *--type object*.
+
+*--dump* _what_
+	Dump results of the intermediate stages of the linking process. The _what_
+	argument may be:
+	- *strtab* to dump the string table
+
+# EXIT STATUS
+
+|[ 0
+:< Successful program execution
+|  1
+:  Invalid input
+
+# FILES
+
+|[ _baseobj_
+:< The main object file to use. Default name of the output depends on it.
+|  _objfiles_
+:  The object files to link with the main file.
+|  _output_
+:  The produced ELF file.
+
+The linker opens its input files read-only.
+
+# SEE ALSO
+
+*viua-asm*(1),
+*viua-dis*(1),
+*viua-readelf*(1).
+
+*readelf*(1),
+*elf*(5).
+
+include(common/footer.scdoc)
+
+; vim:ft=scdoc:

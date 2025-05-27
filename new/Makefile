@@ -111,6 +111,7 @@ all: all-silent
 	@$(BUILD_EXEDIR)/vm --built-with
 
 all-silent: \
+	man \
 	$(BUILD_EXEDIR)/readelf \
 	$(BUILD_EXEDIR)/dis \
 	$(BUILD_EXEDIR)/asm \
@@ -174,16 +175,12 @@ install: all-silent
 	install \
 		--mode 644 \
 		-D --target-directory $(DESTDIR)$(mandir)/man1 \
-		docs/man/*.1
+		$(BUILD_PREFIX)/docs/man/*.1
 	ln -sf $(mandir)/man1/viua.1 $(DESTDIR)$(mandir)/man1/viua-viua.1
 	install \
 		--mode 644 \
 		-D --target-directory $(DESTDIR)$(mandir)/man7 \
-		docs/man/*.7
-	find $(DESTDIR)$(mandir) -type f -name 'viua*' -print0 |\
-		xargs -P 0 -0 sed -i \
-		-e "s#PUT_VIUAVM_TAG_DATESTAMP_HERE#$(VIUA_TAG_DATESTAMP)#g" \
-		-e "s#PUT_VIUAVM_VERSION_HERE#$(VIUA_TAG_VERSION)#g"
+		$(BUILD_PREFIX)/docs/man/*.7
 
 install-binfmt:
 	mkdir -p $(libdir)/binfmt.d
@@ -201,6 +198,19 @@ format:
 	black --quiet tests/suite.py
 	yamlfmt $(shell git rev-parse --show-toplevel)/.builds/*
 
+man: \
+	$(BUILD_PREFIX)/docs/man/viua-asm.1 \
+	$(BUILD_PREFIX)/docs/man/viua-ld.1 \
+	$(BUILD_PREFIX)/docs/man/viua-dis.1 \
+	$(BUILD_PREFIX)/docs/man/viua-readelf.1 \
+	$(BUILD_PREFIX)/docs/man/viua-vm.1 \
+	$(BUILD_PREFIX)/docs/man/viua.1
+
+$(BUILD_PREFIX)/docs/man/%: docs/man/%.scdoc docs/man/common/*.scdoc
+	@mkdir -p $(shell dirname $@)
+	m4 -I docs/man -D "PUT_VIUAVM_VERSION_HERE=$(VIUA_TAG_VERSION)" $< |\
+		scdoc > $@
+
 
 ################################################################################
 # Development quality-of-life targets
@@ -213,6 +223,7 @@ watch-impl:
 		ls -1 Makefile ;\
 		find Makefile.d -mindepth 1 ;\
 		find . -mindepth 2 -name '*.asm' ;\
+		find ./docs/man -type f -name '*.scdoc' ;\
 		find ./src -type f ;\
 		find ./include -type f\
 	)
