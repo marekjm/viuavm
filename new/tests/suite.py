@@ -115,19 +115,29 @@ SKIP_DISASSEMBLER_TESTS = getenv_bool("SKIP_DISASSEMBLER_TESTS", default="false"
 
 PROGRESS_INDICATORS = getenv_bool("PROGRESS_INDICATORS", default="true")
 print(f"PROGRESS_INDICATORS={PROGRESS_INDICATORS}")
-PROGRESS_INDICATOR_ERASER = "\b" * (len("[ ~~ ]") + 1 + 10)
+PROGRESS_INDICATOR_ERASER = "\b" * (len("[ ~~ ]") + (2 * (1 + 10)))
 
 PAUSE_60_FPS = 0.016
 PROGRESS_INDICATOR_PAUSE = 0
 IO_MONITORING_INDICATOR_PAUSE = PAUSE_60_FPS
 
 
+SUITE_START_TIMEPOINT: datetime.datetime = None
+SUITE_STOP_TIMEPOINT: datetime.datetime = None
+
+
 def indicate_progress(start_timepoint, message, *, erase=True):
     if not PROGRESS_INDICATORS:
         return
     erase = PROGRESS_INDICATOR_ERASER if erase else ""
-    run_time = format_run_time(datetime.datetime.now() - start_timepoint)
-    print(f"{erase}[ {message} ] {run_time:10s}", end="", flush=True)
+    suite_run_time = format_run_time(
+        datetime.datetime.now() - SUITE_START_TIMEPOINT
+    ).strip()
+    suite_run_time = f"({suite_run_time})".ljust(10)
+    case_run_time = format_run_time(datetime.datetime.now() - start_timepoint)
+    print(
+        f"{erase}[ {message} ] {case_run_time:10s} {suite_run_time}", end="", flush=True
+    )
     time.sleep(PROGRESS_INDICATOR_PAUSE)
 
 
@@ -1506,6 +1516,9 @@ def main(args):
         )
     )
 
+    global SUITE_START_TIMEPOINT
+    SUITE_START_TIMEPOINT = datetime.datetime.now()
+
     prepare_dependencies(CASES_DIR)
 
     # Set a known PID seed. This makes test checks much easier to write, as the
@@ -1642,7 +1655,7 @@ def main(args):
                         )
                     )
                     if (result and perf)
-                    else ""
+                    else (11 * " ")
                 ),
             )
         )
@@ -1656,6 +1669,9 @@ def main(args):
             traceback.print_exception(
                 internal_test_suite_failure, limit=None, chain=True
             )
+
+    global SUITE_STOP_TIMEPOINT
+    SUITE_STOP_TIMEPOINT = datetime.datetime.now()
 
     for result_tag, tagged_cases in run_list.items():
         with open(os.path.join(CACHE_DIR, result_tag), "w") as ofstream:
@@ -1678,6 +1694,15 @@ def main(args):
             colorise(
                 run_color,
                 "{:5.2f}".format((success_cases / len(cases)) * 100),
+            ),
+        )
+    )
+
+    print(
+        "\nsuite run time was {}".format(
+            colorise(
+                "white",
+                format_run_time(SUITE_STOP_TIMEPOINT - SUITE_START_TIMEPOINT).strip(),
             ),
         )
     )
