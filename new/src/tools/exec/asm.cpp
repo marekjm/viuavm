@@ -3490,7 +3490,7 @@ auto main(
                                                         .value() }
             : std::nullopt
     };
-    auto const requested_dumps =
+    auto const dump_what =
         args.get<std::set<std::string_view>>("dump").value_or(
             std::set<std::string_view>{});
 
@@ -3545,13 +3545,13 @@ auto main(
      * illegal characters are used, strings are unclosed, etc.
      */
     auto lexemes = viua::libs::lexer::stage::lex(source_path, source_text);
-    if (DEBUG_LEX and requested_dumps.contains("lex-raw")) {
+    if (DEBUG_LEX and dump_what.contains("lex-raw")) {
         std::cerr << lexemes.size() << " raw lexeme(s)\n";
         dump_lexemes(lexemes);
     }
 
     lexemes = viua::libs::lexer::stage::remove_noise(std::move(lexemes));
-    if (DEBUG_LEX and requested_dumps.contains("lex-cooked")) {
+    if (DEBUG_LEX and dump_what.contains("lex-cooked")) {
         std::cerr << lexemes.size() << " cooked lexeme(s)\n";
         dump_lexemes(lexemes);
     }
@@ -3574,7 +3574,7 @@ auto main(
     } catch (viua::libs::errors::compile_time::Error const& e) {
         viua::libs::stage::display_error_and_exit(source_path, source_text, e);
     }
-    if (DEBUG_PARSE and requested_dumps.contains("ast")) {
+    if (DEBUG_PARSE and dump_what.contains("ast")) {
         std::cerr << nodes.size() << " AST nodes(s)\n";
         dump_nodes(nodes);
     }

@@ -628,7 +628,7 @@ auto main(
             { { "", "type" }, Args::Kind::Single },
             { { "c", "object" }, Args::Kind::Switch },
             { { "", "static" }, Args::Kind::Switch },
-            { { "", "dump" }, Args::Kind::List },
+            { { "", "dump" }, Args::Kind::Set },
         });
     if (args.args.empty()) {
         viua::support::errorln("no files to link");
