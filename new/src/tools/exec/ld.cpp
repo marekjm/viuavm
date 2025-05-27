@@ -656,9 +656,10 @@ auto main(
         args.get<bool>("static").value_or(false);
     auto const& input_files =
         std::vector<std::filesystem::path>(args.args.begin(), args.args.end());
-    auto const& dump_what =
-        args.get<std::vector<std::string_view>>("dump").value_or({});
-    auto dump_strtab = std::count(dump_what.begin(), dump_what.end(), "strtab");
+    auto const dump_what =
+        args.get<std::set<std::string_view>>("dump").value_or(
+            std::set<std::string_view>{});
+    auto const dump_strtab = dump_what.contains("strtab");
 
     if (as_static_lib or as_shared_lib or as_object_lib) {
         as_executable = false;

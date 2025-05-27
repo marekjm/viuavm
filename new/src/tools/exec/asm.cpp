@@ -3492,7 +3492,8 @@ auto main(
             : std::nullopt
     };
     auto const requested_dumps =
-        args.get<std::set<std::string_view>>("dump").value_or({});
+        args.get<std::set<std::string_view>>("dump").value_or(
+            std::set<std::string_view>{});
 
     auto const source_path = std::filesystem::path{ args.args.back() };
     auto source_text       = std::string{};
