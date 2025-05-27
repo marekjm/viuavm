@@ -24,12 +24,9 @@ main () {
         asm|dis|vm|readelf|repl)
             viua_invoke_tool "${@}"
             ;;
-        help)
+        --help|help|'')
             local subject=${2:-viua}
             exec man viua-${subject}
-            ;;
-        --help|'')
-            exec man viua-viua
             ;;
         --version)
             exec "${exedir}/vm" "${@}" | sed 's/ vm//'
