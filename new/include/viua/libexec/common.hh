@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 
+#include <functional>
 #include <map>
 #include <optional>
 #include <set>
@@ -134,6 +135,23 @@ struct Args {
         }
 
         return std::get<T>(value);
+    }
+
+    template<typename T,
+             typename V       = T,
+             typename Present = std::function<V(T)>,
+             typename Absent  = std::function<V()>>
+    auto map(
+        std::string_view const label,
+        Present&& p,
+        Absent&& a) const -> V
+    {
+        auto v = get<T>(label);
+        if (v.has_value()) {
+            return p(*v);
+        } else {
+            return a();
+        }
     }
 
     using ui_type = std::map<std::tuple<std::string, std::string>, Kind>;

@@ -3496,7 +3496,17 @@ auto main(
             std::set<std::string_view>{});
 
     auto const source_path = std::filesystem::path{ args.args.back() };
-    auto source_text       = std::string{};
+    auto const output_path = args.map<std::string_view, std::filesystem::path>(
+        "out",
+        [](auto v) { return std::filesystem::path{ v }; },
+        [&source_path]()
+        {
+            auto o = source_path;
+            o.replace_extension("o");
+            return o;
+        });
+
+    auto source_text = std::string{};
     {
         auto const source_fd = open(source_path.c_str(), O_RDONLY);
         if (source_fd == -1) {
@@ -3527,14 +3537,6 @@ auto main(
             source_fd, source_text.data(), source_text.size());
         close(source_fd);
     }
-
-    auto const output_path = preferred_output_path.value_or(
-        [source_path]() -> std::filesystem::path
-        {
-            auto o = source_path;
-            o.replace_extension("o");
-            return o;
-        }());
 
     /*
      * Lexical analysis (lexing).
