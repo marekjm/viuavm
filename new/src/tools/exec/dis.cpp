@@ -822,69 +822,58 @@ auto main(
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    auto const args = std::vector<std::string>{ (argv + 1), (argv + argc) };
-    if (args.empty()) {
-        std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                  << ": no file to disassemble\n";
+    using viua::libexec::Args;
+    auto const args = viua::libexec::args_or_exit(
+        "dis",
+        argc,
+        argv,
+        {
+            { { "v", "verbose" }, Args::Kind::Switch },
+            { { "", "version" }, Args::Kind::Switch },
+            { { "h", "help" }, Args::Kind::Switch },
+            { { "", "built-with" }, Args::Kind::Switch },
+            { { "o", "out" }, Args::Kind::Single },
+            { { "i", "instruction" }, Args::Kind::List },
+            { { "N", "no-demangle" }, Args::Kind::Set },
+        });
+    auto const singles =
+        args.map<std::vector<std::string_view>>(
+                "instruction",
+                [](auto value)
+                {
+                    auto singles = std::vector<uint64_t>{};
+                    singles.reserve(value.size());
+                    for (auto const& i : value) {
+                        singles.push_back(std::strtoull(i.data(), nullptr, 0));
+                    }
+                    return singles;
+                })
+            .value_or(std::vector<uint64_t>{});
+
+    if (args.args.empty() and singles.empty()) {
+        viua::support::errorln("nothing to disassemble");
         return 1;
     }
 
-    auto options               = viua::libexec::Common_options{ "dis" };
-    auto preferred_output_path = std::optional<std::filesystem::path>{};
-    auto singles               = std::vector<viua::arch::instruction_type>{};
-    auto demangle_li           = true;
-    auto demangle_mem          = true;
+    auto const no_demangles =
+        args.get<std::set<std::string_view>>("no-demangle")
+            .value_or(std::set<std::string_view>{});
+    auto const demangle_li =
+        not (no_demangles.contains("li") or no_demangles.contains("any"));
+    auto const demangle_mem =
+        not (no_demangles.contains("mem") or no_demangles.contains("any"));
 
-
-    for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
-        auto const& each = args.at(i);
-        if (each == "--") {
-            // explicit separator of options and operands
-            break;
-        }
-        /*
-         * Tool-specific options.
-         */
-        else if (each == "--no-demangle=all") {
-            demangle_li  = false;
-            demangle_mem = false;
-        } else if (each == "--no-demangle=li") {
-            demangle_li = false;
-        } else if (each == "--no-demangle=mem") {
-            demangle_mem = false;
-        } else if (each == "-i") {
-            singles.push_back(std::stoull(args.at(++i), nullptr, 0));
-        } else if (each == "-o") {
-            preferred_output_path = std::filesystem::path{ args.at(++i) };
-        }
-        /*
-         * Common options.
-         */
-        else if (each == "-v" or each == "--verbose") {
-            ++options.verbosity;
-        } else if (each == "--version") {
-            options.show.version = true;
-        } else if (each == "--built-with") {
-            options.show.built_with = true;
-        } else if (each == "--help") {
-            options.show.help = true;
-        } else if (each.front() == '-') {
-            viua::support::errorln("unknown option: {}", each);
-            return 1;
-        } else {
-            // input files start here
-            break;
-        }
+    auto const preferred_output_path = args.get<std::string_view>("out");
+    auto to_file                     = std::ofstream{};
+    if (preferred_output_path.has_value()) {
+        auto const p = std::filesystem::path{ *preferred_output_path };
+        to_file.open(p);
     }
-    if (auto const r = viua::libexec::maybe_show_info_and_exit(options); r) {
-        return *r;
-    }
+    auto& out = (preferred_output_path.has_value() ? to_file : std::cout);
 
     if (singles.size()) {
-        std::cout << std::hex << std::setfill('0');
         for (auto const each : singles) {
-            std::cout << "0x" << std::setw(16) << each << "  "
-                      << ins_to_string(each) << "\n";
+            std::println(out, "0x{:016x}", each, ins_to_string(each));
         }
         return 0;
     }
@@ -895,7 +884,7 @@ auto main(
      * regular file - trying to execute directories or device files does not
      * make much sense.
      */
-    auto const elf_path = std::filesystem::path{ args.back() };
+    auto const elf_path = std::filesystem::path{ args.args.front() };
     if (not std::filesystem::exists(elf_path)) {
         std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
                   << ": file does not exist: " << esc(2, COLOR_FG_WHITE)
@@ -1004,12 +993,6 @@ auto main(
                   << "warning" << esc(2, ATTR_RESET)
                   << ": no entry point defined\n";
     }
-
-    auto to_file = std::ofstream{};
-    if (preferred_output_path.has_value()) {
-        to_file.open(*preferred_output_path);
-    }
-    auto& out = (preferred_output_path.has_value() ? to_file : std::cout);
 
     auto const rodata = main_module.find_fragment(".rodata");
     if (rodata.has_value()) {

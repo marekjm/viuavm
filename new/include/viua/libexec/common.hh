@@ -28,6 +28,7 @@
 #include <set>
 #include <stdexcept>
 #include <string_view>
+#include <type_traits>
 #include <variant>
 #include <vector>
 
@@ -152,6 +153,18 @@ struct Args {
         } else {
             return a();
         }
+    }
+
+    template<typename T, typename Fn>
+    auto map(
+        std::string_view const label,
+        Fn&& fn) const -> std::optional<typename std::result_of<Fn(T)>::type>
+    {
+        auto v = get<T>(label);
+        if (v.has_value()) {
+            return std::optional{ fn(*v) };
+        }
+        return std::nullopt;
     }
 
     using ui_type = std::map<std::tuple<std::string, std::string>, Kind>;

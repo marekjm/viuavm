@@ -1330,13 +1330,16 @@ def test_case_impl(case_log, case_name, test_program, errors):
     # works as intended, and that the code can be assembled, linked,
     # disassembled, and relinked without loss of quality and function.
     test_disassembled_program = test_program + DIS_EXTENSION
+    dis_args = (
+        DISASSEMBLER,
+        "-o",
+        test_disassembled_program,
+        test_executable,
+    )
+    case_log.write("{}\n".format(" ".join(dis_args)))
     dis_return = subprocess.call(
-        args=(
-            DISASSEMBLER,
-            "-o",
-            test_disassembled_program,
-            test_executable,
-        ),
+        args=dis_args,
+        stdin=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
     )

@@ -7,10 +7,7 @@ viua-dis - the Viua VM disassembler
 # SYNOPSIS
 
 *viua dis* *-i* _instruction_++
-*viua dis* [*--no-demangle=all*]++
-         [*--no-demangle=li*]++
-         [*--no-demangle=mem*]++
-         [*--out* _output_] _input_
+*viua dis* [*--no-demangle* _kind_] [*--out* _output_] _input_
 
 # DESCRIPTION
 
@@ -28,14 +25,18 @@ include(common/tool-options.scdoc)
 	Disassemble a single _instruction_ instead of a file. This option may be
 	specified more than once to disassemble more single instructions.
 
-*--no-demangle=li*
-	Do not demangle integer loads into a single *li* pseudoinstruction.
+*-N*, *--no-demangle* _kind_
+	The following table describes what _kind_ of instructions will not be
+	demangled for each value of _kind_:
 
-*--no-demangle=mem*
-	Do not demangle memory loads.
-
-*--no-demangle=all*
-	Do not demangle any pseudoinstructions.
+[[ _kind_
+:< prevents demangling of...
+|  *li*
+:  integer loads into a single *li* pseudoinstruction
+|  *mem*
+:  memory operations
+|  *any*
+:  any pseudoinstruction
 
 # EXIT STATUS
 
