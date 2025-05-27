@@ -8,6 +8,8 @@ packages:
   - liburing-dev
   - util-linux-dev  # needed for <uuid/uuid.h>
   - libuuid
+  - scdoc
+  - m4
 sources:
   - https://git.sr.ht/~maelkum/viuavm
 environment:
