@@ -101,6 +101,11 @@ CXXLIBS=\
 
 
 ################################################################################
+# For reproducible builds
+export SOURCE_DATE_EPOCH=$(shell ./scripts/make_source_date_epoch.sh)
+
+
+################################################################################
 # High-level targets
 #
 # See https://www.gnu.org/prep/standards/html_node/Standard-Targets.html for
