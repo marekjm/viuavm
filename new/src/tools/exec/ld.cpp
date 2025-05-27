@@ -649,13 +649,14 @@ auto main(
         args.get<bool>("object").value_or(false);
     auto const output_type = args.get<std::string_view>("type").value_or(
         default_output_type_is_object ? "object" : "exec");
-    auto as_static_lib [[maybe_unused]] = (output_type == "static");
-    auto as_shared_lib                  = (output_type == "shared");
-    auto as_object_lib                  = (output_type == "object");
+    auto as_static_lib = (output_type == "static");
+    auto as_shared_lib = (output_type == "shared");
+    auto as_object_lib = (output_type == "object");
     auto link_static [[maybe_unused]] =
         args.get<bool>("static").value_or(false);
-    auto const& input_files =
-        std::vector<std::filesystem::path>(args.args.begin(), args.args.end());
+    auto const input_files =
+        std::vector<std::filesystem::path>{ args.args.begin(),
+                                            args.args.end() };
     auto const dump_what =
         args.get<std::set<std::string_view>>("dump").value_or(
             std::set<std::string_view>{});
