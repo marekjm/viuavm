@@ -186,8 +186,8 @@ install: all-silent
 	ln -sf $(mandir)/man1/viua.1 $(DESTDIR)$(mandir)/man1/viua-viua.1
 	install \
 		--mode 644 \
-		-D --target-directory $(DESTDIR)$(mandir)/man7 \
-		$(BUILD_MANDIR)/man7/*.7
+		-D --target-directory $(DESTDIR)$(mandir)/man5 \
+		$(BUILD_MANDIR)/man5/*.5
 
 install-binfmt:
 	mkdir -p $(libdir)/binfmt.d
@@ -206,12 +206,12 @@ format:
 	yamlfmt $(shell git rev-parse --show-toplevel)/.builds/*
 
 man: \
-	$(BUILD_MANDIR)/man7/viua-asm.7 \
 	$(BUILD_MANDIR)/man1/viua-asm.1 \
 	$(BUILD_MANDIR)/man1/viua-ld.1 \
 	$(BUILD_MANDIR)/man1/viua-dis.1 \
 	$(BUILD_MANDIR)/man1/viua-readelf.1 \
 	$(BUILD_MANDIR)/man1/viua-vm.1 \
+	$(BUILD_MANDIR)/man5/viua-asm.5 \
 	$(BUILD_MANDIR)/man1/viua.1
 
 $(BUILD_MANDIR)/%: docs/man/%.scdoc docs/man/common/*.scdoc

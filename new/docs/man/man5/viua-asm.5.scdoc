@@ -1,0 +1,110 @@
+VIUA-ASM(7) "Viua VM PUT_VIUAVM_VERSION_HERE" "Viua VM Manual"
+
+# NAME
+
+viua-asm - Viua VM assembly language reference
+
+# SYNOPSIS
+
+*.section* _name_
+
+*.symbol* _name_++
+*.symbol* [[_attributes_]] _name_
+
+*.label* _name_
+
+_instruction_++
+_instruction_ [[_attributes_]] _argument_...
+
+# DESCRIPTION
+
+Viua assembly language is used to compose the source code of programs to be
+executed by the Viua virtual machine.
+The language consists of *directives* and *instructions*;
+the former directing the assembler, and the latter being encoded into the binary
+form that, after further processing by *viua-ld*(1), the virtual machine can
+understand.
+
+# DIRECTIVES
+
+## Sections
+
+The ELF files consist of sections and segments, each holding a specific part of
+a program.
+To control where a portion of the source code will be put, Viua assembly
+language uses
+
+	*.section* _name_
+
+The above line puts subsequent symbols in section _name_.
+For example:
+
+	*.section* ".text"++
+*.text*  ; shortcut for switching to the .text section
+
+would put information in section *.text*, and
+
+	*.section* ".rodata"++
+*.rodata*  ; shortcut for switching to the .rodata section
+
+in section *.rodata*.
+
+Other sections are currently not used by the virtual machine, and will be
+rejected if the assembler encounters them.
+
+## Symbols and labels
+
+Symbols are most useful to the linker and the loader.
+
+*.symbol* _name_
+	Record a name in *.symtab*, the symbol table.
+	For example, to record the *main* function as used in C or C++ one would
+	use:
+
+		*.symbol* [[entry_point]] main
+
+	This line records a symbol named *main* and marks it as the entry point of
+	the program. (The main function does not have to be named "main"; at a
+	program's startup Viua will look for the symbol in *.text* section marked
+	with the *entry_point* attribute.)
+
+*.label*
+	For example
+
+		*.label* foo
+
+# INSTRUCTIONS
+
+## Diagnostic
+
+*noop*
+
+*ebreak*
+
+## Arithmetic
+
+*add*
+
+# FILES
+
+*.s*, *.asm*
+	By convention, the files containing Viua assembly language source code have
+	either *.s* or *.asm* suffix.
+
+# SEE ALSO
+
+*viua-asm*(1),
+*viua-ld*(1).
+
+*elf*(5).
+
+Levine, John R. _Linkers and Loaders_. Academic Press, 2000.++
+ISBN 978-15-5860-496-4
+
+Patterson, David A. and Waterman, Andrew. _The RISC-V Reader_. Stawberry Canyon
+LLC, 2017.++
+ISBN 978-09-9924-911-6
+
+include(common/footer.scdoc)
+
+; vim:ft=scdoc:
