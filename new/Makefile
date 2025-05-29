@@ -297,7 +297,8 @@ $(BUILD_EXEDIR)/readelf: \
 	$(BUILD_PREFIX)/vm/elf.o \
 	$(BUILD_PREFIX)/support/errno.o \
 	$(BUILD_PREFIX)/support/fdio.o \
-	$(BUILD_PREFIX)/support/tty.o
+	$(BUILD_PREFIX)/support/tty.o \
+	$(BUILD_PREFIX)/tools/exec/readelf.o
 
 VM_OPERATION_TYPE_IMPL=\
 	$(BUILD_PREFIX)/arch/ra.o \
@@ -319,7 +320,8 @@ $(BUILD_EXEDIR)/dis: \
 	$(BUILD_PREFIX)/support/string.o \
 	$(BUILD_PREFIX)/support/tty.o \
 	$(BUILD_PREFIX)/vm/elf.o \
-	$(VM_OPERATION_TYPE_IMPL)
+	$(VM_OPERATION_TYPE_IMPL) \
+	$(BUILD_PREFIX)/tools/exec/dis.o
 
 $(BUILD_EXEDIR)/asm: \
 	$(BUILD_PREFIX)/libexec/common.o \
@@ -332,7 +334,8 @@ $(BUILD_EXEDIR)/asm: \
 	$(BUILD_PREFIX)/tools/libs/stage/error.o \
 	$(BUILD_PREFIX)/tools/libs/stage/save.o \
 	$(BUILD_PREFIX)/tools/libs/assembler.o \
-	$(VM_OPERATION_TYPE_IMPL)
+	$(VM_OPERATION_TYPE_IMPL) \
+	$(BUILD_PREFIX)/tools/exec/asm.o
 
 $(BUILD_EXEDIR)/ld: \
 	$(BUILD_PREFIX)/libexec/common.o \
@@ -346,7 +349,8 @@ $(BUILD_EXEDIR)/ld: \
 	$(BUILD_PREFIX)/support/errno.o \
 	$(BUILD_PREFIX)/support/fdio.o \
 	$(BUILD_PREFIX)/support/string.o \
-	$(BUILD_PREFIX)/support/tty.o
+	$(BUILD_PREFIX)/support/tty.o \
+	$(BUILD_PREFIX)/tools/exec/ld.o
 
 VM_INSTRUCTION_IMPL=\
 	$(BUILD_PREFIX)/vm/ins/impl/aa.o \
@@ -368,7 +372,8 @@ $(BUILD_EXEDIR)/vm: \
 	$(BUILD_PREFIX)/vm/ins/exec.o \
 	$(VM_INSTRUCTION_IMPL) \
 	$(BUILD_PREFIX)/runtime/pid.o \
-	$(VM_OPERATION_TYPE_IMPL)
+	$(VM_OPERATION_TYPE_IMPL) \
+	$(BUILD_PREFIX)/tools/exec/vm.o
 
 $(BUILD_EXEDIR)/repl: \
 	$(BUILD_PREFIX)/libexec/common.o \
@@ -389,4 +394,5 @@ $(BUILD_EXEDIR)/repl: \
 	$(BUILD_PREFIX)/tools/libs/parser.o \
 	$(BUILD_PREFIX)/runtime/pid.o \
 	3rd-party/linenoise/linenoise.o \
-	3rd-party/linenoise/encodings/utf8.o
+	3rd-party/linenoise/encodings/utf8.o \
+	$(BUILD_PREFIX)/tools/exec/repl.o
