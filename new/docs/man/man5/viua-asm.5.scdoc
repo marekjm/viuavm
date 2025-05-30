@@ -54,24 +54,47 @@ rejected if the assembler encounters them.
 
 ## Symbols and labels
 
-Symbols are most useful to the linker and the loader.
+The *.symbol* and *.label* directives control _binding_ and _visibility_ of
+objects defined or declared in a source code file.
+To learn more about what binding and visibility mean, refer to the *elf*(5) man
+page.
 
-*.symbol* _name_
-	Record a name in *.symtab*, the symbol table.
-	For example, to record the *main* function as used in C or C++ one would
-	use:
+These directives are applicable to both functions and data: a symbol or a label
+may be declared for an object in either *.text* or *.rodata* section.
 
-		*.symbol* [[entry_point]] main
+All labels are put into the *.symtab* section—to make disassembler's output more
+useful—but, by default, objects marked with just a label are marked as only
+visible within the current file (eg, like symbols defined *static* in C, or
+within an anonymous namespace in C++).
+; FIXME "current file" or "current compilation unit"? Right now there is no
+; difference, but which wording is better?
+In ELF terms, such objects have local binding (*STB_LOCAL*) and default
+visibility (*STV_DEFAULT*).
 
-	This line records a symbol named *main* and marks it as the entry point of
-	the program. (The main function does not have to be named "main"; at a
-	program's startup Viua will look for the symbol in *.text* section marked
-	with the *entry_point* attribute.)
+	\; local binding and default visibility++
+*.label* foo
 
-*.label*
-	For example
+Declaring a *.symbol* with the same name as a *.label* changes the attached
+object's binding to global (*STB_GLOBAL*).
+Such objects can be referenced by other files—you can think of them as "public".
 
-		*.label* foo
+	\; global binding and default visibility++
+*.symbol* bar++
+*.label* bar
+
+The default binding and visibility can be changed by setting _attributes_ on a
+*.symbol*:
+
+[[ attribute
+:[ meaning
+|  *local*
+:  set _binding_ to *local*
+|  *global*
+:  set _binding_ to *global*
+|  *hidden*
+:  set _visibility_ to *hidden*
+|  *default*
+:  set _visibility_ to *default*
 
 # INSTRUCTIONS
 
