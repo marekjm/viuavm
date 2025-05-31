@@ -1,5 +1,7 @@
 VIUA-ASM(7) "Viua VM PUT_VIUAVM_VERSION_HERE" "Viua VM Manual"
 
+include(viua.m4)
+
 # NAME
 
 viua-asm - Viua VM assembly language reference

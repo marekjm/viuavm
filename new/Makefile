@@ -214,7 +214,7 @@ man: \
 	$(BUILD_MANDIR)/man5/viua-asm.5 \
 	$(BUILD_MANDIR)/man1/viua.1
 
-$(BUILD_MANDIR)/%: docs/man/%.scdoc docs/man/common/*.scdoc
+$(BUILD_MANDIR)/%: docs/man/%.scdoc docs/man/common/*.scdoc docs/man/viua.m4
 	@mkdir -p $(shell dirname $@)
 	m4 -I docs/man -D "PUT_VIUAVM_VERSION_HERE=$(VIUA_TAG_VERSION)" $< |\
 		scdoc > $@
@@ -232,6 +232,7 @@ watch-impl:
 		find Makefile.d -mindepth 1 ;\
 		find . -mindepth 2 -name '*.asm' ;\
 		find ./docs/man -type f -name '*.scdoc' ;\
+		find ./docs/man -type f -name '*.m4' ;\
 		find ./src -type f ;\
 		find ./include -type f\
 	)
