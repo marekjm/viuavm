@@ -15,15 +15,17 @@ exedir=${libexecdir}/viua
 
 
 viua_invoke_tool () {
+    local tool="${1}"
+    if [ ! -x "${exedir}/${tool}" ]; then
+        2>&1 echo "viua: error: \`${tool}' is not part of the toolchain"
+        exit 1
+    fi
     exec "${exedir}/${@}"
 }
 
 main () {
     local tool=${1}
     case ${tool} in
-        asm|dis|vm|readelf|repl)
-            viua_invoke_tool "${@}"
-            ;;
         --help|help|'')
             local subject=${2:-viua}
             exec man viua-${subject}
@@ -42,8 +44,7 @@ main () {
             exit 1
             ;;
         *)
-            2>&1 echo "viua: error: not a part of the viua toolchain: \`${tool}'"
-            exit 1
+            viua_invoke_tool "${@}"
             ;;
     esac
 }
