@@ -57,46 +57,153 @@ rejected if the assembler encounters them.
 ## Symbols and labels
 
 The *.symbol* and *.label* directives control _binding_ and _visibility_ of
-objects defined or declared in a source code file.
+things declared or defined in a source code file.
 To learn more about what binding and visibility mean, refer to the *elf*(5) man
 page.
 
-These directives are applicable to both functions and data: a symbol or a label
-may be declared for an object in either *.text* or *.rodata* section.
+Labels MUST be used right above a *definition* of an object or a function.
+They point at a location in memory.
 
-All labels are put into the *.symtab* section—to make disassembler's output more
-useful—but, by default, objects marked with just a label are marked as only
-visible within the current file (eg, like symbols defined *static* in C, or
-within an anonymous namespace in C++).
-; FIXME "current file" or "current compilation unit"? Right now there is no
-; difference, but which wording is better?
-In ELF terms, such objects have local binding (*STB_LOCAL*) and default
-visibility (*STV_DEFAULT*).
+Symbols are *declarations* of entities found in a compilation unit.
+
+[[ directive
+:[ meaning
+:< comment
+|  *.label*
+:  definition
+:  points at a location in memory
+|  *.symbol*
+:  declaration
+:  controls _binding_ and _visibility_
+
+All labels are put into the *.symtab* section to make disassembler's output more
+useful.
+By default, both have local binding but differ in visibility: objects have
+default visibility, functions are hidden.
 
 	\; local binding and default visibility++
-*.label* foo
+*.section* ".rodata"++
+*.label* obj
 
-Declaring a *.symbol* with the same name as a *.label* changes the attached
-object's binding to global (*STB_GLOBAL*).
-Such objects can be referenced by other files—you can think of them as "public".
+	\; local binding and hidden visibility++
+*.section* ".text"++
+*.label* jmp
+
+If both a *.symbol* and a *.label* are given for a _name_, the *.symbol* MUST be
+the first to appear.
+Presence of a *.symbol* affects the default _binding_ and _visibility_ of
+functions:
+
+	\; local binding and default visibility++
+\; (same as with just a *.label*)++
+*.section* ".rodata"++
+*.symbol* obj++
+*.label* obj
 
 	\; global binding and default visibility++
-*.symbol* bar++
-*.label* bar
+*.section* ".text"++
+*.symbol* fun++
+*.label* fun
 
 The default binding and visibility can be changed by setting _attributes_ on a
 *.symbol*:
 
 [[ attribute
-:[ meaning
+:[ ELF
+:< meaning
 |  *local*
+:  STB_LOCAL
 :  set _binding_ to *local*
 |  *global*
+:  STB_GLOBAL
 :  set _binding_ to *global*
 |  *hidden*
+:  STV_HIDDEN
 :  set _visibility_ to *hidden*
-|  *default*
-:  set _visibility_ to *default*
+
+Objects CANNOT be be *STB_GLOBAL* and *STV_DEFAULT*: Viua does not allow objects
+to be visible outside of the compilation unit they were defined in.
+This means, that the only valid combinations of _binding_ and _visibility_ for
+objects are:
+
+- *STB_LOCAL* and *STV_DEFAULT* (or *STV_HIDDEN*): object only visible in the
+  current file
+- *STB_GLOBAL* and *STV_HIDDEN*: object defined in one file, but intended to be
+  used in a different file—during first linking such global–but–hidden objects
+  are converted to *STB_LOCAL* and *STV_DEFAULT* (this behaviour is useful when
+  assembling modules from several different compilation units)
+
+Further discussion is only concerned with functions ie, with symbols and labels
+pointing into *.text* section.
+
+*STB_LOCAL|STV_HIDDEN*
+
+A non–callable jump label.
+
+	*.label* jmp
+
+	\; or
+
+	*.symbol* [[local,hidden]] x++
+*.label* jmp
+
+A name only visible within the current compilation unit.
+
+Such addresses are *NOT CALLABLE*.
+The assembler will reject using them as targets of *call* instruction, and will
+report any such occurrence as an error.
+They can be used as targets of *if* instructions.
+
+*STB_LOCAL|STV_DEFAULT*
+
+A function private to a compilation unit.
+
+	*.symbol* [[local]] x++
+*.label* fun
+
+A name only visible within the current compilation unit.
+
+Such addresses are *CALLABLE*.
+The assembler will reject using them as targets of *if* instructions, and will
+report any such occurrence as an error.
+
+*STB_GLOBAL|STV_HIDDEN*
+
+A function private to a module ie, a few compilation units linked together.
+
+	*.symbol* [[hidden]] x++
+*.label* jmp
+
+	\; or
+
+	*.symbol* [[global,hidden]] x++
+*.label* jmp
+
+A name visible in other compilation units, but will be converted to *STB_LOCAL*
+and *STV_DEFAULT* after first linking.
+
+Such addresses are *NOT CALLABLE*.
+The assembler will reject using them as targets of *call* instruction, and will
+report any such occurrence as an error.
+They can be used as targets of *if* instructions.
+
+*STB_GLOBAL|STV_DEFAULT*
+
+A public function.
+
+	*.symbol* x++
+*.label* fun
+
+	\; or
+
+	*.symbol* [[global]] x++
+*.label* fun
+
+A name visible in other compilation units.
+
+Such addresses are *CALLABLE*.
+The assembler will reject using them as targets of *if* instructions, and will
+report any such occurrence as an error.
 
 # INSTRUCTIONS
 
