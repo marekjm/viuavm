@@ -29,6 +29,7 @@ tasks:
   - test-preset-debug: |
       cd viuavm/new
       make test_prefix=ci-debug test
+      PATH=./ci-debug/bin:$PATH USE_TOOLCHAIN_SCRIPT=true make test_prefix=ci-debug test
   - build-preset-test: |
       cd viuavm/new
       make clean
@@ -39,6 +40,7 @@ tasks:
   - test-preset-test: |
       cd viuavm/new
       make test_prefix=ci-test test
+      PATH=./ci-test/bin:$PATH USE_TOOLCHAIN_SCRIPT=true make test_prefix=ci-test test
   - build-preset-release: |
       cd viuavm/new
       make clean
@@ -49,3 +51,4 @@ tasks:
   - test-preset-release: |
       cd viuavm/new
       make test_prefix=ci-release test
+      PATH=./ci-release/bin:$PATH USE_TOOLCHAIN_SCRIPT=true make test_prefix=ci-release test

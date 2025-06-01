@@ -91,14 +91,6 @@ EXEC_PREFIX = os.path.abspath(
 LIBEXECDIR = os.path.join(EXEC_PREFIX, "libexec")
 EXEDIR = os.path.join(LIBEXECDIR, "viua")
 
-exe = lambda what: os.path.join(EXEDIR, what)
-INTERPRETER = exe("vm")
-ASSEMBLER = exe("asm")
-LINKER = exe("ld")
-DISASSEMBLER = exe("dis")
-
-DIS_EXTENSION = "~"
-
 
 def env_is_truthy(v):
     return v.lower() in {
@@ -106,9 +98,17 @@ def env_is_truthy(v):
         "1",
     }
 
-
 def getenv_bool(name, *, default):
     return env_is_truthy(os.environ.get(name, default))
+
+USE_TOOLCHAIN_SCRIPT = getenv_bool("USE_TOOLCHAIN_SCRIPT", default="false")
+exe = lambda what: os.path.join(EXEDIR, what)
+INTERPRETER = ("viua", "vm",) if USE_TOOLCHAIN_SCRIPT else (exe("vm"),)
+ASSEMBLER = ("viua", "asm",) if USE_TOOLCHAIN_SCRIPT else (exe("asm"),)
+LINKER = ("viua", "ld",) if USE_TOOLCHAIN_SCRIPT else (exe("ld"),)
+DISASSEMBLER = ("viua", "dis",) if USE_TOOLCHAIN_SCRIPT else (exe("dis"),)
+
+DIS_EXTENSION = "~"
 
 
 SKIP_DISASSEMBLER_TESTS = getenv_bool("SKIP_DISASSEMBLER_TESTS", default="false")
@@ -715,7 +715,7 @@ def run_and_capture(start_timepoint, interpreter, executable, *, args=(), stdin=
     env = dict(os.environ)
     env["VIUA_VM_TRACE_FD"] = str(write_fd)
     proc = subprocess.Popen(
-        args=(interpreter,) + (executable,) + args,
+        args=interpreter + (executable,) + args,
         stdin=(subprocess.DEVNULL if stdin is None else subprocess.PIPE),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -912,8 +912,7 @@ def detect_check_kind(test_path):
 def test_case_impl_asm(reporting, out_path, asm_path):
     start_timepoint, case_log = reporting
 
-    asm_args = (
-        ASSEMBLER,
+    asm_args = ASSEMBLER + (
         "-o",
         out_path,
         asm_path,
@@ -941,8 +940,7 @@ def test_case_impl_asm(reporting, out_path, asm_path):
 def test_case_impl_ld(reporting, exe_path, reloc_path, extras=()):
     start_timepoint, case_log = reporting
 
-    ld_args = (
-        LINKER,
+    ld_args = LINKER + (
         "-o",
         exe_path,
         reloc_path,
@@ -1340,8 +1338,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
     # works as intended, and that the code can be assembled, linked,
     # disassembled, and relinked without loss of quality and function.
     test_disassembled_program = test_program + DIS_EXTENSION
-    dis_args = (
-        DISASSEMBLER,
+    dis_args = DISASSEMBLER + (
         "-o",
         test_disassembled_program,
         test_executable,
@@ -1440,8 +1437,7 @@ def prepare_dependencies(cases_dir):
         base_name = os.path.splitext(dep_src)[0]
         dep_relocatable = f"{base_name}.o"
 
-        asm_args = (
-            ASSEMBLER,
+        asm_args = ASSEMBLER + (
             "-o",
             dep_relocatable,
             dep_src,
@@ -1506,6 +1502,12 @@ def main(args):
     print("using toolchain in:")
     print(f"  prefix={PREFIX}")
     print(f"  exec_prefix={EXEC_PREFIX}")
+
+    print("invocations:")
+    print("  asm: {}".format(" ".join(ASSEMBLER)))
+    print("  ld:  {}".format(" ".join(LINKER)))
+    print("  vm:  {}".format(" ".join(INTERPRETER)))
+    print("  dis: {}".format(" ".join(DISASSEMBLER)))
 
     print("looking for test programs in:")
     print(
