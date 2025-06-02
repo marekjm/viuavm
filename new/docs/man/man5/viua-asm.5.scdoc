@@ -205,6 +205,86 @@ Such addresses are *CALLABLE*.
 The assembler will reject using them as targets of *if* instructions, and will
 report any such occurrence as an error.
 
+## Objects
+
+Objects are placed in the *.rodata* section using the *.object* directive.
+For example
+
+	*.section* ".rodata"++
+*.object* string "Hello, World!"
+
+will allocate an object of type string in the .rodata section.
+By default, objects are anonymous, but a *.label* directive—possibly combined
+with a *.symbol* directive—can be used to assign a name to the address under
+which the labelled object has been allocated.
+
+A fuller example would therefore be
+
+	*.section* ".rodata"++
+*.label* hello_world++
+*.object* string "Hello, World!"
+
+The syntax of the *.object* directive is:
+
+	*.object* _type_ _value_
+
+where _type_ names one of the type recognised by Viua VM, and _value_ is a
+valid constructor for objects of type _type_.
+
+The following types are recognised by the VM:
+
+[[ *string*
+:< a size–prefixed (using a 64–bit unsigned integer) byte sequence
+
+*string*
+
+	*.object* *string* _ctor_...
+
+	_ctor_ := "..."++
+	|= _uint_ \* "..."
+
+All _ctor_ values are concatendated before the string is stored into the
+*.rodata* section.
+For example, the following constructor may be used to allocate the string
+"Hello, World!":
+
+```
+"He" 2 * "l" "o, W" "orld!"
+```
+
+To allocate "Scooby Doo", one could use:
+
+```
+"Sc" 2 * "o" "by D" 2 * "o"
+```
+
+The strings are size–prefixed, and are *NOT* null–terminated.
+The size of the string is stored immediately before the string's contents as a
+little–endian 64–bit unsigned integer.
+
+If a label has been assigned to the string, it will point to the *contents* of
+the string, not its size.
+To obtain the size of the string named _some\_string_ one would use the
+following code (see the source code in the *tests/asm/io_print.asm* file to get
+a complete example):
+
+```
+; LOAD ADDRESS OF THE STRING
+; Load the address of the string into a register.
+arodp $1.l, @some_string
+
+; LOAD SIZE OF THE STRING
+; Load a -8 into another register.
+li $2.l, -8
+; Then add the -8 to the address of the string's content, to
+; get the address of the string's size.
+add $2.l, $1.l, $2.l
+; Load the doubleword under that address.
+ld $2.l, $2.l, 0
+; Cast the raw data into an unsigned integer.
+cast $2.l, uint
+```
+
 # INSTRUCTIONS
 
 ## Diagnostic
