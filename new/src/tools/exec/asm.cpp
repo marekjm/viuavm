@@ -1215,8 +1215,7 @@ auto save_objects(
         auto const is_label = (each->leader.token == TOKEN::DEFINE_LABEL);
         auto const is_alloc = (each->leader.token == TOKEN::ALLOCATE_OBJECT);
         auto const is_instr = (each->leader.token == TOKEN::OPCODE);
-        if (auto const is_interesting = is_label or is_alloc or is_instr;
-            not is_interesting) {
+        if (not (is_label or is_alloc or is_instr)) {
             continue;
         }
 

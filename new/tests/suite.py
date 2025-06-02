@@ -98,15 +98,45 @@ def env_is_truthy(v):
         "1",
     }
 
+
 def getenv_bool(name, *, default):
     return env_is_truthy(os.environ.get(name, default))
 
+
 USE_TOOLCHAIN_SCRIPT = getenv_bool("USE_TOOLCHAIN_SCRIPT", default="false")
 exe = lambda what: os.path.join(EXEDIR, what)
-INTERPRETER = ("viua", "vm",) if USE_TOOLCHAIN_SCRIPT else (exe("vm"),)
-ASSEMBLER = ("viua", "asm",) if USE_TOOLCHAIN_SCRIPT else (exe("asm"),)
-LINKER = ("viua", "ld",) if USE_TOOLCHAIN_SCRIPT else (exe("ld"),)
-DISASSEMBLER = ("viua", "dis",) if USE_TOOLCHAIN_SCRIPT else (exe("dis"),)
+INTERPRETER = (
+    (
+        "viua",
+        "vm",
+    )
+    if USE_TOOLCHAIN_SCRIPT
+    else (exe("vm"),)
+)
+ASSEMBLER = (
+    (
+        "viua",
+        "asm",
+    )
+    if USE_TOOLCHAIN_SCRIPT
+    else (exe("asm"),)
+)
+LINKER = (
+    (
+        "viua",
+        "ld",
+    )
+    if USE_TOOLCHAIN_SCRIPT
+    else (exe("ld"),)
+)
+DISASSEMBLER = (
+    (
+        "viua",
+        "dis",
+    )
+    if USE_TOOLCHAIN_SCRIPT
+    else (exe("dis"),)
+)
 
 DIS_EXTENSION = "~"
 
