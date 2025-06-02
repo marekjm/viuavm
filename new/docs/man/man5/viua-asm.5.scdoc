@@ -205,6 +205,19 @@ Such addresses are *CALLABLE*.
 The assembler will reject using them as targets of *if* instructions, and will
 report any such occurrence as an error.
 
+*External symbols*
+
+These are symbols defined in other compilation units and modules.
+They are declared to inform the assembler that such a symbol exists and will be
+made available during linking, in order to prevent the assembler from reporting
+an error due to use of an undeclared symbol.
+
+	*.symbol* [[*extern*]] "std::memcpy"
+
+In the example above, an external symbol for the std::memcpy function is
+declared.
+No additional attributes may be defined on an external symbol.
+
 ## Objects
 
 Objects are placed in the *.rodata* section using the *.object* directive.
