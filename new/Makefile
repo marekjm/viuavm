@@ -169,7 +169,7 @@ uninstall:
 	rm -r $(DESTDIR)$(bindir)/viua
 	rm -v $(DESTDIR)$(mandir)/man*/viua*
 
-install: all-silent
+install: all-silent $(prefix)
 	install \
 		--mode 755 \
 		-D --target-directory $(DESTDIR)$(exedir) \
@@ -188,6 +188,17 @@ install: all-silent
 		--mode 644 \
 		-D --target-directory $(DESTDIR)$(mandir)/man5 \
 		$(BUILD_MANDIR)/man5/*.5
+
+# This is to fix CI on Sourcehut. For some reason, Make evaluates the
+#
+# 	$(shell realpath $(prefix))
+#
+# expression before the first install(1) command is executed, and, predictably,
+# realpath(1) complains that its argument path does not exist. Making sure that
+# the path DOES exist solves the problem.
+.PHONY: $(prefix)
+$(prefix):
+	mkdir -p $(prefix)
 
 install-binfmt:
 	mkdir -p $(libdir)/binfmt.d
