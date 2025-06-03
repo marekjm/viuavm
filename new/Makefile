@@ -178,7 +178,7 @@ install: all-silent
 		--mode 755 \
 		-D --target-directory $(DESTDIR)$(bindir) \
 		$(BUILD_BINDIR)/viua
-	sed -i -e "s#^prefix=.*#prefix=$(prefix)#" $(DESTDIR)$(bindir)/viua
+	sed -i -e "s#^prefix=.*#prefix=$(shell realpath $(prefix))#" $(DESTDIR)$(bindir)/viua
 	install \
 		--mode 644 \
 		-D --target-directory $(DESTDIR)$(mandir)/man1 \
