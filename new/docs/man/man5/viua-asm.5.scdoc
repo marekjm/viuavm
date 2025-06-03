@@ -1,4 +1,4 @@
-VIUA-ASM(7) "Viua VM PUT_VIUAVM_VERSION_HERE" "Viua VM Manual"
+VIUA-ASM(5) "Viua VM PUT_VIUAVM_VERSION_HERE" "Viua VM Manual"
 
 include(viua.m4)
 
