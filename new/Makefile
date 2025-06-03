@@ -183,7 +183,7 @@ install: all-silent
 		--mode 644 \
 		-D --target-directory $(DESTDIR)$(mandir)/man1 \
 		$(BUILD_MANDIR)/man1/*.1
-	ln -sf $(mandir)/man1/viua.1 $(DESTDIR)$(mandir)/man1/viua-viua.1
+	ln -sf viua.1 $(DESTDIR)$(mandir)/man1/viua-viua.1
 	install \
 		--mode 644 \
 		-D --target-directory $(DESTDIR)$(mandir)/man5 \

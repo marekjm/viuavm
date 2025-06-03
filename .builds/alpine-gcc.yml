@@ -3,6 +3,7 @@ image: alpine/latest
 packages:
   - gcc
   - make
+  - man-db
   - python3
   - linux-headers  # needed by liburing
   - liburing-dev
@@ -52,3 +53,9 @@ tasks:
       cd viuavm/new
       make test_prefix=ci-release test
       PATH=./ci-release/bin:$PATH USE_TOOLCHAIN_SCRIPT=true make test_prefix=ci-release test
+      PATH=./ci-release/bin:$PATH viua help viua.1 >/dev/null
+      PATH=./ci-release/bin:$PATH viua help asm.1 >/dev/null
+      PATH=./ci-release/bin:$PATH viua help ld.1 >/dev/null
+      PATH=./ci-release/bin:$PATH viua help dis.1 >/dev/null
+      PATH=./ci-release/bin:$PATH viua help vm.1 >/dev/null
+      PATH=./ci-release/bin:$PATH viua help asm.5 >/dev/null

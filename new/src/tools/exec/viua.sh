@@ -23,12 +23,16 @@ viua_invoke_tool () {
     exec "${exedir}/${@}"
 }
 
+viua_show_help () {
+    local subject="${1:-viua}"
+    exec man --manpath ${prefix}/share/man viua-${subject}
+}
+
 main () {
     local tool=${1}
     case ${tool} in
         --help|help|'')
-            local subject=${2:-viua}
-            exec man viua-${subject}
+            viua_show_help "${2}"
             ;;
         --version)
             exec "${exedir}/vm" "${@}" | sed 's/ vm//'
