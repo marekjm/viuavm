@@ -298,6 +298,41 @@ ld $2.l, $2.l, 0
 cast $2.l, uint
 ```
 
+## Functions and jump targets
+
+Functions and jump targets are labels pointing into the *.text* section.
+By convention, a label should be put at the beginning of a function, but it can
+be put anywhere—the *.text* section is just a simple array of instructions, and
+labels are just recorded offsets in it.
+
+As explained in section *Symbols and labels*, a *.text* label is, by default,
+_local_ and not callable.
+It is only suitable as a jump target:
+
+	*.label* jmp
+
+To mark it as a callable address you have to change its binding to _global_,
+by attaching a *.symbol* directive to the *.label*:
+
+	*.symbol* fn++
+*.label* fn
+
+Unless additional attributes are set on the *.symbol*, this will record a
+function address.
+
+An entry point into an executable ie, its main function, is identified by
+presence of the *entry\_point* attribute (and, by convention, should be called
+"main"):
+
+	*.symbol* [[entry_point]] main++
+*.label* main
+
+When the output of the linker is requested to be an executable (and not a
+library), the linker will report an error if either no function is marked with
+the *entry\_point* attribute, or multiple functions are marked with it.
+There may be ONLY ONE entry point in the final ELF produced by the Viua
+toolchain.
+
 # INSTRUCTIONS
 
 ## Diagnostic
