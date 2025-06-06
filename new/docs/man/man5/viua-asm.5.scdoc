@@ -340,15 +340,121 @@ toolchain.
 
 # INSTRUCTIONS
 
-## Diagnostic
+## Environment and diagnostic
 
-*noop*
+; *noop*
 
-*ebreak*
+; *halt*
+
+; *ebreak*
+
+; *ecall*
 
 ## Arithmetic
 
-*add*
+; *add*, *sub*, *mul*, *div*
+
+; *addi*, *addiu*
+
+; *subi*, *subiu*
+
+; *muli*, *muliu*
+
+; *divi*, *diviu*
+
+; *mod*
+
+## Bit operations
+
+; *bitshl*, *bitshr*
+
+; *bitashr*
+
+; *bitrol*, *bitror*
+
+; *bitand*, *bitor*, *bitxor*
+
+; *bitnot*
+
+## Flow control
+
+; *eq*, *lt*, *gt*
+
+; *cmp*
+
+; *and*, *or*
+
+; *not*
+
+; *if*
+
+; *frame*
+
+; *call*
+
+; *return*
+
+## I/O
+
+; *io\_submit*
+
+; *io\_wait*
+
+; *io\_shutdown*
+
+; *io\_ctl*
+
+; *io\_peek*
+
+## Register operations
+
+; These operations are type-agnostic.
+; They do not look at the values in the registers, they blindly move the bits
+; around without interpreting them in any way.
+
+; *copy*
+
+; *move*
+
+; *swap*
+
+## Concurrency
+
+; *actor*
+
+; *self*
+
+; *gts*
+
+; *gtl*
+
+## Constructors
+
+; *atom*
+
+; *double*
+
+; *float*
+
+; *lui*, *luiu*
+
+; *lli*
+
+; *cast*
+
+## Memory operations
+
+; *arodp*, *atxtp*
+
+; *sm*
+
+; *lm*
+
+; *aa*
+
+; *ad*
+
+; *ptr*
 
 # FILES
 
