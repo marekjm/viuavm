@@ -218,6 +218,11 @@ In the example above, an external symbol for the std::memcpy function is
 declared.
 No additional attributes may be defined on an external symbol.
 
+Unless a symbol is marked with the *extern* attribute it MUST be defined within
+the compilation unit where it is defined.
+If a *.symbol* is provided ie, a declaration is made, a matching *.label* must
+also be provided; otherwise, the assembler will report an error.
+
 ## Objects
 
 Objects are placed in the *.rodata* section using the *.object* directive.
@@ -350,6 +355,34 @@ toolchain.
 *.s*, *.asm*
 	By convention, the files containing Viua assembly language source code have
 	either *.s* or *.asm* suffix.
+
+# EXAMPLE
+
+## Minimal valid program
+
+The smallest valid program is the program that does nothing: it just
+returns.
+
+```
+include(example/x.s)
+```
+The above snippet shows what does the smallest valid program in Viua look like.
+Assuming you saved it in a file called *x.s*, it can be assembled, linked, and
+executed like this:
+
+```
+]$ viua asm x.s
+]$ viua ld x.o
+]$ viua vm a.out
+```
+
+Or, making the defaults explicit:
+
+```
+]$ viua asm -o x.o x.s
+]$ viua ld --type exec -o a.out x.o
+]$ viua vm a.out
+```
 
 # SEE ALSO
 
