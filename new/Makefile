@@ -160,14 +160,21 @@ clean-test:
 		xargs -0 -I CACHE_DIR find CACHE_DIR -type f -delete
 	find ./tests -type d -name '.cache' -delete
 
+# For clean and mostlyclean use
+#
+# 	find $(BUILD_PREFIX) ... || true
+#
+# to avoid these targets failing in fresh clones when "make clean" is executed
+# before the ./build directory has been created.
 .PHONY: clean
 clean: clean-test
-	rm -rf $(BUILD_PREFIX)
+	find $(BUILD_PREFIX) -type f -delete || true
+	find $(BUILD_PREFIX) -mindepth 1 -type d -delete || true
 
 .PHONY: mostlyclean
 mostlyclean: clean-test
-	find $(BUILD_PREFIX) -type f -not -path '*/share/man/*' -delete
-	find $(BUILD_PREFIX) -mindepth 1 -type d -not -path '*/share*' -delete
+	find $(BUILD_PREFIX) -type f -not -path '*/share/man/*' -delete || true
+	find $(BUILD_PREFIX) -mindepth 1 -type d -not -path '*/share*' -delete || true
 
 distclean: clean
 
