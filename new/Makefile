@@ -145,10 +145,7 @@ test: all
 	test_prefix=$(test_prefix) test_exec_prefix=$(test_exec_prefix) \
 		python3 ./tests/suite.py $(TESTS)
 
-clean-bin:
-	find $(BUILD_PREFIX) -type f -delete 2>/dev/null || true
-	find $(BUILD_PREFIX) -mindepth 1 -type d -delete 2>/dev/null || true
-
+.PHONY: clean-test
 clean-test:
 	find ./tests -type f -name '*.elf' -delete
 	find ./tests -type f -name '*.o' -delete
@@ -158,7 +155,16 @@ clean-test:
 		xargs -0 -I CACHE_DIR find CACHE_DIR -type f -delete
 	find ./tests -type d -name '.cache' -delete
 
-clean: clean-test clean-bin
+.PHONY: clean
+clean: clean-test
+	rm -rf $(BUILD_PREFIX)
+
+.PHONY: mostlyclean
+mostlyclean: clean-test
+	find $(BUILD_PREFIX) -type f -not -path '*/share/man/*' -delete
+	find $(BUILD_PREFIX) -mindepth 1 -type d -not -path '*/share*' -delete
+
+distclean: clean
 
 VIUA_TAG_DATESTAMP=$(shell git show --date=short HEAD |\
 				   awk '/^Date:/ { print $$2 }')
