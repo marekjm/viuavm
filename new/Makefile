@@ -64,8 +64,13 @@ CXXFLAGS_INCLUDE=\
 				 -I./include \
 				 -I./3rd-party
 
-FEATURE_DETECT_FLAGS=\
-					 $(shell CXX=$(CXX) bash ./feature-tests/test.sh ./feature-tests/strerrorname_np.c)
+io_impl::=$(shell bash ./feature-tests/io_impl.sh $(io_impl))
+ifeq ($(io_impl),)
+$(error bad io_impl)
+endif
+FEATURE_DETECT_FLAGS::=\
+					 $(shell CXX=$(CXX) bash ./feature-tests/test.sh ./feature-tests/strerrorname_np.c) \
+					 -DVIUAVM_IO_IMPL=$(io_impl)
 
 # To change version, edit the VERSION file in the repository's root directory.
 VIUAVM_VERSION:=$(shell sh ./scripts/make_version.sh short)
@@ -73,6 +78,7 @@ VIUAVM_VERSION_FULL:=$(shell sh ./scripts/make_version.sh full)
 VERSION_FLAGS=\
 			  -DVIUAVM_VERSION='"$(VIUAVM_VERSION)"' \
 			  -DVIUAVM_VERSION_FULL='"$(VIUAVM_VERSION_FULL)"' \
+			  -DVIUAVM_IO_IMPL_HUMAN_READABLE='"$(io_impl)"' \
 			  -DVIUAVM_CXX_PRESET='"$(PRESET)"' \
 			  -DVIUAVM_CXX_OPTIONS='"$(CXXFLAGS_OPTIMISATION) $(CXXFLAGS_DEBUG) $(CXXFLAGS_SANITISER) $(CXXFLAGS_OPTION)"' \
 			  -DCXX='"$(CXX)"' \
@@ -398,6 +404,8 @@ $(BUILD_EXEDIR)/vm: \
 	$(BUILD_PREFIX)/support/tty.o \
 	$(BUILD_PREFIX)/support/string.o \
 	$(BUILD_PREFIX)/vm/backtrace.o \
+	$(BUILD_PREFIX)/vm/io/impl/$(io_impl).o \
+	$(BUILD_PREFIX)/vm/io/sched.o \
 	$(BUILD_PREFIX)/vm/core.o \
 	$(BUILD_PREFIX)/vm/elf.o \
 	$(BUILD_PREFIX)/vm/ins.o \

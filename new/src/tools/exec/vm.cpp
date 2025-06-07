@@ -54,6 +54,10 @@
 #include <viua/vm/elf.h>
 #include <viua/vm/ins.h>
 
+#include <viua/vm/io/impl/classic.hh>
+#include <viua/vm/io/impl/io_uring.hh>
+
+
 constexpr auto VIUA_SLOW_CYCLES = false;
 
 namespace viua {
@@ -315,7 +319,18 @@ auto main(
         return 1;
     }
 
-    auto core = viua::vm::Core{};
+    auto io = viua::vm::io::impl::VIUAVM_IO_IMPL::IO{};
+    {
+        /*
+         * Watch all standard streams (input, output, and error). Any function
+         * which creates a file descriptor MUST register it in the I/O
+         * scheduler.
+         */
+        io.watch(0);
+        io.watch(1);
+        io.watch(2);
+    }
+    auto core = viua::vm::Core{ io };
     core.modules.emplace("", viua::vm::Module{ elf_path, main_module });
     auto const main_pid [[maybe_unused]] = core.spawn("", entry_addr);
 

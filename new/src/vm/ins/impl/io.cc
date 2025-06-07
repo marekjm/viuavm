@@ -68,21 +68,22 @@ auto execute(
     switch (io_op) {
         case 0:
             {
-                auto buffer   = io::buffer_view{ data_ptr, buffer_size };
+                auto buffer =
+                    io::In{ io::In::buffer_type{ data_ptr, buffer_size } };
                 auto const rd = stack.proc->core->io.schedule(
                     reinterpret_cast<uint8_t*>(req_ptr_raw),
                     io_port,
-                    IORING_OP_READ,
+                    IO_request::Opcode::Read,
                     std::move(buffer));
                 dst = rd;
                 break;
             }
         case 1:
             {
-                auto buffer   = std::string{ reinterpret_cast<char*>(data_ptr),
-                                           buffer_size };
+                auto buffer =
+                    io::Out{ io::Out::buffer_type{ data_ptr, buffer_size } };
                 auto const rd = stack.proc->core->io.schedule(
-                    io_port, IORING_OP_WRITE, std::move(buffer));
+                    io_port, IO_request::Opcode::Write, std::move(buffer));
                 dst = rd;
                 break;
             }
@@ -101,39 +102,8 @@ auto execute(
     }
 
     auto const want_id = *req.get<uint64_t>();
-    if (stack.proc->core->io.requests.contains(want_id)) {
-        io_uring_cqe* cqe{};
-        do {
-            io_uring_wait_cqe(&stack.proc->core->io.ring, &cqe);
-
-            if (cqe->res == -1) {
-                stack.proc->core->io.requests[cqe->user_data]->status =
-                    IO_request::Status::Error;
-            } else {
-                auto& rd  = *stack.proc->core->io.requests[cqe->user_data];
-                rd.status = IO_request::Status::Success;
-
-                if (rd.opcode == IORING_OP_READ) {
-                    auto const size_ptr =
-                        stack.proc->memory_at(
-                            reinterpret_cast<uint64_t>(rd.req_ptr))
-                        + (sizeof(uint64_t) * 2);
-                    auto const buffer_size = htole64(cqe->res);
-                    memcpy(size_ptr, &buffer_size, sizeof(buffer_size));
-
-                    dst = register_type::pointer_type{
-                        reinterpret_cast<uint64_t>(rd.req_ptr)
-                    };
-                } else if (rd.opcode == IORING_OP_WRITE) {
-                    /* ignore */
-                }
-            }
-
-            io_uring_cqe_seen(&stack.proc->core->io.ring, cqe);
-        } while (cqe->user_data != want_id);
-    }
-
-    stack.proc->core->io.requests.erase(want_id);
+    auto const req_ptr = stack.proc->core->io.wait(stack, want_id);
+    dst = register_type::pointer_type{ reinterpret_cast<uint64_t>(req_ptr) };
 }
 auto execute(
     IO_SHUTDOWN const,

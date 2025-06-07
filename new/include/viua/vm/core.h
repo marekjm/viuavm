@@ -44,6 +44,7 @@
 #include <viua/runtime/pid.h>
 #include <viua/support/number.h>
 #include <viua/vm/elf.h>
+#include <viua/vm/io/sched.hh>
 #include <viua/vm/perf.hh>
 
 namespace viua::vm {
@@ -355,88 +356,12 @@ struct Frame {
     {}
 };
 
-namespace io {
-using buffer_view = std::basic_string_view<uint8_t>;
-}
-
-struct IO_request {
-    using id_type = uint64_t;
-    id_type const id{};
-
-    using opcode_type = decltype(io_uring_sqe::opcode);
-    opcode_type const opcode{};
-
-    using buffer_type = std::string;
-    std::variant<io::buffer_view, buffer_type> buffer;
-
-    uint8_t* const req_ptr{ nullptr };
-
-    enum class Status
-    {
-        In_flight,
-        Executing,
-        Success,
-        Error,
-        Cancel,
-    };
-    Status status{ Status::In_flight };
-
-    inline IO_request(
-        uint8_t* const rp,
-        id_type const i,
-        opcode_type const o,
-        buffer_type b)
-        : id{ i }
-        , opcode{ o }
-        , buffer{ b }
-        , req_ptr{ rp }
-    {}
-    inline IO_request(
-        uint8_t* const rp,
-        id_type const i,
-        opcode_type const o,
-        io::buffer_view b)
-        : id{ i }
-        , opcode{ o }
-        , buffer{ b }
-        , req_ptr{ rp }
-    {}
-};
-
-struct IO_scheduler {
-    inline static constexpr auto IO_URING_ENTRIES = size_t{ 4'096 };
-    io_uring ring;
-
-    using id_type = std::atomic<IO_request::id_type>;
-    id_type next_id;
-
-    using map_type =
-        std::unordered_map<IO_request::id_type, std::unique_ptr<IO_request>>;
-    map_type requests;
-
-    inline IO_scheduler()
-    {
-        io_uring_queue_init(IO_URING_ENTRIES, &ring, 0);
-    }
-    inline ~IO_scheduler()
-    {
-        io_uring_queue_exit(&ring);
-    }
-
-    using opcode_type = decltype(io_uring_sqe::opcode);
-    using buffer_type = IO_request::buffer_type;
-    auto schedule(int const, opcode_type const, buffer_type)
-        -> IO_request::id_type;
-    auto schedule(uint8_t* const, int const, opcode_type const, io::buffer_view)
-        -> IO_request::id_type;
-};
-
 struct Process;
 
 struct Core {
     std::map<std::string, Module> modules;
 
-    IO_scheduler io;
+    IO_scheduler& io;
 
     Performance_counters perf_counters;
 
@@ -446,6 +371,11 @@ struct Core {
     std::map<pid_type, std::unique_ptr<Process>> flock;
     std::queue<std::experimental::observer_ptr<Process>> run_queue;
     std::map<pid_type, std::experimental::observer_ptr<Process>> suspended;
+
+    explicit inline Core(
+        IO_scheduler& ios)
+        : io{ ios }
+    {}
 
     inline auto pop_ready() -> auto
     {
