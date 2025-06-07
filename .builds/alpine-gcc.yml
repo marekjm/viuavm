@@ -7,8 +7,6 @@ packages:
   - python3
   - linux-headers  # needed by liburing
   - liburing-dev
-  - util-linux-dev  # needed for <uuid/uuid.h>
-  - libuuid
   - scdoc
   - m4
 sources:

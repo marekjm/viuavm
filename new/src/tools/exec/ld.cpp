@@ -21,7 +21,6 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <uuid/uuid.h>
 
 #include <algorithm>
 #include <array>
