@@ -158,7 +158,7 @@ struct Args {
     template<typename T, typename Fn>
     auto map(
         std::string_view const label,
-        Fn&& fn) const -> std::optional<typename std::result_of<Fn(T)>::type>
+        Fn&& fn) const -> std::optional<typename std::invoke_result_t<Fn,T>>
     {
         auto v = get<T>(label);
         if (v.has_value()) {
