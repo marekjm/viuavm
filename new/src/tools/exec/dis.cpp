@@ -230,7 +230,7 @@ auto load_string(
         std::any_of(s.begin(),
                     s.end(),
                     [](auto const each) -> bool
-                    { return not (std::isalnum(each) or (each == '_')); });
+                    { return not(std::isalnum(each) or (each == '_')); });
     if (needs_quotes) {
         s = ('"' + s + '"');
     }
@@ -859,9 +859,9 @@ auto main(
         args.get<std::set<std::string_view>>("no-demangle")
             .value_or(std::set<std::string_view>{});
     auto const demangle_li =
-        not (no_demangles.contains("li") or no_demangles.contains("any"));
+        not(no_demangles.contains("li") or no_demangles.contains("any"));
     auto const demangle_mem =
-        not (no_demangles.contains("mem") or no_demangles.contains("any"));
+        not(no_demangles.contains("mem") or no_demangles.contains("any"));
 
     auto const preferred_output_path = args.get<std::string_view>("out");
     auto to_file                     = std::ofstream{};

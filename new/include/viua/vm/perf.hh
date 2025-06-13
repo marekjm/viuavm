@@ -48,6 +48,6 @@ struct Performance_counters {
         return (death - bang);
     }
 };
-}
+}  // namespace viua::vm
 
 #endif

@@ -75,7 +75,7 @@ auto R::encode() const -> instruction_type
 auto R::to_string() const -> std::string
 {
     auto imm_str = std::to_string(immediate);
-    if (not (opcode & viua::arch::ops::UNSIGNED)) {
+    if (not(opcode & viua::arch::ops::UNSIGNED)) {
         auto tmp = int32_t{};
         memcpy(&tmp, &immediate, sizeof(immediate));
         tmp     = ((tmp << 8) >> 8);  // sign extend

@@ -43,8 +43,8 @@
 #include <viua/arch/arch.h>
 #include <viua/runtime/pid.h>
 #include <viua/support/number.h>
-#include <viua/vm/perf.hh>
 #include <viua/vm/elf.h>
+#include <viua/vm/perf.hh>
 
 namespace viua::vm {
 struct Module {

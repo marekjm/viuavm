@@ -169,7 +169,7 @@ PenaltyReturnTypeOnItsOwnLine: 1000
 PointerAlignment: Left
 QualifierAlignment: Leave
 ReferenceAlignment: Pointer
-ReflowComments:  true
+ReflowComments:  Always
 RemoveParentheses: Leave
 RemoveSemicolon: true
 RequiresClausePosition: OwnLine
