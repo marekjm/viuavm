@@ -2,4 +2,47 @@ VIUA-READELF(1) "Viua VM PUT_VIUAVM_VERSION_HERE" "Viua VM Manual"
 
 # NAME
 
-viua-readelf
+viua-readelf - inspect ELF files containing Viua VM bytecode
+
+# SYNOPSIS
+
+*viua readelf* [_options_] [--] _elf-file_
+
+# DESCRIPTION
+
+*viua readelf* is used to inspect ELF files containing Viua VM bytecode to see
+what symbols they contain, sizes of various sections and segments, etc.
+
+Any output of the inspection is printed to the standard output stream.
+Standard error stream is reserved for error reports.
+
+# OPTIONS
+
+include(common/tool-options.scdoc)
+The *readelf* tool has no options specific to itself.
+
+# EXIT STATUS
+
+|[ 0
+:< Successful inspection
+|  1
+:  Error during inspection
+
+# ENVIRONMENT
+
+No environment variables are used.
+
+# FILES
+
+_elf-file_ is open read-only, and must be a valid ELF (either an executable or a
+library) file produced by the Viua toolchain.
+
+# SEE ALSO
+
+*readelf*(1).
+
+*elf*(5).
+
+include(common/footer.scdoc)
+
+; vim:ft=scdoc:

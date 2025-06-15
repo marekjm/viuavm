@@ -312,6 +312,7 @@ endif
 ################################################################################
 # Explicit dependencies
 $(BUILD_EXEDIR)/readelf: \
+	$(BUILD_PREFIX)/libexec/common.o \
 	$(BUILD_PREFIX)/vm/elf.o \
 	$(BUILD_PREFIX)/support/errno.o \
 	$(BUILD_PREFIX)/support/fdio.o \

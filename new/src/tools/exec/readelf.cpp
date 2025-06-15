@@ -22,7 +22,9 @@
 #include <filesystem>
 #include <iostream>
 
+#include <viua/libexec/common.hh>
 #include <viua/support/errno.h>
+#include <viua/support/print.hh>
 #include <viua/support/tty.h>
 #include <viua/vm/elf.h>
 
@@ -39,59 +41,23 @@ auto main(
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    auto const args = std::vector<std::string>{ (argv + 1), (argv + argc) };
-    if (args.empty()) {
-        std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                  << ": not path to load\n";
+    using viua::libexec::Args;
+    auto const args = viua::libexec::args_or_exit(
+        "readelf",
+        argc,
+        argv,
+        {
+            { { "v", "verbose" }, Args::Kind::Switch },
+            { { "", "version" }, Args::Kind::Switch },
+            { { "h", "help" }, Args::Kind::Switch },
+            { { "", "built-with" }, Args::Kind::Switch },
+        });
+    if (args.args.empty()) {
+        viua::support::errorln("no path to load");
         return 1;
     }
 
-    auto verbosity_level = 0;
-    auto show_version    = false;
-    auto show_help       = false;
-
-    for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
-        auto const& each = args.at(i);
-        if (each == "--") {
-            // explicit separator of options and operands
-            break;
-        }
-        /*
-         * Common options.
-         */
-        else if (each == "-v" or each == "--verbose") {
-            ++verbosity_level;
-        } else if (each == "--version") {
-            show_version = true;
-        } else if (each == "--help") {
-            show_help = true;
-        } else if (each.front() == '-') {
-            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                      << ": unknown option: " << each << "\n";
-            return 1;
-        } else {
-            // input files start here
-            break;
-        }
-    }
-
-    if (show_version) {
-        if (verbosity_level) {
-            std::cout << "Viua VM ";
-        }
-        std::cout << (verbosity_level ? VIUAVM_VERSION_FULL : VIUAVM_VERSION)
-                  << "\n";
-        return 0;
-    }
-    if (show_help) {
-        if (execlp("man", "man", "1", "viua-readelf", nullptr) == -1) {
-            std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                      << ": man(1) page not installed or not found\n";
-            return 1;
-        }
-    }
-
-    auto const elf_path = std::filesystem::path{ args.back() };
+    auto const elf_path = std::filesystem::path{ args.args.back() };
     if (not std::filesystem::exists(elf_path)) {
         std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
                   << ": file does not exist: " << esc(2, COLOR_FG_WHITE)
