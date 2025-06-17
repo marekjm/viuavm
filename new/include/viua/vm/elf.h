@@ -62,8 +62,6 @@ struct Loaded_elf {
     auto function_table() const
         -> std::map<size_t, std::pair<std::string, size_t>>;
 
-    auto labels_table() const -> std::map<size_t, std::string>;
-
     auto load_strtab() -> void;
     auto load_symtab() -> void;
 

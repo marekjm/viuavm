@@ -288,42 +288,20 @@ auto Loaded_elf::function_table() const
     auto const& raw = find_fragment(".symtab")->get();
     auto ft         = std::map<size_t, std::pair<std::string, size_t>>{};
 
-    for (auto i = size_t{ sizeof(uint64_t) }; i < raw.data.size();
-         i += (2 * sizeof(uint64_t))) {
-        auto fn = fn_at(raw.data, i);
-        ft[i]   = std::move(fn);
-        i += ft[i].first.size();
+    auto const entries = raw.data.size() / sizeof(Elf64_Sym);
+    for (auto i = size_t{ 0 }; i < entries; ++i) {
+        auto const offset = (i * sizeof(Elf64_Sym));
+        auto sym          = Elf64_Sym{};
+        memcpy(&sym, raw.data.data() + offset, sizeof(Elf64_Sym));
+
+        if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
+            continue;
+        }
+
+        ft[offset] = { std::string{ str_at(sym.st_name) }, sym.st_value };
     }
 
     return ft;
-}
-auto Loaded_elf::labels_table() const -> std::map<size_t, std::string>
-{
-    auto lt         = std::map<size_t, std::string>{};
-    auto const& raw = find_fragment(".viua.labels");
-    if (not raw.has_value()) {
-        return lt;
-    }
-
-    auto const data = raw->get().data;
-    for (auto i = size_t{ sizeof(uint64_t) }; i < data.size();
-         i += (2 * sizeof(uint64_t))) {
-        auto sz = uint64_t{};
-        memcpy(&sz, (data.data() + i - sizeof(sz)), sizeof(sz));
-        sz = le64toh(sz);
-
-        auto name =
-            std::string{ reinterpret_cast<char const*>(data.data() + i), sz };
-        auto addr = uint64_t{};
-        memcpy(&addr, (data.data() + i + sz), sizeof(addr));
-        addr = le64toh(addr);
-
-        lt[addr] = std::move(name);
-
-        i += sz;
-    }
-
-    return lt;
 }
 
 auto Loaded_elf::make_text_from(

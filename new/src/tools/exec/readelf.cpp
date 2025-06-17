@@ -96,12 +96,17 @@ auto main(
             constexpr auto NAME_WIDTH = 20;
             std::cout << "  [" << std::setw(index_width) << each.index << "] ";
             std::cout << name << std::string((NAME_WIDTH - name.size()), ' ');
-            std::cout << ((sh.sh_type == SHT_NOBITS)     ? "NOBITS"
-                          : (sh.sh_type == SHT_PROGBITS) ? "PROGBITS"
-                          : (sh.sh_type == SHT_STRTAB)   ? "STRTAB"
-                          : (sh.sh_type == SHT_NULL)
-                              ? "NULL"
-                              : "<unexpected section header type>");
+            std::cout
+                << ((sh.sh_type == SHT_NOBITS)     ? "NOBITS"
+                    : (sh.sh_type == SHT_PROGBITS) ? "PROGBITS"
+                    : (sh.sh_type == SHT_STRTAB)   ? "STRTAB"
+                    : (sh.sh_type == SHT_SYMTAB)   ? "SYMTAB"
+                    : (sh.sh_type == SHT_RELA)     ? "RELA"
+                    : (sh.sh_type == SHT_REL)      ? "REL"
+                    : (sh.sh_type == SHT_NULL)
+                        ? "NULL"
+                        : std::format("<unexpected section header type: {}>",
+                                      sh.sh_type));
             if (ph.has_value()) {
                 std::cout << " in ";
                 std::cout << ((ph->p_type == PT_LOAD)     ? "LOAD"
@@ -176,7 +181,7 @@ auto main(
     }
 
     std::cout << "\nFunction table:\n";
-    std::cout << "  " << std::setw(16) << std::setfill(' ') << "Label offset"
+    std::cout << "  " << std::setw(16) << std::setfill(' ') << "Symbol offset"
               << "            " << std::setw(16) << std::setfill(' ')
               << "Target address"
               << "  Label"
