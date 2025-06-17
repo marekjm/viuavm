@@ -14,7 +14,7 @@ fi
 
 FINGERPRINT=$(cat $(find ./include ./src -type f | sort) | openssl dgst -sha3-256 | cut -d' ' -f2)
 
-MODE=${1}
+MODE=${1:-default}
 case ${MODE} in
     full)
         echo "${VERSION}.${COMMITS_SINCE} (${GIT_HEAD}${GIT_DIRTY})"
