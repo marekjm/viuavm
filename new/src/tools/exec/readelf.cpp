@@ -28,6 +28,37 @@
 #include <viua/support/tty.h>
 #include <viua/vm/elf.h>
 
+auto sh_type_to_string(uint32_t const sh_type) -> std::string
+{
+    switch (sh_type) {
+        case SHT_NULL: return "NULL";
+        case SHT_PROGBITS: return "PROGBITS";
+        case SHT_SYMTAB: return "SYMTAB";
+        case SHT_STRTAB: return "STRTAB";
+        case SHT_RELA: return "RELA";
+        case SHT_HASH: return "HASH";
+        case SHT_DYNAMIC: return "DYNAMIC";
+        case SHT_NOTE: return "NOTE";
+        case SHT_NOBITS: return "NOBITS";
+        case SHT_REL: return "REL";
+        case SHT_SHLIB: return "SHLIB";
+        case SHT_DYNSYM: return "DYNSYM";
+        case SHT_LOPROC: return "LOPROC";
+        case SHT_HIPROC: return "HIPROC";
+        case SHT_LOUSER: return "LOUSER";
+        case SHT_HIUSER: return "HIUSER";
+        default:
+            return std::format("<unknown section header type: {}>", sh_type);
+    }
+}
+
+/*
+auto sh_flags_to_string(uint32_t const sh_flags) -> std::string
+{
+}
+*/
+
+
 auto main(
     int argc,
     char* argv[]) -> int
@@ -96,17 +127,7 @@ auto main(
             constexpr auto NAME_WIDTH = 20;
             std::cout << "  [" << std::setw(index_width) << each.index << "] ";
             std::cout << name << std::string((NAME_WIDTH - name.size()), ' ');
-            std::cout
-                << ((sh.sh_type == SHT_NOBITS)     ? "NOBITS"
-                    : (sh.sh_type == SHT_PROGBITS) ? "PROGBITS"
-                    : (sh.sh_type == SHT_STRTAB)   ? "STRTAB"
-                    : (sh.sh_type == SHT_SYMTAB)   ? "SYMTAB"
-                    : (sh.sh_type == SHT_RELA)     ? "RELA"
-                    : (sh.sh_type == SHT_REL)      ? "REL"
-                    : (sh.sh_type == SHT_NULL)
-                        ? "NULL"
-                        : std::format("<unexpected section header type: {}>",
-                                      sh.sh_type));
+            std::cout << sh_type_to_string(sh.sh_type);
             if (ph.has_value()) {
                 std::cout << " in ";
                 std::cout << ((ph->p_type == PT_LOAD)     ? "LOAD"
