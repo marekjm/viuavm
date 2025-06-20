@@ -140,7 +140,15 @@ auto Loaded_elf::load(
             fragment.program_header = *ph;
         }
 
-        if (sh.sh_size) {
+        /*
+         * Why check both sh_size and sh_type?
+         *
+         * Because the .bss section has a non-zero in-memory size, but uses zero
+         * bytes in the ELF file. We have to check the sh_type field to confirm
+         * that we really want to read the section's data; otherwise we could
+         * run into an EOF inside the whole_read() function and hang.
+         */
+        if (sh.sh_size and (sh.sh_type != SHT_NOBITS)) {
             fragment.data.resize(sh.sh_size);
             lseek(elf_fd, sh.sh_offset, SEEK_SET);
             whole_read(elf_fd, fragment.data.data(), sh.sh_size);
