@@ -52,19 +52,6 @@
 
 namespace viua {
 namespace libexec {
-struct Common_options {
-    std::string_view tool;
-
-    size_t verbosity{ 0 };
-    struct {
-        bool version{ false };
-        bool built_with{ false };
-        bool help{ false };
-    } show;
-
-    explicit Common_options(std::string_view);
-};
-
 /*
  * For a comprehensive description of how a command line interface should work
  * from a user's point of view see the following POSIX documentation:
@@ -201,7 +188,6 @@ auto args_or_exit(std::string_view const,
                   Args::ui_type const&) -> Args;
 
 auto maybe_show_info_and_exit(std::string_view const tool, Args const&) -> void;
-auto maybe_show_info_and_exit(Common_options const&) -> std::optional<int>;
 }  // namespace libexec
 }  // namespace viua
 

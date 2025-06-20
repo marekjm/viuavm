@@ -37,11 +37,6 @@ inline constexpr auto always_false_v = false;
 
 namespace viua {
 namespace libexec {
-Common_options::Common_options(
-    std::string_view t)
-    : tool{ t }
-{}
-
 Args::Args(
     int const ac,
     char* const av[])
@@ -286,42 +281,6 @@ auto args_or_exit(
     auto args = Args{ ac, av };
     pass_or_exit(args, tool, ui);
     return args;
-}
-
-auto maybe_show_info_and_exit(
-    Common_options const& o) -> std::optional<int>
-{
-    if (o.show.version) {
-        /*
-         * For the explanation of why this specific version format is used
-         * consult the following GNU standards page:
-         * https://www.gnu.org/prep/standards/html_node/_002d_002dversion.html
-         */
-        std::println("{} (Viua VM) {}",
-                     o.tool,
-                     (o.verbosity ? VIUAVM_VERSION_FULL : VIUAVM_VERSION));
-    }
-    if (o.show.built_with) {
-        std::println("compiler: {} {}", CXX, CXXVERSION);
-        std::println("standard: {}", CXXSTD);
-        std::println("preset:   {}", VIUAVM_CXX_PRESET);
-        std::println("options:  {}", VIUAVM_CXX_OPTIONS);
-    }
-    if (o.show.version or o.show.built_with) {
-        return 0;
-    }
-
-    if (o.show.help) {
-        auto const man_page = std::format("viua-{}", o.tool);
-        if (execlp("man", "man", "1", man_page.c_str(), nullptr) == -1) {
-            viua::support::errorln(
-                "man(1) page for {} not installed or not found", man_page);
-            return 1;
-        }
-        return 0;
-    }
-
-    return std::nullopt;
 }
 
 auto maybe_show_info_and_exit(

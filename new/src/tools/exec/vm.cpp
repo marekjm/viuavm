@@ -216,44 +216,20 @@ auto main(
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    auto const args = std::vector<std::string>{ (argv + 1), (argv + argc) };
-    if (args.empty()) {
+    using viua::libexec::Args;
+    auto const args = viua::libexec::args_or_exit(
+        "vm",
+        argc,
+        argv,
+        {
+            VIUA_TOOL_COMMON_OPTIONS,
+        });
+    if (args.args.empty()) {
         std::println(stderr,
                      "{}error{}: no executable to run",
                      esc(2, COLOR_FG_RED),
                      esc(2, ATTR_RESET));
         return 1;
-    }
-
-    auto options = viua::libexec::Common_options{ "vm" };
-    for (auto i = decltype(args)::size_type{}; i < args.size(); ++i) {
-        auto const& each = args.at(i);
-        if (each == "--") {
-            // explicit separator of options and operands
-            break;
-        }
-
-        /*
-         * Common options.
-         */
-        else if (each == "-v" or each == "--verbose") {
-            ++options.verbosity;
-        } else if (each == "--version") {
-            options.show.version = true;
-        } else if (each == "--built-with") {
-            options.show.built_with = true;
-        } else if (each == "--help") {
-            options.show.help = true;
-        } else if (each.front() == '-') {
-            viua::support::errorln("unknown option: {}", each);
-            return 1;
-        } else {
-            // input files start here
-            break;
-        }
-    }
-    if (auto const r = viua::libexec::maybe_show_info_and_exit(options); r) {
-        return *r;
     }
 
     /*
@@ -262,7 +238,7 @@ auto main(
      * regular file - trying to execute directories or device files does not
      * make much sense.
      */
-    auto const elf_path = std::filesystem::path{ args.back() };
+    auto const elf_path = std::filesystem::path{ args.args.front() };
     if (not std::filesystem::exists(elf_path)) {
         viua::support::errorln("file does not exist: {}{}{}",
                                esc(2, COLOR_FG_WHITE),
