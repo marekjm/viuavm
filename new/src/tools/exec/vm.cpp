@@ -217,13 +217,12 @@ auto main(
     constexpr auto esc = send_escape_seq;
 
     using viua::libexec::Args;
-    auto const args = viua::libexec::args_or_exit(
-        "vm",
-        argc,
-        argv,
-        {
-            VIUA_TOOL_COMMON_OPTIONS,
-        });
+    auto const args = viua::libexec::args_or_exit("vm",
+                                                  argc,
+                                                  argv,
+                                                  {
+                                                      VIUA_TOOL_COMMON_OPTIONS,
+                                                  });
     if (args.args.empty()) {
         std::println(stderr,
                      "{}error{}: no executable to run",

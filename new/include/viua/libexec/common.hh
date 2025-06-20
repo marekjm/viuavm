@@ -43,11 +43,13 @@
  * https://www.gnu.org/prep/standards/html_node/_002d_002dhelp.html for more
  * details.
  */
-#define VIUA_TOOL_COMMON_OPTIONS \
-    { { "v", { "verbose" } }, Args::Kind::Switch }, \
-    { { "", { "version" } }, Args::Kind::Switch }, \
-    { { "", { "help" } }, Args::Kind::Switch }, \
-    { { "", { "built-with" } }, Args::Kind::Switch }
+#define VIUA_TOOL_COMMON_OPTIONS                       \
+    { { "v", { "verbose" } }, Args::Kind::Switch },    \
+        { { "", { "version" } }, Args::Kind::Switch }, \
+        { { "", { "help" } }, Args::Kind::Switch },    \
+    {                                                  \
+        { "", { "built-with" } }, Args::Kind::Switch   \
+    }
 
 
 namespace viua {
@@ -176,7 +178,8 @@ struct Args {
         return std::nullopt;
     }
 
-    using ui_type = std::map<std::tuple<std::string, std::set<std::string>>, Kind>;
+    using ui_type =
+        std::map<std::tuple<std::string, std::set<std::string>>, Kind>;
     auto parse_with(ui_type const&) -> std::optional<std::string_view>;
 };
 

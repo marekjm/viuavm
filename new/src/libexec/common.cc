@@ -169,9 +169,9 @@ auto Args::parse_with(
                     if ((valid = a.starts_with(maybe_with_equals))) {
                         /*
                          * The option was passed as "--foo=bar". Let's skip the
-                         * "foo=" part so that our a views only the "bar" part. This
-                         * can then be supplied as the value to use by the saver
-                         * function.
+                         * "foo=" part so that our a views only the "bar" part.
+                         * This can then be supplied as the value to use by the
+                         * saver function.
                          */
                         a.remove_prefix(maybe_with_equals.size());
 
