@@ -52,8 +52,6 @@ struct Loaded_elf {
     Elf64_Ehdr header;
     std::vector<std::pair<std::string, Fragment>> fragments;
 
-    std::map<size_t, std::string_view> strtab_quick;
-    std::string_view strtab;
     std::vector<Elf64_Sym> symtab;
     std::map<std::string_view, size_t> fn_map;
 
@@ -67,12 +65,9 @@ struct Loaded_elf {
     auto function_table() const
         -> std::map<size_t, std::pair<std::string, size_t>>;
 
-    auto load_strtab() -> void;
     auto load_symtab() -> void;
 
-    auto fn_at(size_t const) const -> std::pair<std::string_view, size_t>;
     auto str_at(size_t const) const -> std::string_view;
-
     auto strtab_of(std::string const) const -> Strtab_view;
 
     static auto load(int const elf_fd) -> Loaded_elf;

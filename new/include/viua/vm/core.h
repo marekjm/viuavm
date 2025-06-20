@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021-2022 Marek Marecki
+ *  Copyright (C) 2021-2022, 2025 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -81,7 +81,7 @@ struct Module {
         size_t const off) const -> std::pair<std::string, size_t>
     {
         auto const sym  = elf.symtab.at(off);
-        auto name       = std::string{ elf.strtab.at(sym.st_name) };
+        auto name       = std::string{ elf.strtab_of(".strtab").view_at(sym.st_name) };
         auto const addr = sym.st_value;
         return { name, addr };
     }

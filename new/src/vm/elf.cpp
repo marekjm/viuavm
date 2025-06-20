@@ -157,7 +157,6 @@ auto Loaded_elf::load(
             { shstr.at(sh.sh_name), std::move(fragment) });
     }
 
-    loaded.load_strtab();
     loaded.load_symtab();
 
     return loaded;
@@ -183,44 +182,10 @@ auto Loaded_elf::find_fragment(
                ? std::nullopt
                : std::optional{ std::ref(fragment->second) };
 }
-auto Loaded_elf::load_strtab() -> void
-{
-    auto elf_strtab = find_fragment(".strtab");
-    if (not elf_strtab.has_value()) {
-        /*
-         * FIXME Without signalling failure LOUDLY here, there will be
-         * mysterious errors encountered later.
-         */
-        return;
-    }
-
-    auto const strtab_size = elf_strtab->get().section_header.sh_size;
-    strtab                 = std::string_view{ reinterpret_cast<char const*>(
-                                   elf_strtab->get().data.data()),
-                               strtab_size };
-    auto const strtab_data =
-        reinterpret_cast<char const*>(elf_strtab->get().data.data());
-    for (auto i = size_t{ 0 }; i < strtab_size; ++i) {
-        auto sv = std::string_view{ strtab_data + i };
-        strtab_quick.emplace(i, sv);
-        i += sv.size();
-    }
-}
 auto Loaded_elf::str_at(
     size_t const off) const -> std::string_view
 {
-    auto name = std::string_view{};
-    if (strtab_quick.count(off)) {
-        name = strtab_quick.at(off);
-    } else {
-        name = strtab;
-        name.remove_prefix(off);
-        name = std::string_view{ name.data() };
-    }
-    if (strtab.size() <= off) {
-        abort();
-    }
-    return name;
+    return strtab_of(".strtab").view_at(off);
 }
 auto Loaded_elf::strtab_of(std::string const section) const -> Strtab_view
 {

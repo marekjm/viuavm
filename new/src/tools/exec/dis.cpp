@@ -89,7 +89,7 @@ auto main_module_elf_type = ET_NONE;
 auto get_symbol_name_in_executable(
     uint64_t const value,
     std::vector<Elf64_Sym> const& symtab,
-    std::map<size_t, std::string_view> const& strtab) -> std::string
+    viua::vm::elf::Strtab_view const strtab) -> std::string
 {
     auto sym = std::find_if(symtab.begin(),
                             symtab.end(),
@@ -98,19 +98,19 @@ auto get_symbol_name_in_executable(
     if (sym == symtab.end()) {
         abort();  // FIXME std::optional?
     }
-    return std::string{ strtab.at(sym->st_name) };
+    return std::string{ strtab.view_at(sym->st_name) };
 }
 auto get_symbol_name_in_relocatable(
     uint64_t const value,
     std::vector<Elf64_Sym> const& symtab,
-    std::map<size_t, std::string_view> const& strtab) -> std::string
+    viua::vm::elf::Strtab_view const strtab) -> std::string
 {
-    return std::string{ strtab.at(symtab.at(value).st_name) };
+    return std::string{ strtab.view_at(symtab.at(value).st_name) };
 }
 auto get_symbol_name(
     uint64_t const value,
     std::vector<Elf64_Sym> const& symtab,
-    std::map<size_t, std::string_view> const& strtab) -> std::string
+    viua::vm::elf::Strtab_view const strtab) -> std::string
 {
     switch (main_module_elf_type) {
         case ET_EXEC:
@@ -208,10 +208,10 @@ using Cooked_text = std::vector<Cooked_op>;
 namespace cook {
 namespace {
 auto make_label_ref(
-    std::map<size_t, std::string_view> const& strtab,
+    viua::vm::elf::Strtab_view const strtab,
     Elf64_Sym const& sym) -> std::string
 {
-    return ("@" + std::string{ strtab.at(sym.st_name) });
+    return ("@" + std::string{ strtab.view_at(sym.st_name) });
 }
 auto read_size(
     std::vector<uint8_t> const& data,
@@ -252,7 +252,7 @@ auto demangle_symbol_load(
     viua::arch::Register_access const out,
     uint64_t const immediate,
     std::vector<Elf64_Sym> const& symtab,
-    std::map<size_t, std::string_view> const& strtab,
+    viua::vm::elf::Strtab_view const strtab,
     std::vector<uint8_t> const& rodata) -> void
 {
     auto const ins_at = [&raw](size_t const n) -> viua::arch::instruction_type
@@ -370,7 +370,7 @@ auto demangle_symbol_load(
 auto demangle_canonical_li(
     Cooked_text& text,
     std::vector<Elf64_Sym> const& symtab,
-    std::map<size_t, std::string_view> const& strtab,
+    viua::vm::elf::Strtab_view const strtab,
     std::vector<uint8_t> const& rodata) -> void
 {
     auto tmp = Cooked_text{};
@@ -531,7 +531,7 @@ auto demangle_addiu(
 auto demangle_arodp(
     Cooked_text& text,
     std::vector<Elf64_Sym> const& symtab,
-    std::map<size_t, std::string_view> const& strtab,
+    viua::vm::elf::Strtab_view const& strtab,
     std::vector<uint8_t> const& rodata) -> void
 {
     auto tmp          = Cooked_text{};
@@ -1239,7 +1239,7 @@ auto main(
 
         cook::demangle_arodp(cooked_text,
                              main_module.symtab,
-                             main_module.strtab_quick,
+                             main_module.strtab_of(".strtab"),
                              rodata->get().data);
 
         if (demangle_li) {
@@ -1250,7 +1250,7 @@ auto main(
              */
             cook::demangle_canonical_li(cooked_text,
                                         main_module.symtab,
-                                        main_module.strtab_quick,
+                             main_module.strtab_of(".strtab"),
                                         rodata->get().data);
 
             /*
