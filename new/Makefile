@@ -315,6 +315,7 @@ endif
 $(BUILD_EXEDIR)/readelf: \
 	$(BUILD_PREFIX)/libexec/common.o \
 	$(BUILD_PREFIX)/vm/elf.o \
+	$(BUILD_PREFIX)/support/elf.o \
 	$(BUILD_PREFIX)/support/errno.o \
 	$(BUILD_PREFIX)/support/fdio.o \
 	$(BUILD_PREFIX)/support/tty.o \
@@ -366,6 +367,7 @@ $(BUILD_EXEDIR)/ld: \
 	$(BUILD_PREFIX)/vm/elf.o \
 	$(BUILD_PREFIX)/tools/libs/errors/compile_time.o \
 	$(BUILD_PREFIX)/tools/libs/stage/save.o \
+	$(BUILD_PREFIX)/support/elf.o \
 	$(BUILD_PREFIX)/support/errno.o \
 	$(BUILD_PREFIX)/support/fdio.o \
 	$(BUILD_PREFIX)/support/string.o \

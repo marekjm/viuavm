@@ -23,84 +23,11 @@
 #include <iostream>
 
 #include <viua/libexec/common.hh>
+#include <viua/support/elf.hh>
 #include <viua/support/errno.h>
 #include <viua/support/print.hh>
 #include <viua/support/tty.h>
 #include <viua/vm/elf.h>
-
-auto sh_type_to_string(uint32_t const sh_type) -> std::string
-{
-    switch (sh_type) {
-        case SHT_NULL: return "NULL";
-        case SHT_PROGBITS: return "PROGBITS";
-        case SHT_SYMTAB: return "SYMTAB";
-        case SHT_STRTAB: return "STRTAB";
-        case SHT_RELA: return "RELA";
-        case SHT_HASH: return "HASH";
-        case SHT_DYNAMIC: return "DYNAMIC";
-        case SHT_NOTE: return "NOTE";
-        case SHT_NOBITS: return "NOBITS";
-        case SHT_REL: return "REL";
-        case SHT_SHLIB: return "SHLIB";
-        case SHT_DYNSYM: return "DYNSYM";
-        case SHT_LOPROC: return "LOPROC";
-        case SHT_HIPROC: return "HIPROC";
-        case SHT_LOUSER: return "LOUSER";
-        case SHT_HIUSER: return "HIUSER";
-        default:
-            return std::format("<unknown section header type: {}>", sh_type);
-    }
-}
-
-auto st_type_to_string(uint32_t const st_info) -> std::string
-{
-    switch (ELF64_ST_TYPE(st_info)) {
-        case STT_NOTYPE: return "NOTYPE";
-        case STT_OBJECT: return "OBJECT";
-        case STT_FUNC: return "FUNC";
-        case STT_SECTION: return "SECTION";
-        case STT_FILE: return "FILE";
-        case STT_LOPROC: return "LOPROC";
-        case STT_HIPROC: return "HIPROC";
-        default:
-            return std::format("<unknown symbol type: {}>", st_info);
-    }
-}
-
-auto st_bind_to_string(uint32_t const st_info) -> std::string
-{
-    switch (ELF64_ST_BIND(st_info)) {
-        case STB_LOCAL: return "LOCAL";
-        case STB_GLOBAL: return "GLOBAL";
-        case STB_WEAK: return "WEAK";
-        case STB_LOPROC: return "LOPROC";
-        case STB_HIPROC: return "HIPROC";
-        default:
-            return std::format("<unknown binding: {}>", st_info);
-    }
-}
-
-auto st_visibility_to_string(uint32_t const st_other) -> std::string
-{
-    switch (ELF64_ST_VISIBILITY(st_other)) {
-        case STV_DEFAULT: return "DEFAULT";
-        case STV_INTERNAL: return "INTERNAL";
-        case STV_HIDDEN: return "HIDDEN";
-        case STV_PROTECTED: return "PROTECTED";
-        default:
-            return std::format("<unknown visibility: {}>", st_other);
-    }
-}
-
-auto st_shndx_to_string(uint32_t const st_shndx) -> std::string
-{
-    switch (st_shndx) {
-        case SHN_UNDEF: return "UND";
-        case SHN_ABS: return "ABS";
-        default:
-            return std::to_string(st_shndx);
-    }
-}
 
 auto show_symbol_table(viua::vm::elf::Loaded_elf const& elf, std::string const section_name, std::string const strtab_section_name) -> void
 {
@@ -121,9 +48,9 @@ auto show_symbol_table(viua::vm::elf::Loaded_elf const& elf, std::string const s
         auto sym          = Elf64_Sym{};
         memcpy(&sym, data.data() + offset, sizeof(Elf64_Sym));
 
-        auto const type_human_readable = st_type_to_string(sym.st_info);
-        auto const bind_human_readable = st_bind_to_string(sym.st_info);
-        auto const vis_human_readable = st_visibility_to_string(sym.st_other);
+        auto const type_human_readable = viua::st_type_to_string(sym.st_info);
+        auto const bind_human_readable = viua::st_bind_to_string(sym.st_info);
+        auto const vis_human_readable = viua::st_visibility_to_string(sym.st_other);
 
         std::println("  {:3d}: {:016x} {:4d} {:6} {:6} {:9} {:>3} {}",
             i,
@@ -132,12 +59,10 @@ auto show_symbol_table(viua::vm::elf::Loaded_elf const& elf, std::string const s
             type_human_readable,
             bind_human_readable,
             vis_human_readable,
-            st_shndx_to_string(sym.st_shndx),
+            viua::st_shndx_to_string(sym.st_shndx),
             elf.strtab_of(strtab_section_name).view_at(sym.st_name));
     }
 }
-
-
 
 auto main(
     int argc,
@@ -204,7 +129,7 @@ auto main(
             constexpr auto NAME_WIDTH = 20;
             std::cout << "  [" << std::setw(index_width) << section_header_index++ << "] ";
             std::cout << name << std::string((NAME_WIDTH - name.size()), ' ');
-            std::cout << sh_type_to_string(sh.sh_type);
+            std::cout << viua::sh_type_to_string(sh.sh_type);
             if (ph.has_value()) {
                 std::cout << " in ";
                 std::cout << ((ph->p_type == PT_LOAD)     ? "LOAD"

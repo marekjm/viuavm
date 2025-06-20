@@ -34,6 +34,7 @@
 #include <viua/arch/ops.h>
 #include <viua/libexec/common.hh>
 #include <viua/libs/stage.h>
+#include <viua/support/elf.hh>
 #include <viua/support/errno.h>
 #include <viua/support/fdio.h>
 #include <viua/support/print.hh>
@@ -906,26 +907,8 @@ auto main(
             auto const lnk_sym_name = std::string_view{
                 reinterpret_cast<char const*>(lnk_strtab.data()) + sym.st_name
             };
-            auto const sym_type = ELF64_ST_TYPE(sym.st_info);
             if (verbosity) {
-                auto sym_type_human_readable = std::string_view{};
-                switch (sym_type) {
-                    case STT_NOTYPE:
-                        sym_type_human_readable = "STT_NOTYPE";
-                        break;
-                    case STT_FUNC:
-                        sym_type_human_readable = "STT_FUNC";
-                        break;
-                    case STT_OBJECT:
-                        sym_type_human_readable = "STT_OBJECT";
-                        break;
-                    case STT_FILE:
-                        sym_type_human_readable = "STT_FILE";
-                        break;
-                    default:
-                        sym_type_human_readable = "<unknown type>";
-                        break;
-                }
+                auto const sym_type_human_readable = viua::st_type_to_string(sym.st_info);
                 std::println(stderr,
                              "{}: symbol: {}: {}",
                              sym_ndx++,
@@ -953,7 +936,7 @@ auto main(
              * special entry that will tell us from what file the following
              * symbols came, but does not require any further processing.
              */
-            if (sym_type == STT_FILE) {
+            if (ELF64_ST_TYPE(sym.st_info) == STT_FILE) {
                 symtab.push_back(sym);
                 continue;
             }
