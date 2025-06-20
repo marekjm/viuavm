@@ -39,6 +39,10 @@ include(common/tool-options.scdoc)
 	argument may be:
 	- *strtab* to dump the string table
 
+*-i*, *--interpreter*=_interpreter_
+	Set _interpreter_ as the requested program interpreter in the *.interp*
+	section.
+
 # EXIT STATUS
 
 |[ 0

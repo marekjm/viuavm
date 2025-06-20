@@ -55,7 +55,8 @@ auto emit_elf(
     std::optional<std::vector<Elf64_Rel>> relocs,
     std::vector<uint8_t> const& rodata_buf,
     std::vector<uint8_t> const& string_table,
-    std::vector<Elf64_Sym>& symbol_table) -> void
+    std::vector<Elf64_Sym>& symbol_table,
+    std::optional<std::string> const interpreter = std::nullopt) -> void
 {
     auto const a_out = open(output_path.c_str(),
                             O_CREAT | O_TRUNC | O_WRONLY,
@@ -66,7 +67,8 @@ auto emit_elf(
     }
 
     constexpr auto VIUA_MAGIC [[maybe_unused]] = "\x7fVIUA\x00\x00\x00";
-    auto const VIUAVM_INTERP                   = std::string{ INSTALL_PREFIX "/libexec/viua/vm" };
+    auto const DEFAULT_VIUA_INTERP                   = std::string{ INSTALL_PREFIX "/libexec/viua/vm" };
+    auto const VIUA_INTERP = interpreter.value_or(DEFAULT_VIUA_INTERP);
     auto const VIUA_COMMENT = std::string{ VIUAVM_VERSION_FULL };
 
     {
@@ -160,14 +162,14 @@ auto emit_elf(
             Elf64_Phdr seg{};
             seg.p_type   = PT_INTERP;
             seg.p_offset = 0;
-            seg.p_filesz = VIUAVM_INTERP.size() + 1;
+            seg.p_filesz = VIUA_INTERP.size() + 1;
             seg.p_flags  = PF_R;
 
             Elf64_Shdr sec{};
             sec.sh_name   = save_shstr_entry(".interp");
             sec.sh_type   = SHT_PROGBITS;
             sec.sh_offset = 0;
-            sec.sh_size   = VIUAVM_INTERP.size() + 1;
+            sec.sh_size   = VIUA_INTERP.size() + 1;
             sec.sh_flags  = 0;
 
             elf_headers.push_back({ seg, sec });
@@ -458,7 +460,7 @@ auto emit_elf(
         }
 
         viua::support::posix::whole_write(
-            a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);
+            a_out, VIUA_INTERP.c_str(), VIUA_INTERP.size() + 1);
 
         if (relocs.has_value()) {
             for (auto const& rel : *relocs) {
@@ -623,11 +625,13 @@ auto main(
             { { "", "version" }, Args::Kind::Switch },
             { { "h", "help" }, Args::Kind::Switch },
             { { "", "built-with" }, Args::Kind::Switch },
+
             { { "o", "out" }, Args::Kind::Single },
             { { "", "type" }, Args::Kind::Single },
             { { "c", "object" }, Args::Kind::Switch },
             { { "", "static" }, Args::Kind::Switch },
             { { "", "dump" }, Args::Kind::Set },
+            { { "i", "interpreter" }, Args::Kind::Single },
         });
     if (args.args.empty()) {
         viua::support::errorln("no files to link");
@@ -648,6 +652,10 @@ auto main(
         args.get<bool>("object").value_or(false);
     auto const output_type = args.get<std::string_view>("type").value_or(
         default_output_type_is_object ? "object" : "exec");
+    auto const interpreter = args.map<std::string_view>("interpreter", [](auto v)
+    {
+        return std::string{v};
+    });
     auto as_static_lib = (output_type == "static");
     auto as_shared_lib = (output_type == "shared");
     auto as_object_lib = (output_type == "object");
@@ -1243,7 +1251,8 @@ auto main(
                                    : std::optional{ std::move(relocations) }),
                     rodata,
                     strtab,
-                    symtab);
+                    symtab,
+                    interpreter);
 
     return 0;
 }
