@@ -35,7 +35,7 @@ main () {
             viua_show_help "${2}"
             ;;
         --version)
-            exec "${exedir}/vm" "${@}" | sed 's/ vm//'
+            exec "${exedir}/vm" "${@}" | sed 's/^vm //' | tr -d '()'
             ;;
         --built-with)
             exec "${exedir}/vm" "${@}" | sed 's/ vm//'

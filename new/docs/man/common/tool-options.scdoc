@@ -2,7 +2,7 @@
 
 ## Common options
 
-*-h*, *--help*
+*--help*
 	Show the man page.
 
 *--version*

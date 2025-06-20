@@ -284,7 +284,7 @@ auto args_or_exit(
     Args::ui_type const& ui) -> Args
 {
     auto args = Args{ ac, av };
-    viua::libexec::pass_or_exit(args, tool, ui);
+    pass_or_exit(args, tool, ui);
     return args;
 }
 
@@ -292,7 +292,12 @@ auto maybe_show_info_and_exit(
     Common_options const& o) -> std::optional<int>
 {
     if (o.show.version) {
-        std::println("viua {} {}",
+        /*
+         * For the explanation of why this specific version format is used
+         * consult the following GNU standards page:
+         * https://www.gnu.org/prep/standards/html_node/_002d_002dversion.html
+         */
+        std::println("{} (Viua VM) {}",
                      o.tool,
                      (o.verbosity ? VIUAVM_VERSION_FULL : VIUAVM_VERSION));
     }
@@ -329,7 +334,12 @@ auto maybe_show_info_and_exit(
     auto const verbose         = a.get<bool>("verbose").value_or(false);
 
     if (show_version) {
-        std::println("viua {} {}",
+        /*
+         * For the explanation of why this specific version format is used
+         * consult the following GNU standards page:
+         * https://www.gnu.org/prep/standards/html_node/_002d_002dversion.html
+         */
+        std::println("{} (Viua VM) {}",
                      tool,
                      (verbose ? VIUAVM_VERSION_FULL : VIUAVM_VERSION));
     }

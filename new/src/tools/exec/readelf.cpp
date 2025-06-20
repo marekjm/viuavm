@@ -91,7 +91,7 @@ auto main(
         {
             VIUA_TOOL_COMMON_OPTIONS,
             { { "a", { "all" } }, Args::Kind::Switch },
-            { { "H", { "file-header" } }, Args::Kind::Switch },
+            { { "h", { "file-header" } }, Args::Kind::Switch },
             { { "l", { "program-headers", "segments" } }, Args::Kind::Switch },
             { { "S", { "section-headers", "sections" } }, Args::Kind::Switch },
             { { "g", { "section-groups" } }, Args::Kind::Switch },

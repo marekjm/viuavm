@@ -33,10 +33,20 @@
 #include <vector>
 
 
+/*
+ * The short -h label is not used as an alias for --help because it would
+ * conflict with the usage in some tools with which the VM wants to remain
+ * compatible on command line interface level (eg, readelf(1) from GNU Binutils
+ * package).
+ *
+ * Besides, GNU standards for command line interfaces only mention --help; see
+ * https://www.gnu.org/prep/standards/html_node/_002d_002dhelp.html for more
+ * details.
+ */
 #define VIUA_TOOL_COMMON_OPTIONS \
     { { "v", { "verbose" } }, Args::Kind::Switch }, \
     { { "", { "version" } }, Args::Kind::Switch }, \
-    { { "h", { "help" } }, Args::Kind::Switch }, \
+    { { "", { "help" } }, Args::Kind::Switch }, \
     { { "", { "built-with" } }, Args::Kind::Switch }
 
 
@@ -55,6 +65,11 @@ struct Common_options {
     explicit Common_options(std::string_view);
 };
 
+/*
+ * For a comprehensive description of how a command line interface should work
+ * from a user's point of view see the following POSIX documentation:
+ * https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html
+ */
 struct Args {
     /*
      * A more convenient way of accessing argv.
