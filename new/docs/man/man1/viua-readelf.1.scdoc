@@ -22,7 +22,7 @@ include(common/tool-options.scdoc)
 *-a*, *--all*
 	Show all available information.
 
-*-H*, *--file-header*
+*-h*, *--file-header*
 	Inspect the ELF header.
 
 *-l*, *--program-headers*, *--segments*
@@ -37,11 +37,17 @@ include(common/tool-options.scdoc)
 *-t*, *--section-details*
 	Show detailed section information. Implies *--section-headers*.
 
-*-s*, *--symbols*
-	Show the symbol table.
+*-s*, *--symbols*, *--syms*
+	Show the symbol table, if the file contains any.
+
+*--dynamic-symbols*, *--dyn-syms*
+	Show the dynamic symbol table, if the file contains any.
 
 *-e*, *--headers*
 	Show all headers. Equivalent to *-H -l -S*.
+
+*--type*
+	Show ELF type. For EXEC files, also show the entry point.
 
 # EXIT STATUS
 

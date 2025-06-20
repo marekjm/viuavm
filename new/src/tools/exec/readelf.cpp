@@ -98,11 +98,22 @@ auto main(
             { { "t", { "section-details" } }, Args::Kind::Switch },
             { { "e", { "headers" } }, Args::Kind::Switch },
             { { "s", { "symbols", "syms" } }, Args::Kind::Switch },
+            { { "", { "dynamic-symbols", "dyn-syms" } }, Args::Kind::Switch },
+            { { "", { "type" } }, Args::Kind::Switch },
         });
     if (args.args.empty()) {
         viua::support::errorln("no path to load");
         return 1;
     }
+
+    auto const show_all     = args.get<bool>("all");
+    auto const show_type    = show_all or args.get<bool>("type");
+    auto const show_headers = show_all or args.get<bool>("headers");
+    auto const show_headers_sh =
+        show_headers or args.get<bool>("section-headers");
+    auto const show_symbols = show_all or args.get<bool>("symbols");
+    auto const show_symbols_dynamic =
+        show_symbols or args.get<bool>("dynamic-symbols");
 
     auto const elf_path = std::filesystem::path{ args.args.back() };
     if (not std::filesystem::exists(elf_path)) {
@@ -127,97 +138,123 @@ auto main(
 
     using viua::vm::elf::Loaded_elf;
     using viua::vm::elf::VIUA_MAGIC;
-    auto const elf = Loaded_elf::load(elf_fd);
-    std::cout << "Fragments:\n";
-
-    auto const index_width    = std::to_string(elf.fragments.size()).size();
-    auto section_header_index = size_t{ 0 };
-    for (auto const& [name, each] : elf.fragments) {
-        auto const& sh [[maybe_unused]] = each.section_header;
-        auto const& ph [[maybe_unused]] = each.program_header;
-
-        {
-            constexpr auto NAME_WIDTH = 20;
-            std::cout << "  [" << std::setw(index_width)
-                      << section_header_index++ << "] ";
-            std::cout << name << std::string((NAME_WIDTH - name.size()), ' ');
-            std::cout << viua::sh_type_to_string(sh.sh_type);
-            if (ph.has_value()) {
-                std::cout << " in ";
-                std::cout << ((ph->p_type == PT_LOAD)     ? "LOAD"
-                              : (ph->p_type == PT_INTERP) ? "INTERP"
-                              : (ph->p_type == PT_NULL)
-                                  ? "NULL"
-                                  : "<unexpected program header type>");
-            }
-            std::cout << "\n";
+    auto const elf = [elf_fd, &elf_path]()
+    {
+        try {
+            return Loaded_elf::load(elf_fd);
+        } catch (std::runtime_error const& e) {
+            viua::support::errorln("not a Viua ELF: {}{}{}",
+                                   esc(2, COLOR_FG_WHITE),
+                                   elf_path.string(),
+                                   esc(2, ATTR_RESET));
+            exit(2);
         }
+    }();
 
-        auto const INDENT = std::string((index_width + 5), ' ');
-        {
-            std::cout << INDENT << "Offset       "
-                      << std::setw(sizeof(sh.sh_offset)) << std::setfill('0')
-                      << std::hex << sh.sh_offset << std::dec << " ("
-                      << sh.sh_offset << " bytes)"
-                      << "\n";
+    if (show_type) {
+        auto const is_exec = (elf.header.e_type == ET_EXEC);
+        std::cout << "Type:        "
+                  << (is_exec ? "EXEC (Executable)" : "REL (Relocatable)")
+                  << "\n";
+        if (is_exec) {
+            std::cout << "Entry point: ";
+            if (auto const ep = elf.entry_point(); ep.has_value()) {
+                std::cout << std::setw(16) << std::setfill('0') << std::hex
+                          << elf.header.e_entry << "  [.text+0x" << std::hex
+                          << *ep << "]";
+                std::cout << std::dec;
+                std::cout << "  " << elf.name_function_at(*ep) << "\n";
+            } else {
+                std::cout << "not found\n";
+            }
+        }
+    }
 
-            std::cout << INDENT << "File size    "
-                      << std::setw(sizeof(sh.sh_size)) << std::setfill('0')
-                      << std::hex << sh.sh_size << std::dec << " ("
-                      << sh.sh_size << " bytes)"
-                      << "\n";
+    if (show_headers_sh) {
+        std::cout << "Fragments:\n";
 
-            if (ph and (ph->p_type == PT_LOAD)) {
-                std::cout << INDENT << "Memory size  "
-                          << std::setw(sizeof(ph->p_memsz)) << std::setfill('0')
-                          << std::hex << ph->p_memsz << std::dec << " ("
-                          << ph->p_memsz << " bytes)"
+        auto const index_width    = std::to_string(elf.fragments.size()).size();
+        auto section_header_index = size_t{ 0 };
+        for (auto const& [name, each] : elf.fragments) {
+            auto const& sh [[maybe_unused]] = each.section_header;
+            auto const& ph [[maybe_unused]] = each.program_header;
+
+            {
+                constexpr auto NAME_WIDTH = 20;
+                std::cout << "  [" << std::setw(index_width)
+                          << section_header_index++ << "] ";
+                std::cout << name
+                          << std::string((NAME_WIDTH - name.size()), ' ');
+                std::cout << viua::sh_type_to_string(sh.sh_type);
+                if (ph.has_value()) {
+                    std::cout << " in ";
+                    std::cout << ((ph->p_type == PT_LOAD)     ? "LOAD"
+                                  : (ph->p_type == PT_INTERP) ? "INTERP"
+                                  : (ph->p_type == PT_NULL)
+                                      ? "NULL"
+                                      : "<unexpected program header type>");
+                }
+                std::cout << "\n";
+            }
+
+            auto const INDENT = std::string((index_width + 5), ' ');
+            {
+                std::cout << INDENT << "Offset       "
+                          << std::setw(sizeof(sh.sh_offset))
+                          << std::setfill('0') << std::hex << sh.sh_offset
+                          << std::dec << " (" << sh.sh_offset << " bytes)"
                           << "\n";
-            }
-        }
 
-        if (name == ".interp") {
-            std::cout << INDENT << "  [Interpreter: " << each.data.data()
-                      << "]\n";
-        }
-        if (name == ".viua.magic") {
-            std::cout << INDENT << "  [Magic:";
-            std::cout << std::hex;
-            for (auto const c : each.data) {
-                std::cout << ' ' << std::setw(2) << std::setfill('0')
-                          << static_cast<int>(c);
-            }
-            std::cout << std::dec;
+                std::cout << INDENT << "Size         "
+                          << std::setw(sizeof(sh.sh_size)) << std::setfill('0')
+                          << std::hex << sh.sh_size << std::dec << " ("
+                          << sh.sh_size << " bytes)"
+                          << "\n";
 
-            std::cout << (((VIUA_MAGIC.size() == each.data.size())
-                           and (memcmp(VIUA_MAGIC.data(),
-                                       each.data.data(),
-                                       VIUA_MAGIC.size())
-                                == 0))
-                              ? " (valid)"
-                              : " (invalid)")
-                      << "]\n";
+                if (ph and (ph->p_type == PT_LOAD)) {
+                    std::cout << INDENT << "Memory size  "
+                              << std::setw(sizeof(ph->p_memsz))
+                              << std::setfill('0') << std::hex << ph->p_memsz
+                              << std::dec << " (" << ph->p_memsz << " bytes)"
+                              << "\n";
+                }
+            }
+
+            if (name == ".interp") {
+                std::cout << INDENT << "  [Interpreter: " << each.data.data()
+                          << "]\n";
+            }
+            if (name == ".viua.magic") {
+                if (not ph.has_value()) {
+                    std::cerr << "No program header for magic value!\n";
+                }
+
+                std::cout << INDENT << "  [Magic:";
+                std::cout << std::hex;
+                for (auto const c : each.data) {
+                    std::cout << ' ' << std::setw(2) << std::setfill('0')
+                              << static_cast<int>(c);
+                }
+                std::cout << std::dec;
+
+                std::cout << (((VIUA_MAGIC.size() == each.data.size())
+                                and (memcmp(VIUA_MAGIC.data(),
+                                            each.data.data(),
+                                            VIUA_MAGIC.size())
+                                     == 0))
+                                   ? " (valid)"
+                                   : " (invalid)")
+                          << "]\n";
+            }
         }
     }
 
-    std::cout << "\nType:        "
-              << ((elf.header.e_type == ET_EXEC) ? "EXEC (Executable)"
-                                                 : "REL (Relocatable)")
-              << "\n";
-    std::cout << "Entry point: ";
-    if (auto const ep = elf.entry_point(); ep.has_value()) {
-        std::cout << std::setw(16) << std::setfill('0') << std::hex
-                  << elf.header.e_entry << "  [.text+0x" << std::hex << *ep
-                  << "]";
-        std::cout << std::dec;
-        std::cout << "  " << elf.name_function_at(*ep) << "\n";
-    } else {
-        std::cout << "not found\n";
+    if (show_symbols) {
+        show_symbol_table(elf, ".symtab", ".strtab");
     }
-    std::println();
-
-    show_symbol_table(elf, ".symtab", ".strtab");
-    show_symbol_table(elf, ".dynsym", ".dynstr");
+    if (show_symbols_dynamic) {
+        show_symbol_table(elf, ".dynsym", ".dynstr");
+    }
 
     return 0;
 }
