@@ -231,20 +231,28 @@ auto main(
 
                 std::cout << INDENT << "  [Magic:";
                 std::cout << std::hex;
-                for (auto const c : each.data) {
+                auto const got_magic = std::string_view{
+                    reinterpret_cast<char const*>(&ph->p_paddr),
+                    sizeof(ph->p_paddr)
+                };
+                for (auto const c : got_magic) {
                     std::cout << ' ' << std::setw(2) << std::setfill('0')
                               << static_cast<int>(c);
                 }
                 std::cout << std::dec;
 
-                std::cout << (((VIUA_MAGIC.size() == each.data.size())
-                                and (memcmp(VIUA_MAGIC.data(),
-                                            each.data.data(),
-                                            VIUA_MAGIC.size())
-                                     == 0))
-                                   ? " (valid)"
-                                   : " (invalid)")
-                          << "]\n";
+                auto const valid = (got_magic == VIUA_MAGIC);
+                std::cout << (valid ? "" : " (invalid)") << "]\n";
+                if (not valid) {
+                    std::cout << INDENT << "  [Wants:";
+                    std::cout << std::hex;
+                    for (auto const c : VIUA_MAGIC) {
+                        std::cout << ' ' << std::setw(2) << std::setfill('0')
+                                  << static_cast<int>(c);
+                    }
+                    std::cout << std::dec;
+                    std::cout << "]\n";
+                }
             }
         }
     }

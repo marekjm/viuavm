@@ -54,7 +54,9 @@ include(common/tool-options.scdoc)
 |[ 0
 :< Successful inspection
 |  1
-:  Error during inspection
+:  No file given; file does not exist, or cannot be opened
+|  2
+:  File is not a Viua ELF
 
 # ENVIRONMENT
 

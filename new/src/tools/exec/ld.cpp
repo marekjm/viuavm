@@ -67,7 +67,9 @@ auto emit_elf(
         exit(1);
     }
 
-    constexpr auto VIUA_MAGIC [[maybe_unused]] = "\x7fVIUA\x00\x00\x00";
+    constexpr auto VIUA_MAGIC =
+        std::string_view{ "\x7fVIUA\x00\x00\x00",
+                          sizeof(Elf64_Phdr::p_offset) };
     auto const DEFAULT_VIUA_INTERP =
         std::string{ INSTALL_PREFIX "/libexec/viua/vm" };
     auto const VIUA_INTERP  = interpreter.value_or(DEFAULT_VIUA_INTERP);
@@ -138,15 +140,15 @@ auto emit_elf(
              */
             Elf64_Phdr seg{};
             seg.p_type   = PT_NULL;
-            seg.p_offset = 0;
-            memcpy(&seg.p_offset, VIUA_MAGIC, 8);
-            seg.p_filesz = 8;
+            seg.p_offset = sizeof(Elf64_Ehdr) + offsetof(Elf64_Phdr, p_paddr);
+            memcpy(&seg.p_paddr, VIUA_MAGIC.data(), VIUA_MAGIC.size());
+            seg.p_filesz = VIUA_MAGIC.size();
 
             Elf64_Shdr sec{};
             sec.sh_name   = save_shstr_entry(".viua.magic");
             sec.sh_type   = SHT_NOBITS;
-            sec.sh_offset = sizeof(Elf64_Ehdr) + offsetof(Elf64_Phdr, p_offset);
-            sec.sh_size   = 8;
+            sec.sh_offset = sizeof(Elf64_Ehdr) + offsetof(Elf64_Phdr, p_paddr);
+            sec.sh_size   = VIUA_MAGIC.size();
             sec.sh_flags  = 0;
 
             elf_headers.push_back({ seg, sec });

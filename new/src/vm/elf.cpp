@@ -58,7 +58,7 @@ auto Loaded_elf::load(
             throw std::runtime_error{ "invalid ELF magic" };
         }
     }
-    if constexpr (false) {
+    if constexpr (true) {
         /*
          * Verify other ELF attributes.
          */
