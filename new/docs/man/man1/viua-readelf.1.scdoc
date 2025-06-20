@@ -19,7 +19,29 @@ Standard error stream is reserved for error reports.
 # OPTIONS
 
 include(common/tool-options.scdoc)
-The *readelf* tool has no options specific to itself.
+*-a*, *--all*
+	Show all available information.
+
+*-H*, *--file-header*
+	Inspect the ELF header.
+
+*-l*, *--program-headers*, *--segments*
+	Inspect the segment headers.
+
+*-S*, *--section-headers*, *--sections*
+	Inspect the section headers.
+
+*-g*, *--section-groups*
+	Inspect the section groups.
+
+*-t*, *--section-details*
+	Show detailed section information. Implies *--section-headers*.
+
+*-s*, *--symbols*
+	Show the symbol table.
+
+*-e*, *--headers*
+	Show all headers. Equivalent to *-H -l -S*.
 
 # EXIT STATUS
 

@@ -90,6 +90,14 @@ auto main(
         argv,
         {
             VIUA_TOOL_COMMON_OPTIONS,
+            { { "a", { "all" } }, Args::Kind::Switch },
+            { { "H", { "file-header" } }, Args::Kind::Switch },
+            { { "l", { "program-headers", "segments" } }, Args::Kind::Switch },
+            { { "S", { "section-headers", "sections" } }, Args::Kind::Switch },
+            { { "g", { "section-groups" } }, Args::Kind::Switch },
+            { { "t", { "section-details" } }, Args::Kind::Switch },
+            { { "e", { "headers" } }, Args::Kind::Switch },
+            { { "s", { "symbols", "syms" } }, Args::Kind::Switch },
         });
     if (args.args.empty()) {
         viua::support::errorln("no path to load");
