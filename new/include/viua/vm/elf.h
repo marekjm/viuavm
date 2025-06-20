@@ -37,10 +37,15 @@ namespace viua::vm::elf {
 struct Fragment {
     using data_type = std::vector<uint8_t>;
 
-    size_t index{};
     std::optional<Elf64_Phdr> program_header{};
     Elf64_Shdr section_header{};
     data_type data;
+};
+
+struct Strtab_view {
+    std::string_view const data;
+
+    auto view_at(size_t const) const -> std::string_view;
 };
 
 struct Loaded_elf {
@@ -67,6 +72,8 @@ struct Loaded_elf {
 
     auto fn_at(size_t const) const -> std::pair<std::string_view, size_t>;
     auto str_at(size_t const) const -> std::string_view;
+
+    auto strtab_of(std::string const) const -> Strtab_view;
 
     static auto load(int const elf_fd) -> Loaded_elf;
     static auto make_text_from(Fragment::data_type const&)

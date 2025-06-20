@@ -52,11 +52,91 @@ auto sh_type_to_string(uint32_t const sh_type) -> std::string
     }
 }
 
-/*
-auto sh_flags_to_string(uint32_t const sh_flags) -> std::string
+auto st_type_to_string(uint32_t const st_info) -> std::string
 {
+    switch (ELF64_ST_TYPE(st_info)) {
+        case STT_NOTYPE: return "NOTYPE";
+        case STT_OBJECT: return "OBJECT";
+        case STT_FUNC: return "FUNC";
+        case STT_SECTION: return "SECTION";
+        case STT_FILE: return "FILE";
+        case STT_LOPROC: return "LOPROC";
+        case STT_HIPROC: return "HIPROC";
+        default:
+            return std::format("<unknown symbol type: {}>", st_info);
+    }
 }
-*/
+
+auto st_bind_to_string(uint32_t const st_info) -> std::string
+{
+    switch (ELF64_ST_BIND(st_info)) {
+        case STB_LOCAL: return "LOCAL";
+        case STB_GLOBAL: return "GLOBAL";
+        case STB_WEAK: return "WEAK";
+        case STB_LOPROC: return "LOPROC";
+        case STB_HIPROC: return "HIPROC";
+        default:
+            return std::format("<unknown binding: {}>", st_info);
+    }
+}
+
+auto st_visibility_to_string(uint32_t const st_other) -> std::string
+{
+    switch (ELF64_ST_VISIBILITY(st_other)) {
+        case STV_DEFAULT: return "DEFAULT";
+        case STV_INTERNAL: return "INTERNAL";
+        case STV_HIDDEN: return "HIDDEN";
+        case STV_PROTECTED: return "PROTECTED";
+        default:
+            return std::format("<unknown visibility: {}>", st_other);
+    }
+}
+
+auto st_shndx_to_string(uint32_t const st_shndx) -> std::string
+{
+    switch (st_shndx) {
+        case SHN_UNDEF: return "UND";
+        case SHN_ABS: return "ABS";
+        default:
+            return std::to_string(st_shndx);
+    }
+}
+
+auto show_symbol_table(viua::vm::elf::Loaded_elf const& elf, std::string const section_name, std::string const strtab_section_name) -> void
+{
+    auto const frag = elf.find_fragment(section_name);
+    if (not frag.has_value()) {
+        return;
+    }
+
+    auto const& symtab = frag->get();
+    auto const& sh[[maybe_unused]] = symtab.section_header;
+    auto const& data = symtab.data;
+
+    auto const entries = data.size() / sizeof(Elf64_Sym);
+    std::println("Symbol table '{}' contains {} entries:", section_name, entries);
+    std::println("  Num: Value            Size Type   Bind   Vis       Ndx Name");
+    for (auto i = size_t{ 0 }; i < entries; ++i) {
+        auto const offset = (i * sizeof(Elf64_Sym));
+        auto sym          = Elf64_Sym{};
+        memcpy(&sym, data.data() + offset, sizeof(Elf64_Sym));
+
+        auto const type_human_readable = st_type_to_string(sym.st_info);
+        auto const bind_human_readable = st_bind_to_string(sym.st_info);
+        auto const vis_human_readable = st_visibility_to_string(sym.st_other);
+
+        std::println("  {:3d}: {:016x} {:4d} {:6} {:6} {:9} {:>3} {}",
+            i,
+            sym.st_value,
+            sym.st_size,
+            type_human_readable,
+            bind_human_readable,
+            vis_human_readable,
+            st_shndx_to_string(sym.st_shndx),
+            elf.strtab_of(strtab_section_name).view_at(sym.st_name));
+    }
+}
+
 
 
 auto main(
@@ -115,17 +195,14 @@ auto main(
     std::cout << "Fragments:\n";
 
     auto const index_width = std::to_string(elf.fragments.size()).size();
+    auto section_header_index = size_t{ 0 };
     for (auto const& [name, each] : elf.fragments) {
         auto const& sh [[maybe_unused]] = each.section_header;
         auto const& ph [[maybe_unused]] = each.program_header;
 
-        if (sh.sh_type == SHT_NULL) {
-            continue;
-        }
-
         {
             constexpr auto NAME_WIDTH = 20;
-            std::cout << "  [" << std::setw(index_width) << each.index << "] ";
+            std::cout << "  [" << std::setw(index_width) << section_header_index++ << "] ";
             std::cout << name << std::string((NAME_WIDTH - name.size()), ' ');
             std::cout << sh_type_to_string(sh.sh_type);
             if (ph.has_value()) {
@@ -200,20 +277,10 @@ auto main(
     } else {
         std::cout << "not found\n";
     }
+    std::println();
 
-    std::cout << "\nFunction table:\n";
-    std::cout << "  " << std::setw(16) << std::setfill(' ') << "Symbol offset"
-              << "            " << std::setw(16) << std::setfill(' ')
-              << "Target address"
-              << "  Label"
-              << "\n";
-    for (auto const& [offset, fn] : elf.function_table()) {
-        auto const& [name, addr] = fn;
-
-        std::cout << "  " << std::hex << std::setw(16) << std::setfill('0')
-                  << offset << "  [.text+0x" << std::setw(16)
-                  << std::setfill('0') << addr << "]  " << name << "\n";
-    }
+    show_symbol_table(elf, ".symtab", ".strtab");
+    show_symbol_table(elf, ".dynsym", ".dynstr");
 
     return 0;
 }

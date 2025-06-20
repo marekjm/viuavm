@@ -58,7 +58,7 @@ auto Loaded_elf::load(
             throw std::runtime_error{ "invalid ELF magic" };
         }
     }
-    {
+    if constexpr (false) {
         /*
          * Verify other ELF attributes.
          */
@@ -110,7 +110,7 @@ auto Loaded_elf::load(
         }
     }
 
-    auto section_names = std::vector<std::string>{};
+    auto shstr = std::map<size_t, std::string>{};
     {
         auto const& shstrtab = sheaders.back();
 
@@ -119,12 +119,11 @@ auto Loaded_elf::load(
         whole_read(elf_fd, buf.data(), buf.size());
 
         for (auto i = size_t{ 0 }; i < shstrtab.sh_size; ++i) {
-            section_names.emplace_back(&buf[i]);
-            i += section_names.back().size();
+            auto const it = shstr.emplace(i, &buf[i]).first;
+            i += it->second.size();
         }
     }
 
-    auto sh_index = size_t{ 0 };
     for (auto const& sh : sheaders) {
         auto const ph =
             std::find_if(pheaders.begin(),
@@ -154,9 +153,8 @@ auto Loaded_elf::load(
             whole_read(elf_fd, fragment.data.data(), sh.sh_size);
         }
 
-        fragment.index = sh_index++;
         loaded.fragments.push_back(
-            { section_names.at(fragment.index), std::move(fragment) });
+            { shstr.at(sh.sh_name), std::move(fragment) });
     }
 
     loaded.load_strtab();
@@ -224,6 +222,32 @@ auto Loaded_elf::str_at(
     }
     return name;
 }
+auto Loaded_elf::strtab_of(std::string const section) const -> Strtab_view
+{
+    auto elf_strtab = find_fragment(section);
+    if (not elf_strtab.has_value()) {
+        return Strtab_view{""};
+    }
+
+    auto const strtab_size = elf_strtab->get().section_header.sh_size;
+    return Strtab_view{ std::string_view{ reinterpret_cast<char const*>(
+                                   elf_strtab->get().data.data()),
+                               strtab_size } };
+}
+auto Strtab_view::view_at(size_t const offset) const -> std::string_view
+{
+    if (offset >= data.size()) {
+        abort();
+    }
+
+    auto name = data;
+    name.remove_prefix(offset);
+    auto const nul = (name.find('\0') == std::string_view::npos)
+        ? name.size()
+        : name.find('\0');
+    return std::string_view{ name.data(), nul };
+}
+
 auto Loaded_elf::load_symtab() -> void
 {
     auto elf_symtab = find_fragment(".symtab");
