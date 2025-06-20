@@ -66,7 +66,7 @@ auto emit_elf(
     }
 
     constexpr auto VIUA_MAGIC [[maybe_unused]] = "\x7fVIUA\x00\x00\x00";
-    auto const VIUAVM_INTERP                   = std::string{ "viua-vm" };
+    auto const VIUAVM_INTERP                   = std::string{ INSTALL_PREFIX "/libexec/viua/vm" };
     auto const VIUA_COMMENT = std::string{ VIUAVM_VERSION_FULL };
 
     {
