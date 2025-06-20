@@ -1250,7 +1250,7 @@ auto main(
              */
             cook::demangle_canonical_li(cooked_text,
                                         main_module.symtab,
-                             main_module.strtab_of(".strtab"),
+                                        main_module.strtab_of(".strtab"),
                                         rodata->get().data);
 
             /*

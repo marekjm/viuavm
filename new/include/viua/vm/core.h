@@ -80,8 +80,9 @@ struct Module {
     inline auto function_at(
         size_t const off) const -> std::pair<std::string, size_t>
     {
-        auto const sym  = elf.symtab.at(off);
-        auto name       = std::string{ elf.strtab_of(".strtab").view_at(sym.st_name) };
+        auto const sym = elf.symtab.at(off);
+        auto name =
+            std::string{ elf.strtab_of(".strtab").view_at(sym.st_name) };
         auto const addr = sym.st_value;
         return { name, addr };
     }

@@ -26,6 +26,6 @@ auto st_type_to_string(uint32_t const st_info) -> std::string;
 auto st_bind_to_string(uint32_t const st_info) -> std::string;
 auto st_visibility_to_string(uint32_t const st_other) -> std::string;
 auto st_shndx_to_string(uint32_t const st_shndx) -> std::string;
-}
+}  // namespace viua
 
 #endif

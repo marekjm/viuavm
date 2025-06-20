@@ -29,20 +29,25 @@
 #include <viua/support/tty.h>
 #include <viua/vm/elf.h>
 
-auto show_symbol_table(viua::vm::elf::Loaded_elf const& elf, std::string const section_name, std::string const strtab_section_name) -> void
+auto show_symbol_table(
+    viua::vm::elf::Loaded_elf const& elf,
+    std::string const section_name,
+    std::string const strtab_section_name) -> void
 {
     auto const frag = elf.find_fragment(section_name);
     if (not frag.has_value()) {
         return;
     }
 
-    auto const& symtab = frag->get();
-    auto const& sh[[maybe_unused]] = symtab.section_header;
-    auto const& data = symtab.data;
+    auto const& symtab              = frag->get();
+    auto const& sh [[maybe_unused]] = symtab.section_header;
+    auto const& data                = symtab.data;
 
     auto const entries = data.size() / sizeof(Elf64_Sym);
-    std::println("Symbol table '{}' contains {} entries:", section_name, entries);
-    std::println("  Num: Value            Size Type   Bind   Vis       Ndx Name");
+    std::println(
+        "Symbol table '{}' contains {} entries:", section_name, entries);
+    std::println(
+        "  Num: Value            Size Type   Bind   Vis       Ndx Name");
     for (auto i = size_t{ 0 }; i < entries; ++i) {
         auto const offset = (i * sizeof(Elf64_Sym));
         auto sym          = Elf64_Sym{};
@@ -50,17 +55,18 @@ auto show_symbol_table(viua::vm::elf::Loaded_elf const& elf, std::string const s
 
         auto const type_human_readable = viua::st_type_to_string(sym.st_info);
         auto const bind_human_readable = viua::st_bind_to_string(sym.st_info);
-        auto const vis_human_readable = viua::st_visibility_to_string(sym.st_other);
+        auto const vis_human_readable =
+            viua::st_visibility_to_string(sym.st_other);
 
         std::println("  {:3d}: {:016x} {:4d} {:6} {:6} {:9} {:>3} {}",
-            i,
-            sym.st_value,
-            sym.st_size,
-            type_human_readable,
-            bind_human_readable,
-            vis_human_readable,
-            viua::st_shndx_to_string(sym.st_shndx),
-            elf.strtab_of(strtab_section_name).view_at(sym.st_name));
+                     i,
+                     sym.st_value,
+                     sym.st_size,
+                     type_human_readable,
+                     bind_human_readable,
+                     vis_human_readable,
+                     viua::st_shndx_to_string(sym.st_shndx),
+                     elf.strtab_of(strtab_section_name).view_at(sym.st_name));
     }
 }
 
@@ -119,7 +125,7 @@ auto main(
     auto const elf = Loaded_elf::load(elf_fd);
     std::cout << "Fragments:\n";
 
-    auto const index_width = std::to_string(elf.fragments.size()).size();
+    auto const index_width    = std::to_string(elf.fragments.size()).size();
     auto section_header_index = size_t{ 0 };
     for (auto const& [name, each] : elf.fragments) {
         auto const& sh [[maybe_unused]] = each.section_header;
@@ -127,7 +133,8 @@ auto main(
 
         {
             constexpr auto NAME_WIDTH = 20;
-            std::cout << "  [" << std::setw(index_width) << section_header_index++ << "] ";
+            std::cout << "  [" << std::setw(index_width)
+                      << section_header_index++ << "] ";
             std::cout << name << std::string((NAME_WIDTH - name.size()), ' ');
             std::cout << viua::sh_type_to_string(sh.sh_type);
             if (ph.has_value()) {

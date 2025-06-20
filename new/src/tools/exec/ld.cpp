@@ -68,8 +68,9 @@ auto emit_elf(
     }
 
     constexpr auto VIUA_MAGIC [[maybe_unused]] = "\x7fVIUA\x00\x00\x00";
-    auto const DEFAULT_VIUA_INTERP                   = std::string{ INSTALL_PREFIX "/libexec/viua/vm" };
-    auto const VIUA_INTERP = interpreter.value_or(DEFAULT_VIUA_INTERP);
+    auto const DEFAULT_VIUA_INTERP =
+        std::string{ INSTALL_PREFIX "/libexec/viua/vm" };
+    auto const VIUA_INTERP  = interpreter.value_or(DEFAULT_VIUA_INTERP);
     auto const VIUA_COMMENT = std::string{ VIUAVM_VERSION_FULL };
 
     {
@@ -653,10 +654,8 @@ auto main(
         args.get<bool>("object").value_or(false);
     auto const output_type = args.get<std::string_view>("type").value_or(
         default_output_type_is_object ? "object" : "exec");
-    auto const interpreter = args.map<std::string_view>("interpreter", [](auto v)
-    {
-        return std::string{v};
-    });
+    auto const interpreter = args.map<std::string_view>(
+        "interpreter", [](auto v) { return std::string{ v }; });
     auto as_static_lib = (output_type == "static");
     auto as_shared_lib = (output_type == "shared");
     auto as_object_lib = (output_type == "object");
@@ -908,7 +907,8 @@ auto main(
                 reinterpret_cast<char const*>(lnk_strtab.data()) + sym.st_name
             };
             if (verbosity) {
-                auto const sym_type_human_readable = viua::st_type_to_string(sym.st_info);
+                auto const sym_type_human_readable =
+                    viua::st_type_to_string(sym.st_info);
                 std::println(stderr,
                              "{}: symbol: {}: {}",
                              sym_ndx++,

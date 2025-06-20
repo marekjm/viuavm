@@ -187,19 +187,21 @@ auto Loaded_elf::str_at(
 {
     return strtab_of(".strtab").view_at(off);
 }
-auto Loaded_elf::strtab_of(std::string const section) const -> Strtab_view
+auto Loaded_elf::strtab_of(
+    std::string const section) const -> Strtab_view
 {
     auto elf_strtab = find_fragment(section);
     if (not elf_strtab.has_value()) {
-        return Strtab_view{""};
+        return Strtab_view{ "" };
     }
 
     auto const strtab_size = elf_strtab->get().section_header.sh_size;
-    return Strtab_view{ std::string_view{ reinterpret_cast<char const*>(
-                                   elf_strtab->get().data.data()),
-                               strtab_size } };
+    return Strtab_view{ std::string_view{
+        reinterpret_cast<char const*>(elf_strtab->get().data.data()),
+        strtab_size } };
 }
-auto Strtab_view::view_at(size_t const offset) const -> std::string_view
+auto Strtab_view::view_at(
+    size_t const offset) const -> std::string_view
 {
     if (offset >= data.size()) {
         abort();
@@ -208,8 +210,8 @@ auto Strtab_view::view_at(size_t const offset) const -> std::string_view
     auto name = data;
     name.remove_prefix(offset);
     auto const nul = (name.find('\0') == std::string_view::npos)
-        ? name.size()
-        : name.find('\0');
+                         ? name.size()
+                         : name.find('\0');
     return std::string_view{ name.data(), nul };
 }
 
