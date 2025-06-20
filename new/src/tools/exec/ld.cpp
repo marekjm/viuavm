@@ -623,17 +623,13 @@ auto main(
         argc,
         argv,
         {
-            { { "v", "verbose" }, Args::Kind::Switch },
-            { { "", "version" }, Args::Kind::Switch },
-            { { "h", "help" }, Args::Kind::Switch },
-            { { "", "built-with" }, Args::Kind::Switch },
-
-            { { "o", "out" }, Args::Kind::Single },
-            { { "", "type" }, Args::Kind::Single },
-            { { "c", "object" }, Args::Kind::Switch },
-            { { "", "static" }, Args::Kind::Switch },
-            { { "", "dump" }, Args::Kind::Set },
-            { { "i", "interpreter" }, Args::Kind::Single },
+            VIUA_TOOL_COMMON_OPTIONS,
+            { { "o", { "out" } }, Args::Kind::Single },
+            { { "", { "type" } }, Args::Kind::Single },
+            { { "c", { "object" } }, Args::Kind::Switch },
+            { { "", { "static" } }, Args::Kind::Switch },
+            { { "", { "dump" } }, Args::Kind::Set },
+            { { "i", { "interpreter" } }, Args::Kind::Single },
         });
     if (args.args.empty()) {
         viua::support::errorln("no files to link");

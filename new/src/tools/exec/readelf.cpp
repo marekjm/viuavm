@@ -89,10 +89,7 @@ auto main(
         argc,
         argv,
         {
-            { { "v", "verbose" }, Args::Kind::Switch },
-            { { "", "version" }, Args::Kind::Switch },
-            { { "h", "help" }, Args::Kind::Switch },
-            { { "", "built-with" }, Args::Kind::Switch },
+            VIUA_TOOL_COMMON_OPTIONS,
         });
     if (args.args.empty()) {
         viua::support::errorln("no path to load");

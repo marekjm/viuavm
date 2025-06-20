@@ -156,33 +156,41 @@ auto Args::parse_with(
 
             auto valid = false;
             for (auto const& [opt, kind] : ui) {
-                auto const& [_, label] = opt;
-                if ((valid = (a == label))) {
-                    save(label, kind);
+                auto const& [_, labels] = opt;
 
-                    /*
-                     * We found the match, so let's not continue uselessly
-                     * iterating over all other options.
-                     */
-                    break;
+                auto const& canonical = *labels.begin();
+                for (auto const& label : labels) {
+                    if ((valid = (a == label))) {
+                        save(canonical, kind);
+
+                        /*
+                         * We found the match, so let's not continue uselessly
+                         * iterating over all other options.
+                         */
+                        break;
+                    }
+
+                    auto const maybe_with_equals = std::string{ label } + '=';
+                    if ((valid = a.starts_with(maybe_with_equals))) {
+                        /*
+                         * The option was passed as "--foo=bar". Let's skip the
+                         * "foo=" part so that our a views only the "bar" part. This
+                         * can then be supplied as the value to use by the saver
+                         * function.
+                         */
+                        a.remove_prefix(maybe_with_equals.size());
+
+                        save(canonical, kind, a);
+
+                        /*
+                         * We found the match, so let's not continue uselessly
+                         * iterating over all other options.
+                         */
+                        break;
+                    }
                 }
 
-                auto const maybe_with_equals = std::string{ label } + '=';
-                if ((valid = a.starts_with(maybe_with_equals))) {
-                    /*
-                     * The option was passed as "--foo=bar". Let's skip the
-                     * "foo=" part so that our a views only the "bar" part. This
-                     * can then be supplied as the value to use by the saver
-                     * function.
-                     */
-                    a.remove_prefix(maybe_with_equals.size());
-
-                    save(label, kind, a);
-
-                    /*
-                     * We found the match, so let's not continue uselessly
-                     * iterating over all other options.
-                     */
+                if (valid) {
                     break;
                 }
             }
@@ -199,9 +207,11 @@ auto Args::parse_with(
 
             auto valid = false;
             for (auto const& [opt, kind] : ui) {
-                auto const& [shortcut, label] = opt;
+                auto const& [shortcut, labels] = opt;
+
+                auto const& canonical = *labels.begin();
                 if ((valid = (a == shortcut))) {
-                    save(label, kind);
+                    save(canonical, kind);
 
                     /*
                      * We found the match, so let's not continue uselessly
@@ -220,7 +230,7 @@ auto Args::parse_with(
                      */
                     a.remove_prefix(maybe_with_equals.size());
 
-                    save(label, kind, a);
+                    save(canonical, kind, a);
 
                     /*
                      * We found the match, so let's not continue uselessly

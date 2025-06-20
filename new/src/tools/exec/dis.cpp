@@ -828,13 +828,10 @@ auto main(
         argc,
         argv,
         {
-            { { "v", "verbose" }, Args::Kind::Switch },
-            { { "", "version" }, Args::Kind::Switch },
-            { { "h", "help" }, Args::Kind::Switch },
-            { { "", "built-with" }, Args::Kind::Switch },
-            { { "o", "out" }, Args::Kind::Single },
-            { { "i", "instruction" }, Args::Kind::List },
-            { { "N", "no-demangle" }, Args::Kind::Set },
+            VIUA_TOOL_COMMON_OPTIONS,
+            { { "o", { "out" } }, Args::Kind::Single },
+            { { "i", { "instruction" } }, Args::Kind::List },
+            { { "N", { "no-demangle" } }, Args::Kind::Set },
         });
     auto const singles =
         args.map<std::vector<std::string_view>>(

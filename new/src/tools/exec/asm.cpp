@@ -3470,12 +3470,9 @@ auto main(
         argc,
         argv,
         {
-            { { "v", "verbose" }, Args::Kind::Switch },
-            { { "", "version" }, Args::Kind::Switch },
-            { { "h", "help" }, Args::Kind::Switch },
-            { { "", "built-with" }, Args::Kind::Switch },
-            { { "o", "out" }, Args::Kind::Single },
-            { { " ", "dump" }, Args::Kind::Set },
+            VIUA_TOOL_COMMON_OPTIONS,
+            { { "o", { "out" } }, Args::Kind::Single },
+            { { "", { "dump" } }, Args::Kind::Set },
         });
     if (args.args.empty()) {
         viua::support::errorln("no file to assemble");
