@@ -20,7 +20,24 @@
 #ifndef VIUA_SUPPORT_ELF_HH
 #define VIUA_SUPPORT_ELF_HH
 
+#include <elf.h>
+#include <stdint.h>
+
+#include <string>
+
+
 namespace viua {
+auto elf_class_to_string(uint8_t const) -> std::string;
+auto elf_class_to_string(uint8_t const e_ident[EI_NIDENT]) -> std::string;
+auto elf_data_to_string(uint8_t const) -> std::string;
+auto elf_data_to_string(uint8_t const e_ident[EI_NIDENT]) -> std::string;
+auto elf_osabi_to_string(uint8_t const) -> std::string;
+auto elf_osabi_to_string(uint8_t const e_ident[EI_NIDENT]) -> std::string;
+auto elf_abiversion_to_string(uint8_t const) -> std::string;
+auto elf_abiversion_to_string(uint8_t const e_ident[EI_NIDENT]) -> std::string;
+auto elf_type_to_string(uint16_t const) -> std::string;
+auto elf_machine_to_string(uint16_t const) -> std::string;
+
 auto sh_type_to_string(uint32_t const sh_type) -> std::string;
 auto st_type_to_string(uint32_t const st_info) -> std::string;
 auto st_bind_to_string(uint32_t const st_info) -> std::string;

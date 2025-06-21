@@ -33,6 +33,7 @@
 
 #include <viua/arch/arch.h>
 
+
 namespace viua::vm::elf {
 struct Fragment {
     using data_type = std::vector<uint8_t>;
@@ -74,9 +75,6 @@ struct Loaded_elf {
     static auto make_text_from(Fragment::data_type const&)
         -> std::vector<viua::arch::instruction_type>;
 };
-
-constexpr inline auto VIUA_MAGIC =
-    std::string_view{ "\x7fVIUA\x00\x00\x00", 8 };
 }  // namespace viua::vm::elf
 
 #endif

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2023 Marek Marecki
+ *  Copyright (C) 2023, 2025 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -22,6 +22,9 @@
 
 #include <stdint.h>
 
+#include <string_view>
+
+
 namespace viua::arch::elf {
 enum class R_VIUA : uint8_t
 {
@@ -29,6 +32,33 @@ enum class R_VIUA : uint8_t
     R_VIUA_JUMP_SLOT = 1,
     R_VIUA_OBJECT    = 2,
 };
+
+/*
+ * Eight bytes are used because that is what we have available in the
+ * Elf64_Phdr::p_paddr field, where the magic number is stored. See elf(5) for
+ * more information.
+ *
+ * If this value is ever changed, remember to adjust the binfmt.d/viua-exec.conf
+ * file responsible for proper detection of Viua ELF files.
+ */
+constexpr inline auto VIUA_MAGIC =
+    std::string_view{ "\x7fVIUA\x00\x00\x00", 8 };
+
+/*
+ * See elf(5) for more information about the Elf64_Ehdr structure, and its
+ * e_machine field.
+ *
+ * See the comment about "new unofficial EM_* values" in the elf.h header file
+ * for more information about how one should choose values for unofficial
+ * machines. The advice is to "pick large random numbers".
+ */
+constexpr inline auto EM_VIUAVM = uint16_t{ 0x69'f2 };
 }  // namespace viua::arch::elf
+
+/*
+ * The various EM_* values from <elf.h> are available in the global namespace,
+ * so let's put our value in the global namespace too.
+ */
+using viua::arch::elf::EM_VIUAVM;
 
 #endif

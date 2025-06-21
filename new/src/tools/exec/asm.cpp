@@ -3005,7 +3005,6 @@ auto make_reloc_table(
 
 auto emit_elf(
     std::filesystem::path const output_path,
-    bool const as_executable,
     std::optional<uint64_t> const entry_point_fn,
     Text const& text,
     std::optional<std::vector<Elf64_Rel>> relocs,
@@ -3039,8 +3038,8 @@ auto emit_elf(
         elf_header.e_ident[EI_VERSION]    = EV_CURRENT;
         elf_header.e_ident[EI_OSABI]      = ELFOSABI_STANDALONE;
         elf_header.e_ident[EI_ABIVERSION] = 0;
-        elf_header.e_type                 = (as_executable ? ET_EXEC : ET_REL);
-        elf_header.e_machine              = ET_NONE;
+        elf_header.e_type                 = ET_REL;
+        elf_header.e_machine              = EM_VIUAVM;
         elf_header.e_version              = elf_header.e_ident[EI_VERSION];
         elf_header.e_flags  = 0;  // processor-specific flags, should be 0
         elf_header.e_ehsize = sizeof(elf_header);
@@ -3706,7 +3705,6 @@ auto main(
      */
     auto const reloc_table = make_reloc_table(text);
     emit_elf(output_path,
-             false,
              (entry_point_fn.has_value()
                   ? std::optional{ symbol_table
                                        .at(symbol_map.at(

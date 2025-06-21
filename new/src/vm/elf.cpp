@@ -27,8 +27,10 @@
 #include <utility>
 #include <vector>
 
+#include <viua/arch/elf.h>
 #include <viua/support/fdio.h>
 #include <viua/vm/elf.h>
+
 
 namespace viua::vm::elf {
 using viua::support::posix::whole_read;
@@ -79,7 +81,7 @@ auto Loaded_elf::load(
         if (ehdr.e_ident[EI_ABIVERSION] != 0) {
             throw std::runtime_error{ "invalid ELF ABI version" };
         }
-        if (ehdr.e_machine != ET_NONE) {
+        if (ehdr.e_machine != EM_VIUAVM) {
             throw std::runtime_error{ "invalid ELF machine" };
         }
         if (ehdr.e_version != EV_CURRENT) {

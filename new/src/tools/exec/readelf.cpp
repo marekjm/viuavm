@@ -23,6 +23,7 @@
 #include <iostream>
 #include <numeric>
 
+#include <viua/arch/elf.h>
 #include <viua/libexec/common.hh>
 #include <viua/support/elf.hh>
 #include <viua/support/errno.h>
@@ -137,8 +138,8 @@ auto main(
         return 1;
     }
 
+    using viua::arch::elf::VIUA_MAGIC;
     using viua::vm::elf::Loaded_elf;
-    using viua::vm::elf::VIUA_MAGIC;
     auto const elf = [elf_fd, &elf_path]()
     {
         try {
@@ -161,20 +162,50 @@ auto main(
             std::format("{:x}", elf.header.e_ident[0]),
             [](std::string acc, uint8_t const each) -> std::string
             { return std::move(acc) + " " + std::format("{:x}", each); });
-        std::println("  Magic: {}", magic_human_readable);
+        std::println("  Magic:                      {}", magic_human_readable);
 
+        std::println("  Class:                      {}",
+                     viua::elf_class_to_string(elf.header.e_ident));
+        std::println("  Data:                       {}",
+                     viua::elf_data_to_string(elf.header.e_ident));
+        std::println("  OS/ABI:                     {}",
+                     viua::elf_osabi_to_string(elf.header.e_ident));
+        std::println("  ABI version:                {}",
+                     viua::elf_abiversion_to_string(elf.header.e_ident));
+
+        std::println("  Type:                       {}",
+                     viua::elf_type_to_string(elf.header.e_type));
         auto const is_exec = (elf.header.e_type == ET_EXEC);
-        std::println("  Type:  {}",
-                     (is_exec ? "EXEC (Executable)" : "REL (Relocatable)"));
         if (is_exec) {
             auto const ep = elf.entry_point();
             auto const ep_human_readable =
                 ep.has_value()
                     ? std::format(
-                          "0x{:016x}  [.text+0x{:x}]", elf.header.e_entry, *ep)
+                          "0x{:x}  [.text+0x{:x}]", elf.header.e_entry, *ep)
                     : "not found";
-            std::println("  Entry: {}", ep_human_readable);
+            std::println("  Entry:                      {}", ep_human_readable);
         }
+
+        std::println("  Machine:                    {}",
+                     viua::elf_machine_to_string(elf.header.e_machine));
+        std::println("  Version:                    {}", elf.header.e_version);
+
+        std::println(
+            "  Flags:                      0x{:08x}", elf.header.e_flags);
+
+        std::println("  Section headers, offset of: 0x{:x} (bytes into file)",
+                     elf.header.e_shoff);
+        std::println("  Section headers, number of: {}", elf.header.e_shnum);
+        std::println(
+            "  Section headers, size of:   {} (bytes)", elf.header.e_shentsize);
+
+        std::println("  Program headers, offset of: 0x{:x} (bytes into file)",
+                     elf.header.e_phoff);
+        std::println("  Program headers, number of: {}", elf.header.e_phnum);
+        std::println(
+            "  Program headers, size of:   {} (bytes)", elf.header.e_phentsize);
+
+        std::println("  Section index of .shstrtab: {}", elf.header.e_shstrndx);
     }
 
     if (show_headers_sh) {

@@ -31,6 +31,7 @@
 #include <vector>
 
 #include <viua/arch/arch.h>
+#include <viua/arch/elf.h>
 #include <viua/arch/ops.h>
 #include <viua/libexec/common.hh>
 #include <viua/libs/stage.h>
@@ -88,7 +89,7 @@ auto emit_elf(
         elf_header.e_ident[EI_OSABI]      = ELFOSABI_STANDALONE;
         elf_header.e_ident[EI_ABIVERSION] = 0;
         elf_header.e_type                 = (as_executable ? ET_EXEC : ET_REL);
-        elf_header.e_machine              = ET_NONE;
+        elf_header.e_machine              = EM_VIUAVM;
         elf_header.e_version              = elf_header.e_ident[EI_VERSION];
         elf_header.e_flags  = 0;  // processor-specific flags, should be 0
         elf_header.e_ehsize = sizeof(elf_header);

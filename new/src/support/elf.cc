@@ -23,10 +23,143 @@
 #include <format>
 #include <string>
 
+#include <viua/arch/elf.h>
 #include <viua/support/elf.hh>
 
 
 namespace viua {
+auto elf_class_to_string(
+    uint8_t const ei_class) -> std::string
+{
+    switch (ei_class) {
+        case ELFCLASS64:
+            return "ELF64";
+        case ELFCLASS32:
+            return "ELF32";
+        case ELFCLASSNONE:
+            return "ELFNONE";
+        default:
+            return "ELFINVALID";
+    }
+}
+auto elf_class_to_string(
+    uint8_t const e_ident[EI_NIDENT]) -> std::string
+{
+    return elf_class_to_string(e_ident[EI_CLASS]);
+}
+
+auto elf_data_to_string(
+    uint8_t const ei_data) -> std::string
+{
+    switch (ei_data) {
+        case ELFDATA2LSB:
+            return "two's complement, little-endian";
+        case ELFDATA2MSB:
+            return "two's complement, big-endian";
+        case ELFDATANONE:
+        default:
+            return std::format("unknown data format: {}", ei_data);
+    }
+}
+auto elf_data_to_string(
+    uint8_t const e_ident[EI_NIDENT]) -> std::string
+{
+    return elf_data_to_string(e_ident[EI_DATA]);
+}
+
+auto elf_osabi_to_string(
+    uint8_t const ei_osabi) -> std::string
+{
+    switch (ei_osabi) {
+        case ELFOSABI_SYSV:
+            return "UNIX System V";
+        case ELFOSABI_HPUX:
+            return "HP-UX";
+        case ELFOSABI_NETBSD:
+            return "NetBSD";
+        case ELFOSABI_LINUX:
+            return "Linux";
+        case ELFOSABI_SOLARIS:
+            return "Solaris";
+        case ELFOSABI_AIX:
+            return "IBM AIX";
+        case ELFOSABI_IRIX:
+            return "IRIX";
+        case ELFOSABI_FREEBSD:
+            return "FreeBSD";
+        case ELFOSABI_TRU64:
+            return "TRU64 UNIX";
+        case ELFOSABI_MODESTO:
+            return "Novell Modesto";
+        case ELFOSABI_OPENBSD:
+            return "OpenBSD";
+        case ELFOSABI_ARM_AEABI:
+            return "ARM EABI";
+        case ELFOSABI_ARM:
+            return "ARM";
+        case ELFOSABI_STANDALONE:
+            return "Standalone";
+        default:
+            return std::format("unknown OS/ABI: {}", ei_osabi);
+    }
+}
+auto elf_osabi_to_string(
+    uint8_t const e_ident[EI_NIDENT]) -> std::string
+{
+    return elf_osabi_to_string(e_ident[EI_OSABI]);
+}
+
+auto elf_abiversion_to_string(
+    uint8_t const ei_abiversion) -> std::string
+{
+    return std::to_string(static_cast<unsigned int>(ei_abiversion));
+}
+auto elf_abiversion_to_string(
+    uint8_t const e_ident[EI_NIDENT]) -> std::string
+{
+    return elf_abiversion_to_string(e_ident[EI_ABIVERSION]);
+}
+
+auto elf_type_to_string(
+    uint16_t const e_type) -> std::string
+{
+    switch (e_type) {
+        case ET_REL:
+            return "REL (Relocatable)";
+        case ET_EXEC:
+            return "EXEC (Executable)";
+        case ET_DYN:
+            return "DYN (Shared object)";
+        case ET_CORE:
+            return "CORE (Core)";
+        case ET_NONE:
+        default:
+            return std::format("None (Unknown type {})", e_type);
+    }
+}
+auto elf_machine_to_string(
+    uint16_t const e_machine) -> std::string
+{
+    switch (e_machine) {
+        case EM_NONE:
+            return "None";
+        case EM_X86_64:
+            return "AMD x86-64";
+        case EM_AARCH64:
+            return "ARM AArch64";
+        case EM_RISCV:
+            return "RISC-V";
+        case EM_VIUAVM:
+            return "Viua VM";
+        default:
+            break;
+    }
+    if (e_machine < EM_NUM) {
+        return "Known machine";
+    }
+    return "Unknown machine";
+}
+
 auto sh_type_to_string(
     uint32_t const sh_type) -> std::string
 {
