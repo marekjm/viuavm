@@ -21,6 +21,7 @@
 
 #include <filesystem>
 #include <iostream>
+#include <numeric>
 
 #include <viua/libexec/common.hh>
 #include <viua/support/elf.hh>
@@ -106,9 +107,9 @@ auto main(
         return 1;
     }
 
-    auto const show_all     = args.get<bool>("all");
-    auto const show_type    = show_all or args.get<bool>("type");
-    auto const show_headers = show_all or args.get<bool>("headers");
+    auto const show_all         = args.get<bool>("all");
+    auto const show_headers     = show_all or args.get<bool>("headers");
+    auto const show_headers_elf = show_headers or args.get<bool>("file-header");
     auto const show_headers_sh =
         show_headers or args.get<bool>("section-headers");
     auto const show_symbols = show_all or args.get<bool>("symbols");
@@ -151,22 +152,28 @@ auto main(
         }
     }();
 
-    if (show_type) {
+    if (show_headers_elf) {
+        std::println("ELF header:");
+
+        auto const magic_human_readable = std::accumulate(
+            std::begin(elf.header.e_ident) + 1,
+            std::end(elf.header.e_ident),
+            std::format("{:x}", elf.header.e_ident[0]),
+            [](std::string acc, uint8_t const each) -> std::string
+            { return std::move(acc) + " " + std::format("{:x}", each); });
+        std::println("  Magic: {}", magic_human_readable);
+
         auto const is_exec = (elf.header.e_type == ET_EXEC);
-        std::cout << "Type:        "
-                  << (is_exec ? "EXEC (Executable)" : "REL (Relocatable)")
-                  << "\n";
+        std::println("  Type:  {}",
+                     (is_exec ? "EXEC (Executable)" : "REL (Relocatable)"));
         if (is_exec) {
-            std::cout << "Entry point: ";
-            if (auto const ep = elf.entry_point(); ep.has_value()) {
-                std::cout << std::setw(16) << std::setfill('0') << std::hex
-                          << elf.header.e_entry << "  [.text+0x" << std::hex
-                          << *ep << "]";
-                std::cout << std::dec;
-                std::cout << "  " << elf.name_function_at(*ep) << "\n";
-            } else {
-                std::cout << "not found\n";
-            }
+            auto const ep = elf.entry_point();
+            auto const ep_human_readable =
+                ep.has_value()
+                    ? std::format(
+                          "0x{:016x}  [.text+0x{:x}]", elf.header.e_entry, *ep)
+                    : "not found";
+            std::println("  Entry: {}", ep_human_readable);
         }
     }
 

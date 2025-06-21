@@ -44,10 +44,7 @@ include(common/tool-options.scdoc)
 	Show the dynamic symbol table, if the file contains any.
 
 *-e*, *--headers*
-	Show all headers. Equivalent to *-H -l -S*.
-
-*--type*
-	Show ELF type. For EXEC files, also show the entry point.
+	Show all headers. Equivalent to *-h -l -S*.
 
 # EXIT STATUS
 
