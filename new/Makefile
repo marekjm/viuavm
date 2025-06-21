@@ -98,6 +98,8 @@ CXXFLAGS=\
 		 $(CXXFLAGS_INCLUDE)
 
 CXXLIBS=\
+		-lmd \
+		-luuid \
 		-luring
 
 

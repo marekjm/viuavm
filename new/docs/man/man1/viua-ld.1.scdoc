@@ -43,6 +43,33 @@ include(common/tool-options.scdoc)
 	Set _interpreter_ as the requested program interpreter in the *.interp*
 	section.
 
+*--build-id*=_style_
+	Create a ".note.gnu.build-id" ELF note section, uniquely identifying a
+	linked file. _style_ can be either of:
+
+[[ *sha1*
+:< SHA1, 160 bits
+|  *sha256*
+:  SHA2, 256 bits
+|  *sha384*
+:  SHA2, 384 bits
+|  *sha512*
+:  SHA2, 512 bits
+|  *uuid*
+:  random UUID, 128 bits
+|  *none*
+:  explicitly disables .note.gnu.build-id
+
+	For hash-based build IDs, the whole file contents are hashed, with the space
+	reserved for the digest zeroed out.
+
+; - *sha1*
+; - *sha256*
+; - *sha384*
+; - *sha512*
+; - *uuid*
+; - *none*
+
 # EXIT STATUS
 
 |[ 0

@@ -20,6 +20,7 @@
 #ifndef VIUA_ARCH_ELF_H
 #define VIUA_ARCH_ELF_H
 
+#include <elf.h>
 #include <stdint.h>
 
 #include <string_view>
@@ -41,8 +42,9 @@ enum class R_VIUA : uint8_t
  * If this value is ever changed, remember to adjust the binfmt.d/viua-exec.conf
  * file responsible for proper detection of Viua ELF files.
  */
-constexpr inline auto VIUA_MAGIC =
-    std::string_view{ "\x7fVIUA\x00\x00\x00", 8 };
+constexpr auto VIUA_MAGIC =
+    std::string_view{ "\x7fVIUA\x00\x00\x00",
+                      sizeof(Elf64_Phdr::p_offset) };
 
 /*
  * See elf(5) for more information about the Elf64_Ehdr structure, and its
