@@ -93,8 +93,6 @@ auto elf_osabi_to_string(
             return "Novell Modesto";
         case ELFOSABI_OPENBSD:
             return "OpenBSD";
-        case ELFOSABI_ARM_AEABI:
-            return "ARM EABI";
         case ELFOSABI_ARM:
             return "ARM";
         case ELFOSABI_STANDALONE:
