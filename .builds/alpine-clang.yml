@@ -1,5 +1,5 @@
 ---
-image: alpine/latest
+image: alpine/edge
 packages:
   - clang
   - make
@@ -11,6 +11,7 @@ packages:
   - libuuid
   - libmd-dev  # for SHA1 and SHA2
   - libb2-dev  # for BLAKE2
+  - blake3-dev
   - scdoc
   - m4
 sources:

@@ -27,6 +27,7 @@
 #include <sha2.h>
 #include <uuid/uuid.h>
 #include <blake2.h>
+#include <blake3.h>
 
 #include <algorithm>
 #include <array>
@@ -61,6 +62,7 @@ enum class Build_id_hash {
     SHA384,
     SHA512,
     BLAKE2B,
+    BLAKE3,
 };
 
 namespace stage {
@@ -126,6 +128,9 @@ auto emit_elf(
                 break;
             case BLAKE2B:
                 build_id.resize(build_id_size.value_or(BLAKE2B_OUTBYTES * 8) / 8);
+                break;
+            case BLAKE3:
+                build_id.resize(build_id_size.value_or(BLAKE3_OUT_LEN * 8) / 8);
                 break;
         }
 
@@ -663,6 +668,13 @@ auto emit_elf(
                 0 /* keylen */);
             break;
                          }
+        case BLAKE3: {
+            blake3_hasher hasher;
+            blake3_hasher_init(&hasher);
+            blake3_hasher_update(&hasher, output_buffer.data(), output_buffer.size());
+            blake3_hasher_finalize(&hasher, build_id.data(), build_id.size());
+            break;
+                         }
     }
 
     memcpy(output_buffer.data() + build_id_offset, build_id.data(), build_id.size());
@@ -835,6 +847,8 @@ auto main(
                 return Build_id_hash::SHA512;
             } else if (v == "blake2b") {
                 return Build_id_hash::BLAKE2B;
+            } else if (v == "blake3") {
+                return Build_id_hash::BLAKE3;
             } else {
                 viua::support::errorln("invalid style for --build-id: {}", v);
                 exit(1);
@@ -848,6 +862,7 @@ auto main(
 
             auto const tunable_hashes = std::set{
                 Build_id_hash::BLAKE2B,
+                Build_id_hash::BLAKE3,
             };
             if (not tunable_hashes.contains(*build_id_hash)) {
                 viua::support::errorln("cannot set digest size with a non-tunable --build-id: {}", args.get<std::string_view>("build-id").value());

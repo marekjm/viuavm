@@ -99,6 +99,7 @@ CXXFLAGS=\
 
 CXXLIBS=\
 		-lb2 \
+		-lblake3 \
 		-lmd \
 		-luuid \
 		-luring

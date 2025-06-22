@@ -57,10 +57,14 @@ include(common/tool-options.scdoc)
 :  SHA2, 512 bits
 |  *blake2b*
 :  BLAKE2B, 512 bits by default, see *--build-id-size*
+|  *blake3*
+:  BLAKE3, 256 bits by default, see *--build-id-size*
 |  *uuid*
 :  random UUID, 128 bits
 |  *none*
 :  explicitly disables .note.gnu.build-id
+|  *default*
+:  alias for *blake3*
 
 	For hash-based build IDs, the whole file contents are hashed, with the space
 	reserved for the digest zeroed out.
