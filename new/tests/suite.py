@@ -970,6 +970,8 @@ def test_case_impl_ld(reporting, exe_path, reloc_path, extras=()):
     start_timepoint, case_log = reporting
 
     ld_args = LINKER + (
+        "--build-id=blake3",
+        "--build-id-size=160",
         "-o",
         exe_path,
         reloc_path,

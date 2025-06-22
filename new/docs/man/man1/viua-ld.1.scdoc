@@ -47,31 +47,37 @@ include(common/tool-options.scdoc)
 	Create a ".note.gnu.build-id" ELF note section, uniquely identifying a
 	linked file. _style_ can be either of:
 
-[[ *sha1*
-:< SHA1, 160 bits
+[[ _style_
+:[ bits
+:< comment
+|  *sha1*
+:  160
+:  SHA1
 |  *sha256*
-:  SHA2, 256 bits
+:  256
+:  SHA2
 |  *sha384*
-:  SHA2, 384 bits
+:  384
+:  SHA2
 |  *sha512*
-:  SHA2, 512 bits
+:  512
+:  SHA2
 |  *blake2b*
-:  BLAKE2B, 512 bits by default, see *--build-id-size*
+:  32-512
+:  BLAKE2B, by default 512 bits (see *--build-id-size*)
 |  *blake3*
-:  BLAKE3, 256 bits by default, see *--build-id-size*
-|  *uuid*
-:  random UUID, 128 bits
+:  32-unlimited
+:  BLAKE3, by default 256 bits (see *--build-id-size*)
 |  *none*
+:  -
 :  explicitly disables .note.gnu.build-id
-|  *default*
-:  alias for *blake3*
 
 	For hash-based build IDs, the whole file contents are hashed, with the space
 	reserved for the digest zeroed out.
 
 *--build-id-size*=_size_
-	Sets size of the digest, in bits, for tunable hashes. The size must be
-	divisible by 8.
+	Set the size of the digest for *blake2b* or *blake3* build IDs. The size
+	must be divisible by 8.
 
 ; - *sha1*
 ; - *sha256*
