@@ -55,6 +55,8 @@ include(common/tool-options.scdoc)
 :  SHA2, 384 bits
 |  *sha512*
 :  SHA2, 512 bits
+|  *blake2b*
+:  BLAKE2B, 512 bits by default, see *--build-id-size*
 |  *uuid*
 :  random UUID, 128 bits
 |  *none*
@@ -62,6 +64,10 @@ include(common/tool-options.scdoc)
 
 	For hash-based build IDs, the whole file contents are hashed, with the space
 	reserved for the digest zeroed out.
+
+*--build-id-size*=_size_
+	Sets size of the digest, in bits, for tunable hashes. The size must be
+	divisible by 8.
 
 ; - *sha1*
 ; - *sha256*

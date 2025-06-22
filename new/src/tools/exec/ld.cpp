@@ -26,6 +26,7 @@
 #include <sha1.h>
 #include <sha2.h>
 #include <uuid/uuid.h>
+#include <blake2.h>
 
 #include <algorithm>
 #include <array>
@@ -59,6 +60,7 @@ enum class Build_id_hash {
     SHA256,
     SHA384,
     SHA512,
+    BLAKE2B,
 };
 
 namespace stage {
@@ -72,7 +74,8 @@ auto emit_elf(
     std::vector<uint8_t> const& string_table,
     std::vector<Elf64_Sym>& symbol_table,
     std::optional<std::string> const interpreter = std::nullopt,
-    std::optional<Build_id_hash> const build_id_hash = std::nullopt
+    std::optional<Build_id_hash> const build_id_hash = std::nullopt,
+    std::optional<size_t> const build_id_size = std::nullopt
     ) -> void
 {
     auto output_buffer = std::vector<uint8_t>{};
@@ -120,6 +123,9 @@ auto emit_elf(
                 break;
             case SHA512:
                 build_id.resize(SHA512_DIGEST_LENGTH);
+                break;
+            case BLAKE2B:
+                build_id.resize(build_id_size.value_or(BLAKE2B_OUTBYTES * 8) / 8);
                 break;
         }
 
@@ -647,6 +653,16 @@ auto emit_elf(
             SHA512Final(build_id.data(), &context);
             break;
                      }
+        case BLAKE2B: {
+            blake2b(
+                build_id.data(),
+                output_buffer.data(),
+                nullptr /* key */,
+                build_id.size(),
+                output_buffer.size(),
+                0 /* keylen */);
+            break;
+                         }
     }
 
     memcpy(output_buffer.data() + build_id_offset, build_id.data(), build_id.size());
@@ -780,6 +796,7 @@ auto main(
             { { "", { "dump" } }, Args::Kind::Set },
             { { "i", { "interpreter" } }, Args::Kind::Single },
             { { "", { "build-id" } }, Args::Kind::Single },
+            { { "", { "build-id-size" } }, Args::Kind::Single },
         });
     if (args.args.empty()) {
         viua::support::errorln("no files to link");
@@ -816,11 +833,35 @@ auto main(
                 return Build_id_hash::SHA384;
             } else if (v == "sha512") {
                 return Build_id_hash::SHA512;
+            } else if (v == "blake2b") {
+                return Build_id_hash::BLAKE2B;
             } else {
                 viua::support::errorln("invalid style for --build-id: {}", v);
                 exit(1);
             }
         }).value_or(std::nullopt);
+    auto const build_id_size = args.map<std::string_view>("build-id-size", [&args, &build_id_hash](auto v) -> size_t
+        {
+            if (not build_id_hash.has_value()) {
+                return 0;
+            }
+
+            auto const tunable_hashes = std::set{
+                Build_id_hash::BLAKE2B,
+            };
+            if (not tunable_hashes.contains(*build_id_hash)) {
+                viua::support::errorln("cannot set digest size with a non-tunable --build-id: {}", args.get<std::string_view>("build-id").value());
+                exit(1);
+            }
+
+            auto const n = std::stoull(std::string{v});
+            if (n % 8) {
+                viua::support::errorln("digest size not divisible by 8: {}", v);
+                exit(1);
+            }
+
+            return n;
+        });
     auto as_static_lib = (output_type == "static");
     auto as_shared_lib = (output_type == "shared");
     auto as_object_lib = (output_type == "object");
@@ -1401,7 +1442,8 @@ auto main(
                     strtab,
                     symtab,
                     interpreter,
-                    build_id_hash);
+                    build_id_hash,
+                    build_id_size);
 
     return 0;
 }
