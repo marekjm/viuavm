@@ -885,20 +885,39 @@ auto main(
                 return 0;
             }
 
+            using enum Build_id_hash;
             auto const tunable_hashes = std::set{
-                Build_id_hash::BLAKE2B,
-                Build_id_hash::BLAKE3,
+                BLAKE2B,
+                BLAKE3,
             };
+
+            auto const build_id_hash_name =
+                args.get<std::string_view>("build-id").value();
+
             if (not tunable_hashes.contains(*build_id_hash)) {
                 viua::support::errorln(
                     "cannot set digest size with a non-tunable --build-id: {}",
-                    args.get<std::string_view>("build-id").value());
+                    build_id_hash_name);
                 exit(1);
             }
 
             auto const n = std::stoull(std::string{ v });
             if (n % 8) {
                 viua::support::errorln("digest size not divisible by 8: {}", v);
+                exit(1);
+            }
+
+            if (n < 32) {
+                viua::support::errorln(
+                    "--build-id-size: digest size cannot be smaller than 32 "
+                    "bits");
+                exit(1);
+            }
+
+            if ((build_id_hash == BLAKE2B) and (n > 512)) {
+                viua::support::errorln(
+                    "--build-id-size: maximum digest size for {} is 512 bits",
+                    build_id_hash_name);
                 exit(1);
             }
 
