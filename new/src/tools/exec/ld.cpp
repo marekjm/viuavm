@@ -23,11 +23,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <blake2.h>
+#include <blake3.h>
 #include <sha1.h>
 #include <sha2.h>
 #include <uuid/uuid.h>
-#include <blake2.h>
-#include <blake3.h>
 
 #include <algorithm>
 #include <array>
@@ -55,7 +55,8 @@ using Text = std::vector<viua::arch::instruction_type>;
 
 using viua::support::string::quote_fancy;
 
-enum class Build_id_hash {
+enum class Build_id_hash
+{
     UUID,
     SHA1,
     SHA256,
@@ -75,13 +76,13 @@ auto emit_elf(
     std::vector<uint8_t> const& rodata_buf,
     std::vector<uint8_t> const& string_table,
     std::vector<Elf64_Sym>& symbol_table,
-    std::optional<std::string> const interpreter = std::nullopt,
+    std::optional<std::string> const interpreter     = std::nullopt,
     std::optional<Build_id_hash> const build_id_hash = std::nullopt,
-    std::optional<size_t> const build_id_size = std::nullopt
-    ) -> void
+    std::optional<size_t> const build_id_size        = std::nullopt) -> void
 {
     auto output_buffer = std::vector<uint8_t>{};
-    auto const save = [&output_buffer](void const* const data, size_t const size)
+    auto const save    = [&output_buffer](
+                          void const* const data, size_t const size)
     {
         auto const tail = output_buffer.size();
         output_buffer.resize(tail + size);
@@ -103,7 +104,7 @@ auto emit_elf(
     auto const VIUA_COMMENT = std::string{ VIUAVM_VERSION_FULL };
 
     constexpr auto gnu_namespace = std::string_view{ "GNU", 4 };
-    auto build_id = std::vector<uint8_t>{};
+    auto build_id                = std::vector<uint8_t>{};
     if (build_id_hash.has_value()) {
         switch (*build_id_hash) {
             using enum Build_id_hash;
@@ -127,7 +128,8 @@ auto emit_elf(
                 build_id.resize(SHA512_DIGEST_LENGTH);
                 break;
             case BLAKE2B:
-                build_id.resize(build_id_size.value_or(BLAKE2B_OUTBYTES * 8) / 8);
+                build_id.resize(build_id_size.value_or(BLAKE2B_OUTBYTES * 8)
+                                / 8);
                 break;
             case BLAKE3:
                 build_id.resize(build_id_size.value_or(BLAKE3_OUT_LEN * 8) / 8);
@@ -140,12 +142,12 @@ auto emit_elf(
          */
         build_id.reserve(build_id.size() + 1);
     }
-    auto note_gnu_build_id = Elf64_Nhdr{};
+    auto note_gnu_build_id     = Elf64_Nhdr{};
     note_gnu_build_id.n_namesz = gnu_namespace.size();
     note_gnu_build_id.n_descsz = build_id.size();
-    note_gnu_build_id.n_type = NT_GNU_BUILD_ID;
+    note_gnu_build_id.n_type   = NT_GNU_BUILD_ID;
 
-    auto build_id_offset = size_t{ 0 };
+    auto build_id_offset               = size_t{ 0 };
     auto note_gnu_build_id_section_ndx = size_t{ 0 };
     {
         // see elf(5)
@@ -259,7 +261,8 @@ auto emit_elf(
             Elf64_Phdr seg{};
             seg.p_type   = PT_NOTE;
             seg.p_offset = 0;
-            seg.p_filesz = sizeof(note_gnu_build_id) + gnu_namespace.size() + build_id.size();
+            seg.p_filesz = sizeof(note_gnu_build_id) + gnu_namespace.size()
+                           + build_id.size();
 
             Elf64_Shdr sec{};
             sec.sh_name   = save_shstr_entry(".note.gnu.build-id");
@@ -277,8 +280,8 @@ auto emit_elf(
              * So we just have to wait until we have all the information. Be
              * patient. (It is said to be a virute.)
              */
-            sec.sh_size   = seg.p_filesz;
-            sec.sh_flags  = SHF_ALLOC;
+            sec.sh_size  = seg.p_filesz;
+            sec.sh_flags = SHF_ALLOC;
 
             note_gnu_build_id_section_ndx = elf_headers.size();
             elf_headers.push_back({ seg, sec });
@@ -560,7 +563,8 @@ auto emit_elf(
             if (not segment) {
                 continue;
             }
-            save(&*segment, sizeof(std::remove_reference_t<decltype(*segment)>));
+            save(
+                &*segment, sizeof(std::remove_reference_t<decltype(*segment)>));
         }
         for (auto const& [_, section] : elf_headers) {
             save(&section, sizeof(std::remove_reference_t<decltype(section)>));
@@ -614,73 +618,87 @@ auto emit_elf(
         if (build_id_hash.has_value()) {
             build_id_offset =
                 elf_headers.at(note_gnu_build_id_section_ndx).second.sh_offset
-                + sizeof(Elf64_Nhdr)
-                + gnu_namespace.size();
+                + sizeof(Elf64_Nhdr) + gnu_namespace.size();
         }
     }
 
     if (build_id_hash.has_value()) {
-    switch (*build_id_hash) {
-        using enum Build_id_hash;
-        case UUID: {
-               uuid_t uu;
-               uuid_generate_random(uu);
-               std::array<char, 36 + 1> hr {};
-               uuid_unparse(uu, hr.data());
-               memcpy(build_id.data(), &uu, sizeof(uu));
-               break;
-           }
-        case SHA1: {
-            SHA1_CTX context;
-            SHA1Init(&context);
-            SHA1Update(&context, output_buffer.data(), output_buffer.size());
-            SHA1Final(build_id.data(), &context);
-            break;
-                   }
-        case SHA256: {
-            SHA2_CTX context;
-            SHA256Init(&context);
-            SHA256Update(&context, output_buffer.data(), output_buffer.size());
-            SHA256Final(build_id.data(), &context);
-            break;
-                     }
-        case SHA384: {
-            SHA2_CTX context;
-            SHA384Init(&context);
-            SHA384Update(&context, output_buffer.data(), output_buffer.size());
-            SHA384Final(build_id.data(), &context);
-            break;
-                     }
-        case SHA512: {
-            SHA2_CTX context;
-            SHA512Init(&context);
-            SHA512Update(&context, output_buffer.data(), output_buffer.size());
-            SHA512Final(build_id.data(), &context);
-            break;
-                     }
-        case BLAKE2B: {
-            blake2b(
-                build_id.data(),
-                output_buffer.data(),
-                nullptr /* key */,
-                build_id.size(),
-                output_buffer.size(),
-                0 /* keylen */);
-            break;
-                         }
-        case BLAKE3: {
-            blake3_hasher hasher;
-            blake3_hasher_init(&hasher);
-            blake3_hasher_update(&hasher, output_buffer.data(), output_buffer.size());
-            blake3_hasher_finalize(&hasher, build_id.data(), build_id.size());
-            break;
-                         }
+        switch (*build_id_hash) {
+            using enum Build_id_hash;
+            case UUID:
+                {
+                    uuid_t uu;
+                    uuid_generate_random(uu);
+                    std::array<char, 36 + 1> hr{};
+                    uuid_unparse(uu, hr.data());
+                    memcpy(build_id.data(), &uu, sizeof(uu));
+                    break;
+                }
+            case SHA1:
+                {
+                    SHA1_CTX context;
+                    SHA1Init(&context);
+                    SHA1Update(
+                        &context, output_buffer.data(), output_buffer.size());
+                    SHA1Final(build_id.data(), &context);
+                    break;
+                }
+            case SHA256:
+                {
+                    SHA2_CTX context;
+                    SHA256Init(&context);
+                    SHA256Update(
+                        &context, output_buffer.data(), output_buffer.size());
+                    SHA256Final(build_id.data(), &context);
+                    break;
+                }
+            case SHA384:
+                {
+                    SHA2_CTX context;
+                    SHA384Init(&context);
+                    SHA384Update(
+                        &context, output_buffer.data(), output_buffer.size());
+                    SHA384Final(build_id.data(), &context);
+                    break;
+                }
+            case SHA512:
+                {
+                    SHA2_CTX context;
+                    SHA512Init(&context);
+                    SHA512Update(
+                        &context, output_buffer.data(), output_buffer.size());
+                    SHA512Final(build_id.data(), &context);
+                    break;
+                }
+            case BLAKE2B:
+                {
+                    blake2b(build_id.data(),
+                            output_buffer.data(),
+                            nullptr /* key */,
+                            build_id.size(),
+                            output_buffer.size(),
+                            0 /* keylen */);
+                    break;
+                }
+            case BLAKE3:
+                {
+                    blake3_hasher hasher;
+                    blake3_hasher_init(&hasher);
+                    blake3_hasher_update(
+                        &hasher, output_buffer.data(), output_buffer.size());
+                    blake3_hasher_finalize(
+                        &hasher, build_id.data(), build_id.size());
+                    break;
+                }
+        }
+
+        memcpy(output_buffer.data() + build_id_offset,
+               build_id.data(),
+               build_id.size());
     }
 
-    memcpy(output_buffer.data() + build_id_offset, build_id.data(), build_id.size());
-    }
-
-    viua::support::posix::whole_write(a_out, output_buffer.data(), output_buffer.size());
+    viua::support::posix::whole_write(
+        a_out, output_buffer.data(), output_buffer.size());
     close(a_out);
 }
 
@@ -831,30 +849,37 @@ auto main(
         default_output_type_is_object ? "object" : "exec");
     auto const interpreter = args.map<std::string_view>(
         "interpreter", [](auto v) { return std::string{ v }; });
-    auto const build_id_hash = args.map<std::string_view>("build-id", [](auto v) -> std::optional<Build_id_hash>
-        {
-            if (v == "none") {
-                return std::nullopt;
-            } else if (v == "uuid") {
-                return Build_id_hash::UUID;
-            } else if (v == "sha1") {
-                return Build_id_hash::SHA1;
-            } else if (v == "sha256") {
-                return Build_id_hash::SHA256;
-            } else if (v == "sha384") {
-                return Build_id_hash::SHA384;
-            } else if (v == "sha512") {
-                return Build_id_hash::SHA512;
-            } else if (v == "blake2b") {
-                return Build_id_hash::BLAKE2B;
-            } else if (v == "blake3") {
-                return Build_id_hash::BLAKE3;
-            } else {
-                viua::support::errorln("invalid style for --build-id: {}", v);
-                exit(1);
-            }
-        }).value_or(std::nullopt);
-    auto const build_id_size = args.map<std::string_view>("build-id-size", [&args, &build_id_hash](auto v) -> size_t
+    auto const build_id_hash =
+        args.map<std::string_view>(
+                "build-id",
+                [](auto v) -> std::optional<Build_id_hash>
+                {
+                    if (v == "none") {
+                        return std::nullopt;
+                    } else if (v == "uuid") {
+                        return Build_id_hash::UUID;
+                    } else if (v == "sha1") {
+                        return Build_id_hash::SHA1;
+                    } else if (v == "sha256") {
+                        return Build_id_hash::SHA256;
+                    } else if (v == "sha384") {
+                        return Build_id_hash::SHA384;
+                    } else if (v == "sha512") {
+                        return Build_id_hash::SHA512;
+                    } else if (v == "blake2b") {
+                        return Build_id_hash::BLAKE2B;
+                    } else if (v == "blake3") {
+                        return Build_id_hash::BLAKE3;
+                    } else {
+                        viua::support::errorln(
+                            "invalid style for --build-id: {}", v);
+                        exit(1);
+                    }
+                })
+            .value_or(std::nullopt);
+    auto const build_id_size = args.map<std::string_view>(
+        "build-id-size",
+        [&args, &build_id_hash](auto v) -> size_t
         {
             if (not build_id_hash.has_value()) {
                 return 0;
@@ -865,11 +890,13 @@ auto main(
                 Build_id_hash::BLAKE3,
             };
             if (not tunable_hashes.contains(*build_id_hash)) {
-                viua::support::errorln("cannot set digest size with a non-tunable --build-id: {}", args.get<std::string_view>("build-id").value());
+                viua::support::errorln(
+                    "cannot set digest size with a non-tunable --build-id: {}",
+                    args.get<std::string_view>("build-id").value());
                 exit(1);
             }
 
-            auto const n = std::stoull(std::string{v});
+            auto const n = std::stoull(std::string{ v });
             if (n % 8) {
                 viua::support::errorln("digest size not divisible by 8: {}", v);
                 exit(1);

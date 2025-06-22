@@ -43,8 +43,7 @@ enum class R_VIUA : uint8_t
  * file responsible for proper detection of Viua ELF files.
  */
 constexpr auto VIUA_MAGIC =
-    std::string_view{ "\x7fVIUA\x00\x00\x00",
-                      sizeof(Elf64_Phdr::p_offset) };
+    std::string_view{ "\x7fVIUA\x00\x00\x00", sizeof(Elf64_Phdr::p_offset) };
 
 /*
  * See elf(5) for more information about the Elf64_Ehdr structure, and its
