@@ -3480,27 +3480,24 @@ auto main(
         return 1;
     }
 
-    auto preferred_output_path = std::optional<std::filesystem::path>{
-        args.options.contains("out")
-            ? std::optional<std::filesystem::path>{ args.get<std::string_view>(
-                                                            "out")
-                                                        .value() }
-            : std::nullopt
-    };
+    auto preferred_output_path = args.get<std::string_view>("out").transform(
+        [](auto&& s) { return std::filesystem::path{ std::move(s) }; });
     auto const dump_what =
         args.get<std::set<std::string_view>>("dump").value_or(
             std::set<std::string_view>{});
 
     auto const source_path = std::filesystem::path{ args.args.back() };
-    auto const output_path = args.map<std::string_view, std::filesystem::path>(
-        "out",
-        [](auto v) { return std::filesystem::path{ v }; },
-        [&source_path]()
-        {
-            auto o = source_path;
-            o.replace_extension("o");
-            return o;
-        });
+    auto const output_path =
+        args.get<std::string_view>("out")
+            .transform([](auto v) { return std::filesystem::path{ v }; })
+            .or_else(
+                [&source_path]()
+                {
+                    auto o = source_path;
+                    o.replace_extension("o");
+                    return std::optional{ o };
+                })
+            .value();
 
     auto source_text = std::string{};
     {

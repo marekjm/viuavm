@@ -149,35 +149,6 @@ struct Args {
         return std::get<T>(value);
     }
 
-    template<typename T,
-             typename V       = T,
-             typename Present = std::function<V(T)>,
-             typename Absent  = std::function<V()>>
-    auto map(
-        std::string_view const label,
-        Present&& p,
-        Absent&& a) const -> V
-    {
-        auto v = get<T>(label);
-        if (v.has_value()) {
-            return p(*v);
-        } else {
-            return a();
-        }
-    }
-
-    template<typename T, typename Fn>
-    auto map(
-        std::string_view const label,
-        Fn&& fn) const -> std::optional<typename std::invoke_result_t<Fn, T>>
-    {
-        auto v = get<T>(label);
-        if (v.has_value()) {
-            return std::optional{ fn(*v) };
-        }
-        return std::nullopt;
-    }
-
     using ui_type =
         std::map<std::tuple<std::string, std::set<std::string>>, Kind>;
     auto parse_with(ui_type const&) -> std::optional<std::string_view>;

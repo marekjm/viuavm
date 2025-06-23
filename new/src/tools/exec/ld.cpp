@@ -834,24 +834,21 @@ auto main(
     }
     auto const verbosity = args.get<bool>("verbose").value_or(false);
 
-    auto preferred_output_path = std::optional<std::filesystem::path>{
-        args.options.contains("out")
-            ? std::optional<std::filesystem::path>{ args.get<std::string_view>(
-                                                            "out")
-                                                        .value() }
-            : std::nullopt
-    };
+    auto const preferred_output_path =
+        args.get<std::string_view>("out").transform(
+            [](auto&& s) { return std::filesystem::path{ std::move(s) }; });
     auto as_executable = true;
 
     auto const default_output_type_is_object =
         args.get<bool>("object").value_or(false);
     auto const output_type = args.get<std::string_view>("type").value_or(
         default_output_type_is_object ? "object" : "exec");
-    auto const interpreter = args.map<std::string_view>(
-        "interpreter", [](auto v) { return std::string{ v }; });
+    auto const interpreter =
+        args.get<std::string_view>("interpreter")
+            .transform([](auto const v) { return std::string{ v }; });
     auto const build_id_hash =
-        args.map<std::string_view>(
-                "build-id",
+        args.get<std::string_view>("build-id")
+            .and_then(
                 [](auto v) -> std::optional<Build_id_hash>
                 {
                     if (v == "none") {
@@ -875,54 +872,58 @@ auto main(
                             "invalid style for --build-id: {}", v);
                         exit(1);
                     }
-                })
-            .value_or(std::nullopt);
-    auto const build_id_size = args.map<std::string_view>(
-        "build-id-size",
-        [&args, &build_id_hash](auto v) -> size_t
-        {
-            if (not build_id_hash.has_value()) {
-                return 0;
-            }
+                });
+    auto const build_id_size =
+        args.get<std::string_view>("build-id-size")
+            .and_then(
+                [&args, &build_id_hash](auto v) -> std::optional<size_t>
+                {
+                    if (not build_id_hash.has_value()) {
+                        return std::nullopt;
+                    }
 
-            using enum Build_id_hash;
-            auto const tunable_hashes = std::set{
-                BLAKE2B,
-                BLAKE3,
-            };
+                    using enum Build_id_hash;
+                    auto const tunable_hashes = std::set{
+                        BLAKE2B,
+                        BLAKE3,
+                    };
 
-            auto const build_id_hash_name =
-                args.get<std::string_view>("build-id").value();
+                    auto const build_id_hash_name =
+                        args.get<std::string_view>("build-id").value();
 
-            if (not tunable_hashes.contains(*build_id_hash)) {
-                viua::support::errorln(
-                    "cannot set digest size with a non-tunable --build-id: {}",
-                    build_id_hash_name);
-                exit(1);
-            }
+                    if (not tunable_hashes.contains(*build_id_hash)) {
+                        viua::support::errorln(
+                            "cannot set digest size with a non-tunable "
+                            "--build-id: {}",
+                            build_id_hash_name);
+                        exit(1);
+                    }
 
-            auto const n = std::stoull(std::string{ v });
-            if (n % 8) {
-                viua::support::errorln("digest size not divisible by 8: {}", v);
-                exit(1);
-            }
+                    auto const n = std::stoull(std::string{ v });
+                    if (n % 8) {
+                        viua::support::errorln(
+                            "digest size not divisible by 8: {}", v);
+                        exit(1);
+                    }
 
-            if (n < 32) {
-                viua::support::errorln(
-                    "--build-id-size: digest size cannot be smaller than 32 "
-                    "bits");
-                exit(1);
-            }
+                    if (n < 32) {
+                        viua::support::errorln(
+                            "--build-id-size: digest size cannot be smaller "
+                            "than 32 "
+                            "bits");
+                        exit(1);
+                    }
 
-            if ((build_id_hash == BLAKE2B) and (n > 512)) {
-                viua::support::errorln(
-                    "--build-id-size: maximum digest size for {} is 512 bits",
-                    build_id_hash_name);
-                exit(1);
-            }
+                    if ((build_id_hash == BLAKE2B) and (n > 512)) {
+                        viua::support::errorln(
+                            "--build-id-size: maximum digest size for {} is "
+                            "512 bits",
+                            build_id_hash_name);
+                        exit(1);
+                    }
 
-            return n;
-        });
+                    return n;
+                });
     auto as_static_lib = (output_type == "static");
     auto as_shared_lib = (output_type == "shared");
     auto as_object_lib = (output_type == "object");
@@ -941,17 +942,22 @@ auto main(
     }
 
     auto const source_path = input_files.front();
-    auto const output_path = preferred_output_path.value_or(
-        as_executable ? std::filesystem::path{ "a.out" }
-                      : [source_path,
-                         as_shared_lib,
-                         as_object_lib]() -> std::filesystem::path
-        {
-            auto o = source_path;
-            o.replace_extension(as_shared_lib ? "so"
-                                              : (as_object_lib ? "o" : "a"));
-            return o;
-        }());
+    auto const output_path =
+        preferred_output_path
+            .or_else(
+                [as_executable, source_path, as_shared_lib, as_object_lib]()
+                    -> std::optional<std::filesystem::path>
+                {
+                    if (as_executable) {
+                        return std::filesystem::path{ "a.out" };
+                    }
+
+                    auto o = source_path;
+                    o.replace_extension(
+                        as_shared_lib ? "so" : (as_object_lib ? "o" : "a"));
+                    return o;
+                })
+            .value();
 
     auto entry_addr =
         std::optional<std::pair<uint64_t, std::filesystem::path>>{};

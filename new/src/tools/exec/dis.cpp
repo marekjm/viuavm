@@ -834,8 +834,8 @@ auto main(
             { { "N", { "no-demangle" } }, Args::Kind::Set },
         });
     auto const singles =
-        args.map<std::vector<std::string_view>>(
-                "instruction",
+        args.get<std::vector<std::string_view>>("instruction")
+            .transform(
                 [](auto value)
                 {
                     auto singles = std::vector<uint64_t>{};
