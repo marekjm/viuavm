@@ -76,6 +76,7 @@ auto emit_elf(
     std::vector<uint8_t> const& rodata_buf,
     std::vector<uint8_t> const& string_table,
     std::vector<Elf64_Sym>& symbol_table,
+    std::string const comment,
     std::optional<std::string> const interpreter     = std::nullopt,
     std::optional<Build_id_hash> const build_id_hash = std::nullopt,
     std::optional<size_t> const build_id_size        = std::nullopt) -> void
@@ -100,8 +101,7 @@ auto emit_elf(
     using viua::arch::elf::VIUA_MAGIC;
     auto const DEFAULT_VIUA_INTERP =
         std::string{ INSTALL_PREFIX "/libexec/viua/vm" };
-    auto const VIUA_INTERP  = interpreter.value_or(DEFAULT_VIUA_INTERP);
-    auto const VIUA_COMMENT = std::string{ VIUAVM_VERSION_FULL };
+    auto const VIUA_INTERP = interpreter.value_or(DEFAULT_VIUA_INTERP);
 
     constexpr auto gnu_namespace = std::string_view{ "GNU", 4 };
     auto build_id                = std::vector<uint8_t>{};
@@ -387,7 +387,7 @@ auto emit_elf(
             sec.sh_name   = save_shstr_entry(".comment");
             sec.sh_type   = SHT_PROGBITS;
             sec.sh_offset = 0;
-            sec.sh_size   = VIUA_COMMENT.size() + 1;
+            sec.sh_size   = comment.size() + 1;
             sec.sh_flags  = 0;
 
             elf_headers.push_back({ std::nullopt, sec });
@@ -593,7 +593,7 @@ auto emit_elf(
 
         save(rodata_buf.data(), rodata_buf.size());
 
-        save(VIUA_COMMENT.c_str(), VIUA_COMMENT.size() + 1);
+        save(comment.c_str(), comment.size() + 1);
 
         for (auto& each : symbol_table) {
             switch (ELF64_ST_TYPE(each.st_info)) {
@@ -824,6 +824,7 @@ auto main(
             { { "c", { "object" } }, Args::Kind::Switch },
             { { "", { "static" } }, Args::Kind::Switch },
             { { "", { "dump" } }, Args::Kind::Set },
+            { { "", { "comment" } }, Args::Kind::Single },
             { { "i", { "interpreter" } }, Args::Kind::Single },
             { { "", { "build-id" } }, Args::Kind::Single },
             { { "", { "build-id-size" } }, Args::Kind::Single },
@@ -936,6 +937,11 @@ auto main(
         args.get<std::set<std::string_view>>("dump").value_or(
             std::set<std::string_view>{});
     auto const dump_strtab = dump_what.contains("strtab");
+    auto const comment     = args.get<std::string_view>("comment")
+                             .or_else([] -> std::optional<std::string_view>
+                                      { return VIUAVM_VERSION_FULL; })
+                             .transform([](auto v) { return std::string{ v }; })
+                             .value();
 
     if (as_static_lib or as_shared_lib or as_object_lib) {
         as_executable = false;
@@ -1508,6 +1514,7 @@ auto main(
                     rodata,
                     strtab,
                     symtab,
+                    comment,
                     interpreter,
                     build_id_hash,
                     build_id_size);

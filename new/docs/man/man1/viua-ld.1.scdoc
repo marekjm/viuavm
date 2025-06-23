@@ -39,6 +39,9 @@ include(common/tool-options.scdoc)
 	argument may be:
 	- *strtab* to dump the string table
 
+*--comment*=_value_
+	Set contents of the *.comment* section to _value_.
+
 *-i*, *--interpreter*=_interpreter_
 	Set _interpreter_ as the requested program interpreter in the *.interp*
 	section.

@@ -21,6 +21,9 @@ include(common/tool-options.scdoc)
 	Write produced ELF file into _output_ file instead of the default _source_.o
 	file.
 
+*--comment*=_value_
+	Set contents of the *.comment* section to _value_.
+
 *--dump*=_what_
 	Dump results of intermediate stages of the assembler's work.
 	The _what_ argument can be either of:

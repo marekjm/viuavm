@@ -3010,7 +3010,8 @@ auto emit_elf(
     std::optional<std::vector<Elf64_Rel>> relocs,
     std::vector<uint8_t> const& rodata_buf,
     std::vector<uint8_t> const& string_table,
-    std::vector<Elf64_Sym>& symbol_table) -> void
+    std::vector<Elf64_Sym>& symbol_table,
+    std::string const comment) -> void
 {
     auto const a_out = open(output_path.c_str(),
                             O_CREAT | O_TRUNC | O_WRONLY,
@@ -3024,7 +3025,6 @@ auto emit_elf(
         std::string_view{ "\x7fVIUA\x00\x00\x00",
                           sizeof(Elf64_Phdr::p_offset) };
     auto const VIUAVM_INTERP = std::string{ "viua-vm" };
-    auto const VIUA_COMMENT  = std::string{ VIUAVM_VERSION_FULL };
 
     {
         // see elf(5)
@@ -3230,7 +3230,7 @@ auto emit_elf(
             sec.sh_name   = save_shstr_entry(".comment");
             sec.sh_type   = SHT_PROGBITS;
             sec.sh_offset = 0;
-            sec.sh_size   = VIUA_COMMENT.size() + 1;
+            sec.sh_size   = comment.size() + 1;
             sec.sh_flags  = 0;
 
             elf_headers.push_back({ std::nullopt, sec });
@@ -3432,7 +3432,7 @@ auto emit_elf(
             a_out, rodata_buf.data(), rodata_buf.size());
 
         viua::support::posix::whole_write(
-            a_out, VIUA_COMMENT.c_str(), VIUA_COMMENT.size() + 1);
+            a_out, comment.c_str(), comment.size() + 1);
 
         for (auto& each : symbol_table) {
             switch (ELF64_ST_TYPE(each.st_info)) {
@@ -3473,6 +3473,7 @@ auto main(
         {
             VIUA_TOOL_COMMON_OPTIONS,
             { { "o", { "out" } }, Args::Kind::Single },
+            { { "", { "comment" } }, Args::Kind::Single },
             { { "", { "dump" } }, Args::Kind::Set },
         });
     if (args.args.empty()) {
@@ -3498,6 +3499,12 @@ auto main(
                     return std::optional{ o };
                 })
             .value();
+
+    auto const comment = args.get<std::string_view>("comment")
+                             .or_else([] -> std::optional<std::string_view>
+                                      { return VIUAVM_VERSION_FULL; })
+                             .transform([](auto v) { return std::string{ v }; })
+                             .value();
 
     auto source_text = std::string{};
     {
@@ -3712,7 +3719,8 @@ auto main(
              reloc_table,
              rodata_contents,
              string_table,
-             symbol_table);
+             symbol_table,
+             comment);
 
     return 0;
 }

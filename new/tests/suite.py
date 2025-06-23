@@ -942,6 +942,7 @@ def test_case_impl_asm(reporting, out_path, asm_path):
     start_timepoint, case_log = reporting
 
     asm_args = ASSEMBLER + (
+        "--comment=",
         "-o",
         out_path,
         asm_path,
@@ -972,6 +973,7 @@ def test_case_impl_ld(reporting, exe_path, reloc_path, extras=()):
     ld_args = LINKER + (
         "--build-id=blake3",
         "--build-id-size=160",
+        "--comment=",
         "-o",
         exe_path,
         reloc_path,
@@ -1469,6 +1471,7 @@ def prepare_dependencies(cases_dir):
         dep_relocatable = f"{base_name}.o"
 
         asm_args = ASSEMBLER + (
+            "--comment=",
             "-o",
             dep_relocatable,
             dep_src,
