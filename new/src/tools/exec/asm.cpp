@@ -1277,10 +1277,10 @@ auto save_objects(
                 active_symbol.reset(&sym);
             }
 
-            std::cerr << "recording object label " << active_label << " at "
-                      << "[.rodata+0x" << std::hex << std::setfill('0')
-                      << std::setw(16) << rodata_buf.size() << std::dec
-                      << std::setfill(' ') << "]\n";
+            std::println(stdout,
+                         "recording object label {} at [.rodata+0x{:016x}]",
+                         active_label,
+                         rodata_buf.size());
 
             active_symbol->st_value = rodata_buf.size();
             continue;
@@ -1293,8 +1293,11 @@ auto save_objects(
             throw Error{ each->leader, Cause::None, "FUCKUP" };
         } else if (is_alloc) {
             auto const& alc = static_cast<ast::Object&>(*each);
-            std::cerr << "allocating " << alc.type.text << " under label "
-                      << active_label << "\n";
+
+            std::println(stdout,
+                         "allocating {} under label {}",
+                         alc.type.text,
+                         active_label);
 
             if (alc.type.text == "string") {
                 auto s = std::string{};
@@ -1389,12 +1392,13 @@ auto save_objects(
                         (rodata_buf.size() - active_symbol->st_value);
                 }
 
-                std::cerr << "allocated " << active_symbol->st_size
-                          << " byte(s) of " << alc.type.text << " under label "
-                          << active_label << " at "
-                          << "[.rodata+0x" << std::hex << std::setfill('0')
-                          << std::setw(16) << active_symbol->st_value
-                          << std::dec << std::setfill(' ') << "]\n";
+                std::println(stdout,
+                             "allocated {} byte(s) of {} under label {} at "
+                             "[.rodata+0x{:016x}]",
+                             active_symbol->st_size,
+                             alc.type.text,
+                             active_label,
+                             active_symbol->st_value);
                 active_symbol.reset();
             }
         }
@@ -1442,11 +1446,11 @@ auto save_objects(
                      */
                     symbol.st_shndx = 0;
 
-                    std::cerr << "allocated " << symbol.st_size
-                              << " byte(s) of string anonymous at "
-                              << "[.rodata+0x" << std::hex << std::setfill('0')
-                              << std::setw(16) << symbol.st_value << std::dec
-                              << std::setfill(' ') << "]\n";
+                    std::println(stdout,
+                                 "allocated {} byte(s) of string (anonymous) "
+                                 "at [.rodata+0x{:016x}]",
+                                 symbol.st_size,
+                                 symbol.st_value);
 
                     saved_at = viua::libs::stage::record_symbol(
                         "", symbol, symbol_table, symbol_map);
@@ -1608,11 +1612,11 @@ auto save_objects(
                      */
                     symbol.st_shndx = 0;
 
-                    std::cerr << "allocated " << symbol.st_size
-                              << " byte(s) of double anonymous at "
-                              << "[.rodata+0x" << std::hex << std::setfill('0')
-                              << std::setw(16) << symbol.st_value << std::dec
-                              << std::setfill(' ') << "]\n";
+                    std::println(stdout,
+                                 "allocated {} bytes() of double (anonymous) "
+                                 "at [.rodata+0x{:016x}]",
+                                 symbol.st_size,
+                                 symbol.st_value);
 
                     saved_at = viua::libs::stage::record_symbol(
                         "", symbol, symbol_table, symbol_map);
@@ -1748,10 +1752,11 @@ auto cache_function_labels(
                     &symbol_table.at(symbol_map.at(active_label)));
             }
 
-            std::cerr << "caching "
-                      << ((active_symbol->st_other == STV_DEFAULT) ? "function"
-                                                                   : "jump")
-                      << " label " << active_label << "\n";
+            std::println(stdout,
+                         "caching {} label {}",
+                         ((active_symbol->st_other == STV_DEFAULT) ? "function"
+                                                                   : "jump"),
+                         active_label);
             continue;
         }
     }
@@ -1961,21 +1966,15 @@ auto expand_li(
     auto const is_greedy = (raw.leader.text.find("g.") == 0);
     auto const full_form = raw.has_attr("full") or force_full;
 
-    std::cerr << "EXPANDING" << (is_unsigned ? " UNSIGNED" : "") << " LI OF "
-              << raw_value.text << " => " << std::hex << std::setfill('0')
-              << std::setw(16) << value << std::dec << std::setfill(' ')
-              << " (";
-    if (is_unsigned) {
-        std::cerr << value;
-    } else {
-        std::cerr << static_cast<int64_t>(value);
-    }
-    std::cerr << ")"
-              << "\n";
-    std::cerr << "  HI " << std::hex << std::setfill('0') << std::setw(8) << hi
-              << "\n";
-    std::cerr << "  LO " << std::setw(8) << lo << "\n";
-    std::cerr << std::setfill(' ') << std::dec;
+    std::println(stdout,
+                 "expanding {}signed li of {} => {:016x} ({})",
+                 (is_unsigned ? "un" : ""),
+                 raw_value.text,
+                 value,
+                 (is_unsigned ? std::to_string(value)
+                              : std::to_string(static_cast<int64_t>(value))));
+    std::println("  hi {:08x}", hi);
+    std::println("  lo {:08x}", lo);
 
     auto const important_hi =
         is_unsigned ? hi : (hi != static_cast<uint32_t>(-1));
@@ -2086,7 +2085,7 @@ auto expand_li(
         cooked.push_back(emit_instruction(synth));
     }
 
-    std::cerr << "        cooked into " << cooked.size() << " op(s)\n";
+    std::println(stdout, "        cooked into {} op(s)", cooked.size());
 
     return cooked;
 }
@@ -2212,7 +2211,7 @@ auto expand_flow_control(
     }
     cooked.push_back(emit_instruction(jmp));
 
-    std::cerr << "        cooked into " << cooked.size() << " ops\n";
+    std::println(stdout, "        cooked into {} op(s)", cooked.size());
 
     return cooked;
 }
@@ -2359,7 +2358,7 @@ auto expand_call(
     }
     cooked.push_back(emit_instruction(call));
 
-    std::cerr << "        cooked into " << cooked.size() << " ops\n";
+    std::println(stdout, "        cooked into {} op(s)", cooked.size());
 
     return cooked;
 }
@@ -2397,7 +2396,7 @@ auto expand_atom(
     synth.operands.pop_back();
     cooked.push_back(emit_instruction(synth));
 
-    std::cerr << "        cooked into " << cooked.size() << " ops\n";
+    std::println(stdout, "        cooked into {} op(s)", cooked.size());
 
     return cooked;
 }
@@ -2435,7 +2434,7 @@ auto expand_double(
     synth.operands.pop_back();
     cooked.push_back(emit_instruction(synth));
 
-    std::cerr << "        cooked into " << cooked.size() << " ops\n";
+    std::println(stdout, "        cooked into {} op(s)", cooked.size());
 
     return cooked;
 }
@@ -2699,15 +2698,16 @@ auto cook_instructions(
             af->st_size = ((text.size() * sizeof(viua::arch::instruction_type))
                            - af->st_value);
 
-            std::cerr << "  size of function " << function_label->name.text
-                      << " is " << af->st_size << " bytes\n";
-            std::cerr
-                << "  span of function " << function_label->name.text << " is "
-                << "[.text+0x" << std::hex << std::setfill('0') << std::setw(16)
-                << af->st_value << "..." << std::setw(16)
-                << (af->st_value + af->st_size
-                    - sizeof(viua::arch::instruction_type))
-                << std::dec << std::setfill(' ') << "]\n";
+            std::println(stdout,
+                         "  size of function {} is {} bytes",
+                         function_label->name.text,
+                         af->st_size);
+            std::println(stdout,
+                         "  span of function {} is [.text+0x{:016x}...{:016x}]",
+                         function_label->name.text,
+                         af->st_value,
+                         (af->st_value + af->st_size
+                          - sizeof(viua::arch::instruction_type)));
         }
     };
 
@@ -2784,14 +2784,13 @@ auto cook_instructions(
                 function_label.reset(&lab);
             }
 
-            std::cerr << (is_jump_label ? "  " : "") << "recording "
-                      << (is_jump_label ? "jump" : "call") << " label "
-                      << active_label << " at "
-                      << "[.text+0x" << std::hex << std::setfill('0')
-                      << std::setw(16)
-                      << (text.size() * sizeof(viua::arch::instruction_type))
-                      << std::dec << std::setfill(' ') << "]\n";
-            std::cerr << "      .text has " << text.size() << " op(s)\n";
+            std::println(stdout,
+                         "{}recording {} label {} at [.text+0x{:016x}]",
+                         (is_jump_label ? "  " : ""),
+                         (is_jump_label ? "jump" : "call"),
+                         active_label,
+                         (text.size() * sizeof(viua::arch::instruction_type)));
+            std::println(stdout, "      .text has {} op(s)", text.size());
 
             active_symbol = labelled_symbol;
 
@@ -2800,7 +2799,7 @@ auto cook_instructions(
 
         if (is_instruction) {
             auto const& raw_instr = static_cast<ast::Instruction&>(*each);
-            std::cerr << "    cooking " << raw_instr.leader.text << "\n";
+            std::println(stdout, "    cooking {}", raw_instr.leader.text);
 
             // 1. expand the raw instruction
             // 2. append the resulting sequence to text
@@ -2819,7 +2818,7 @@ auto cook_instructions(
                 expand_instruction(
                     raw_instr, symbol_table, symbol_map, decl_map),
                 std::back_inserter(text));
-            std::cerr << "      .text has " << text.size() << " op(s)\n";
+            std::println(stdout, "      .text has {} op(s)", text.size());
         }
     }
     save_size_of_active_function();
@@ -3547,13 +3546,13 @@ auto main(
      */
     auto lexemes = viua::libs::lexer::stage::lex(source_path, source_text);
     if (DEBUG_LEX and dump_what.contains("lex-raw")) {
-        std::cerr << lexemes.size() << " raw lexeme(s)\n";
+        std::println(stdout, "{} raw lexeme(s)", lexemes.size());
         dump_lexemes(lexemes);
     }
 
     lexemes = viua::libs::lexer::stage::remove_noise(std::move(lexemes));
     if (DEBUG_LEX and dump_what.contains("lex-cooked")) {
-        std::cerr << lexemes.size() << " cooked lexeme(s)\n";
+        std::println(stdout, "{} cooked lexeme(s)", lexemes.size());
         dump_lexemes(lexemes);
     }
 
@@ -3576,7 +3575,7 @@ auto main(
         viua::libs::stage::display_error_and_exit(source_path, source_text, e);
     }
     if (DEBUG_PARSE and dump_what.contains("ast")) {
-        std::cerr << nodes.size() << " AST nodes(s)\n";
+        std::println(stdout, "{} AST node(s)", nodes.size());
         dump_nodes(nodes);
     }
 
@@ -3665,10 +3664,10 @@ auto main(
     }
     if (entry_point_fn.has_value()) {
         auto const sym = symbol_table.at(symbol_map.at(entry_point_fn->text));
-        std::cerr << "entry point is " << entry_point_fn->text
-                  << " at [.text+0x" << std::hex << std::setfill('0')
-                  << std::setw(16) << sym.st_value << std::dec
-                  << std::setfill(' ') << "]\n";
+        std::println(stdout,
+                     "entry point is {} at [.text+0x{:016x}",
+                     entry_point_fn->text,
+                     sym.st_value);
     }
 
     for (auto const& [decl_sym, decl_sec] : declared_symbols) {
