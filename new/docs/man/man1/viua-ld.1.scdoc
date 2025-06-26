@@ -55,7 +55,7 @@ include(common/tool-options.scdoc)
 :< comment
 |  *sha1*
 :  160
-:  SHA1
+:  SHA1, consider *blake2b* or *blake3* with size 160 instead of *sha1*
 |  *sha256*
 :  256
 :  SHA2
