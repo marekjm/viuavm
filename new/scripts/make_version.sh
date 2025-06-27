@@ -12,7 +12,7 @@ if [ $(git ls-files -m | wc -l) -ne 0 ]; then
     GIT_DIRTY='-dirty'
 fi
 
-FINGERPRINT=$(cat $(find ./include ./src -type f | sort) | openssl dgst -sha3-256 | cut -d' ' -f2)
+FINGERPRINT=$(cat $(find ./include ./src -type f | sort) | b2sum --length 160 | cut -d' ' -f1)
 
 MODE=${1:-default}
 
