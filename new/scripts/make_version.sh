@@ -15,24 +15,27 @@ fi
 FINGERPRINT=$(cat $(find ./include ./src -type f | sort) | openssl dgst -sha3-256 | cut -d' ' -f2)
 
 MODE=${1:-default}
+
+if test "${MODE}" = '--help'
+then
+    echo "usage: $0 <style>"
+    echo "  <style> must be one of:"
+    cat "$0" | grep -P '^\s+[a-z|]+\)  #' | sed 's/)  #/\t/'
+    exit 0
+fi
+
 case ${MODE} in
-    full)
-        echo "${VERSION}.${COMMITS_SINCE} (${GIT_HEAD}${GIT_DIRTY})"
-        ;;
-    fuller)
-        echo "${VERSION}.${COMMITS_SINCE}-${GIT_HEAD}${GIT_DIRTY} (${FINGERPRINT})"
-        ;;
-    git)
-        echo "${GIT_HEAD}${GIT_DIRTY}"
-        ;;
-    fingerprint|fp)
-        echo "${FINGERPRINT}"
-        ;;
-    short|default)
+    short|default)  # just the version
         echo "${VERSION}.${COMMITS_SINCE}"
         ;;
-    base)
+    full|precise)  # version tagged with the HEAD commit
+        echo "${VERSION}.${COMMITS_SINCE}.${GIT_HEAD}${GIT_DIRTY}"
+        ;;
+    base|release)  # base release (with 0 as patch segment)
         echo "${VERSION}.0"
+        ;;
+    fingerprint|fp)  # fingerprint of the code
+        echo "${FINGERPRINT}"
         ;;
     *)
         exit 1

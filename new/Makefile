@@ -68,8 +68,8 @@ FEATURE_DETECT_FLAGS=\
 					 $(shell CXX=$(CXX) bash ./feature-tests/test.sh ./feature-tests/strerrorname_np.c)
 
 # To change version, edit the VERSION file in the repository's root directory.
-VIUAVM_VERSION=$(shell sh ./scripts/make_version.sh short)
-VIUAVM_VERSION_FULL=$(shell sh ./scripts/make_version.sh full)
+VIUAVM_VERSION:=$(shell sh ./scripts/make_version.sh short)
+VIUAVM_VERSION_FULL:=$(shell sh ./scripts/make_version.sh full)
 VERSION_FLAGS=\
 			  -DVIUAVM_VERSION='"$(VIUAVM_VERSION)"' \
 			  -DVIUAVM_VERSION_FULL='"$(VIUAVM_VERSION_FULL)"' \
