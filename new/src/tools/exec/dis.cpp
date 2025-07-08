@@ -883,29 +883,24 @@ auto main(
      */
     auto const elf_path = std::filesystem::path{ args.args.front() };
     if (not std::filesystem::exists(elf_path)) {
-        std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                  << ": file does not exist: " << esc(2, COLOR_FG_WHITE)
-                  << elf_path.native() << esc(2, ATTR_RESET) << "\n";
+        viua::support::errorln("file does not exist: {}{}{}",
+                               esc(2, COLOR_FG_WHITE),
+                               elf_path.native(),
+                               esc(2, ATTR_RESET));
         return 1;
     }
     {
         struct stat statbuf{};
         if (stat(elf_path.c_str(), &statbuf) == -1) {
             auto const saved_errno = errno;
-            auto const errname     = viua::support::errno_name(saved_errno);
-            auto const errdesc     = viua::support::errno_desc(saved_errno);
-
-            std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                      << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                      << esc(2, ATTR_RESET) << ": " << errname << ": "
-                      << errdesc << "\n";
+            viua::support::errorln(elf_path,
+                                   "{}: {}",
+                                   viua::support::errno_name(saved_errno),
+                                   viua::support::errno_desc(saved_errno));
             return 1;
         }
         if ((statbuf.st_mode & S_IFMT) != S_IFREG) {
-            std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                      << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                      << esc(2, ATTR_RESET);
-            std::cerr << ": not a regular file\n";
+            viua::support::errorln(elf_path, "not a regular file");
             return 1;
         }
     }
@@ -917,13 +912,10 @@ auto main(
     auto const elf_fd = open(elf_path.c_str(), O_RDONLY);
     if (elf_fd == -1) {
         auto const saved_errno = errno;
-        auto const errname     = viua::support::errno_name(saved_errno);
-        auto const errdesc     = viua::support::errno_desc(saved_errno);
-
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET) << ": " << errname << ": " << errdesc
-                  << "\n";
+        viua::support::errorln(elf_path,
+                               "{}: {}",
+                               viua::support::errno_name(saved_errno),
+                               viua::support::errno_desc(saved_errno));
         return 1;
     }
 
@@ -933,49 +925,23 @@ auto main(
 
     if (auto const f = main_module.find_fragment(".rodata");
         not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET) << ": no strings fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .rodata section found\n";
+        viua::support::errorln(elf_path, "no .rodata section found");
         return 1;
     }
     if (auto const f = main_module.find_fragment(".strtab");
         not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no string table fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
-                  << "note" << esc(2, ATTR_RESET)
-                  << ": no .strtab section found\n";
+        viua::support::errorln(elf_path, "no .strtab section found");
         return 1;
     }
     if (auto const f = main_module.find_fragment(".symtab");
         not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no symbol table fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
-                  << "note" << esc(2, ATTR_RESET)
-                  << ": no .symtab section found\n";
+        viua::support::errorln(elf_path, "no .symtab section found");
         return 1;
     }
 
     auto text = std::vector<viua::arch::instruction_type>{};
     if (auto const f = main_module.find_fragment(".text"); not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no text fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_CYAN)
-                  << "note" << esc(2, ATTR_RESET)
-                  << ": no .text section found\n";
+        viua::support::errorln(elf_path, "no .text section found");
         return 1;
     } else {
         text = main_module.make_text_from(f->get().data);
@@ -985,10 +951,7 @@ auto main(
     if (auto const ep = main_module.entry_point(); ep.has_value()) {
         entry_addr = *ep;
     } else {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_ORANGE_RED_1)
-                  << "warning" << esc(2, ATTR_RESET)
-                  << ": no entry point defined\n";
+        viua::support::warningln(elf_path, "no entry point defined");
     }
 
     auto const rodata = main_module.find_fragment(".rodata");
