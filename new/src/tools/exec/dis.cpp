@@ -1075,21 +1075,6 @@ auto main(
         out << "\n";
     }
 
-#if 0
-    auto const all_jump_labels = main_module.symtab | std::views::filter([](auto const& sym)
-    {
-        if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
-            return false;
-        }
-        if (ELF64_ST_BIND(sym.st_info) != STB_LOCAL) {
-            return false;
-        }
-        if (sym.st_other != STV_HIDDEN) {
-            return false;
-        }
-        return true;
-    });
-#endif
     auto ef = main_module.name_function_at(entry_addr);
     for (auto const& sym : main_module.symtab) {
         if (ELF64_ST_TYPE(sym.st_info) != STT_FUNC) {
@@ -1146,22 +1131,6 @@ auto main(
         out << ".label " << safe_name << "\n";
 
         auto own_jump_labels = std::map<size_t, Elf64_Sym const*>{};
-#if 0
-        std::ranges::copy(all_jump_labels
-            | std::views::filter([addr, size](auto const& sym)
-                {
-                    if (sym.st_value <= addr) {
-                        return false;
-                    }
-                    if (sym.st_value >= (addr + size)) {
-                        return false;
-                    }
-                    return true;
-                }), [&own_jump_labels](auto const& sym)
-                    {
-                        return own_jump_labels.emplace(sym.st_value, &sym);
-                    });
-#endif
         std::for_each(main_module.symtab.begin(),
                       main_module.symtab.end(),
                       [&own_jump_labels, addr, size](auto const& sym)
