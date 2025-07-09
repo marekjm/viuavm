@@ -270,4 +270,33 @@ auto st_shndx_to_string(
             return std::to_string(st_shndx);
     }
 }
+
+auto p_type_to_string(
+    uint32_t const p_type) -> std::string
+{
+    if ((p_type >= PT_LOPROC) and (p_type <= PT_HIPROC)) {
+        return "RESERVED";
+    }
+
+    switch (p_type) {
+        case PT_NULL:
+            return "NULL";
+        case PT_LOAD:
+            return "LOAD";
+        case PT_DYNAMIC:
+            return "DYNAMIC";
+        case PT_INTERP:
+            return "INTERP";
+        case PT_NOTE:
+            return "NOTE";
+        case PT_SHLIB:
+            return "SHLIB";
+        case PT_PHDR:
+            return "PHDR";
+        case PT_GNU_STACK:
+            return "GNU_STACK";
+        default:
+            return std::to_string(p_type);
+    }
+}
 }  // namespace viua

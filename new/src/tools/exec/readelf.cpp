@@ -72,6 +72,21 @@ auto show_symbol_table(
     }
 }
 
+auto to_hex_byte_string(
+    std::string_view const sv) -> std::string
+{
+    if (sv.empty()) {
+        return "";
+    }
+
+    return std::accumulate(
+        sv.begin() + 1,
+        sv.end(),
+        std::format("{:02x}", sv[0]),
+        [](std::string acc, char const each) -> std::string
+        { return std::move(acc) + " " + std::format("{:02x}", each); });
+}
+
 auto main(
     int argc,
     char* argv[]) -> int
@@ -119,22 +134,20 @@ auto main(
 
     auto const elf_path = std::filesystem::path{ args.args.back() };
     if (not std::filesystem::exists(elf_path)) {
-        std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                  << ": file does not exist: " << esc(2, COLOR_FG_WHITE)
-                  << elf_path.string() << esc(2, ATTR_RESET) << "\n";
+        viua::support::errorln("file does not exist: {}{}{}",
+                               esc(2, COLOR_FG_WHITE),
+                               elf_path.string(),
+                               esc(2, ATTR_RESET));
         return 1;
     }
 
     auto const elf_fd = open(elf_path.c_str(), O_RDONLY);
     if (elf_fd == -1) {
         auto const saved_errno = errno;
-        auto const errname     = viua::support::errno_name(saved_errno);
-        auto const errdesc     = viua::support::errno_desc(saved_errno);
-
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.string()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET) << ": " << errname << ": " << errdesc
-                  << "\n";
+        viua::support::errorln(elf_path,
+                               "{}: {}",
+                               viua::support::errno_name(saved_errno),
+                               viua::support::errno_desc(saved_errno));
         return 1;
     }
 
@@ -145,10 +158,7 @@ auto main(
         try {
             return Loaded_elf::load(elf_fd);
         } catch (std::runtime_error const& e) {
-            viua::support::errorln("not a Viua ELF: {}{}{}",
-                                   esc(2, COLOR_FG_WHITE),
-                                   elf_path.string(),
-                                   esc(2, ATTR_RESET));
+            viua::support::errorln(elf_path, "not a Viua ELF");
             exit(2);
         }
     }();
@@ -156,12 +166,10 @@ auto main(
     if (show_headers_elf) {
         std::println("ELF header:");
 
-        auto const magic_human_readable = std::accumulate(
-            std::begin(elf.header.e_ident) + 1,
-            std::end(elf.header.e_ident),
-            std::format("{:x}", elf.header.e_ident[0]),
-            [](std::string acc, uint8_t const each) -> std::string
-            { return std::move(acc) + " " + std::format("{:x}", each); });
+        auto const ident_view =
+            std::string_view{ reinterpret_cast<char const*>(elf.header.e_ident),
+                              sizeof(elf.header.e_ident) };
+        auto const magic_human_readable = to_hex_byte_string(ident_view);
         std::println("  Magic:                      {}", magic_human_readable);
 
         std::println("  Class:                      {}",
@@ -209,87 +217,58 @@ auto main(
     }
 
     if (show_headers_sh) {
-        std::cout << "Fragments:\n";
+        std::println("Fragments:");
 
-        auto const index_width    = std::to_string(elf.fragments.size()).size();
         auto section_header_index = size_t{ 0 };
         for (auto const& [name, each] : elf.fragments) {
             auto const& sh [[maybe_unused]] = each.section_header;
             auto const& ph [[maybe_unused]] = each.program_header;
 
-            {
-                constexpr auto NAME_WIDTH = 20;
-                std::cout << "  [" << std::setw(index_width)
-                          << section_header_index++ << "] ";
-                std::cout << name
-                          << std::string((NAME_WIDTH - name.size()), ' ');
-                std::cout << viua::sh_type_to_string(sh.sh_type);
-                if (ph.has_value()) {
-                    std::cout << " in ";
-                    std::cout << ((ph->p_type == PT_LOAD)     ? "LOAD"
-                                  : (ph->p_type == PT_INTERP) ? "INTERP"
-                                  : (ph->p_type == PT_NULL)
-                                      ? "NULL"
-                                      : "<unexpected program header type>");
-                }
-                std::cout << "\n";
-            }
+            std::println("  [{:2d}] {:20} {} in {}",
+                         section_header_index++,
+                         name,
+                         viua::sh_type_to_string(sh.sh_type),
+                         viua::p_type_to_string(ph->p_type));
 
-            auto const INDENT = std::string((index_width + 5), ' ');
-            {
-                std::cout << INDENT << "Offset       "
-                          << std::setw(sizeof(sh.sh_offset))
-                          << std::setfill('0') << std::hex << sh.sh_offset
-                          << std::dec << " (" << sh.sh_offset << " bytes)"
-                          << "\n";
+            std::println("       Offset       {:016x} ({} bytes)",
+                         sh.sh_offset,
+                         sh.sh_offset);
+            std::println("       Size         0x{:x} ({} bytes)",
+                         sh.sh_size,
+                         sh.sh_size);
 
-                std::cout << INDENT << "Size         "
-                          << std::setw(sizeof(sh.sh_size)) << std::setfill('0')
-                          << std::hex << sh.sh_size << std::dec << " ("
-                          << sh.sh_size << " bytes)"
-                          << "\n";
-
-                if (ph and (ph->p_type == PT_LOAD)) {
-                    std::cout << INDENT << "Memory size  "
-                              << std::setw(sizeof(ph->p_memsz))
-                              << std::setfill('0') << std::hex << ph->p_memsz
-                              << std::dec << " (" << ph->p_memsz << " bytes)"
-                              << "\n";
-                }
+            if (ph and (ph->p_type == PT_LOAD)) {
+                std::println("       Memory size  0x{:x} ({} bytes)",
+                             ph->p_memsz,
+                             ph->p_memsz);
             }
 
             if (name == ".interp") {
-                std::cout << INDENT << "  [Interpreter: " << each.data.data()
-                          << "]\n";
+                auto const interp = std::string_view{
+                    reinterpret_cast<char const*>(each.data.data()),
+                    each.data.size()
+                };
+                std::println("         [Interpreter: {}]", interp);
             }
             if (name == ".viua.magic") {
                 if (not ph.has_value()) {
-                    std::cerr << "No program header for magic value!\n";
-                }
+                    viua::support::errorln(
+                        elf_path, "no program header with the magic value");
+                } else {
+                    auto const got_magic = std::string_view{
+                        reinterpret_cast<char const*>(&ph->p_paddr),
+                        sizeof(ph->p_paddr)
+                    };
+                    auto const valid = (got_magic == VIUA_MAGIC);
 
-                std::cout << INDENT << "  [Magic:";
-                std::cout << std::hex;
-                auto const got_magic = std::string_view{
-                    reinterpret_cast<char const*>(&ph->p_paddr),
-                    sizeof(ph->p_paddr)
-                };
-                for (auto const c : got_magic) {
-                    std::cout << ' ' << std::setw(2) << std::setfill('0')
-                              << static_cast<int>(c);
-                }
-                std::cout << std::dec;
+                    std::println("         [Magic: {}{}]",
+                                 to_hex_byte_string(got_magic),
+                                 (valid ? "" : " (invalid)"));
 
-                auto const valid = (got_magic == VIUA_MAGIC);
-                std::cout << (valid ? "" : " (invalid)") << "]\n";
-                if (not valid) {
-                    std::cout << INDENT << "  [Wants:";
-                    std::cout << std::hex;
-                    for (auto const c : VIUA_MAGIC) {
-                        std::cout << ' ' << std::setw(2) << std::setfill('0')
-                                  << static_cast<int>(c);
+                    if (not valid) {
+                        std::println("         [Wants: {}]",
+                                     to_hex_byte_string(VIUA_MAGIC));
                     }
-                    std::cout << std::dec;
-                    std::cout << "]\n";
                 }
             }
         }
