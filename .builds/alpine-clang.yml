@@ -62,3 +62,10 @@ tasks:
       PATH=./ci-release/bin:$PATH viua help dis.1 >/dev/null
       PATH=./ci-release/bin:$PATH viua help vm.1 >/dev/null
       PATH=./ci-release/bin:$PATH viua help asm.5 >/dev/null
+  - build-io-classic: |
+      cd viuavm/new
+      make clean
+      make PRESET=release io_impl=classic -j
+  - test-io-classic: |
+      cd viuavm/new
+      make io_impl=classic test
