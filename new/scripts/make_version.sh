@@ -4,7 +4,10 @@ set -e
 
 VERSION=$(cat $(git rev-parse --show-toplevel)/VERSION)
 TAG="v${VERSION}.0"
-COMMITS_SINCE=$(git log --oneline ${TAG}..HEAD | wc -l)
+
+# We have to explicitly delete whitespace since BSD version of wc(1) emits some
+# in front of the count.
+COMMITS_SINCE=$(git log --oneline ${TAG}..HEAD | wc -l | tr -d ' ')
 
 GIT_HEAD=$(git rev-parse HEAD)
 GIT_DIRTY=''
