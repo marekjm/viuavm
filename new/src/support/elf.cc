@@ -152,10 +152,7 @@ auto elf_machine_to_string(
         default:
             break;
     }
-    if (e_machine < EM_NUM) {
-        return "Known machine";
-    }
-    return "Unknown machine";
+    return "Other/Unknown machine";
 }
 
 auto sh_type_to_string(
