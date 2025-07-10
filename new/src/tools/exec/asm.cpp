@@ -3052,11 +3052,20 @@ auto emit_elf(
             return saved_at;
         };
 
-        auto text_section_ndx   = size_t{ 0 };
+        /*
+         * These variables have their type forced by the elf(5) structures. The
+         * index values we create here must fit into members of various ELF
+         * structures.
+         */
+        auto text_section_ndx   = uint16_t{ 0 };
+        auto rodata_section_ndx = uint16_t{ 0 };
+        auto symtab_section_ndx = uint32_t{ 0 };
+        auto strtab_section_ndx = uint32_t{ 0 };
+
+        /*
+         * This is for internal use, we can go crazy with size_t.
+         */
         auto rel_section_ndx    = size_t{ 0 };
-        auto rodata_section_ndx = size_t{ 0 };
-        auto symtab_section_ndx = size_t{ 0 };
-        auto strtab_section_ndx = size_t{ 0 };
 
         using Header_pair = std::pair<std::optional<Elf64_Phdr>, Elf64_Shdr>;
         auto elf_headers  = std::vector<Header_pair>{};
@@ -3437,11 +3446,11 @@ auto emit_elf(
             switch (ELF64_ST_TYPE(each.st_info)) {
                 case STT_FUNC:
                     each.st_shndx =
-                        static_cast<Elf64_Section>(text_section_ndx);
+                        text_section_ndx;
                     break;
                 case STT_OBJECT:
                     each.st_shndx =
-                        static_cast<Elf64_Section>(rodata_section_ndx);
+                        rodata_section_ndx;
                     break;
                 default:
                     break;
