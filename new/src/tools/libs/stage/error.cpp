@@ -24,6 +24,7 @@
 #include <array>
 #include <charconv>
 #include <iostream>
+#include <sstream>
 #include <string_view>
 
 #include <viua/libs/errors/compile_time.h>
