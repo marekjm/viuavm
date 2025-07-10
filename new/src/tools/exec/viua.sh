@@ -24,8 +24,23 @@ viua_invoke_tool () {
 }
 
 viua_show_help () {
-    local subject="${1:-viua}"
-    exec man --manpath ${prefix}/share/man viua-${subject}
+    local subject="${1:-viua.1}"
+
+    local page=
+    local section=
+
+    if ( echo "${subject}" | grep '\.[0-9]$' >/dev/null ); then
+        section=$(echo "${subject}" | grep -o '\.[0-9]$' | tr -d '.')
+        page=$(echo "${subject}" | sed -e "s/\.${section}$//")
+    else
+        page="${subject}"
+    fi
+
+    if [ -n "${section}" ]; then
+        section="-S ${section}"
+    fi
+
+    exec man -M ${prefix}/share/man ${section} viua-${page}
 }
 
 main () {
