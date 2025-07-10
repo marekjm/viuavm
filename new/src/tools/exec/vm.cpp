@@ -53,8 +53,13 @@
 #include <viua/vm/elf.h>
 #include <viua/vm/ins.h>
 
+#if defined(VIUAVM_IO_IMPL_CLASSIC)
 #include <viua/vm/io/impl/classic.hh>
+#elif defined(VIUAVM_IO_IMPL_IO_URING)
 #include <viua/vm/io/impl/io_uring.hh>
+#else
+#error "no I/O implementation selected"
+#endif
 
 
 constexpr auto VIUA_SLOW_CYCLES = false;

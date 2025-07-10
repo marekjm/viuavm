@@ -1,3 +1,5 @@
 # vim:ft=make:
 
-IO_IMPL_LIBS=-luring
+LIBS_IO_IMPL=-luring
+
+FEATURE_IO_IMPL=-DVIUAVM_IO_IMPL_IO_URING

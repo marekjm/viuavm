@@ -27,7 +27,9 @@
 #include <viua/vm/io/sched.hh>
 
 
-namespace viua::vm::io::impl::io_uring {
+#define VIUAVM_IO_IMPL io_uring
+
+namespace viua::vm::io::impl::VIUAVM_IO_IMPL {
 struct IO : IO_scheduler {
     inline static constexpr auto IO_URING_ENTRIES = size_t{ 4'096 };
     ::io_uring ring;

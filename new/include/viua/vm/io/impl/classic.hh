@@ -26,7 +26,9 @@
 #include <viua/vm/io/sched.hh>
 
 
-namespace viua::vm::io::impl::classic {
+#define VIUAVM_IO_IMPL classic
+
+namespace viua::vm::io::impl::VIUAVM_IO_IMPL {
 struct IO : IO_scheduler {
     IO();
     ~IO() override;

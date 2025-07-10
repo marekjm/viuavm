@@ -1,0 +1,8 @@
+# vim:ft=make:
+
+io_impl::=$(shell bash ./feature-tests/io_impl.sh $(io_impl))
+ifeq ($(io_impl),)
+$(error bad io_impl)
+endif
+
+include Makefile.d/io_impl/$(io_impl)
