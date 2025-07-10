@@ -1,0 +1,14 @@
+Name of the platform is the output from uname(1) with -s flag eg, for Linux it
+would be:
+
+    ]$ uname -s
+    Linux
+
+and for FreeBSD:
+
+    ]$ uname -s
+    FreeBSD
+
+Of course, the platform can always be selected explicitly:
+
+    ]$ gmake platform=Linux

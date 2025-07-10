@@ -307,6 +307,7 @@ auto maybe_show_info_and_exit(
         std::println("standard: {}", CXXSTD);
         std::println("preset:   {}", VIUAVM_CXX_PRESET);
         std::println("options:  {}", VIUAVM_CXX_OPTIONS);
+        std::println("platform: {}", VIUAVM_PLATFORM);
         std::println("I/O impl: {}", VIUAVM_IO_IMPL_HUMAN_READABLE);
     }
     if (show_version or show_built_with) {

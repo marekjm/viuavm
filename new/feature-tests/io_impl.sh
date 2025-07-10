@@ -6,9 +6,12 @@ default_impl=${VIUAVM_IO_IMPL:-auto}
 impl=${1:-${default_impl}}
 
 if [[ ${impl} == "auto" ]]; then
-    case $(uname --kernel-name) in
+    case $(uname -s) in
         Linux)
             impl=io_uring
+            ;;
+        FreeBSD)
+            impl=classic
             ;;
         *)
             exit 1

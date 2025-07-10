@@ -46,10 +46,21 @@ BUILD_MANDIR=$(BUILD_SHAREDIR)/man
 
 
 ################################################################################
+# Platform selection
+#
+# Platforms are not created equal (even if somewhat compatible) and some need
+# special treatment. This is the first place where this becomes relevant.
+platform?=$(shell uname -s)
+include Makefile.d/Platform/$(platform)
+
+
+################################################################################
 # Compilation flags
+#
+# This is mostly platform-independent. We select the compiler, the standard, and
+# some basic presets like optimisation level, debugging symbols, and sanitisers.
 CXX?=g++
 CXXSTD?=c++23
-
 PRESET?=default
 include Makefile.d/Preset/$(PRESET)
 
@@ -61,6 +72,7 @@ ifeq ($(BUILD_SUBMITTER),)
 endif
 
 CXXFLAGS_INCLUDE=\
+				 $(PLATFORM_INCLUDE_FLAGS) \
 				 -I./include \
 				 -I./3rd-party
 
@@ -87,6 +99,7 @@ FEATURE_DETECT_FLAGS::=\
 VIUAVM_VERSION:=$(shell sh ./scripts/make_version.sh short)
 VIUAVM_VERSION_FULL:=$(shell sh ./scripts/make_version.sh full)
 VERSION_FLAGS=\
+			  -DVIUAVM_PLATFORM='"$(platform)"' \
 			  -DVIUAVM_VERSION='"$(VIUAVM_VERSION)"' \
 			  -DVIUAVM_VERSION_FULL='"$(VIUAVM_VERSION_FULL)"' \
 			  -DVIUAVM_IO_IMPL_HUMAN_READABLE='"$(io_impl)"' \
@@ -115,6 +128,7 @@ CXXFLAGS=\
 		 $(CXXFLAGS_INCLUDE)
 
 CXXLIBS=\
+		$(PLATFORM_LIBS) \
 		-lb2 \
 		$(LIBS_BLAKE3) \
 		-lmd \
@@ -165,7 +179,7 @@ test_prefix?=$(BUILD_PREFIX)
 test_exec_prefix?=$(test_prefix)
 test: all
 	test_prefix=$(test_prefix) test_exec_prefix=$(test_exec_prefix) \
-		python3 ./tests/suite.py $(TESTS)
+		$(python3) ./tests/suite.py $(TESTS)
 
 .PHONY: clean-test
 clean-test:
@@ -195,7 +209,7 @@ mostlyclean: clean-test
 
 distclean: clean
 
-VIUA_TAG_DATESTAMP=$(shell git show --date=short HEAD |\
+VIUA_TAG_DATESTAMP::=$(shell git show --date=short HEAD |\
 				   awk '/^Date:/ { print $$2 }')
 VIUA_TAG_VERSION=$(VIUAVM_VERSION)
 
@@ -205,22 +219,22 @@ uninstall:
 	rm -v $(DESTDIR)$(mandir)/man*/viua*
 
 install: all-silent $(prefix)
-	install \
-		--mode 755 \
+	$(install) \
+		-m 755 \
 		-D --target-directory $(DESTDIR)$(exedir) \
 		$(BUILD_EXEDIR)/*
-	install \
-		--mode 755 \
+	$(install) \
+		-m 755 \
 		-D --target-directory $(DESTDIR)$(bindir) \
 		$(BUILD_BINDIR)/viua
 	sed -i -e "s#^prefix=.*#prefix=$(shell realpath $(prefix))#" $(DESTDIR)$(bindir)/viua
-	install \
-		--mode 644 \
+	$(install) \
+		-m 644 \
 		-D --target-directory $(DESTDIR)$(mandir)/man1 \
 		$(BUILD_MANDIR)/man1/*.1
 	ln -sf viua.1 $(DESTDIR)$(mandir)/man1/viua-viua.1
-	install \
-		--mode 644 \
+	$(install) \
+		-m 644 \
 		-D --target-directory $(DESTDIR)$(mandir)/man5 \
 		$(BUILD_MANDIR)/man5/*.5
 
@@ -293,7 +307,7 @@ watch-tests:
 		find ./tests/asm -type f -name '*.stdin' ;\
 		find ./tests/asm -type f -name '*.stdout' ;\
 		ls -1 tests/suite.py \
-	) | entr -c python3 ./tests/suite.py
+	) | entr -c $(python3) ./tests/suite.py
 
 
 ################################################################################

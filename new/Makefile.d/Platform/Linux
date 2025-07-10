@@ -1,0 +1,4 @@
+# vim:ft=make:
+
+install=install
+python3=python3
