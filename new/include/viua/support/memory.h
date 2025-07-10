@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2023 Marek Marecki
+ *  Copyright (C) 2023, 2025 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -33,5 +33,56 @@ auto memload(
     return tmp;
 }
 }  // namespace viua::support
+
+namespace viua {
+template<typename T>
+struct view_ptr {
+    using element_type = T;
+    using pointer      = element_type*;
+
+    pointer viewed_ptr{ nullptr };
+
+    explicit view_ptr(
+        pointer const ptr = nullptr)
+        : viewed_ptr{ ptr }
+    {}
+    view_ptr(
+        std::nullptr_t)
+        : viewed_ptr{ nullptr }
+    {}
+
+    constexpr auto reset(
+        pointer ptr = pointer{}) noexcept -> void
+    {
+        viewed_ptr = ptr;
+    }
+
+    constexpr auto empty() const noexcept -> bool
+    {
+        return (viewed_ptr == nullptr);
+    }
+    constexpr operator bool() const noexcept
+    {
+        return not empty();
+    }
+
+    auto get() const -> pointer
+    {
+        if (empty()) {
+            throw std::runtime_error{ "view_ptr::get: nullptr" };
+        }
+        return viewed_ptr;
+    }
+
+    auto operator*() const -> std::add_lvalue_reference<element_type>::type
+    {
+        return *get();
+    }
+    auto operator->() const -> pointer
+    {
+        return get();
+    }
+};
+}  // namespace viua
 
 #endif

@@ -30,7 +30,6 @@
 #include <algorithm>
 #include <charconv>
 #include <chrono>
-#include <experimental/memory>
 #include <filesystem>
 #include <functional>
 #include <iomanip>
@@ -60,6 +59,7 @@
 #include <viua/libs/stage.h>
 #include <viua/support/errno.h>
 #include <viua/support/fdio.h>
+#include <viua/support/memory.h>
 #include <viua/support/number.h>
 #include <viua/support/print.hh>
 #include <viua/support/string.h>
@@ -1051,7 +1051,7 @@ auto save_declared_symbols(
         TEXT,
     };
     auto active_section = SECTION::NONE;
-    auto activator      = std::experimental::observer_ptr<ast::Section const>{};
+    auto activator      = viua::view_ptr<ast::Section const>{};
     for (auto const& each : nodes) {
         using viua::libs::lexer::TOKEN;
 
@@ -1184,12 +1184,12 @@ auto save_objects(
         TEXT,
     };
     auto active_section = SECTION::NONE;
-    auto activator      = std::experimental::observer_ptr<ast::Section const>{};
+    auto activator      = viua::view_ptr<ast::Section const>{};
 
     auto active_label = std::string{};
-    auto labeller     = std::experimental::observer_ptr<ast::Label const>{};
+    auto labeller     = viua::view_ptr<ast::Label const>{};
 
-    auto active_symbol = std::experimental::observer_ptr<Elf64_Sym>{};
+    auto active_symbol = viua::view_ptr<Elf64_Sym>{};
 
     for (auto& each : nodes) {
         using viua::libs::lexer::TOKEN;
@@ -1693,12 +1693,12 @@ auto cache_function_labels(
         TEXT,
     };
     auto active_section = SECTION::NONE;
-    auto activator      = std::experimental::observer_ptr<ast::Section const>{};
+    auto activator      = viua::view_ptr<ast::Section const>{};
 
     auto active_label = std::string{};
-    auto labeller     = std::experimental::observer_ptr<ast::Label const>{};
+    auto labeller     = viua::view_ptr<ast::Label const>{};
 
-    auto active_symbol = std::experimental::observer_ptr<Elf64_Sym>{};
+    auto active_symbol = viua::view_ptr<Elf64_Sym>{};
 
     for (auto const& each : nodes) {
         using viua::libs::lexer::TOKEN;
@@ -2670,14 +2670,14 @@ auto cook_instructions(
         TEXT,
     };
     auto active_section = SECTION::NONE;
-    auto activator      = std::experimental::observer_ptr<ast::Section const>{};
+    auto activator      = viua::view_ptr<ast::Section const>{};
 
-    auto active_function = std::experimental::observer_ptr<Elf64_Sym>{};
-    auto function_label  = std::experimental::observer_ptr<ast::Label const>{};
+    auto active_function = viua::view_ptr<Elf64_Sym>{};
+    auto function_label  = viua::view_ptr<ast::Label const>{};
 
-    auto active_symbol = std::experimental::observer_ptr<Elf64_Sym>{};
+    auto active_symbol = viua::view_ptr<Elf64_Sym>{};
     auto active_label  = std::string{};
-    auto labeller      = std::experimental::observer_ptr<ast::Label const>{};
+    auto labeller      = viua::view_ptr<ast::Label const>{};
 
     auto text = Text{};
     {
@@ -2753,7 +2753,7 @@ auto cook_instructions(
             labeller.reset(&lab);
             active_label = make_name_from_lexeme(lab.name);
 
-            auto labelled_symbol = std::experimental::observer_ptr<Elf64_Sym>{};
+            auto labelled_symbol = viua::view_ptr<Elf64_Sym>{};
             if (symbol_map.contains(active_label)) {
                 labelled_symbol.reset(
                     &symbol_table.at(symbol_map.at(active_label)));

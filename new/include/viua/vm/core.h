@@ -26,7 +26,6 @@
 #include <atomic>
 #include <chrono>
 #include <exception>
-#include <experimental/memory>
 #include <filesystem>
 #include <memory>
 #include <optional>
@@ -41,6 +40,7 @@
 
 #include <viua/arch/arch.h>
 #include <viua/runtime/pid.h>
+#include <viua/support/memory.h>
 #include <viua/support/number.h>
 #include <viua/vm/elf.h>
 #include <viua/vm/io/sched.hh>
@@ -368,8 +368,8 @@ struct Core {
     viua::runtime::Pid_emitter pids;
 
     std::map<pid_type, std::unique_ptr<Process>> flock;
-    std::queue<std::experimental::observer_ptr<Process>> run_queue;
-    std::map<pid_type, std::experimental::observer_ptr<Process>> suspended;
+    std::queue<viua::view_ptr<Process>> run_queue;
+    std::map<pid_type, viua::view_ptr<Process>> suspended;
 
     explicit inline Core(
         IO_scheduler& ios)
@@ -383,11 +383,11 @@ struct Core {
         return proc;
     }
     inline auto push_ready(
-        std::experimental::observer_ptr<Process> proc) -> void
+        viua::view_ptr<Process> proc) -> void
     {
         run_queue.push(std::move(proc));
     }
-    auto find(pid_type const) -> std::experimental::observer_ptr<Process>;
+    auto find(pid_type const) -> viua::view_ptr<Process>;
 
     auto spawn(std::string, uint64_t const) -> pid_type;
 };

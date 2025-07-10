@@ -20,7 +20,6 @@
 #include <fcntl.h>
 #include <sys/types.h>
 
-#include <experimental/memory>
 #include <filesystem>
 #include <iostream>
 #include <memory>
@@ -35,6 +34,7 @@
 #include <viua/libs/parser.h>
 #include <viua/libs/stage.h>
 #include <viua/support/fdstream.h>
+#include <viua/support/memory.h>
 #include <viua/support/tty.h>
 #include <viua/vm/core.h>
 #include <viua/vm/ins.h>
@@ -51,7 +51,7 @@ struct Global_state {
 };
 
 namespace {
-auto REPL_STATE = std::experimental::observer_ptr<Global_state>{};
+auto REPL_STATE = viua::view_ptr<Global_state>{};
 }
 
 /*

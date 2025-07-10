@@ -20,6 +20,7 @@
 #include <memory>
 
 #include <viua/support/fdstream.h>
+#include <viua/support/memory.h>
 #include <viua/vm/core.h>
 #include <viua/vm/io/sched.hh>
 
@@ -29,10 +30,9 @@ extern viua::support::fdstream TRACE_STREAM;
 
 namespace viua::vm {
 auto Core::find(
-    pid_type const p) -> std::experimental::observer_ptr<Process>
+    pid_type const p) -> viua::view_ptr<Process>
 {
-    using std::experimental::make_observer;
-    return flock.count(p) ? make_observer<Process>(flock.at(p).get()) : nullptr;
+    return flock.count(p) ? viua::view_ptr{ flock.at(p).get() } : nullptr;
 }
 
 auto Core::spawn(
@@ -45,7 +45,7 @@ auto Core::spawn(
     auto proc      = std::make_unique<Process>(pid, this, mod);
     proc->push_frame(256, (mod.ip_base + entry), nullptr);
 
-    run_queue.push(std::experimental::make_observer<Process>(proc.get()));
+    run_queue.push(viua::view_ptr<Process>(proc.get()));
     flock.insert({ pid, std::move(proc) });
 
     return pid;
