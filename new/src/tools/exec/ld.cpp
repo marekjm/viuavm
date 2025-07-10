@@ -27,8 +27,9 @@
 #if defined(VIUA_PLATFORM_HAS_FEATURE_BLAKE3)
 #include <blake3.h>
 #endif
-#include <sha1.h>
-#include <sha2.h>
+#include <sha.h>
+#include <sha256.h>
+#include <sha512.h>
 #include <uuid/uuid.h>
 
 #include <algorithm>
@@ -62,7 +63,6 @@ enum class Build_id_hash
     UUID,
     SHA1,
     SHA256,
-    SHA384,
     SHA512,
     BLAKE2B,
 #if defined(VIUA_PLATFORM_HAS_FEATURE_BLAKE3)
@@ -120,13 +120,10 @@ auto emit_elf(
                 build_id.resize(16);
                 break;
             case SHA1:
-                build_id.resize(SHA1_DIGEST_LENGTH);
+                build_id.resize(SHA_DIGEST_LENGTH);
                 break;
             case SHA256:
                 build_id.resize(SHA256_DIGEST_LENGTH);
-                break;
-            case SHA384:
-                build_id.resize(SHA384_DIGEST_LENGTH);
                 break;
             case SHA512:
                 build_id.resize(SHA512_DIGEST_LENGTH);
@@ -643,37 +640,28 @@ auto emit_elf(
             case SHA1:
                 {
                     SHA1_CTX context;
-                    SHA1Init(&context);
-                    SHA1Update(
+                    SHA1_Init(&context);
+                    SHA1_Update(
                         &context, output_buffer.data(), output_buffer.size());
-                    SHA1Final(build_id.data(), &context);
+                    SHA1_Final(build_id.data(), &context);
                     break;
                 }
             case SHA256:
                 {
-                    SHA2_CTX context;
-                    SHA256Init(&context);
-                    SHA256Update(
+                    SHA256_CTX context;
+                    SHA256_Init(&context);
+                    SHA256_Update(
                         &context, output_buffer.data(), output_buffer.size());
-                    SHA256Final(build_id.data(), &context);
-                    break;
-                }
-            case SHA384:
-                {
-                    SHA2_CTX context;
-                    SHA384Init(&context);
-                    SHA384Update(
-                        &context, output_buffer.data(), output_buffer.size());
-                    SHA384Final(build_id.data(), &context);
+                    SHA256_Final(build_id.data(), &context);
                     break;
                 }
             case SHA512:
                 {
-                    SHA2_CTX context;
-                    SHA512Init(&context);
-                    SHA512Update(
+                    SHA512_CTX context;
+                    SHA512_Init(&context);
+                    SHA512_Update(
                         &context, output_buffer.data(), output_buffer.size());
-                    SHA512Final(build_id.data(), &context);
+                    SHA512_Final(build_id.data(), &context);
                     break;
                 }
             case BLAKE2B:
@@ -868,8 +856,6 @@ auto main(
                         return Build_id_hash::SHA1;
                     } else if (v == "sha256") {
                         return Build_id_hash::SHA256;
-                    } else if (v == "sha384") {
-                        return Build_id_hash::SHA384;
                     } else if (v == "sha512") {
                         return Build_id_hash::SHA512;
                     } else if (v == "blake2b") {

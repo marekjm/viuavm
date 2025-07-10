@@ -59,9 +59,6 @@ include(common/tool-options.scdoc)
 |  *sha256*
 :  256
 :  SHA2
-|  *sha384*
-:  384
-:  SHA2
 |  *sha512*
 :  512
 :  SHA2
@@ -81,13 +78,6 @@ include(common/tool-options.scdoc)
 *--build-id-size*=_size_
 	Set the size of the digest for *blake2b* or *blake3* build IDs. The size
 	must be divisible by 8.
-
-; - *sha1*
-; - *sha256*
-; - *sha384*
-; - *sha512*
-; - *uuid*
-; - *none*
 
 # EXIT STATUS
 
