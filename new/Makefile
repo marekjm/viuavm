@@ -73,11 +73,12 @@ CXXFLAGS_INCLUDE=\
 #    feature
 #  - LIBS_FOO: a set of -l... flags linking to necessary libraries
 include Makefile.d/Feature/BLAKE3
+include Makefile.d/Feature/STRERRORNAME_NP
 include Makefile.d/Feature/IO_IMPL
 
 
 FEATURE_DETECT_FLAGS::=\
-	$(shell CXX=$(CXX) bash ./feature-tests/test.sh ./feature-tests/strerrorname_np.c) \
+	$(FEATURE_STRERRORNAME_NP) \
 	$(FEATURE_BLAKE3) \
 	$(FEATURE_IO_IMPL)
 

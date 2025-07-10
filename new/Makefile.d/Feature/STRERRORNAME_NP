@@ -1,0 +1,3 @@
+# vim:ft=make:
+
+FEATURE_STRERRORNAME_NP::=$(shell CXX=$(CXX) bash ./feature-tests/test.sh ./feature-tests/strerrorname_np.c)
