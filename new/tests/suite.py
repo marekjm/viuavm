@@ -7,7 +7,7 @@ import io
 import os
 import re
 import random
-import select
+import selectors
 import subprocess
 import sys
 import time
@@ -754,12 +754,13 @@ def run_and_capture(start_timepoint, interpreter, executable, *, args=(), stdin=
     )
     os.close(write_fd)
 
-    monitor = select.epoll(sizehint=4)
-    monitor.register(read_fd, select.EPOLLIN)
-    monitor.register((stdout_fd := proc.stdout.fileno()), select.EPOLLIN)
-    monitor.register((stderr_fd := proc.stderr.fileno()), select.EPOLLIN)
+    monitor = selectors.DefaultSelector()
+    monitor.register(read_fd, selectors.EVENT_READ)
+    monitor.register((stdout_fd := proc.stdout.fileno()), selectors.EVENT_READ)
+    monitor.register((stderr_fd := proc.stderr.fileno()), selectors.EVENT_READ)
     if stdin is not None:
-        monitor.register((stdin_fd := proc.stdin.fileno()), select.EPOLLOUT)
+        monitor.register((stdin_fd := proc.stdin.fileno()),
+                         selectors.EVENT_WRITE)
     else:
         stdin_fd = None
 
@@ -793,7 +794,7 @@ def run_and_capture(start_timepoint, interpreter, executable, *, args=(), stdin=
     n = 0
     eof = False
     while not eof:
-        fds = monitor.poll(timeout=0.016)
+        fds = monitor.select(timeout=0.016)
         if MONITOR_IO:
             if n:
                 print("\b" * 79)
@@ -814,22 +815,23 @@ def run_and_capture(start_timepoint, interpreter, executable, *, args=(), stdin=
         indicate_progress(start_timepoint, f"{sp}{sp}")
         n += 1
 
-        for fd, events in fds:
-            if fd == read_fd and events & select.EPOLLIN:
+        for key, events in fds:
+            fd = key.fd
+            if fd == read_fd and events & selectors.EVENT_READ:
                 chunk = os.read(fd, BUF_SIZE)
+                if len(chunk) == 0:
+                    # We are done with trace output.
+                    eof = True
+                    continue
+
                 trace += chunk
-            elif fd == read_fd and events & select.EPOLLHUP:
-                # We are done with trace output.
-                eof = True
-            elif fd == stdout_fd and events & select.EPOLLIN:
+            elif fd == stdout_fd and events & selectors.EVENT_READ:
                 chunk = os.read(fd, BUF_SIZE)
                 stdout += chunk
-            elif fd == stderr_fd and events & select.EPOLLIN:
+            elif fd == stderr_fd and events & selectors.EVENT_READ:
                 chunk = os.read(fd, BUF_SIZE)
                 stderr += chunk
-            elif fd == stdin_fd and events & select.EPOLLHUP:
-                pass
-            elif fd == stdin_fd and events & select.EPOLLOUT:
+            elif fd == stdin_fd and events & selectors.EVENT_WRITE:
                 if stdin_written >= len(stdin):
                     continue
                 chunk = os.write(fd, stdin[stdin_written:])
