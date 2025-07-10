@@ -1,0 +1,3 @@
+# vim:ft=make:
+
+IO_IMPL_LIBS=-luring

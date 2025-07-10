@@ -68,6 +68,7 @@ io_impl::=$(shell bash ./feature-tests/io_impl.sh $(io_impl))
 ifeq ($(io_impl),)
 $(error bad io_impl)
 endif
+include Makefile.d/io_impl/$(io_impl)
 FEATURE_DETECT_FLAGS::=\
 					 $(shell CXX=$(CXX) bash ./feature-tests/test.sh ./feature-tests/strerrorname_np.c) \
 					 -DVIUAVM_IO_IMPL=$(io_impl)
@@ -108,7 +109,7 @@ CXXLIBS=\
 		-lblake3 \
 		-lmd \
 		-luuid \
-		-luring
+		$(IO_IMPL_LIBS)
 
 
 ################################################################################
