@@ -72,13 +72,15 @@ CXXFLAGS_INCLUDE=\
 #  - FEATURE_FOO: a -D... flag defining a C preprocessor macro enabling the
 #    feature
 #  - LIBS_FOO: a set of -l... flags linking to necessary libraries
+include Makefile.d/Feature/BLAKE3
 include Makefile.d/Feature/IO_IMPL
 
 
 FEATURE_DETECT_FLAGS::=\
-					 $(shell CXX=$(CXX) bash ./feature-tests/test.sh ./feature-tests/strerrorname_np.c) \
-					 $(FEATURE_IO_IMPL) \
-					 -D$(shell echo "VIUAVM_IO_IMPL_$(io_impl)" | sed 's/.*/\U\0/')
+	$(shell CXX=$(CXX) bash ./feature-tests/test.sh ./feature-tests/strerrorname_np.c) \
+	$(FEATURE_BLAKE3) \
+	$(FEATURE_IO_IMPL)
+
 
 # To change version, edit the VERSION file in the repository's root directory.
 VIUAVM_VERSION:=$(shell sh ./scripts/make_version.sh short)
@@ -113,7 +115,7 @@ CXXFLAGS=\
 
 CXXLIBS=\
 		-lb2 \
-		-lblake3 \
+		$(LIBS_BLAKE3) \
 		-lmd \
 		-luuid \
 		$(LIBS_IO_IMPL)

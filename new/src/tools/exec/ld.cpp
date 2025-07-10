@@ -24,7 +24,9 @@
 #include <unistd.h>
 
 #include <blake2.h>
+#if defined(VIUA_PLATFORM_HAS_FEATURE_BLAKE3)
 #include <blake3.h>
+#endif
 #include <sha1.h>
 #include <sha2.h>
 #include <uuid/uuid.h>
@@ -63,7 +65,9 @@ enum class Build_id_hash
     SHA384,
     SHA512,
     BLAKE2B,
+#if defined(VIUA_PLATFORM_HAS_FEATURE_BLAKE3)
     BLAKE3,
+#endif
 };
 
 namespace stage {
@@ -131,9 +135,11 @@ auto emit_elf(
                 build_id.resize(build_id_size.value_or(BLAKE2B_OUTBYTES * 8)
                                 / 8);
                 break;
+#if defined(VIUA_PLATFORM_HAS_FEATURE_BLAKE3)
             case BLAKE3:
                 build_id.resize(build_id_size.value_or(BLAKE3_OUT_LEN * 8) / 8);
                 break;
+#endif
         }
 
         /*
@@ -680,6 +686,7 @@ auto emit_elf(
                             0 /* keylen */);
                     break;
                 }
+#if defined(VIUA_PLATFORM_HAS_FEATURE_BLAKE3)
             case BLAKE3:
                 {
                     blake3_hasher hasher;
@@ -690,6 +697,7 @@ auto emit_elf(
                         &hasher, build_id.data(), build_id.size());
                     break;
                 }
+#endif
         }
 
         memcpy(output_buffer.data() + build_id_offset,
@@ -866,8 +874,10 @@ auto main(
                         return Build_id_hash::SHA512;
                     } else if (v == "blake2b") {
                         return Build_id_hash::BLAKE2B;
+#if defined(VIUA_PLATFORM_HAS_FEATURE_BLAKE3)
                     } else if (v == "blake3") {
                         return Build_id_hash::BLAKE3;
+#endif
                     } else {
                         viua::support::errorln(
                             "invalid style for --build-id: {}", v);
@@ -886,7 +896,9 @@ auto main(
                     using enum Build_id_hash;
                     auto const tunable_hashes = std::set{
                         BLAKE2B,
+#if defined(VIUA_PLATFORM_HAS_FEATURE_BLAKE3)
                         BLAKE3,
+#endif
                     };
 
                     auto const build_id_hash_name =

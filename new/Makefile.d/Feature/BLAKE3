@@ -1,0 +1,9 @@
+# vim:ft=make:
+
+# Not all platforms have BLAKE3 available (saying "all" may be a bit hyperbolic,
+# given the VM only compiles on Linux and FreeBSD, but whatever).
+with_blake3::=$(shell bash ./feature-tests/blake3.sh $(with_blake3))
+ifeq ($(with_blake3),yes)
+LIBS_BLAKE3=-lblake3
+FEATURE_BLAKE3=-DVIUA_PLATFORM_HAS_FEATURE_BLAKE3
+endif
