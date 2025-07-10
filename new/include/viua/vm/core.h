@@ -21,7 +21,6 @@
 #define VIUA_VM_CORE_H
 
 #include <endian.h>
-#include <liburing.h>
 #include <string.h>
 
 #include <atomic>

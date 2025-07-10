@@ -19,7 +19,6 @@
 
 #include <elf.h>
 #include <fcntl.h>
-#include <liburing.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
