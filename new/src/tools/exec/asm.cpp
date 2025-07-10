@@ -2973,7 +2973,7 @@ auto make_reloc_table(
         Elf64_Rel rel;
         rel.r_offset = i * sizeof(viua::arch::instruction_type);
         rel.r_info =
-            ELF64_R_INFO(symtab_entry_index, static_cast<uint8_t>(type));
+            ELF64_R_INFO(static_cast<uint64_t>(symtab_entry_index), static_cast<uint8_t>(type));
         reloc_table.push_back(rel);
     };
 
