@@ -320,16 +320,7 @@ else
 	@$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
 endif
 
-$(BUILD_EXEDIR)/%: $(BUILD_PREFIX)/tools/exec/%.o
-	@mkdir -p $(shell dirname $@)
-ifeq ($(VERBOSE),true)
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
-else
-	@echo $(CXX) $@ '<=' $<
-	@$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
-endif
-
-$(BUILD_BINDIR)/%: ./src/tools/exec/%.sh
+$(BUILD_BINDIR)/%: ./src/libexec/viua/%.sh
 	@mkdir -p $(BUILD_BINDIR)
 	@cp -v $^ $@
 
@@ -354,14 +345,30 @@ endif
 
 ################################################################################
 # Explicit dependencies
+#
+# Also, since the object files with the main() function of each executable in
+# the Viua toolset are not really mentioned anywhere in the Makefile, GNU Make
+# will consider them to be "intermediate" and delete them after it is done.
+# Mentioning the files as prerequisites of the magic .NOTINTERMEDIATE: target
+# prevents GNU Make from deleting these files.
+#
+# See https://www.gnu.org/software/make/manual/html_node/Chained-Rules.html for
+# more information.
+.NOTINTERMEDIATE: \
+	$(BUILD_EXEDIR)/readelf.o \
+	$(BUILD_EXEDIR)/dis.o \
+	$(BUILD_EXEDIR)/asm.o \
+	$(BUILD_EXEDIR)/ld.o \
+	$(BUILD_EXEDIR)/vm.o \
+	$(BUILD_EXEDIR)/repl.o
+
 $(BUILD_EXEDIR)/readelf: \
 	$(BUILD_PREFIX)/libexec/common.o \
 	$(BUILD_PREFIX)/vm/elf.o \
 	$(BUILD_PREFIX)/support/elf.o \
 	$(BUILD_PREFIX)/support/errno.o \
 	$(BUILD_PREFIX)/support/fdio.o \
-	$(BUILD_PREFIX)/support/tty.o \
-	$(BUILD_PREFIX)/tools/exec/readelf.o
+	$(BUILD_PREFIX)/support/tty.o
 
 VM_OPERATION_TYPE_IMPL=\
 	$(BUILD_PREFIX)/arch/ra.o \
@@ -383,8 +390,7 @@ $(BUILD_EXEDIR)/dis: \
 	$(BUILD_PREFIX)/support/string.o \
 	$(BUILD_PREFIX)/support/tty.o \
 	$(BUILD_PREFIX)/vm/elf.o \
-	$(VM_OPERATION_TYPE_IMPL) \
-	$(BUILD_PREFIX)/tools/exec/dis.o
+	$(VM_OPERATION_TYPE_IMPL)
 
 $(BUILD_EXEDIR)/asm: \
 	$(BUILD_PREFIX)/libexec/common.o \
@@ -397,8 +403,7 @@ $(BUILD_EXEDIR)/asm: \
 	$(BUILD_PREFIX)/tools/libs/stage/error.o \
 	$(BUILD_PREFIX)/tools/libs/stage/save.o \
 	$(BUILD_PREFIX)/tools/libs/assembler.o \
-	$(VM_OPERATION_TYPE_IMPL) \
-	$(BUILD_PREFIX)/tools/exec/asm.o
+	$(VM_OPERATION_TYPE_IMPL)
 
 $(BUILD_EXEDIR)/ld: \
 	$(BUILD_PREFIX)/libexec/common.o \
@@ -413,8 +418,7 @@ $(BUILD_EXEDIR)/ld: \
 	$(BUILD_PREFIX)/support/errno.o \
 	$(BUILD_PREFIX)/support/fdio.o \
 	$(BUILD_PREFIX)/support/string.o \
-	$(BUILD_PREFIX)/support/tty.o \
-	$(BUILD_PREFIX)/tools/exec/ld.o
+	$(BUILD_PREFIX)/support/tty.o
 
 VM_INSTRUCTION_IMPL=\
 	$(BUILD_PREFIX)/vm/ins/impl/aa.o \
@@ -438,8 +442,7 @@ $(BUILD_EXEDIR)/vm: \
 	$(BUILD_PREFIX)/vm/ins/exec.o \
 	$(VM_INSTRUCTION_IMPL) \
 	$(BUILD_PREFIX)/runtime/pid.o \
-	$(VM_OPERATION_TYPE_IMPL) \
-	$(BUILD_PREFIX)/tools/exec/vm.o
+	$(VM_OPERATION_TYPE_IMPL)
 
 $(BUILD_EXEDIR)/repl: \
 	$(BUILD_PREFIX)/libexec/common.o \
@@ -460,5 +463,4 @@ $(BUILD_EXEDIR)/repl: \
 	$(BUILD_PREFIX)/tools/libs/parser.o \
 	$(BUILD_PREFIX)/runtime/pid.o \
 	3rd-party/linenoise/linenoise.o \
-	3rd-party/linenoise/encodings/utf8.o \
-	$(BUILD_PREFIX)/tools/exec/repl.o
+	3rd-party/linenoise/encodings/utf8.o
