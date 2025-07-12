@@ -344,6 +344,32 @@ endif
 
 
 ################################################################################
+# Automatic prerequisites (header dependencies)
+#
+# https://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html
+# contains more information about generating automatic prerequisites.
+#
+# One difference between what the manual says and what we do is that we keep the
+# dependency files in the build, not source, directory. This makes cleaning the
+# repository much easier--just nuke the build directory and you are done--and
+# does not pollute the source directory with automatically generated files.
+$(BUILD_PREFIX)/%.d: src/%.cpp
+	@mkdir -p $(shell dirname $@)
+	@echo $(CXX) $@ '<=' $<
+	@$(CXX) -MM $(CXXFLAGS) $< |\
+		sed 's,\($(shell basename $*)\)\.o:,$(BUILD_PREFIX)/$*.o $@:,' > $@
+
+$(BUILD_PREFIX)/%.d: src/%.cc
+	@mkdir -p $(shell dirname $@)
+	@echo $(CXX) $@ '<=' $<
+	@$(CXX) -MM $(CXXFLAGS) $< |\
+		sed 's,\($(shell basename $*)\)\.o:,$(BUILD_PREFIX)/$*.o $@:,' > $@
+
+include $(shell find src -type f -name '*.cpp' -or -name '*.cc' |\
+			 sed -e 's,\.\(cpp\|cc\),.d,' -e 's,^src\>,$(BUILD_PREFIX),')
+
+
+################################################################################
 # Explicit dependencies
 #
 # Also, since the object files with the main() function of each executable in
