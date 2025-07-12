@@ -361,13 +361,13 @@ endif
 $(BUILD_PREFIX)/%.d: $(sourcedir)/%.cpp
 	@mkdir -p $(shell dirname $@)
 	@echo $(CXX) $@ '<=' $<
-	@$(CXX) -MM $(CXXFLAGS) $< |\
+	@-$(CXX) -MM $(CXXFLAGS) $< |\
 		sed 's,\($(shell basename $*)\)\.o:,$(BUILD_PREFIX)/$*.o $@:,' > $@
 
 $(BUILD_PREFIX)/%.d: $(sourcedir)/%.cc
 	@mkdir -p $(shell dirname $@)
 	@echo $(CXX) $@ '<=' $<
-	@$(CXX) -MM $(CXXFLAGS) $< |\
+	@-$(CXX) -MM $(CXXFLAGS) $< |\
 		sed 's,\($(shell basename $*)\)\.o:,$(BUILD_PREFIX)/$*.o $@:,' > $@
 
 include $(shell find $(sourcedir) -type f -name '*.cpp' -or -name '*.cc' |\
