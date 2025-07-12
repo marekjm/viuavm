@@ -46,6 +46,11 @@ BUILD_MANDIR=$(BUILD_SHAREDIR)/man
 
 
 ################################################################################
+# Source and header directories
+sourcedir=src
+headerdir=include
+
+################################################################################
 # Platform selection
 #
 # Platforms are not created equal (even if somewhat compatible) and some need
@@ -73,7 +78,7 @@ endif
 
 CXXFLAGS_INCLUDE=\
 				 $(PLATFORM_INCLUDE_FLAGS) \
-				 -I./include \
+				 -I$(headerdir) \
 				 -I./3rd-party
 
 
@@ -259,8 +264,8 @@ install-binfmt:
 
 format:
 	(\
-		find ./include -type f -name '*.h' -or -name '*.hh' ;\
-		find ./src -type f -name '*.cpp' -or -name '*.cc' \
+		find $(headerdir) -type f -name '*.h' -or -name '*.hh' ;\
+		find $(sourcedir) -type f -name '*.cpp' -or -name '*.cc' \
 	) | xargs --max-args 1 --max-procs 0 clang-format -i
 	black --quiet tests/suite.py
 	yamlfmt $(shell git rev-parse --show-toplevel)/.builds/*
@@ -293,8 +298,8 @@ watch-impl:
 		find . -mindepth 2 -name '*.asm' ;\
 		find ./docs/man -type f -name '*.scdoc' ;\
 		find ./docs/man -type f -name '*.m4' ;\
-		find ./src -type f ;\
-		find ./include -type f\
+		find $(sourcedir) -type f ;\
+		find $(headerdir) -type f\
 	)
 
 watch-tests:
@@ -320,11 +325,11 @@ else
 	@$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
 endif
 
-$(BUILD_BINDIR)/%: ./src/libexec/viua/%.sh
+$(BUILD_BINDIR)/%: $(sourcedir)/libexec/viua/%.sh
 	@mkdir -p $(BUILD_BINDIR)
 	@cp -v $^ $@
 
-$(BUILD_PREFIX)/%.o: ./src/%.cpp
+$(BUILD_PREFIX)/%.o: $(sourcedir)/%.cpp
 	@mkdir -p $(shell dirname $@)
 ifeq ($(VERBOSE),true)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -333,7 +338,7 @@ else
 	@$(CXX) $(CXXFLAGS) -c -o $@ $<
 endif
 
-$(BUILD_PREFIX)/%.o: ./src/%.cc
+$(BUILD_PREFIX)/%.o: $(sourcedir)/%.cc
 	@mkdir -p $(shell dirname $@)
 ifeq ($(VERBOSE),true)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -353,20 +358,20 @@ endif
 # dependency files in the build, not source, directory. This makes cleaning the
 # repository much easier--just nuke the build directory and you are done--and
 # does not pollute the source directory with automatically generated files.
-$(BUILD_PREFIX)/%.d: src/%.cpp
+$(BUILD_PREFIX)/%.d: $(sourcedir)/%.cpp
 	@mkdir -p $(shell dirname $@)
 	@echo $(CXX) $@ '<=' $<
 	@$(CXX) -MM $(CXXFLAGS) $< |\
 		sed 's,\($(shell basename $*)\)\.o:,$(BUILD_PREFIX)/$*.o $@:,' > $@
 
-$(BUILD_PREFIX)/%.d: src/%.cc
+$(BUILD_PREFIX)/%.d: $(sourcedir)/%.cc
 	@mkdir -p $(shell dirname $@)
 	@echo $(CXX) $@ '<=' $<
 	@$(CXX) -MM $(CXXFLAGS) $< |\
 		sed 's,\($(shell basename $*)\)\.o:,$(BUILD_PREFIX)/$*.o $@:,' > $@
 
-include $(shell find src -type f -name '*.cpp' -or -name '*.cc' |\
-			 sed -e 's,\.\(cpp\|cc\),.d,' -e 's,^src\>,$(BUILD_PREFIX),')
+include $(shell find $(sourcedir) -type f -name '*.cpp' -or -name '*.cc' |\
+			 sed -e 's,\.\(cpp\|cc\),.d,' -e 's,^$(sourcedir)\>,$(BUILD_PREFIX),')
 
 
 ################################################################################
