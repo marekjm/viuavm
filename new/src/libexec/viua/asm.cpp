@@ -2972,8 +2972,8 @@ auto make_reloc_table(
 
         Elf64_Rel rel;
         rel.r_offset = i * sizeof(viua::arch::instruction_type);
-        rel.r_info =
-            ELF64_R_INFO(static_cast<uint64_t>(symtab_entry_index), static_cast<uint8_t>(type));
+        rel.r_info   = ELF64_R_INFO(static_cast<uint64_t>(symtab_entry_index),
+                                  static_cast<uint8_t>(type));
         reloc_table.push_back(rel);
     };
 
@@ -3065,7 +3065,7 @@ auto emit_elf(
         /*
          * This is for internal use, we can go crazy with size_t.
          */
-        auto rel_section_ndx    = size_t{ 0 };
+        auto rel_section_ndx = size_t{ 0 };
 
         using Header_pair = std::pair<std::optional<Elf64_Phdr>, Elf64_Shdr>;
         auto elf_headers  = std::vector<Header_pair>{};
@@ -3445,12 +3445,10 @@ auto emit_elf(
         for (auto& each : symbol_table) {
             switch (ELF64_ST_TYPE(each.st_info)) {
                 case STT_FUNC:
-                    each.st_shndx =
-                        text_section_ndx;
+                    each.st_shndx = text_section_ndx;
                     break;
                 case STT_OBJECT:
-                    each.st_shndx =
-                        rodata_section_ndx;
+                    each.st_shndx = rodata_section_ndx;
                     break;
                 default:
                     break;

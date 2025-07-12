@@ -759,8 +759,7 @@ def run_and_capture(start_timepoint, interpreter, executable, *, args=(), stdin=
     monitor.register((stdout_fd := proc.stdout.fileno()), selectors.EVENT_READ)
     monitor.register((stderr_fd := proc.stderr.fileno()), selectors.EVENT_READ)
     if stdin is not None:
-        monitor.register((stdin_fd := proc.stdin.fileno()),
-                         selectors.EVENT_WRITE)
+        monitor.register((stdin_fd := proc.stdin.fileno()), selectors.EVENT_WRITE)
     else:
         stdin_fd = None
 

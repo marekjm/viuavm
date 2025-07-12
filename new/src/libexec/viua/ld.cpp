@@ -192,7 +192,7 @@ auto emit_elf(
         /*
          * This is for internal use, we can go crazy with size_t.
          */
-        auto rel_section_ndx    = size_t{ 0 };
+        auto rel_section_ndx = size_t{ 0 };
 
         using Header_pair = std::pair<std::optional<Elf64_Phdr>, Elf64_Shdr>;
         auto elf_headers  = std::vector<Header_pair>{};
@@ -610,12 +610,10 @@ auto emit_elf(
         for (auto& each : symbol_table) {
             switch (ELF64_ST_TYPE(each.st_info)) {
                 case STT_FUNC:
-                    each.st_shndx =
-                        text_section_ndx;
+                    each.st_shndx = text_section_ndx;
                     break;
                 case STT_OBJECT:
-                    each.st_shndx =
-                        rodata_section_ndx;
+                    each.st_shndx = rodata_section_ndx;
                     break;
                 default:
                     break;

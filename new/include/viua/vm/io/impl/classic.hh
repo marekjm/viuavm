@@ -40,6 +40,6 @@ struct IO : IO_scheduler {
 
     auto wait(Stack&, IO_request::id_type const) -> uint8_t* override;
 };
-}  // namespace viua::vm::io::impl::classic
+}  // namespace viua::vm::io::impl::VIUAVM_IO_IMPL
 
 #endif
