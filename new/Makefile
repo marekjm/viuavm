@@ -371,7 +371,10 @@ $(BUILD_PREFIX)/%.d: $(sourcedir)/%.cc
 		sed 's,\($(shell basename $*)\)\.o:,$(BUILD_PREFIX)/$*.o $@:,' > $@
 
 include $(shell find $(sourcedir) -type f -name '*.cpp' -or -name '*.cc' |\
-			 sed -e 's,\.\(cpp\|cc\),.d,' -e 's,^$(sourcedir)\>,$(BUILD_PREFIX),')
+	sed \
+		-e 's/\.cpp$$/.d/' \
+		-e 's/\.cc$$/.d/' \
+		-e 's,^$(sourcedir)\>,$(BUILD_PREFIX),')
 
 
 ################################################################################
