@@ -361,13 +361,13 @@ endif
 $(BUILD_PREFIX)/%.d: $(sourcedir)/%.cpp
 	@mkdir -p $(shell dirname $@)
 	@echo $(CXX) $@ '<=' $<
-	@-$(CXX) -MM $(CXXFLAGS) $< |\
+	@-$(CXX) -MM $(CXXFLAGS) $< 2>/dev/null |\
 		sed 's,\($(shell basename $*)\)\.o:,$(BUILD_PREFIX)/$*.o $@:,' > $@
 
 $(BUILD_PREFIX)/%.d: $(sourcedir)/%.cc
 	@mkdir -p $(shell dirname $@)
 	@echo $(CXX) $@ '<=' $<
-	@-$(CXX) -MM $(CXXFLAGS) $< |\
+	@-$(CXX) -MM $(CXXFLAGS) $< 2>/dev/null |\
 		sed 's,\($(shell basename $*)\)\.o:,$(BUILD_PREFIX)/$*.o $@:,' > $@
 
 include $(shell find $(sourcedir) -type f -name '*.cpp' -or -name '*.cc' |\
@@ -455,7 +455,15 @@ $(BUILD_EXEDIR)/ld: \
 	$(BUILD_PREFIX)/support/tty.o
 
 VM_INSTRUCTION_IMPL=\
-	$(BUILD_PREFIX)/vm/ins/impl/aa.o \
+	$(BUILD_PREFIX)/vm/ins/impl/memory.o \
+	$(BUILD_PREFIX)/vm/ins/impl/concurrency.o \
+	$(BUILD_PREFIX)/vm/ins/impl/globaltable.o \
+	$(BUILD_PREFIX)/vm/ins/impl/bitwise.o \
+	$(BUILD_PREFIX)/vm/ins/impl/registers.o \
+	$(BUILD_PREFIX)/vm/ins/impl/logic.o \
+	$(BUILD_PREFIX)/vm/ins/impl/arithmetic.o \
+	$(BUILD_PREFIX)/vm/ins/impl/constructors.o \
+	$(BUILD_PREFIX)/vm/ins/impl/flow.o \
 	$(BUILD_PREFIX)/vm/ins/impl/ebreak.o \
 	$(BUILD_PREFIX)/vm/ins/impl/ecall.o \
 	$(BUILD_PREFIX)/vm/ins/impl/io.o
@@ -471,7 +479,6 @@ $(BUILD_EXEDIR)/vm: \
 	$(BUILD_PREFIX)/vm/io/sched.o \
 	$(BUILD_PREFIX)/vm/core.o \
 	$(BUILD_PREFIX)/vm/elf.o \
-	$(BUILD_PREFIX)/vm/ins.o \
 	$(BUILD_PREFIX)/vm/ins/proxy.o \
 	$(BUILD_PREFIX)/vm/ins/exec.o \
 	$(VM_INSTRUCTION_IMPL) \
@@ -485,7 +492,6 @@ $(BUILD_EXEDIR)/repl: \
 	$(BUILD_PREFIX)/vm/backtrace.o \
 	$(BUILD_PREFIX)/vm/core.o \
 	$(BUILD_PREFIX)/vm/elf.o \
-	$(BUILD_PREFIX)/vm/ins.o \
 	$(VM_INSTRUCTION_IMPL) \
 	$(BUILD_PREFIX)/support/fdio.o \
 	$(BUILD_PREFIX)/support/string.o \
