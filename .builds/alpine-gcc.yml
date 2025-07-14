@@ -14,6 +14,7 @@ packages:
   - blake3-dev
   - scdoc
   - m4
+  - coreutils  # for b2sum
 sources:
   - https://git.sr.ht/~maelkum/viuavm
 environment:
