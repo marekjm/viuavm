@@ -209,8 +209,7 @@ clean: clean-test
 
 .PHONY: mostlyclean
 mostlyclean: clean-test
-	find $(BUILD_PREFIX) -type f -not -path '*/share/man/*' -delete || true
-	find $(BUILD_PREFIX) -mindepth 1 -type d -not -path '*/share*' -delete || true
+	find $(BUILD_PREFIX) -type f -not -path '*/share/man/*' -and -not -name '*.d' -delete || true
 
 distclean: clean
 
