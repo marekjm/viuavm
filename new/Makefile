@@ -288,7 +288,7 @@ $(BUILD_MANDIR)/%: docs/man/%.scdoc docs/man/common/*.scdoc docs/man/viua.m4
 # Development quality-of-life targets
 watch:
 	make --no-print-directory watch-impl |\
-		entr -c make -j
+		entr -c make --shuffle=random -j
 
 .PHONY: watch-impl
 watch-impl:
