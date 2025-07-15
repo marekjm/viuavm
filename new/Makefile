@@ -114,6 +114,25 @@ VERSION_FLAGS=\
 			  -DCXXVERSION='"$(shell $(CXX) -dumpversion)"' \
 			  -DCXXSTD='"$(CXXSTD)"'
 
+
+################################################################################
+# Automatic prerequisites (header dependencies)
+#
+# https://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html
+# contains more information about generating automatic prerequisites.
+#
+# One difference between what the manual says and what we do is that we keep the
+# dependency files in the build, not source, directory. This makes cleaning the
+# repository much easier--just nuke the build directory and you are done--and
+# does not pollute the source directory with automatically generated files.
+#
+# See https://make.mad-scientist.net/papers/advanced-auto-dependency-generation/
+# for a modern, fully-automated and efficient take on automatic dependency
+# tracking. What is used here is based on the solution presented in the
+# aforementioned article. If you are reading this Makefile, I would suggest
+# taking a brief detour to read the article.
+DEPFLAGS=-MT "$@ $(@:.o=.d)" -MMD
+
 CXXFLAGS=\
 		 $(VERSION_FLAGS) \
 		 -std=$(CXXSTD) \
@@ -124,6 +143,7 @@ CXXFLAGS=\
 		 $(CXXFLAGS_SANITISER) \
 		 $(CXXFLAGS_OPTION) \
 		 $(CXXFLAGS_WARNING) \
+		 $(DEPFLAGS) \
 		 -Wall \
 		 -Wextra \
 		 -Wpedantic \
@@ -349,35 +369,6 @@ endif
 
 
 ################################################################################
-# Automatic prerequisites (header dependencies)
-#
-# https://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html
-# contains more information about generating automatic prerequisites.
-#
-# One difference between what the manual says and what we do is that we keep the
-# dependency files in the build, not source, directory. This makes cleaning the
-# repository much easier--just nuke the build directory and you are done--and
-# does not pollute the source directory with automatically generated files.
-$(BUILD_PREFIX)/%.d: $(sourcedir)/%.cpp
-	@mkdir -p $(shell dirname $@)
-	@echo $(CXX) $@ '<=' $<
-	@-$(CXX) -MM $(CXXFLAGS) $< 2>/dev/null |\
-		sed 's,\($(shell basename $*)\)\.o:,$(BUILD_PREFIX)/$*.o $@:,' > $@
-
-$(BUILD_PREFIX)/%.d: $(sourcedir)/%.cc
-	@mkdir -p $(shell dirname $@)
-	@echo $(CXX) $@ '<=' $<
-	@-$(CXX) -MM $(CXXFLAGS) $< 2>/dev/null |\
-		sed 's,\($(shell basename $*)\)\.o:,$(BUILD_PREFIX)/$*.o $@:,' > $@
-
-include $(shell find $(sourcedir) -type f -name '*.cpp' -or -name '*.cc' |\
-	sed \
-		-e 's/\.cpp$$/.d/' \
-		-e 's/\.cc$$/.d/' \
-		-e 's,^$(sourcedir)\>,$(BUILD_PREFIX),')
-
-
-################################################################################
 # Explicit dependencies
 #
 # Also, since the object files with the main() function of each executable in
@@ -504,3 +495,5 @@ $(BUILD_EXEDIR)/repl: \
 	$(BUILD_PREFIX)/runtime/pid.o \
 	3rd-party/linenoise/linenoise.o \
 	3rd-party/linenoise/encodings/utf8.o
+
+-include $(find ./build -type f -name '*.d')
