@@ -287,11 +287,12 @@ $(BUILD_MANDIR)/%: docs/man/%.scdoc docs/man/common/*.scdoc docs/man/viua.m4
 ################################################################################
 # Development quality-of-life targets
 watch:
-	make watch-impl | entr -c make -j
+	make --no-print-directory watch-impl |\
+		entr -c make -j
 
 .PHONY: watch-impl
 watch-impl:
-	(\
+	@(\
 		ls -1 Makefile ;\
 		find Makefile.d -mindepth 1 ;\
 		find . -mindepth 2 -name '*.asm' ;\
