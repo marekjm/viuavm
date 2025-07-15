@@ -22,7 +22,7 @@ tasks:
   - build-preset-debug: |
       cd viuavm/new
       gmake clean
-      gmake PRESET=debug io_impl=classic
+      gmake PRESET=debug io_impl=classic --jobs 2
   - install-preset-debug: |
       cd viuavm/new
       gmake prefix=ci-debug install
@@ -33,7 +33,7 @@ tasks:
   - build-preset-test: |
       cd viuavm/new
       gmake clean
-      gmake PRESET=test io_impl=classic
+      gmake PRESET=test io_impl=classic --jobs 2
   - install-preset-test: |
       cd viuavm/new
       gmake prefix=ci-test install
@@ -44,7 +44,7 @@ tasks:
   - build-preset-release: |
       cd viuavm/new
       gmake clean
-      gmake PRESET=release io_impl=classic
+      gmake PRESET=release io_impl=classic --jobs 2
   - install-preset-release: |
       cd viuavm/new
       gmake prefix=ci-release install

@@ -27,7 +27,7 @@ tasks:
   - build-preset-debug: |
       cd viuavm/new
       make clean
-      make PRESET=debug -j
+      make PRESET=debug --jobs 2
   - install-preset-debug: |
       cd viuavm/new
       make prefix=ci-debug install
@@ -38,7 +38,7 @@ tasks:
   - build-preset-test: |
       cd viuavm/new
       make clean
-      make PRESET=test -j
+      make PRESET=test --jobs 2
   - install-preset-test: |
       cd viuavm/new
       make prefix=ci-test install
@@ -49,7 +49,7 @@ tasks:
   - build-preset-release: |
       cd viuavm/new
       make clean
-      make PRESET=release -j
+      make PRESET=release --jobs 2
   - install-preset-release: |
       cd viuavm/new
       make prefix=ci-release install
@@ -66,7 +66,7 @@ tasks:
   - build-io-classic: |
       cd viuavm/new
       make clean
-      make PRESET=release io_impl=classic -j
+      make PRESET=release io_impl=classic --jobs 2
   - test-io-classic: |
       cd viuavm/new
       make io_impl=classic test
