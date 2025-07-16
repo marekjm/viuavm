@@ -26,6 +26,7 @@
 #include <iostream>
 #include <limits>
 #include <optional>
+#include <print>
 #include <utility>
 #include <vector>
 
@@ -50,8 +51,7 @@ auto execute(
 {
     auto const raw = *ip;
 
-    auto const opcode = static_cast<viua::arch::opcode_type>(
-        raw & viua::arch::ops::OPCODE_MASK);
+    auto const opcode = carve_opcode_out(raw) & viua::arch::ops::OPCODE_MASK;
     auto const format = static_cast<viua::arch::ops::FORMAT>(
         opcode & viua::arch::ops::FORMAT_MASK);
 
@@ -199,9 +199,11 @@ auto execute(
         case N:
             {
                 if constexpr (VIUA_TRACE_CYCLES) {
-                    viua::TRACE_STREAM << "    "
-                                       << viua::arch::ops::to_string(opcode)
-                                       << viua::TRACE_STREAM.endl;
+                    viua::TRACE_STREAM
+                        << "    "
+                        << viua::arch::ops::to_string(
+                               static_cast<viua::arch::opcode_type>(opcode))
+                        << viua::TRACE_STREAM.endl;
                 }
 
                 using viua::arch::ops::OPCODE_N;
@@ -294,8 +296,10 @@ auto execute(
                 break;
             }
         default:
-            std::cerr << "unimplemented instruction: "
-                      << viua::arch::ops::to_string(opcode) << "\n";
+            std::println(stderr,
+                         "unimplemented instruction: {}",
+                         viua::arch::ops::to_string(
+                             static_cast<viua::arch::opcode_type>(opcode)));
             return nullptr;
     }
 

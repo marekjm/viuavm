@@ -246,8 +246,8 @@ auto execute_arithmetic_immediate_op(
         typename std::conditional<signed_immediate, int64_t, uint64_t>::type;
     auto const immediate =
         (signed_immediate
-             ? static_cast<immediate_type>(
-                   static_cast<int32_t>(op.instruction.immediate << 8) >> 8)
+             ? viua::support::sign_extend<immediate_type>(
+                   op.instruction.immediate)
              : static_cast<immediate_type>(op.instruction.immediate));
 
     if (in.template holds<void>()) {
@@ -260,7 +260,9 @@ auto execute_arithmetic_immediate_op(
         return;
     }
     if (auto const v = in.template get<int64_t>(); v) {
-        out = typename Op::template functor_type<int64_t>{}(*v, immediate);
+        auto const n =
+            typename Op::template functor_type<int64_t>{}(*v, immediate);
+        out = n;
         return;
     }
     if (auto const v = in.template get<float>(); v) {

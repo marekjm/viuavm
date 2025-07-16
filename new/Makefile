@@ -434,8 +434,9 @@ $(BUILD_EXEDIR)/ld: \
 	$(BUILD_PREFIX)/libexec/common.o \
 	$(BUILD_PREFIX)/arch/ra.o \
 	$(BUILD_PREFIX)/arch/ops.o \
-	$(BUILD_PREFIX)/arch/ops/f.o \
 	$(BUILD_PREFIX)/arch/ops/e.o \
+	$(BUILD_PREFIX)/arch/ops/f.o \
+	$(BUILD_PREFIX)/arch/ops/r.o \
 	$(BUILD_PREFIX)/vm/elf.o \
 	$(BUILD_PREFIX)/tools/libs/errors/compile_time.o \
 	$(BUILD_PREFIX)/tools/libs/stage/save.o \

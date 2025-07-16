@@ -355,7 +355,8 @@ auto emit_elf(
             sec.sh_size   = seg.p_filesz;
             sec.sh_flags  = SHF_ALLOC | SHF_EXECINSTR;
 
-            text_section_ndx = elf_headers.size();
+            // FIXME What if we had a file with more than 65535 ELF headers?
+            text_section_ndx = static_cast<uint16_t>(elf_headers.size());
             elf_headers.push_back({ seg, sec });
         }
         {
@@ -388,7 +389,8 @@ auto emit_elf(
             sec.sh_size   = seg.p_filesz;
             sec.sh_flags  = SHF_ALLOC;
 
-            rodata_section_ndx = elf_headers.size();
+            // FIXME What if we had a file with more than 65535 ELF headers?
+            rodata_section_ndx = static_cast<uint16_t>(elf_headers.size());
             elf_headers.push_back({ seg, sec });
         }
         {
@@ -746,7 +748,8 @@ auto relocate(
 
     using viua::arch::ops::OPCODE;
     auto const op =
-        static_cast<OPCODE>(text.at(text_ndx) & viua::arch::ops::OPCODE_MASK);
+        static_cast<OPCODE>(viua::carve_opcode_out(text.at(text_ndx))
+                            & viua::arch::ops::OPCODE_MASK);
 
     if (op == OPCODE::ARODP or op == OPCODE::ATXTP) {
         using viua::arch::ops::E;
@@ -754,15 +757,19 @@ auto relocate(
         text.at(text_ndx) = E{ imm_op.opcode, imm_op.out, value }.encode();
     } else {
         using viua::arch::ops::F;
+        using viua::arch::ops::R;
+
+        // the LUIU
         auto const hi_ndx = text_ndx - 2;
         auto hi_op        = F::decode(text.at(hi_ndx));
         auto const hi     = static_cast<uint32_t>(value >> 32);
         text.at(hi_ndx)   = F{ hi_op.opcode, hi_op.out, hi }.encode();
 
+        // the ADDIU
         auto const lo_ndx = text_ndx - 1;
-        auto lo_op        = F::decode(text.at(lo_ndx));
+        auto lo_op        = R::decode(text.at(lo_ndx));
         auto const lo     = static_cast<uint32_t>(value);
-        text.at(lo_ndx)   = F{ lo_op.opcode, lo_op.out, lo }.encode();
+        text.at(lo_ndx) = R{ lo_op.opcode, lo_op.out, lo_op.out, lo }.encode();
     }
 }
 

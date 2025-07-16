@@ -41,6 +41,7 @@
 #include <optional>
 #include <ranges>
 #include <set>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -247,21 +248,6 @@ auto any_find_mistake(
     return std::nullopt;
 }
 
-auto fits_in_unsigned_r_immediate(
-    uint32_t const n) -> bool
-{
-    constexpr auto LOW_24 = uint32_t{ 0x00'ff'ff'ff };
-    return ((n & LOW_24) == n);
-}
-auto fits_in_signed_r_immediate(
-    uint32_t const n) -> bool
-{
-    constexpr auto LOW_24 = uint32_t{ 0x00'ff'ff'ff };
-    auto const just_low   = (n & LOW_24);
-    return (static_cast<int32_t>(n)
-            == (static_cast<int32_t>(just_low << 8) >> 8));
-}
-
 auto make_name_from_lexeme(
     viua::libs::lexer::Lexeme const& r) -> std::string
 {
@@ -293,10 +279,34 @@ struct Node {
     auto attr [[maybe_unused]] (std::string_view const) const
         -> std::optional<Lexeme>;
 
+    auto to_string() const -> std::string;
+
     virtual ~Node();
 };
 Node::~Node()
 {}
+auto Node::to_string() const -> std::string
+{
+    auto ss = std::ostringstream{};
+
+    ss << leader.text;
+
+    if (not attributes.empty()) {
+        ss << " [[";
+        auto sep = std::string{ "" };
+        for (auto const& [a, v] : attributes) {
+            ss << sep;
+            ss << a.text;
+            if (v.has_value()) {
+                ss << "=";
+                ss << v.value().text;
+            }
+            sep = ",";
+        }
+        ss << "]]";
+    }
+    return ss.str();
+}
 auto Node::has_attr(
     std::string_view const key) const -> std::optional<attribute_type>
 {
@@ -361,6 +371,8 @@ struct Operand : Node {
     std::vector<Lexeme> ingredients;
 
     auto make_access() const -> viua::arch::Register_access;
+
+    auto to_string() const -> std::string;
 };
 auto Operand::make_access() const -> viua::arch::Register_access
 {
@@ -376,19 +388,18 @@ auto Operand::make_access() const -> viua::arch::Register_access
         throw Error{ lx, Cause::Invalid_register_access };
     }
 
-    auto const direct = (lx == TOKEN::DOLLAR);
-    auto const index  = viua::support::ston<uint8_t>(ingredients.at(1).text);
+    auto const index = viua::support::ston<uint8_t>(ingredients.at(1).text);
     if (ingredients.size() == 2) {
-        return viua::arch::Register_access::make_local(index, direct);
+        return viua::arch::Register_access::make_local(index);
     }
 
     auto const rs = ingredients.back();
     if (rs == "l") {
-        return viua::arch::Register_access::make_local(index, direct);
+        return viua::arch::Register_access::make_local(index);
     } else if (rs == "a") {
-        return viua::arch::Register_access::make_argument(index, direct);
+        return viua::arch::Register_access::make_argument(index);
     } else if (rs == "p") {
-        return viua::arch::Register_access::make_parameter(index, direct);
+        return viua::arch::Register_access::make_parameter(index);
     } else {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
@@ -402,9 +413,35 @@ auto Operand::make_access() const -> viua::arch::Register_access
                   + quote_fancy("a") + ", and " + quote_fancy("p"));
     }
 }
+auto Operand::to_string() const -> std::string
+{
+    auto ss = std::ostringstream{};
+    ss << Node::to_string();
+    ss << " ";
+    for (auto const& i : ingredients) {
+        ss << i.text;
+    }
+    return ss.str();
+}
 struct Instruction : Node {
     std::vector<Operand> operands;
+
+    auto to_string() const -> std::string;
 };
+auto Instruction::to_string() const -> std::string
+{
+    auto ss = std::ostringstream{};
+    ss << Node::to_string();
+
+    auto sep = std::string{ " " };
+    for (auto const& o : operands) {
+        ss << sep;
+        ss << o.to_string();
+        sep = ", ";
+    }
+
+    return ss.str();
+}
 struct Begin : Node {};
 struct End : Node {};
 }  // namespace ast
@@ -1797,7 +1834,7 @@ auto emit_instruction(
     auto format = static_cast<FORMAT>(opcode & FORMAT_MASK);
     switch (format) {
         case FORMAT::N:
-            return static_cast<uint64_t>(opcode);
+            return viua::arch::ops::N{ opcode }.encode();
         case FORMAT::T:
             return viua::arch::ops::T{ opcode,
                                        operand_or_throw(insn, 0).make_access(),
@@ -1869,26 +1906,16 @@ auto emit_instruction(
                         auto const tmp = viua::support::ston<int32_t>(imm.text);
                         memcpy(&val, &tmp, sizeof(tmp));
                     }
-
-                    auto const fits = is_unsigned
-                                          ? fits_in_unsigned_r_immediate(val)
-                                          : fits_in_signed_r_immediate(val);
-                    if (not fits) {
-                        using viua::libs::errors::compile_time::Cause;
-                        using viua::libs::errors::compile_time::Error;
-                        throw Error{ imm,
-                                     Cause::Value_out_of_range,
-                                     "value does not fit into 24-bit wide "
-                                     "immediate" };
-                    }
-
-                    return viua::arch::ops::R{
-                        opcode,
-                        insn.operands.at(0).make_access(),
-                        insn.operands.at(1).make_access(),
-                        val
-                    }
-                        .encode();
+                    std::println("cooked imm for R: {}u ({}s)",
+                                 val,
+                                 static_cast<int32_t>(val));
+                    auto const r =
+                        viua::arch::ops::R{ opcode,
+                                            insn.operands.at(0).make_access(),
+                                            insn.operands.at(1).make_access(),
+                                            val };
+                    std::println("cooked R: {}", r.to_string());
+                    return r.encode();
                 } catch (std::invalid_argument const&) {
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
@@ -1962,7 +1989,8 @@ auto expand_li(
     }
 
     using viua::libs::assembler::to_loading_parts_unsigned;
-    auto const [hi, lo]  = to_loading_parts_unsigned(value);
+    auto const hi        = viua::carve_bits_out<uint32_t, 32>(value);
+    auto const lo        = viua::carve_bits_out<uint32_t, 0>(value);
     auto const is_greedy = (raw.leader.text.find("g.") == 0);
     auto const full_form = raw.has_attr("full") or force_full;
 
@@ -1973,23 +2001,23 @@ auto expand_li(
                  value,
                  (is_unsigned ? std::to_string(value)
                               : std::to_string(static_cast<int64_t>(value))));
-    std::println("  hi {:08x}", hi);
-    std::println("  lo {:08x}", lo);
+    std::println("  hi {:08x} ({}u) ({}s)", hi, hi, static_cast<int32_t>(hi));
+    std::println("  lo {:08x} ({}u) ({}s)", lo, lo, static_cast<int32_t>(lo));
 
     auto const important_hi =
-        is_unsigned ? hi : (hi != static_cast<uint32_t>(-1));
+        is_unsigned ? hi : (hi and (hi != static_cast<uint32_t>(-1)));
+    std::println("  hi is {}important", (important_hi ? "" : "not "));
 
-    auto const fits_in_addi = is_unsigned ? fits_in_unsigned_r_immediate(lo)
-                                          : fits_in_signed_r_immediate(lo);
-
-    auto const needs_leader = full_form or important_hi or (not fits_in_addi);
+    auto const needs_leader = full_form or important_hi;
+    std::println(
+        "  expansion does {}need a leader", (needs_leader ? "" : "not "));
 
     /*
      * When loading immediates we have several cases to consider:
      *
-     *  - the immediate is short ie, occupies only lower 24-bits and thus fits
+     *  - the immediate is short ie, occupies only lower 32-bits and thus fits
      *    fully in the immediate of an ADDI instruction
-     *  - the immediate is long ie, has any of the high 40 bits set
+     *  - the immediate is long ie, has any of the high 32 bits set
      *
      * In the first case we could be done with a single ADDI, and (if we are not
      * loading addresses and need to take the pessimistic route to accommodate
@@ -1999,11 +2027,7 @@ auto expand_li(
      * real instructions:
      *
      *  - LUI to load the high word
-     *  - LLI to load the low word
-     *
-     * LUI is necessary even if the long immediate being loaded only has lower
-     * 32 bits set, because LLI needs a value to be already present in the
-     * output register to determine the signedness of its output.
+     *  - ADDI to load the low word
      *
      * In any case, for long immediates the sequence of
      *
@@ -2013,6 +2037,8 @@ auto expand_li(
      * is emitted which is cheap and executed without releasing the virtual CPU.
      */
     auto cooked = Text{};
+
+    std::println("{}", raw.to_string());
 
     if (needs_leader) {
         using namespace std::string_literals;
@@ -2027,6 +2053,7 @@ auto expand_li(
 
         synth.operands.at(1).ingredients.front().text =
             std::string{ hi_literal.data() };
+
         cooked.push_back(emit_instruction(synth));
     }
 
@@ -2036,26 +2063,31 @@ auto expand_li(
      */
     if (needs_leader) {
         auto synth        = raw;
-        synth.leader.text = (is_greedy ? "g.lli" : "lli");
-
-        auto const& lx = raw.operands.front().ingredients.at(1);
-
-        using viua::libs::lexer::TOKEN;
-        {
-            auto dst = ast::Operand{};
-            dst.ingredients.push_back(lx.make_synth("$", TOKEN::DOLLAR));
-            dst.ingredients.push_back(lx.make_synth(
-                std::to_string(std::stoull(lx.text)), TOKEN::LITERAL_INTEGER));
-            dst.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
-            dst.ingredients.push_back(lx.make_synth("l", TOKEN::LITERAL_ATOM));
-
-            synth.operands.push_back(dst);
+        synth.leader.text = "addiu";
+        if (is_greedy) {
+            synth.leader.text = "g." + synth.leader.text;
         }
-        {
-            auto immediate = ast::Operand{};
-            immediate.ingredients.push_back(
-                lx.make_synth(std::to_string(lo), TOKEN::LITERAL_INTEGER));
 
+        /*
+         * Pop the immediate.
+         */
+        synth.operands.pop_back();
+
+        /*
+         * Duplicate the register.
+         */
+        synth.operands.push_back(synth.operands.back());
+
+
+        /*
+         * Synthesise out own immediate.
+         */
+        {
+            using viua::libs::lexer::TOKEN;
+            auto const& lx = raw.operands.back().ingredients.at(0);
+            auto immediate = ast::Operand{};
+            immediate.ingredients.push_back(lx.make_synth(
+                std::format("0x{:x}", lo), TOKEN::LITERAL_INTEGER));
             synth.operands.push_back(immediate);
         }
 
@@ -2074,7 +2106,7 @@ auto expand_li(
         synth.operands.push_back(synth.operands.back());
 
         /*
-         * If the first part of the load (the high 36 bits) was zero then it
+         * If the first part of the load (the high 32 bits) was zero then it
          * means we don't have anything to add to so the source (left-hand side
          * operand) should be void ie, the default value.
          */
@@ -2130,7 +2162,7 @@ auto expand_flow_control(
         auto const& lx = target.ingredients.front();
         jmp_offset.ingredients.push_back(lx.make_synth("$", TOKEN::DOLLAR));
         jmp_offset.ingredients.push_back(
-            lx.make_synth("253", TOKEN::LITERAL_INTEGER));
+            lx.make_synth("61", TOKEN::LITERAL_INTEGER));
         jmp_offset.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
         jmp_offset.ingredients.push_back(
             lx.make_synth("l", TOKEN::LITERAL_ATOM));
@@ -2250,7 +2282,7 @@ auto expand_call(
      *
      * ...is expanded into this sequence:
      *
-     *      li $_, fn_tbl_offset(foo)
+     *      g.atxtp $_, fn_tbl_offset(foo)
      *      call $1, $_
      */
     auto const ret = raw.operands.front();
@@ -2260,7 +2292,7 @@ auto expand_call(
          * If the return register is void we need a completely synthetic
          * register to store the function offset. The li
          * pseudoinstruction uses at most three registers to do its job
-         * so we can use register 253 as the base to avoid disturbing
+         * so we can use register 61 as the base to avoid disturbing
          * user code.
          */
         fn_offset = ast::Operand{};
@@ -2268,7 +2300,7 @@ auto expand_call(
         auto const& lx = ret.ingredients.front();
         fn_offset.ingredients.push_back(lx.make_synth("$", TOKEN::DOLLAR));
         fn_offset.ingredients.push_back(
-            lx.make_synth("253", TOKEN::LITERAL_INTEGER));
+            lx.make_synth("61", TOKEN::LITERAL_INTEGER));
         fn_offset.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
         fn_offset.ingredients.push_back(
             lx.make_synth("l", TOKEN::LITERAL_ATOM));
@@ -2419,8 +2451,8 @@ auto expand_double(
     std::ranges::copy(expand_li(li, true), std::back_inserter(cooked));
 
     /*
-     * Then, synthesize the actual ATOM instruction. This means
-     * simply replacing the literal atom (or a reference to one) with the
+     * Then, synthesize the actual DOUBLE instruction. This means
+     * simply replacing the literal double (or a reference to one) with the
      * register containing its loaded offset ie, changing this code:
      *
      *      double $42, PI
@@ -2923,8 +2955,8 @@ auto make_reloc_table(
     auto const push_reloc = [&text, &reloc_table](size_t const i) -> void
     {
         using viua::arch::ops::OPCODE;
-        auto const op =
-            static_cast<OPCODE>(text.at(i) & viua::arch::ops::OPCODE_MASK);
+        auto const op = static_cast<OPCODE>(viua::carve_opcode_out(text.at(i))
+                                            & viua::arch::ops::OPCODE_MASK);
 
         using enum viua::arch::elf::R_VIUA;
         auto const into_rodata = (op == OPCODE::ATOM) or (op == OPCODE::DOUBLE)
@@ -2932,24 +2964,47 @@ auto make_reloc_table(
         auto const type = into_rodata ? R_VIUA_OBJECT : R_VIUA_JUMP_SLOT;
 
         using viua::arch::ops::FORMAT_MASK;
-        using viua::arch::ops::FORMAT_F;
+        using viua::arch::ops::FORMAT_R;
         auto const reloc_to_section_ptr =
             op == OPCODE::ARODP or op == OPCODE::ATXTP;
-        auto const reloc_to_long_addr =
-            (text.at(i - 1) & FORMAT_MASK) == FORMAT_F;
+        auto const prev_op            = (viua::carve_opcode_out(text.at(i - 1))
+                              & viua::arch::ops::OPCODE_MASK);
+        auto const reloc_to_long_addr = (prev_op & FORMAT_MASK) == FORMAT_R;
 
         auto symtab_entry_index = uint32_t{};
         if (reloc_to_section_ptr) {
             using viua::arch::ops::E;
             symtab_entry_index =
                 static_cast<uint32_t>(E::decode(text.at(i)).immediate);
+
+            std::println(
+                "recording relocation for .symtab entry {} against section "
+                "pointer to [.{}+0x{:016x}] at {}th instruction",
+                symtab_entry_index,
+                (into_rodata ? "rodata" : "text"),
+                (i * sizeof(viua::arch::instruction_type)),
+                i);
         } else if (reloc_to_long_addr) {
             using viua::arch::ops::F;
+            using viua::arch::ops::R;
+
+            // the LUIU
             auto const hi =
                 static_cast<uint64_t>(F::decode(text.at(i - 2)).immediate)
                 << 32;
-            auto const lo      = F::decode(text.at(i - 1)).immediate;
+
+            // the ADDIU
+            auto const lo = R::decode(text.at(i - 1)).immediate;
+
             symtab_entry_index = static_cast<uint32_t>(hi | lo);
+
+            std::println(
+                "recording relocation for .symtab entry {} using long address "
+                "to [.{}+0x{:016x}] at {}th instruction",
+                symtab_entry_index,
+                (into_rodata ? "rodata" : "text"),
+                (i * sizeof(viua::arch::instruction_type)),
+                i);
         } else {
             /*
              * Well, it is not really a reloc after all.
@@ -2967,6 +3022,10 @@ auto make_reloc_table(
             // FIXME This branch should be removed after calls and jumps use
             // atxtp exclusively. Addresses should not really be loaded using
             // integers, but using pointers instead. See AUIPC of RISC-V.
+            std::println(
+                "skipping relocation for .symtab entry {} at {}th instruction",
+                symtab_entry_index,
+                i);
             return;
         }
 
@@ -2978,13 +3037,12 @@ auto make_reloc_table(
     };
 
     for (auto i = size_t{ 0 }; i < text.size(); ++i) {
-        using viua::arch::opcode_type;
         using viua::arch::ops::OPCODE;
 
         auto const each = text.at(i);
 
-        auto const op =
-            static_cast<OPCODE>(each & viua::arch::ops::OPCODE_MASK);
+        auto const op = static_cast<OPCODE>(viua::carve_opcode_out(each)
+                                            & viua::arch::ops::OPCODE_MASK);
         switch (op) {
             using enum viua::arch::ops::OPCODE;
             // FIXME ATOM and DOUBLE should rely on ARODP
@@ -3194,7 +3252,8 @@ auto emit_elf(
             sec.sh_size   = seg.p_filesz;
             sec.sh_flags  = SHF_ALLOC | SHF_EXECINSTR;
 
-            text_section_ndx = elf_headers.size();
+            // FIXME What if we had a file with more than 65535 ELF headers?
+            text_section_ndx = static_cast<uint16_t>(elf_headers.size());
             elf_headers.push_back({ seg, sec });
         }
         {
@@ -3227,7 +3286,7 @@ auto emit_elf(
             sec.sh_size   = seg.p_filesz;
             sec.sh_flags  = SHF_ALLOC;
 
-            rodata_section_ndx = elf_headers.size();
+            rodata_section_ndx = static_cast<uint16_t>(elf_headers.size());
             elf_headers.push_back({ seg, sec });
         }
         {
@@ -3672,7 +3731,7 @@ auto main(
     if (entry_point_fn.has_value()) {
         auto const sym = symbol_table.at(symbol_map.at(entry_point_fn->text));
         std::println(stdout,
-                     "entry point is {} at [.text+0x{:016x}",
+                     "entry point is {} at [.text+0x{:016x}]",
                      entry_point_fn->text,
                      sym.st_value);
     }

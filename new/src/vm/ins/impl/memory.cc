@@ -18,16 +18,10 @@
  */
 
 #include <endian.h>
+#include <stdio.h>
 #include <string.h>
 
-#include <algorithm>
-#include <functional>
-#include <iomanip>
-#include <iostream>
-#include <limits>
-#include <optional>
-#include <utility>
-#include <vector>
+#include <print>
 
 #include <viua/arch/arch.h>
 #include <viua/vm/ins.h>
@@ -169,7 +163,9 @@ auto execute(
 
     if (not base.has_value()) {
         throw abort_execution{ stack,
-                               "invalid operand type for aa instruction" };
+                               "invalid base operand type in "
+                                   + op.instruction.in.to_string()
+                                   + " for aa instruction" };
     }
 
     // FIXME Ensure that enough memory is available to satisfy both size and

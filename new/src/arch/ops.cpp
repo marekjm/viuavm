@@ -46,53 +46,50 @@ auto to_string(
             return "M";
     }
 
-    return "<unknown>";
+    return "<unknown format>";
 }
 
-auto to_string(
-    opcode_type const raw) -> std::string
+namespace {
+auto to_string_impl(
+    opcode_type const opcode) -> std::string
 {
-    auto const greedy =
-        std::string{ static_cast<bool>(raw & GREEDY) ? "g." : "" };
-    auto const opcode = static_cast<OPCODE>(raw & OPCODE_MASK);
-
-    switch (opcode) {
+    switch (static_cast<OPCODE>(opcode)) {
         case OPCODE::NOOP:
-            return greedy + "noop";
+            return "noop";
         case OPCODE::HALT:
-            return greedy + "halt";
+            return "halt";
         case OPCODE::EBREAK:
-            return greedy + "ebreak";
+            return "ebreak";
         case OPCODE::ECALL:
-            return greedy + "ecall";
+            return "ecall";
         case OPCODE::RETURN:
-            return greedy + "return";
+            return "return";
         case OPCODE::ADD:
-            return greedy + "add";
+            return "add";
         case OPCODE::SUB:
-            return greedy + "sub";
+            return "sub";
         case OPCODE::MUL:
-            return greedy + "mul";
+            return "mul";
         case OPCODE::DIV:
-            return greedy + "div";
+            return "div";
         case OPCODE::MOD:
-            return greedy + "mod";
+            return "mod";
         case OPCODE::BITSHL:
-            return greedy + "bitshl";
+            return "bitshl";
         case OPCODE::BITSHR:
-            return greedy + "bitshr";
+            return "bitshr";
         case OPCODE::BITASHR:
-            return greedy + "bitashr";
+            return "bitashr";
         case OPCODE::BITROL:
-            return greedy + "bitrol";
+            return "bitrol";
         case OPCODE::BITROR:
-            return greedy + "bitror";
+            return "bitror";
         case OPCODE::BITAND:
-            return greedy + "bitand";
+            return "bitand";
         case OPCODE::BITOR:
-            return greedy + "bitor";
+            return "bitor";
         case OPCODE::BITXOR:
-            return greedy + "bitxor";
+            return "bitxor";
         case OPCODE::EQ:
             return "eq";
         case OPCODE::LT:
@@ -108,84 +105,93 @@ auto to_string(
         case OPCODE::CALL:
             return "call";
         case OPCODE::BITNOT:
-            return greedy + "bitnot";
+            return "bitnot";
         case OPCODE::NOT:
-            return greedy + "not";
+            return "not";
         case OPCODE::ATOM:
-            return greedy + "atom";
+            return "atom";
         case OPCODE::FRAME:
-            return greedy + "frame";
+            return "frame";
         case OPCODE::LUI:
-            return greedy + "lui";
+            return "lui";
         case OPCODE::LUIU:
-            return greedy + "luiu";
+            return "luiu";
         case OPCODE::LLI:
-            return greedy + "lli";
+            return "lli";
         case OPCODE::ADDI:
-            return greedy + "addi";
+            return "addi";
         case OPCODE::ADDIU:
-            return greedy + "addiu";
+            return "addiu";
         case OPCODE::SUBI:
-            return greedy + "subi";
+            return "subi";
         case OPCODE::SUBIU:
-            return greedy + "subiu";
+            return "subiu";
         case OPCODE::MULI:
-            return greedy + "muli";
+            return "muli";
         case OPCODE::MULIU:
-            return greedy + "muliu";
+            return "muliu";
         case OPCODE::DIVI:
-            return greedy + "divi";
+            return "divi";
         case OPCODE::DIVIU:
-            return greedy + "diviu";
+            return "diviu";
         case OPCODE::FLOAT:
-            return greedy + "float";
+            return "float";
         case OPCODE::DOUBLE:
-            return greedy + "double";
+            return "double";
         case OPCODE::COPY:
-            return greedy + "copy";
+            return "copy";
         case OPCODE::MOVE:
-            return greedy + "move";
+            return "move";
         case OPCODE::SWAP:
-            return greedy + "swap";
+            return "swap";
         case OPCODE::IF:
-            return greedy + "if";
+            return "if";
         case OPCODE::IO_SUBMIT:
-            return greedy + "io_submit";
+            return "io_submit";
         case OPCODE::IO_WAIT:
-            return greedy + "io_wait";
+            return "io_wait";
         case OPCODE::IO_SHUTDOWN:
-            return greedy + "io_shutdown";
+            return "io_shutdown";
         case OPCODE::IO_CTL:
-            return greedy + "io_ctl";
+            return "io_ctl";
         case OPCODE::IO_PEEK:
-            return greedy + "io_peek";
+            return "io_peek";
         case OPCODE::ACTOR:
-            return greedy + "actor";
+            return "actor";
         case OPCODE::SELF:
-            return greedy + "self";
+            return "self";
         case OPCODE::GTS:
-            return greedy + "gts";
+            return "gts";
         case OPCODE::GTL:
-            return greedy + "gtl";
+            return "gtl";
         case OPCODE::CAST:
-            return greedy + "cast";
+            return "cast";
         case OPCODE::ARODP:
-            return greedy + "arodp";
+            return "arodp";
         case OPCODE::ATXTP:
-            return greedy + "atxtp";
+            return "atxtp";
         case OPCODE::SM:
-            return greedy + "sm";
+            return "sm";
         case OPCODE::LM:
-            return greedy + "lm";
+            return "lm";
         case OPCODE::AA:
-            return greedy + "ama";
+            return "ama";
         case OPCODE::AD:
-            return greedy + "amd";
+            return "amd";
         case OPCODE::PTR:
-            return greedy + "ptr";
+            return "ptr";
     }
+    return "<unknown opcode>";
+}
+}  // namespace
 
-    return "<unknown>";
+auto to_string(
+    opcode_type const raw) -> std::string
+{
+    auto const greedy =
+        std::string{ static_cast<bool>(raw & GREEDY) ? "g." : "" };
+    auto const opcode = (raw & OPCODE_MASK);
+    return greedy + to_string_impl(static_cast<opcode_type>(opcode));
 }
 auto parse_opcode(
     std::string_view const raw) -> opcode_type

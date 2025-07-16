@@ -368,6 +368,32 @@ auto main(
         std::println(stderr, "Aborted instruction: 0x{:016x}", *e.stack.ip);
         viua::vm::backtrace::print_backtrace(e.stack);
 
+        auto const& stack = e.stack;
+
+        for (auto i = size_t{ 0 }; i < stack.frames.size(); ++i) {
+            auto const& each = stack.frames.at(i);
+
+            std::println(stderr, "registers of #{}", i);
+
+            /*
+            auto const fptr = each.saved.fp;
+            auto const sbrk = each.saved.sbrk;
+            TRACE_STREAM << "        [fptr] "
+                         << "iu " << std::hex << std::setw(16) <<
+            std::setfill('0')
+                         << fptr << " " << std::dec << fptr << '\n';
+            TRACE_STREAM << "        [sbrk] "
+                         << "iu " << std::hex << std::setw(16) <<
+            std::setfill('0')
+                         << sbrk << " " << std::dec << sbrk << '\n';
+                         */
+
+            viua::vm::backtrace::dump_registers(
+                each.parameters, stack.proc->atoms, "p");
+            viua::vm::backtrace::dump_registers(
+                each.registers, stack.proc->atoms, "l");
+        }
+
         if constexpr (true) {
             throw;
         } else {

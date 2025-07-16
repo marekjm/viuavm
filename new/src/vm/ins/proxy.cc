@@ -35,10 +35,6 @@ auto mutable_proxy(
     Stack& stack,
     access_type const a) -> Mutable_proxy
 {
-    if (not a.direct) {
-        throw abort_execution{ stack, "dereferences are not implemented" };
-    }
-
     auto at_or_exception = [&stack, i = a.index](std::string_view const rs,
                                                  auto& v) -> Mutable_proxy
     {
@@ -96,10 +92,6 @@ auto immutable_proxy(
     Stack& stack,
     access_type const a) -> Immutable_proxy
 {
-    if (not a.direct) {
-        throw abort_execution{ stack, "dereferences are not implemented" };
-    }
-
     static register_type const void_placeholder;
     switch (a.set) {
         using enum viua::arch::REGISTER_SET;
@@ -122,10 +114,6 @@ auto immutable_proxy(
     access_type const a,
     Stack const& stack) -> Immutable_proxy
 {
-    if (not a.direct) {
-        throw abort_execution{ stack, "dereferences are not implemented" };
-    }
-
     static register_type const void_placeholder;
     switch (a.set) {
         using enum viua::arch::REGISTER_SET;

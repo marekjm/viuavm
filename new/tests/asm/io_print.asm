@@ -19,6 +19,7 @@
     cast $2.l, uint
 
     ; Allocate memory to hold the string.
+    ebreak
     amba $3.l, $2.l, 0
 
     frame $3.a

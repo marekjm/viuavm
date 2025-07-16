@@ -48,10 +48,13 @@ namespace {
 auto ins_to_string(
     viua::arch::instruction_type const ip) -> std::string
 {
-    auto const opcode =
-        static_cast<viua::arch::opcode_type>(ip & viua::arch::ops::OPCODE_MASK);
+    auto const opcode = viua::carve_opcode_out(ip);
     auto const format = static_cast<viua::arch::ops::FORMAT>(
         opcode & viua::arch::ops::FORMAT_MASK);
+
+    std::println("got format: {:04x} ({})",
+                 static_cast<uint16_t>(format),
+                 to_string(format));
 
     switch (format) {
         using enum viua::arch::ops::FORMAT;
@@ -81,9 +84,10 @@ auto match_opcode(
     viua::arch::ops::OPCODE const op,
     viua::arch::opcode_type const flags = 0) -> bool
 {
+    auto const opcode =
+        (viua::carve_opcode_out(ip) & viua::arch::ops::OPCODE_MASK) | flags;
     using viua::arch::opcode_type;
-    return (static_cast<opcode_type>(ip)
-            == (static_cast<opcode_type>(op) | flags));
+    return (opcode == (static_cast<opcode_type>(op) | flags));
 }
 
 auto main_module_elf_type = ET_NONE;
@@ -385,26 +389,29 @@ auto demangle_canonical_li(
     auto match_canonical_li = [m](size_t const n,
                                   viua::arch::ops::OPCODE const lui) -> bool
     {
-        using enum viua::arch::ops::OPCODE;
         using viua::arch::ops::GREEDY;
-        return m((n + 0), lui, GREEDY)
-               and (m((n + 1), LLI, GREEDY) or m((n + 1), LLI));
+        using enum viua::arch::ops::OPCODE;
+
+        auto const li = m((n + 0), lui, GREEDY);
+        return li and (m((n + 1), ADDI, GREEDY) or m((n + 1), ADDIU, GREEDY));
     };
 
     using enum viua::arch::ops::OPCODE;
     for (auto i = size_t{ 0 }; i < text.size(); ++i) {
         if (match_canonical_li(i, LUI) or match_canonical_li(i, LUIU)) {
             using viua::arch::ops::F;
+            using viua::arch::ops::R;
 
-            auto const lui       = F::decode(ins_at(i));
-            auto const high_part = (static_cast<uint64_t>(lui.immediate) << 32);
-            auto const lli       = F::decode(ins_at(i + 1));
-            auto const low_part  = lli.immediate;
+            auto const luiu = F::decode(ins_at(i));
+            auto const high_part =
+                (static_cast<uint64_t>(luiu.immediate) << 32);
+            auto const addiu    = R::decode(ins_at(i + 1));
+            auto const low_part = addiu.immediate;
 
             auto const value = (high_part | low_part);
 
             using viua::arch::ops::GREEDY;
-            auto const needs_greedy   = m((i + 1), LLI, GREEDY);
+            auto const needs_greedy   = m((i + 1), ADDIU, GREEDY);
             auto const needs_unsigned = m(i, LUIU, GREEDY);
 
             auto const literal =
@@ -424,13 +431,13 @@ auto demangle_canonical_li(
                 std::nullopt,
                 std::nullopt,
                 (std::string{ "[[full]] " } + (needs_greedy ? "g." : "")
-                 + std::string{ "li " } + lui.out.to_string() + ", "
+                 + std::string{ "li " } + luiu.out.to_string() + ", "
                  + literal));
 
             // FIXME calls are using ATXTP instead of LUIU
             if (needs_unsigned) {
                 demangle_symbol_load(
-                    text, tmp, i, lui.out, value, symtab, strtab, rodata);
+                    text, tmp, i, luiu.out, value, symtab, strtab, rodata);
             }
         } else {
             tmp.push_back(std::move(text.at(i)));
@@ -469,7 +476,7 @@ auto demangle_short_li(
                 auto const literal =
                     needs_unsigned
                         ? (std::to_string(value) + 'u')
-                        : std::to_string(static_cast<int32_t>(value << 8) >> 8);
+                        : std::to_string(static_cast<int32_t>(value));
 
                 auto idx          = text.at(i).index;
                 idx.physical_span = idx.physical;
@@ -871,7 +878,7 @@ auto main(
 
     if (singles.size()) {
         for (auto const each : singles) {
-            std::println(out, "0x{:016x}", each, ins_to_string(each));
+            std::println(out, "0x{:016x} {}", each, ins_to_string(each));
         }
         return 0;
     }
@@ -1162,8 +1169,7 @@ auto main(
         auto const offset = (addr / sizeof(viua::arch::instruction_type));
         for (auto i = size_t{ 0 }; i < no_of_ops; ++i) {
             auto const ip     = text.at(offset + i);
-            auto const opcode = static_cast<viua::arch::opcode_type>(
-                ip & viua::arch::ops::OPCODE_MASK);
+            auto const opcode = viua::carve_opcode_out(ip);
             cooked_text.emplace_back(i, opcode, ip, ins_to_string(ip));
         }
 

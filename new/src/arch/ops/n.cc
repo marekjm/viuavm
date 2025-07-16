@@ -37,13 +37,12 @@ N::N(
 auto N::decode(
     instruction_type const raw) -> N
 {
-    auto const opcode =
-        static_cast<viua::arch::opcode_type>(raw & 0x00'00'00'00'00'00'ff'ff);
+    auto const opcode = carve_opcode_out(raw);
 
     return N{ opcode };
 }
 auto N::encode() const -> instruction_type
 {
-    return uint64_t{ opcode };
+    return (static_cast<uint64_t>(opcode) << 48);
 }
 }  // namespace viua::arch::ops

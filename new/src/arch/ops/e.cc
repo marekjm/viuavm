@@ -37,14 +37,13 @@ E::E(
 auto E::decode(
     instruction_type const raw) -> E
 {
-    auto const opcode =
-        static_cast<viua::arch::opcode_type>(raw & 0x00'00'00'00'00'00'ff'ff);
-    auto const out =
-        Register_access::decode((raw & 0x00'00'00'00'ff'ff'00'00) >> 16);
-    auto const high  = (((raw >> 28) & 0xf) << 32);
-    auto const low   = ((raw >> 32) & 0x00'00'00'00'ff'ff'ff'ff);
+    auto const opcode = carve_opcode_out(raw);
+    auto const out   = carve_bits_out<Register_access::underlying_type, 0>(raw);
+    auto const low   = carve_bits_out<uint32_t, 8>(raw);
+    auto const high  = carve_bits_out<uint8_t, 40>(raw) & 0x0f;
     auto const value = (high | low);
-    return E{ opcode, out, value };
+
+    return E{ opcode, Register_access::decode(out), value };
 }
 auto E::encode() const -> instruction_type
 {
@@ -52,7 +51,8 @@ auto E::encode() const -> instruction_type
     auto output_register = uint64_t{ out.encode() };
     auto high            = ((immediate & 0x00'00'00'0f'00'00'00'00) >> 32);
     auto low             = (immediate & 0x00'00'00'00'ff'ff'ff'ff);
-    return base | (output_register << 16) | (high << 28) | (low << 32);
+
+    return (base << 48) | (high << 40) | (low << 8) | output_register;
 }
 auto E::to_string() const -> std::string
 {

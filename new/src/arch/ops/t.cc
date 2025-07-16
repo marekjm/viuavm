@@ -39,12 +39,15 @@ T::T(
 auto T::decode(
     instruction_type const raw) -> T
 {
-    auto opcode =
-        static_cast<viua::arch::opcode_type>(raw & 0x00'00'00'00'00'00'ff'ff);
-    auto out = Register_access::decode((raw & 0x00'00'00'00'ff'ff'00'00) >> 16);
-    auto lhs = Register_access::decode((raw & 0x00'00'ff'ff'00'00'00'00) >> 32);
-    auto rhs = Register_access::decode((raw & 0xff'ff'00'00'00'00'00'00) >> 48);
-    return T{ opcode, out, lhs, rhs };
+    auto const opcode = carve_opcode_out(raw);
+    auto const rhs = carve_bits_out<Register_access::underlying_type, 0>(raw);
+    auto const lhs = carve_bits_out<Register_access::underlying_type, 8>(raw);
+    auto const out = carve_bits_out<Register_access::underlying_type, 16>(raw);
+
+    return T{ opcode,
+              Register_access::decode(out),
+              Register_access::decode(lhs),
+              Register_access::decode(rhs) };
 }
 auto T::encode() const -> instruction_type
 {
@@ -52,8 +55,9 @@ auto T::encode() const -> instruction_type
     auto output_register     = uint64_t{ out.encode() };
     auto left_hand_register  = uint64_t{ lhs.encode() };
     auto right_hand_register = uint64_t{ rhs.encode() };
-    return base | (output_register << 16) | (left_hand_register << 32)
-           | (right_hand_register << 48);
+
+    return (base << 48) | (output_register << 16) | (left_hand_register << 8)
+           | right_hand_register;
 }
 auto T::to_string() const -> std::string
 {

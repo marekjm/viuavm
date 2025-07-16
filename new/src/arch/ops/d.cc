@@ -37,20 +37,20 @@ D::D(
 auto D::decode(
     instruction_type const raw) -> D
 {
-    auto const opcode =
-        carve_bits_out<viua::arch::opcode_type, 0>(raw);
-    auto const out =
-        Register_access::decode(carve_bits_out<uint16_t, 16>(raw));
-    auto const in =
-        Register_access::decode(carve_bits_out<uint16_t, 32>(raw));
-    return D{ opcode, out, in };
+    auto const opcode = carve_opcode_out(raw);
+    auto const dst = carve_bits_out<Register_access::underlying_type, 8>(raw);
+    auto const src = carve_bits_out<Register_access::underlying_type, 0>(raw);
+
+    return D{ opcode,
+              Register_access::decode(dst),
+              Register_access::decode(src) };
 }
 auto D::encode() const -> instruction_type
 {
     auto base            = uint64_t{ opcode };
     auto output_register = uint64_t{ out.encode() };
     auto input_register  = uint64_t{ in.encode() };
-    return base | (output_register << 16) | (input_register << 32);
+    return (base << 48) | (output_register << 8) | input_register;
 }
 auto D::to_string() const -> std::string
 {

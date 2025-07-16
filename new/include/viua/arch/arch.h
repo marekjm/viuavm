@@ -98,32 +98,33 @@ enum class REGISTER_SET
     PARAMETER,
 };
 
-using register_index_type         = uint8_t;
-constexpr auto MAX_REGISTER_INDEX = register_index_type{ 255 };
+using register_index_type                 = uint8_t;
+constexpr auto REGISTER_ACCESS_INDEX_MASK = uint8_t{ 0b0011'1111 };
+constexpr auto REGISTER_ACCESS_SET_MASK   = uint8_t{ 0b1100'0000 };
+constexpr auto MAX_REGISTER_INDEX         = register_index_type{ 63 };
 
 struct Register_access {
-    using set_type = viua::arch::REGISTER_SET;
+    using underlying_type = uint8_t;
+    using set_type        = viua::arch::REGISTER_SET;
 
     set_type set;
-    bool direct;
     register_index_type index;
 
     Register_access();
-    Register_access(set_type const, bool const, uint8_t const);
+    Register_access(set_type const, register_index_type const);
 
-    static auto decode(uint16_t const) -> Register_access;
-    auto encode() const -> uint16_t;
+    static auto decode(underlying_type const) -> Register_access;
+    auto encode() const -> underlying_type;
 
     auto operator==(
         Register_access const& other) const -> bool
     {
-        return (set == other.set) and (direct == other.direct)
-               and (index == other.index);
+        return (set == other.set) and (index == other.index);
     }
 
     inline auto is_legal() const -> bool
     {
-        if (is_void() and not direct and index != 0) {
+        if (is_void() and index != 0) {
             return false;
         }
         return true;
@@ -134,11 +135,9 @@ struct Register_access {
         return (set == set_type::VOID);
     }
 
-    static auto make_local(uint8_t const, bool const = true) -> Register_access;
-    static auto make_argument(uint8_t const, bool const = true)
-        -> Register_access;
-    static auto make_parameter(uint8_t const, bool const = true)
-        -> Register_access;
+    static auto make_local(register_index_type const) -> Register_access;
+    static auto make_argument(register_index_type const) -> Register_access;
+    static auto make_parameter(register_index_type const) -> Register_access;
     static auto make_void() -> Register_access;
 
     auto to_string() const -> std::string;

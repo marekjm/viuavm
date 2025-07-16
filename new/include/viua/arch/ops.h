@@ -29,12 +29,19 @@
 
 namespace viua {
 template<typename Sub, size_t Offset, typename T>
-constexpr auto carve_bits_out(T const v) -> Sub
+constexpr auto carve_bits_out(
+    T const v) -> Sub
 {
     constexpr auto mask = static_cast<T>(static_cast<Sub>(-1)) << Offset;
     return static_cast<Sub>((v & mask) >> Offset);
 }
+
+constexpr inline auto carve_opcode_out(
+    viua::arch::instruction_type const i) -> viua::arch::opcode_type
+{
+    return carve_bits_out<viua::arch::opcode_type, 48>(i);
 }
+}  // namespace viua
 
 namespace viua::arch::ops {
 constexpr auto FORMAT_N = opcode_type{ 0x00'00 };
@@ -232,8 +239,9 @@ struct N {
 
 constexpr auto GREEDY      = opcode_type{ 0x80'00 };
 constexpr auto UNSIGNED    = opcode_type{ 0x08'00 };
-constexpr auto OPCODE_MASK = opcode_type{ 0x7f'ff };
+constexpr auto INSTR_MASK  = opcode_type{ 0x0f'ff };
 constexpr auto FORMAT_MASK = opcode_type{ 0x70'00 };
+constexpr auto OPCODE_MASK = opcode_type{ FORMAT_MASK | INSTR_MASK };
 
 enum class OPCODE : opcode_type
 {

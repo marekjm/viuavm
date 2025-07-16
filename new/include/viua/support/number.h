@@ -25,7 +25,20 @@
 #include <string_view>
 #include <type_traits>
 
+
 namespace viua::support {
+template<typename To, typename From>
+auto sign_extend(
+    From const v) -> To
+{
+    if constexpr (sizeof(To) <= sizeof(From)) {
+        return static_cast<To>(v);
+    } else {
+        constexpr auto sign_extend_shift = (sizeof(To) - sizeof(From)) * 8;
+        return (static_cast<To>(v) << sign_extend_shift) >> sign_extend_shift;
+    }
+}
+
 namespace {
 template<typename T>
 auto ston_int_impl(
@@ -34,7 +47,7 @@ auto ston_int_impl(
     -> std::conditional_t<std::is_signed_v<T>, int64_t, uint64_t>
 {
     if constexpr (std::is_signed_v<T>) {
-        return std::stoll(n, nullptr, base);
+        return viua::support::sign_extend<T>(std::stoll(n, nullptr, base));
     } else {
         return std::stoull(n, nullptr, base);
     }

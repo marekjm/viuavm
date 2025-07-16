@@ -75,7 +75,7 @@ auto execute(
         fn.reset();
     } else {
         throw abort_execution{ stack,
-                               "invalid in operand to call instruction" };
+                               "invalid src operand to call instruction" };
     }
 
     if (fn_addr % sizeof(viua::arch::instruction_type)) {
@@ -169,7 +169,7 @@ auto execute(
         target_offset = jmp->ptr;
         jmp.reset();
     } else {
-        throw abort_execution{ stack, "invalid in operand to if instruction" };
+        throw abort_execution{ stack, "invalid src operand to if instruction" };
     }
 
     auto const target_addr =
