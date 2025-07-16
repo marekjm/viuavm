@@ -34,6 +34,39 @@ auto execute(
     ip_type const) -> void
 {
     auto const in = immutable_proxy(stack, op.instruction.in);
+    // FIXME Improve static analysis run by the assembler to catch calling
+    // functions with "holes" in the frame's argument register set eg,
+    //
+    //      frame $2.a
+    //      copy $0.a, ...
+    //      call void, foo
+    //
+    // This leaves $1.p in the callee empty, and could lead to the error
+    // reported below, the "cannot copy a void".
+    //
+    // FIXME Improve static analysis run by the assembler to catch
+    // copying, or moving out of, a void. This is a non-sensical operation.
+    // Sure, one could argue that the following code could be a valid way of
+    // erasing a register $1.l:
+    //
+    //      copy $1.l, void     ; use void directly
+    //      copy $1.l, $123.l   ; use a register that happens to be empty as the
+    //                          ; source (this one sounds like an error)
+    //
+    // But. There already is a standard way of erasing a register ie, the
+    // "delete" pseudoinstruction:
+    //
+    //      delete $1.l
+    //
+    // which expands to:
+    //
+    //      move void, $1.l
+    //
+    // So, since there is a canonical way of erasing a register, I see no need
+    // of the copy-a-void being a valid operation.
+    if (in.target.is_void()) {
+        throw abort_execution{ stack, "cannot copy a void" };
+    }
     mutable_proxy(stack, op.instruction.out) = in;
 }
 auto execute(
