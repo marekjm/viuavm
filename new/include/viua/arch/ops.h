@@ -26,6 +26,16 @@
 
 #include <viua/arch/arch.h>
 
+
+namespace viua {
+template<typename Sub, size_t Offset, typename T>
+constexpr auto carve_bits_out(T const v) -> Sub
+{
+    constexpr auto mask = static_cast<T>(static_cast<Sub>(-1)) << Offset;
+    return static_cast<Sub>((v & mask) >> Offset);
+}
+}
+
 namespace viua::arch::ops {
 constexpr auto FORMAT_N = opcode_type{ 0x00'00 };
 constexpr auto FORMAT_T = opcode_type{ 0x10'00 };

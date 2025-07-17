@@ -37,10 +37,12 @@ D::D(
 auto D::decode(
     instruction_type const raw) -> D
 {
-    auto opcode =
-        static_cast<viua::arch::opcode_type>(raw & 0x00'00'00'00'00'00'ff'ff);
-    auto out = Register_access::decode((raw & 0x00'00'00'00'ff'ff'00'00) >> 16);
-    auto in  = Register_access::decode((raw & 0x00'00'ff'ff'00'00'00'00) >> 32);
+    auto const opcode =
+        carve_bits_out<viua::arch::opcode_type, 0>(raw);
+    auto const out =
+        Register_access::decode(carve_bits_out<uint16_t, 16>(raw));
+    auto const in =
+        Register_access::decode(carve_bits_out<uint16_t, 32>(raw));
     return D{ opcode, out, in };
 }
 auto D::encode() const -> instruction_type

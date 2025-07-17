@@ -496,4 +496,5 @@ $(BUILD_EXEDIR)/repl: \
 	3rd-party/linenoise/linenoise.o \
 	3rd-party/linenoise/encodings/utf8.o
 
--include $(find ./build -type f -name '*.d')
+# FIXME dependencies are broken
+include $(shell find ./build -type f -name '*.d')
