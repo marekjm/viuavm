@@ -51,10 +51,8 @@ auto F::decode(
 }
 auto F::encode() const -> instruction_type
 {
-    auto base            = uint64_t{ opcode };
-    auto output_register = uint64_t{ out.encode() };
-    auto value           = uint64_t{ htole32(immediate) };
-    return (base << 48) | (value << 8) | output_register;
+    return viua::compose_bits_into<instruction_type>(
+        out.encode(), htole32(immediate), viua::compose_filler{ 8 }, opcode);
 }
 auto F::to_string() const -> std::string
 {

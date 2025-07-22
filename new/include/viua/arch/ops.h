@@ -431,6 +431,52 @@ constexpr inline auto carve_format_out(
 {
     return carve_format_out(static_cast<viua::arch::opcode_type>(o));
 }
+
+struct compose_filler {
+    size_t const size;
+};
+
+template<typename Into, typename Last>
+constexpr auto compose_bits_into_impl(
+    Into const accumulator,
+    size_t const offset,
+    Last const last) -> Into
+{
+    if ((sizeof(Into) * 8) != (offset + (sizeof(Last) * 8))) {
+        throw std::logic_error{
+            "compose_bits_into: parts do not fill the output type"
+        };
+    }
+    return accumulator | (static_cast<Into>(last) << offset);
+}
+template<typename Into, typename... Args>
+constexpr auto compose_bits_into_impl(
+    Into const accumulator,
+    size_t const offset,
+    compose_filler const filler,
+    Args const... args) -> Into
+{
+    return compose_bits_into_impl(accumulator, offset + filler.size, args...);
+}
+template<typename Into, typename First, typename... Args>
+constexpr auto compose_bits_into_impl(
+    Into const accumulator,
+    size_t const offset,
+    First const first,
+    Args const... args) -> Into
+{
+    return compose_bits_into_impl(
+        accumulator | (static_cast<Into>(first) << offset),
+        offset + (sizeof(First) * 8),
+        args...);
+}
+
+template<typename Into, typename... Args>
+constexpr auto compose_bits_into(
+    Args const... args) -> Into
+{
+    return compose_bits_into_impl(Into{}, 0, args...);
+}
 }  // namespace viua
 
 #endif

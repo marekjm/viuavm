@@ -51,13 +51,11 @@ auto T::decode(
 }
 auto T::encode() const -> instruction_type
 {
-    auto base                = uint64_t{ opcode };
-    auto output_register     = uint64_t{ out.encode() };
-    auto left_hand_register  = uint64_t{ lhs.encode() };
-    auto right_hand_register = uint64_t{ rhs.encode() };
-
-    return (base << 48) | (output_register << 16) | (left_hand_register << 8)
-           | right_hand_register;
+    return viua::compose_bits_into<instruction_type>(rhs.encode(),
+                                                     lhs.encode(),
+                                                     out.encode(),
+                                                     viua::compose_filler{ 24 },
+                                                     opcode);
 }
 auto T::to_string() const -> std::string
 {

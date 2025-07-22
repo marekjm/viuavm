@@ -43,6 +43,7 @@ auto N::decode(
 }
 auto N::encode() const -> instruction_type
 {
-    return (static_cast<uint64_t>(opcode) << 48);
+    return viua::compose_bits_into<instruction_type>(
+        viua::compose_filler{ 48 }, opcode);
 }
 }  // namespace viua::arch::ops

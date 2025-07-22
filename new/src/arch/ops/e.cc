@@ -47,12 +47,13 @@ auto E::decode(
 }
 auto E::encode() const -> instruction_type
 {
-    auto base            = uint64_t{ opcode };
-    auto output_register = uint64_t{ out.encode() };
-    auto high            = ((immediate & 0x00'00'00'0f'00'00'00'00) >> 32);
-    auto low             = (immediate & 0x00'00'00'00'ff'ff'ff'ff);
+    auto const high =
+        static_cast<uint8_t>((immediate & 0x00'00'00'0f'00'00'00'00) >> 32);
+    auto const low =
+        static_cast<uint32_t>(immediate & 0x00'00'00'00'ff'ff'ff'ff);
 
-    return (base << 48) | (high << 40) | (low << 8) | output_register;
+    return viua::compose_bits_into<instruction_type>(
+        out.encode(), low, high, opcode);
 }
 auto E::to_string() const -> std::string
 {

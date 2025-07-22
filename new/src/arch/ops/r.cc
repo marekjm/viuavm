@@ -53,12 +53,8 @@ auto R::decode(
 }
 auto R::encode() const -> instruction_type
 {
-    auto base            = uint64_t{ opcode };
-    auto output_register = uint64_t{ out.encode() };
-    auto input_register  = uint64_t{ in.encode() };
-    auto imm             = uint64_t{ immediate };
-
-    return (base << 48) | (imm << 16) | (output_register << 8) | input_register;
+    return viua::compose_bits_into<instruction_type>(
+        in.encode(), out.encode(), immediate, opcode);
 }
 auto R::to_string() const -> std::string
 {

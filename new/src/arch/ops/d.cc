@@ -47,10 +47,8 @@ auto D::decode(
 }
 auto D::encode() const -> instruction_type
 {
-    auto base            = uint64_t{ opcode };
-    auto output_register = uint64_t{ out.encode() };
-    auto input_register  = uint64_t{ in.encode() };
-    return (base << 48) | (output_register << 8) | input_register;
+    return viua::compose_bits_into<instruction_type>(
+        in.encode(), out.encode(), viua::compose_filler{ 32 }, opcode);
 }
 auto D::to_string() const -> std::string
 {
