@@ -2955,8 +2955,7 @@ auto make_reloc_table(
     auto const push_reloc = [&text, &reloc_table](size_t const i) -> void
     {
         using viua::arch::ops::OPCODE;
-        auto const op = static_cast<OPCODE>(viua::carve_opcode_out(text.at(i))
-                                            & viua::arch::ops::OPCODE_MASK);
+        auto const op = viua::carve_just_opcode_out(text.at(i));
 
         using enum viua::arch::elf::R_VIUA;
         auto const into_rodata = (op == OPCODE::ATOM) or (op == OPCODE::DOUBLE)
@@ -2967,8 +2966,7 @@ auto make_reloc_table(
         using viua::arch::ops::FORMAT_R;
         auto const reloc_to_section_ptr =
             op == OPCODE::ARODP or op == OPCODE::ATXTP;
-        auto const prev_op            = (viua::carve_opcode_out(text.at(i - 1))
-                              & viua::arch::ops::OPCODE_MASK);
+        auto const prev_op            = viua::carve_opcode_out(text.at(i - 1));
         auto const reloc_to_long_addr = (prev_op & FORMAT_MASK) == FORMAT_R;
 
         auto symtab_entry_index = uint32_t{};
@@ -3041,8 +3039,7 @@ auto make_reloc_table(
 
         auto const each = text.at(i);
 
-        auto const op = static_cast<OPCODE>(viua::carve_opcode_out(each)
-                                            & viua::arch::ops::OPCODE_MASK);
+        auto const op = viua::carve_just_opcode_out(each);
         switch (op) {
             using enum viua::arch::ops::OPCODE;
             // FIXME ATOM and DOUBLE should rely on ARODP

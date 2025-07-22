@@ -747,9 +747,7 @@ auto relocate(
     auto const text_ndx = (rel.r_offset / sizeof(viua::arch::instruction_type));
 
     using viua::arch::ops::OPCODE;
-    auto const op =
-        static_cast<OPCODE>(viua::carve_opcode_out(text.at(text_ndx))
-                            & viua::arch::ops::OPCODE_MASK);
+    auto const op = viua::carve_just_opcode_out(text.at(text_ndx));
 
     if (op == OPCODE::ARODP or op == OPCODE::ATXTP) {
         using viua::arch::ops::E;

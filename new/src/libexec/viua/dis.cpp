@@ -49,8 +49,7 @@ auto ins_to_string(
     viua::arch::instruction_type const ip) -> std::string
 {
     auto const opcode = viua::carve_opcode_out(ip);
-    auto const format = static_cast<viua::arch::ops::FORMAT>(
-        opcode & viua::arch::ops::FORMAT_MASK);
+    auto const format = viua::carve_format_out(opcode);
 
     std::println("got format: {:04x} ({})",
                  static_cast<uint16_t>(format),
@@ -84,8 +83,7 @@ auto match_opcode(
     viua::arch::ops::OPCODE const op,
     viua::arch::opcode_type const flags = 0) -> bool
 {
-    auto const opcode =
-        (viua::carve_opcode_out(ip) & viua::arch::ops::OPCODE_MASK) | flags;
+    auto const opcode = viua::carve_opcode_out(ip);
     using viua::arch::opcode_type;
     return (opcode == (static_cast<opcode_type>(op) | flags));
 }

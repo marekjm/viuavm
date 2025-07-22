@@ -51,9 +51,8 @@ auto execute(
 {
     auto const raw = *ip;
 
-    auto const opcode = carve_opcode_out(raw) & viua::arch::ops::OPCODE_MASK;
-    auto const format = static_cast<viua::arch::ops::FORMAT>(
-        opcode & viua::arch::ops::FORMAT_MASK);
+    auto const opcode = carve_just_opcode_out(raw);
+    auto const format = carve_format_out(opcode);
 
     switch (format) {
         using viua::vm::ins::execute;

@@ -27,22 +27,6 @@
 #include <viua/arch/arch.h>
 
 
-namespace viua {
-template<typename Sub, size_t Offset, typename T>
-constexpr auto carve_bits_out(
-    T const v) -> Sub
-{
-    constexpr auto mask = static_cast<T>(static_cast<Sub>(-1)) << Offset;
-    return static_cast<Sub>((v & mask) >> Offset);
-}
-
-constexpr inline auto carve_opcode_out(
-    viua::arch::instruction_type const i) -> viua::arch::opcode_type
-{
-    return carve_bits_out<viua::arch::opcode_type, 48>(i);
-}
-}  // namespace viua
-
 namespace viua::arch::ops {
 constexpr auto FORMAT_N = opcode_type{ 0x00'00 };
 constexpr auto FORMAT_T = opcode_type{ 0x10'00 };
@@ -413,5 +397,40 @@ enum class OPCODE_M : opcode_type
 };
 #undef Make_entry
 }  // namespace viua::arch::ops
+
+namespace viua {
+template<typename Sub, size_t Offset, typename T>
+constexpr auto carve_bits_out(
+    T const v) -> Sub
+{
+    constexpr auto mask = static_cast<T>(static_cast<Sub>(-1)) << Offset;
+    return static_cast<Sub>((v & mask) >> Offset);
+}
+
+constexpr inline auto carve_opcode_out(
+    viua::arch::instruction_type const i) -> viua::arch::opcode_type
+{
+    return carve_bits_out<viua::arch::opcode_type, 48>(i);
+}
+
+constexpr inline auto carve_just_opcode_out(
+    viua::arch::instruction_type const i) -> viua::arch::ops::OPCODE
+{
+    return static_cast<viua::arch::ops::OPCODE>(carve_opcode_out(i)
+                                                & viua::arch::ops::OPCODE_MASK);
+}
+
+constexpr inline auto carve_format_out(
+    viua::arch::opcode_type const o) -> viua::arch::ops::FORMAT
+{
+    return static_cast<viua::arch::ops::FORMAT>(o
+                                                & viua::arch::ops::FORMAT_MASK);
+}
+constexpr inline auto carve_format_out(
+    viua::arch::ops::OPCODE const o) -> viua::arch::ops::FORMAT
+{
+    return carve_format_out(static_cast<viua::arch::opcode_type>(o));
+}
+}  // namespace viua
 
 #endif
