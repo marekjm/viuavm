@@ -750,9 +750,15 @@ auto relocate(
     auto const op = viua::carve_just_opcode_out(text.at(text_ndx));
 
     if (op == OPCODE::ARODP or op == OPCODE::ATXTP) {
-        using viua::arch::ops::E;
-        auto imm_op       = E::decode(text.at(text_ndx));
-        text.at(text_ndx) = E{ imm_op.opcode, imm_op.out, value }.encode();
+        if (value != static_cast<uint32_t>(value)) {
+            abort();
+        }
+
+        using viua::arch::ops::F;
+        auto imm_op = F::decode(text.at(text_ndx));
+        text.at(text_ndx) =
+            F{ imm_op.opcode, imm_op.out, static_cast<uint32_t>(value) }
+                .encode();
     } else {
         using viua::arch::ops::F;
         using viua::arch::ops::R;

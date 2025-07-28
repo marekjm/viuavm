@@ -38,8 +38,6 @@ auto to_string(
             return "S";
         case FORMAT::F:
             return "F";
-        case FORMAT::E:
-            return "E";
         case FORMAT::R:
             return "R";
         case FORMAT::M:

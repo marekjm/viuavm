@@ -350,26 +350,26 @@ struct FLOAT : Instruction {
 };
 
 struct CAST : Instruction {
-    viua::arch::ops::E instruction;
+    viua::arch::ops::F instruction;
 
     CAST(
-        viua::arch::ops::E i)
+        viua::arch::ops::F i)
         : instruction{ i }
     {}
 };
 struct ARODP : Instruction {
-    viua::arch::ops::E instruction;
+    viua::arch::ops::F instruction;
 
     ARODP(
-        viua::arch::ops::E i)
+        viua::arch::ops::F i)
         : instruction{ i }
     {}
 };
 struct ATXTP : Instruction {
-    viua::arch::ops::E instruction;
+    viua::arch::ops::F instruction;
 
     ATXTP(
-        viua::arch::ops::E i)
+        viua::arch::ops::F i)
         : instruction{ i }
     {}
 };

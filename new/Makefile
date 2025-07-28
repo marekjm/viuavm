@@ -402,7 +402,6 @@ VM_OPERATION_TYPE_IMPL=\
 	$(BUILD_PREFIX)/arch/ops/d.o \
 	$(BUILD_PREFIX)/arch/ops/s.o \
 	$(BUILD_PREFIX)/arch/ops/f.o \
-	$(BUILD_PREFIX)/arch/ops/e.o \
 	$(BUILD_PREFIX)/arch/ops/r.o \
 	$(BUILD_PREFIX)/arch/ops/m.o \
 	$(BUILD_PREFIX)/arch/ops.o
@@ -434,7 +433,6 @@ $(BUILD_EXEDIR)/ld: \
 	$(BUILD_PREFIX)/libexec/common.o \
 	$(BUILD_PREFIX)/arch/ra.o \
 	$(BUILD_PREFIX)/arch/ops.o \
-	$(BUILD_PREFIX)/arch/ops/e.o \
 	$(BUILD_PREFIX)/arch/ops/f.o \
 	$(BUILD_PREFIX)/arch/ops/r.o \
 	$(BUILD_PREFIX)/vm/elf.o \

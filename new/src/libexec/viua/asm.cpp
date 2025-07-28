@@ -1864,15 +1864,6 @@ auto emit_instruction(
                 }
                     .encode();
             }
-        case FORMAT::E:
-            return viua::arch::ops::E{
-                opcode,
-                operand_or_throw(insn, 0).make_access(),
-                std::stoull(operand_or_throw(insn, 1).ingredients.front().text,
-                            nullptr,
-                            0)
-            }
-                .encode();
         case FORMAT::R:
             {
                 auto const imm = insn.operands.at(2).ingredients.front();
@@ -2971,9 +2962,9 @@ auto make_reloc_table(
 
         auto symtab_entry_index = uint32_t{};
         if (reloc_to_section_ptr) {
-            using viua::arch::ops::E;
+            using viua::arch::ops::F;
             symtab_entry_index =
-                static_cast<uint32_t>(E::decode(text.at(i)).immediate);
+                static_cast<uint32_t>(F::decode(text.at(i)).immediate);
 
             std::println(
                 "recording relocation for .symtab entry {} against section "

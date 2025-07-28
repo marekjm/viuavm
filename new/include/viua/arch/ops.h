@@ -33,9 +33,8 @@ constexpr auto FORMAT_T = opcode_type{ 0x10'00 };
 constexpr auto FORMAT_D = opcode_type{ 0x20'00 };
 constexpr auto FORMAT_S = opcode_type{ 0x30'00 };
 constexpr auto FORMAT_F = opcode_type{ 0x40'00 };
-constexpr auto FORMAT_E = opcode_type{ 0x50'00 };
-constexpr auto FORMAT_R = opcode_type{ 0x60'00 };
-constexpr auto FORMAT_M = opcode_type{ 0x70'00 };
+constexpr auto FORMAT_R = opcode_type{ 0x50'00 };
+constexpr auto FORMAT_M = opcode_type{ 0x60'00 };
 
 /*
  * Create an enum to make use of switch statement's exhaustiveness checks.
@@ -54,7 +53,6 @@ enum class FORMAT : opcode_type
     D = FORMAT_D,
     S = FORMAT_S,
     F = FORMAT_F,
-    E = FORMAT_E,
     R = FORMAT_R,
     M = FORMAT_M,
 };
@@ -168,25 +166,6 @@ struct F {
 };
 
 /*
- * One-way register access with 36-bit wide immediate value.
- * "E" because it is "extended" immediate, 4 bits longer than the F format.
- */
-struct E {
-    viua::arch::opcode_type opcode;
-    Register_access const out;
-    uint64_t const immediate;
-
-    E(viua::arch::opcode_type const op,
-      Register_access const o,
-      uint64_t const i);
-
-    static auto decode(instruction_type const) -> E;
-    auto encode() const -> instruction_type;
-
-    auto to_string() const -> std::string;
-};
-
-/*
  * Two-way register access with 24-bit wide immediate value.
  * "R" because it is "reduced" immediate, 8 bits shorter than the F format.
  */
@@ -280,10 +259,9 @@ enum class OPCODE : opcode_type
     LUIU  = (FORMAT_F | 0x00'01 | UNSIGNED),
     LLI   = (FORMAT_F | 0x00'02),
     FLOAT = (FORMAT_F | 0x00'03),
-
-    CAST  = (FORMAT_E | 0x00'01),
-    ARODP = (FORMAT_E | 0x00'02),
-    ATXTP = (FORMAT_E | 0x00'03),
+    CAST  = (FORMAT_F | 0x00'04),
+    ARODP = (FORMAT_F | 0x00'05),
+    ATXTP = (FORMAT_F | 0x00'06),
 
     ADDI  = (FORMAT_R | 0x00'01),
     ADDIU = (FORMAT_R | 0x00'01 | UNSIGNED),
@@ -362,6 +340,9 @@ enum class OPCODE_F : opcode_type
     Make_entry(LUIU),
     Make_entry(LLI),
     Make_entry(FLOAT),
+    Make_entry(CAST),
+    Make_entry(ARODP),
+    Make_entry(ATXTP),
 };
 enum class OPCODE_E : opcode_type
 {

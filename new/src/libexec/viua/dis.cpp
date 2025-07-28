@@ -67,8 +67,6 @@ auto ins_to_string(
             return viua::arch::ops::S::decode(ip).to_string();
         case F:
             return viua::arch::ops::F::decode(ip).to_string();
-        case E:
-            return viua::arch::ops::E::decode(ip).to_string();
         case R:
             return viua::arch::ops::R::decode(ip).to_string();
         case M:
@@ -267,7 +265,6 @@ auto demangle_symbol_load(
 
     using enum viua::arch::ops::OPCODE;
     using viua::arch::ops::D;
-    using viua::arch::ops::E;
     using viua::arch::ops::S;
     if (m(i + 1, ATOM) and S::decode(ins_at(i + 1)).out == out) {
         auto ins = raw.at(i + 1);
@@ -552,8 +549,8 @@ auto demangle_arodp(
     for (auto i = size_t{ 0 }; i < text.size(); ++i) {
         using viua::arch::ops::GREEDY;
         if (m(i, ARODP) or m(i, ARODP, GREEDY)) {
-            using viua::arch::ops::E;
-            auto const arodp        = E::decode(ins_at(i));
+            using viua::arch::ops::F;
+            auto const arodp        = F::decode(ins_at(i));
             auto const needs_greedy = (arodp.opcode & GREEDY);
 
             auto const off = arodp.immediate;
@@ -581,8 +578,8 @@ auto demangle_arodp(
             continue;
         }
         if (m(i, ATXTP) or m(i, ATXTP, GREEDY)) {
-            using viua::arch::ops::E;
-            auto const atxtp        = E::decode(ins_at(i));
+            using viua::arch::ops::F;
+            auto const atxtp        = F::decode(ins_at(i));
             auto const needs_greedy = (atxtp.opcode & GREEDY);
 
             auto const off = atxtp.immediate;
@@ -712,9 +709,9 @@ auto demangle_memory(
             continue;
         }
         if (m(i, CAST)) {
-            using viua::arch::ops::E;
+            using viua::arch::ops::F;
             auto const raw_op = ins_at(i);
-            auto const op     = E::decode(raw_op);
+            auto const op     = F::decode(raw_op);
 
             auto desired_type = std::string{ "void" };
             switch (static_cast<viua::arch::FUNDAMENTAL_TYPES>(op.immediate)) {

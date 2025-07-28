@@ -144,24 +144,6 @@ auto execute(
                     Work(LUIU);
                     Work(LLI);
                     Work(FLOAT);
-#undef Work
-                }
-                break;
-            }
-        case E:
-            {
-                auto instruction = viua::arch::ops::E::decode(raw);
-                if constexpr (VIUA_TRACE_CYCLES) {
-                    viua::TRACE_STREAM << "    " << instruction.to_string()
-                                       << viua::TRACE_STREAM.endl;
-                }
-
-                using viua::arch::ops::OPCODE_E;
-                switch (static_cast<OPCODE_E>(opcode)) {
-#define Work(OP)                               \
-    case OPCODE_E::OP:                         \
-        execute(OP{ instruction }, stack, ip); \
-        break
                     Work(CAST);
                     Work(ARODP);
                     Work(ATXTP);
