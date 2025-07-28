@@ -44,13 +44,16 @@ auto F::decode(
         throw std::runtime_error{ "F::decode: not an F format instruction" };
     }
 
-    auto const out   = carve_bits_out<Register_access::underlying_type, 0>(raw);
-    auto const value = carve_bits_out<uint32_t, 8>(raw);
+    auto const out = carve_bits_out<Register_access::underlying_type, 16>(raw);
+    auto const value = carve_bits_out<uint32_t, 32>(raw);
 
     return F{ opcode, Register_access::decode(out), le32toh(value) };
 }
 auto F::encode() const -> instruction_type
 {
+    return viua::compose_bits_into<instruction_type>(
+        opcode, out.encode(), viua::compose_filler{ 8 }, htole32(immediate));
+
     return viua::compose_bits_into<instruction_type>(
         out.encode(), htole32(immediate), viua::compose_filler{ 8 }, opcode);
 }

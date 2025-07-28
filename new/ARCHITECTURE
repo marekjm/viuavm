@@ -15,54 +15,85 @@ Each set has at most 64 registers, indexed from 0.
 
 REGISTER ACCESS FORMAT
 
- 7  6|5          0|
-+----+------------+
-| rs |    index   |
-+----+------------+
+ 7   6|5     0
++-----+-------+
+| set | index |
++-----+-------+
+
+The "set" is one of:
+
+ - local
+ - argument
+ - parameter
+ - void
+
+All sets except for "void" are indexed by the "index" field; the "void" set acts
+as a single register (accessed through the "void" keyword) wired to be empty.
+
+The void register can be used as any write-operand to signal that the result
+should be dropped eg,
+
+    move void, $1.l
+
+will erase the value stored in the $1.l register.
+
+When void is used as a read-operand the meaning depends on the specific
+instruction eg,
+
+    return void
+
+means that nothing should be returned to the caller; and
+
+    if void, branch
+
+means that the CPU should unconditionally jump to the "branch" label.
 
 
 GENERAL INSTRUCTION FORMAT
 
- 63    48|47                     0
-+--------+------------------------+
-| opcode |        workload        |
-+--------+------------------------+
+ 63                         16|15     0
++-----------------------------+--------+
+|           workload          | opcode |
++-----------------------------+--------+
 
 
 T-FORMAT
 
 Three-way (triple) register access.
 
- 63    48|47  24|23 16|15  8|7   0
-+--------+------+-----+-----+-----+
-| opcode |      | out | lhs | rhs |
-+--------+------+-----+-----+-----+
+ 63       40|39 32|31 24|23 16|15     0
++-----------+-----+-----+-----+--------+
+|           | snd | src | dst | opcode |
++-----------+-----+-----+-----+--------+
 
-Bits 47...24 are reserved and have unspecified value.
+src is the left-hand side of the operation, and snd is the right-hand side of
+the operation.
+
+Bits 63...40 are reserved and have unspecified value.
 
 
 D-FORMAT
 
 Two-way (double) register access.
 
- 63    48|47        16|15  8|7   0
-+--------+------------+-----+-----+
-| opcode |            | dst | src |
-+--------+------------+-----+-----+
+ 63             32|31 24|23 16|15     0
++-----------------+-----+-----+--------+
+|                 | src | dst | opcode |
++-----------------+-----+-----+--------+
 
-Bits 47...16 are reserved and have unspecified value.
+Bits 63...32 are reserved and have unspecified value.
 
 
 S-FORMAT
 
 One-way (single) register access.
 
- 63    48|47               8|7   0
-+--------+------------------+-----+
-| opcode |                  | rgr |
-+--------+------------------+-----+
+ 63                   32|31 24|23     8
++-----------------------+-----+--------+
+|                       | rgr | opcode |
++-----------------------+-----+--------+
 
-Bits 47...8 are reserved and have unspecified value.
+Bits 63...32 are reserved and have unspecified value.
 
 
 M-FORMAT
@@ -71,12 +102,12 @@ Two-way register access with 16-bit memory offset and 8-bit specifier.
 "M" name is used because the format is used for loads and stores, which interact
 with -M-emory.
 
- 63    48|47 40|39 24|23 16|15  8|7   0
-+--------+-----+-----+-----+-----+-----+
-| opcode |     | off | spc | dst | src |
-+--------+-----+-----+-----+-----+-----+
+ 63 56|55 40|39 32|31 24|23 16|15     0
++-----+-----+-----+-----+-----+--------+
+|     | off | spc | src | dst | opcode |
++-----+-----+-----+-----+-----+--------+
 
-Bits 47...40 are reserved and have unspecified value.
+Bits 63...58 are reserved and have unspecified value.
 
 
 I-FORMAT (old F-FORMAT)
@@ -84,25 +115,12 @@ I-FORMAT (old F-FORMAT)
 One-way register access with 32-bit wide immediate value.
 "I" name is used because of the -i-mmediate value.
 
- 63    48|47 40|39              8|7   0
-+--------+-----+-----------------+-----+
-| opcode |     |    immediate    | rgr |
-+--------+-----+-----------------+-----+
+ 63             32|31 24|23 16|15     0
++-----------------+-----+-----+--------+
+|    immediate    |     | dst | opcode |
++-----------------+-----+-----+--------+
 
-Bits 47...40 are reserved and have unspecified value.
-
-
-E-FORMAT
-
-One-way register access with extended 36-bit wide immediate value.
-"E" name is used because of the -e-xtended immediate value.
-
- 63    48|47 44|43              8|7   0
-+--------+-----+-----------------+-----+
-| opcode |     |    immediate    | rgr |
-+--------+-----+-----------------+-----+
-
-Bits 47...44 are reserved and have unspecified value.
+Bits 31...24 are reserved and have unspecified value.
 
 
 U-FORMAT (old R-FORMAT)
@@ -110,27 +128,22 @@ U-FORMAT (old R-FORMAT)
 Two-way register access with 32-bit immediate value.
 "U" name is used because of its -u-sefulness.
 
- 63    48|47             16|15  8|7   0
-+--------+-----------------+-----+-----+
-| opcode |    immediate    | dst | src |
-+--------+-----------------+-----+-----+
+ 63             32|31 24|23 16|15     0
++-----------------+-----+-----+--------+
+|    immediate    | src | dst | opcode |
++-----------------+-----+-----+--------+
 
 
 OPCODE ENCODING
 
-  15 |14 12| 11 |10    0|
-+----+-----+----+-------+
-| gr | fmt | us | instr |
-+----+-----+----+-------+
+    15   |14 12|    11   |10          0
++--------+-----+---------+-------------+
+| greedy | fmt | usigned | instruction |
++--------+-----+---------+-------------+
 
-gr: greedy flag
-fmt: format
-us: unsigned flag
-instr: instruction
-
-The "us" is used to denote instructions constructing unsigned values (as the VM
-must have some way of recognising that it should create an unsigned instead of
-signed value), but nothing prevents it from being interpreted to have a
-different meaning when signedness is irrelevant. Thus, full 12 bits are
+The "usigned" flag is used to denote instructions constructing unsigned values
+(as the VM must have some way of recognising that it should create an unsigned
+instead of signed value), but nothing prevents it from being interpreted to have
+a different meaning when signedness is irrelevant. Thus, full 12 bits are
 available to enumerate instructions, giving the VM a limit of 4096 possible
 instructions in each 7 formats (for a total 28'672 possible instructions).

@@ -391,7 +391,7 @@ constexpr auto carve_bits_out(
 constexpr inline auto carve_opcode_out(
     viua::arch::instruction_type const i) -> viua::arch::opcode_type
 {
-    return carve_bits_out<viua::arch::opcode_type, 48>(i);
+    return carve_bits_out<viua::arch::opcode_type, 0>(i);
 }
 
 constexpr inline auto carve_just_opcode_out(
@@ -429,6 +429,19 @@ constexpr auto compose_bits_into_impl(
         };
     }
     return accumulator | (static_cast<Into>(last) << offset);
+}
+template<typename Into>
+constexpr auto compose_bits_into_impl(
+    Into const accumulator,
+    size_t const offset,
+    compose_filler const last) -> Into
+{
+    if ((sizeof(Into) * 8) != (offset + last.size)) {
+        throw std::logic_error{
+            "compose_bits_into: parts do not fill the output type"
+        };
+    }
+    return accumulator;
 }
 template<typename Into, typename... Args>
 constexpr auto compose_bits_into_impl(

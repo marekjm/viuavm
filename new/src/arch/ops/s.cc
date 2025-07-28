@@ -36,15 +36,14 @@ auto S::decode(
     instruction_type const raw) -> S
 {
     auto const opcode = carve_opcode_out(raw);
-    auto const dst = carve_bits_out<Register_access::underlying_type, 0>(raw);
+    auto const dst = carve_bits_out<Register_access::underlying_type, 16>(raw);
 
     return S{ opcode, Register_access::decode(dst) };
 }
 auto S::encode() const -> instruction_type
 {
-    auto base            = uint64_t{ opcode };
-    auto output_register = uint64_t{ out.encode() };
-    return (base << 48) | output_register;
+    return viua::compose_bits_into<instruction_type>(
+        opcode, out.encode(), viua::compose_filler{ 40 });
 }
 auto S::to_string() const -> std::string
 {

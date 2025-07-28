@@ -42,19 +42,19 @@ auto R::decode(
     instruction_type const raw) -> R
 {
     auto const opcode = carve_opcode_out(raw);
-    auto const src = carve_bits_out<Register_access::underlying_type, 0>(raw);
-    auto const dst = carve_bits_out<Register_access::underlying_type, 8>(raw);
-    auto const immediate = carve_bits_out<uint32_t, 16>(raw);
+    auto const dst = carve_bits_out<Register_access::underlying_type, 16>(raw);
+    auto const src = carve_bits_out<Register_access::underlying_type, 24>(raw);
+    auto const immediate = carve_bits_out<uint32_t, 32>(raw);
 
     return R{ opcode,
               Register_access::decode(dst),
               Register_access::decode(src),
-              immediate };
+              le32toh(immediate) };
 }
 auto R::encode() const -> instruction_type
 {
     return viua::compose_bits_into<instruction_type>(
-        in.encode(), out.encode(), immediate, opcode);
+        opcode, out.encode(), in.encode(), htole32(immediate));
 }
 auto R::to_string() const -> std::string
 {

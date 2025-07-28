@@ -2978,6 +2978,8 @@ auto make_reloc_table(
             using viua::arch::ops::R;
 
             // the LUIU
+            // FIXME This does not make any sense: we shift by 32 bits to the
+            // left, only to later cut the value to the lowest 32 bits.
             auto const hi =
                 static_cast<uint64_t>(F::decode(text.at(i - 2)).immediate)
                 << 32;

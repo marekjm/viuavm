@@ -44,6 +44,6 @@ auto N::decode(
 auto N::encode() const -> instruction_type
 {
     return viua::compose_bits_into<instruction_type>(
-        viua::compose_filler{ 48 }, opcode);
+        opcode, viua::compose_filler{ 48 });
 }
 }  // namespace viua::arch::ops
