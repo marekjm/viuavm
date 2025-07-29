@@ -1010,10 +1010,13 @@ def test_case_impl_checks(
     result,
     ebreak,
     abort_report,
+    during_rerun=False,
 ):
     start_timepoint, case_log = reporting
 
     r_exit = result["exit"]
+
+    during_rerun = " (during rerun)" if during_rerun else ""
 
     if r_exit == -6 and check_kind == "abort":
         pass
@@ -1023,7 +1026,7 @@ def test_case_impl_checks(
         return (
             Status.Normal,
             False,
-            f"crashed with non-zero return: {r_exit}",
+            f"crashed with non-zero return: {r_exit}{during_rerun}",
             count_runtime(),
             None,
         )
@@ -1037,7 +1040,7 @@ def test_case_impl_checks(
             return (
                 Status.Normal,
                 False,
-                "empty ebreak file",
+                f"empty ebreak file{during_rerun}",
                 count_runtime(),
                 None,
             )
@@ -1046,7 +1049,7 @@ def test_case_impl_checks(
             return (
                 Status.Normal,
                 False,
-                "program did not emit ebreak",
+                f"program did not emit ebreak{during_rerun}",
                 count_runtime(),
                 None,
             )
@@ -1061,7 +1064,7 @@ def test_case_impl_checks(
             return (
                 Status.Normal,
                 False,
-                e.to_string(),
+                f"{e.to_string()}{during_rerun}",
                 count_runtime(),
                 None,
             )
@@ -1069,7 +1072,7 @@ def test_case_impl_checks(
             return (
                 Status.Normal,
                 False,
-                f"bad ebreak script, error on line {e.args[0]}",
+                f"bad ebreak script, error on line {e.args[0]}{during_rerun}",
                 count_runtime(),
                 None,
             )
@@ -1082,7 +1085,7 @@ def test_case_impl_checks(
             return (
                 Status.Normal,
                 False,
-                "empty abort file",
+                f"empty abort file{during_rerun}",
                 count_runtime(),
                 None,
             )
@@ -1091,7 +1094,7 @@ def test_case_impl_checks(
             return (
                 Status.Normal,
                 False,
-                "program did not abort",
+                f"program did not abort{during_rerun}",
                 count_runtime(),
                 None,
             )
@@ -1099,7 +1102,7 @@ def test_case_impl_checks(
         if (want_value := abort_test[0]) != (live_value := abort_report["ip"]):
             leader = f"    aborted IP"
             errors.write(
-                "{} is {}\n".format(
+                "{} actual   {}\n".format(
                     leader,
                     live_value,
                     colorise("red", live_value),
@@ -1112,11 +1115,17 @@ def test_case_impl_checks(
                     colorise("green", want_value),
                 )
             )
-            raise Unexpected_value()
+            return (
+                Status.Normal,
+                False,
+                f"unexpected IP{during_rerun}",
+                count_runtime(),
+                None,
+            )
         if (want_value := abort_test[1]) != (live_value := abort_report["instruction"]):
             leader = f"    aborted instruction"
             errors.write(
-                "{} is {}\n".format(
+                "{} actual   {}\n".format(
                     leader,
                     live_value,
                     colorise("red", live_value),
@@ -1129,11 +1138,17 @@ def test_case_impl_checks(
                     colorise("green", want_value),
                 )
             )
-            raise Unexpected_value()
+            return (
+                Status.Normal,
+                False,
+                f"unexpected instruction{during_rerun}",
+                count_runtime(),
+                None,
+            )
         if (want_value := abort_test[2]) != (live_value := abort_report["message"]):
             leader = f"    abort message"
             errors.write(
-                "{} is {}\n".format(
+                "{} actual   {}\n".format(
                     leader,
                     live_value,
                     colorise("red", live_value),
@@ -1146,7 +1161,13 @@ def test_case_impl_checks(
                     colorise("green", want_value),
                 )
             )
-            raise Unexpected_value()
+            return (
+                Status.Normal,
+                False,
+                f"unexpected abort message{during_rerun}",
+                count_runtime(),
+                None,
+            )
     elif check_kind == "stdout":
         stdout_test = f"{base_path}.stdout"
         want_stdout: str
@@ -1157,7 +1178,7 @@ def test_case_impl_checks(
             return (
                 Status.Normal,
                 False,
-                "empty stdout file",
+                f"empty stdout file{during_rerun}",
                 count_runtime(),
                 None,
             )
@@ -1177,7 +1198,7 @@ def test_case_impl_checks(
             return (
                 Status.Normal,
                 False,
-                "bad stdout",
+                f"bad stdout{during_rerun}",
                 count_runtime(),
                 None,
             )
@@ -1290,7 +1311,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
         test_executable,
         stdin=test_stdin,
     )
-    run_checks = lambda r, e, a: test_case_impl_checks(
+    run_checks = lambda r, e, a, d: test_case_impl_checks(
         (start_timepoint, case_log),
         errors,
         count_runtime,
@@ -1299,6 +1320,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
         r,
         e,
         a,
+        d,
     )
 
     # FIRST RUN
@@ -1339,7 +1361,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
     result, ebreak, abort_report, perf = run_test()
 
     indicate_progress(start_timepoint, "ch")
-    if (fail := run_checks(result, ebreak, abort_report)) is not None:
+    if (fail := run_checks(result, ebreak, abort_report, False)) is not None:
         return fail
 
     make_good_report = lambda: (
@@ -1423,7 +1445,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
     result, ebreak, abort_report, _ = run_test()
 
     indicate_progress(start_timepoint, "ch")
-    if (fail := run_checks(result, ebreak, abort_report)) is not None:
+    if (fail := run_checks(result, ebreak, abort_report, True)) is not None:
         return fail
 
     return make_good_report()
