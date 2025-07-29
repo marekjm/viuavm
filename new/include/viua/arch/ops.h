@@ -32,8 +32,8 @@ constexpr auto FORMAT_N = opcode_type{ 0x00'00 };
 constexpr auto FORMAT_T = opcode_type{ 0x10'00 };
 constexpr auto FORMAT_D = opcode_type{ 0x20'00 };
 constexpr auto FORMAT_S = opcode_type{ 0x30'00 };
-constexpr auto FORMAT_F = opcode_type{ 0x40'00 };
-constexpr auto FORMAT_R = opcode_type{ 0x50'00 };
+constexpr auto FORMAT_I = opcode_type{ 0x40'00 };
+constexpr auto FORMAT_U = opcode_type{ 0x50'00 };
 constexpr auto FORMAT_M = opcode_type{ 0x60'00 };
 
 /*
@@ -52,8 +52,8 @@ enum class FORMAT : opcode_type
     T = FORMAT_T,
     D = FORMAT_D,
     S = FORMAT_S,
-    F = FORMAT_F,
-    R = FORMAT_R,
+    I = FORMAT_I,
+    U = FORMAT_U,
     M = FORMAT_M,
 };
 auto to_string(FORMAT const) -> std::string;
@@ -136,14 +136,14 @@ struct S {
 
 /*
  * One-way register access with 32-bit wide immediate value.
- * "F" because it is used for eg, floats.
+ * "I" because it is the primary format with an "immediate" value.
  */
-struct F {
+struct I {
     viua::arch::opcode_type opcode;
     Register_access const out;
     uint32_t const immediate;
 
-    F(viua::arch::opcode_type const op,
+    I(viua::arch::opcode_type const op,
       Register_access const o,
       uint32_t const i);
 
@@ -151,36 +151,36 @@ struct F {
     static auto make(
         viua::arch::opcode_type const op,
         Register_access const o,
-        T const v) -> F
+        T const v) -> I
     {
         static_assert(sizeof(T) == sizeof(uint32_t));
         auto imm = uint32_t{};
         memcpy(&imm, &v, sizeof(imm));
-        return F{ op, o, imm };
+        return I{ op, o, imm };
     }
 
-    static auto decode(instruction_type const) -> F;
+    static auto decode(instruction_type const) -> I;
     auto encode() const -> instruction_type;
 
     auto to_string() const -> std::string;
 };
 
 /*
- * Two-way register access with 24-bit wide immediate value.
- * "R" because it is "reduced" immediate, 8 bits shorter than the F format.
+ * Two-way register access with 32-bit wide immediate value.
+ * "U" because it is a "useful" format.
  */
-struct R {
+struct U {
     viua::arch::opcode_type opcode;
     Register_access const out;
     Register_access const in;
     uint32_t const immediate;
 
-    R(viua::arch::opcode_type const,
+    U(viua::arch::opcode_type const,
       Register_access const,
       Register_access const,
       uint32_t const);
 
-    static auto decode(instruction_type const) -> R;
+    static auto decode(instruction_type const) -> U;
     auto encode() const -> instruction_type;
 
     auto to_string() const -> std::string;
@@ -255,22 +255,22 @@ enum class OPCODE : opcode_type
     DOUBLE = (FORMAT_S | 0x00'04),
     SELF   = (FORMAT_S | 0x00'05),
 
-    LUI   = (FORMAT_F | 0x00'01),
-    LUIU  = (FORMAT_F | 0x00'01 | UNSIGNED),
-    LLI   = (FORMAT_F | 0x00'02),
-    FLOAT = (FORMAT_F | 0x00'03),
-    CAST  = (FORMAT_F | 0x00'04),
-    ARODP = (FORMAT_F | 0x00'05),
-    ATXTP = (FORMAT_F | 0x00'06),
+    LUI   = (FORMAT_I | 0x00'01),
+    LUIU  = (FORMAT_I | 0x00'01 | UNSIGNED),
+    LLI   = (FORMAT_I | 0x00'02),
+    FLOAT = (FORMAT_I | 0x00'03),
+    CAST  = (FORMAT_I | 0x00'04),
+    ARODP = (FORMAT_I | 0x00'05),
+    ATXTP = (FORMAT_I | 0x00'06),
 
-    ADDI  = (FORMAT_R | 0x00'01),
-    ADDIU = (FORMAT_R | 0x00'01 | UNSIGNED),
-    SUBI  = (FORMAT_R | 0x00'02),
-    SUBIU = (FORMAT_R | 0x00'02 | UNSIGNED),
-    MULI  = (FORMAT_R | 0x00'03),
-    MULIU = (FORMAT_R | 0x00'03 | UNSIGNED),
-    DIVI  = (FORMAT_R | 0x00'04),
-    DIVIU = (FORMAT_R | 0x00'04 | UNSIGNED),
+    ADDI  = (FORMAT_U | 0x00'01),
+    ADDIU = (FORMAT_U | 0x00'01 | UNSIGNED),
+    SUBI  = (FORMAT_U | 0x00'02),
+    SUBIU = (FORMAT_U | 0x00'02 | UNSIGNED),
+    MULI  = (FORMAT_U | 0x00'03),
+    MULIU = (FORMAT_U | 0x00'03 | UNSIGNED),
+    DIVI  = (FORMAT_U | 0x00'04),
+    DIVIU = (FORMAT_U | 0x00'04 | UNSIGNED),
 
     SM  = (FORMAT_M | 0x00'01), /* Store Memory */
     LM  = (FORMAT_M | 0x00'02), /* Load Memory */
@@ -334,7 +334,7 @@ enum class OPCODE_S : opcode_type
     Make_entry(DOUBLE),
     Make_entry(SELF),
 };
-enum class OPCODE_F : opcode_type
+enum class OPCODE_I : opcode_type
 {
     Make_entry(LUI),
     Make_entry(LUIU),
@@ -344,13 +344,7 @@ enum class OPCODE_F : opcode_type
     Make_entry(ARODP),
     Make_entry(ATXTP),
 };
-enum class OPCODE_E : opcode_type
-{
-    Make_entry(CAST),
-    Make_entry(ARODP),
-    Make_entry(ATXTP),
-};
-enum class OPCODE_R : opcode_type
+enum class OPCODE_U : opcode_type
 {
     Make_entry(ADDI),
     Make_entry(ADDIU),

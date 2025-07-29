@@ -401,8 +401,8 @@ VM_OPERATION_TYPE_IMPL=\
 	$(BUILD_PREFIX)/arch/ops/t.o \
 	$(BUILD_PREFIX)/arch/ops/d.o \
 	$(BUILD_PREFIX)/arch/ops/s.o \
-	$(BUILD_PREFIX)/arch/ops/f.o \
-	$(BUILD_PREFIX)/arch/ops/r.o \
+	$(BUILD_PREFIX)/arch/ops/i.o \
+	$(BUILD_PREFIX)/arch/ops/u.o \
 	$(BUILD_PREFIX)/arch/ops/m.o \
 	$(BUILD_PREFIX)/arch/ops.o
 
@@ -433,8 +433,8 @@ $(BUILD_EXEDIR)/ld: \
 	$(BUILD_PREFIX)/libexec/common.o \
 	$(BUILD_PREFIX)/arch/ra.o \
 	$(BUILD_PREFIX)/arch/ops.o \
-	$(BUILD_PREFIX)/arch/ops/f.o \
-	$(BUILD_PREFIX)/arch/ops/r.o \
+	$(BUILD_PREFIX)/arch/ops/i.o \
+	$(BUILD_PREFIX)/arch/ops/u.o \
 	$(BUILD_PREFIX)/vm/elf.o \
 	$(BUILD_PREFIX)/tools/libs/errors/compile_time.o \
 	$(BUILD_PREFIX)/tools/libs/stage/save.o \
@@ -496,4 +496,4 @@ $(BUILD_EXEDIR)/repl: \
 	3rd-party/linenoise/encodings/utf8.o
 
 # FIXME dependencies are broken
-include $(shell find ./build -type f -name '*.d')
+-include $(shell find ./build -type f -name '*.d')

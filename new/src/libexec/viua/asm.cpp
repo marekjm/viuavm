@@ -1850,7 +1850,7 @@ auto emit_instruction(
             return viua::arch::ops::S{ opcode,
                                        operand_or_throw(insn, 0).make_access() }
                 .encode();
-        case FORMAT::F:
+        case FORMAT::I:
             {
                 auto const raw =
                     operand_or_throw(insn, 1).ingredients.front().text;
@@ -1859,12 +1859,12 @@ auto emit_instruction(
                     auto tmp = std::stof(raw);
                     memcpy(&val, &tmp, sizeof(val));
                 }
-                return viua::arch::ops::F{
+                return viua::arch::ops::I{
                     opcode, operand_or_throw(insn, 0).make_access(), val
                 }
                     .encode();
             }
-        case FORMAT::R:
+        case FORMAT::U:
             {
                 auto const imm = insn.operands.at(2).ingredients.front();
                 auto const is_unsigned = (static_cast<opcode_type>(opcode)
@@ -1897,15 +1897,15 @@ auto emit_instruction(
                         auto const tmp = viua::support::ston<int32_t>(imm.text);
                         memcpy(&val, &tmp, sizeof(tmp));
                     }
-                    std::println("cooked imm for R: {}u ({}s)",
+                    std::println("cooked imm for U: {}u ({}s)",
                                  val,
                                  static_cast<int32_t>(val));
                     auto const r =
-                        viua::arch::ops::R{ opcode,
+                        viua::arch::ops::U{ opcode,
                                             insn.operands.at(0).make_access(),
                                             insn.operands.at(1).make_access(),
                                             val };
-                    std::println("cooked R: {}", r.to_string());
+                    std::println("cooked U: {}", r.to_string());
                     return r.encode();
                 } catch (std::invalid_argument const&) {
                     using viua::libs::errors::compile_time::Cause;
@@ -2954,17 +2954,17 @@ auto make_reloc_table(
         auto const type = into_rodata ? R_VIUA_OBJECT : R_VIUA_JUMP_SLOT;
 
         using viua::arch::ops::FORMAT_MASK;
-        using viua::arch::ops::FORMAT_R;
+        using viua::arch::ops::FORMAT_U;
         auto const reloc_to_section_ptr =
             op == OPCODE::ARODP or op == OPCODE::ATXTP;
         auto const prev_op            = viua::carve_opcode_out(text.at(i - 1));
-        auto const reloc_to_long_addr = (prev_op & FORMAT_MASK) == FORMAT_R;
+        auto const reloc_to_long_addr = (prev_op & FORMAT_MASK) == FORMAT_U;
 
         auto symtab_entry_index = uint32_t{};
         if (reloc_to_section_ptr) {
-            using viua::arch::ops::F;
+            using viua::arch::ops::I;
             symtab_entry_index =
-                static_cast<uint32_t>(F::decode(text.at(i)).immediate);
+                static_cast<uint32_t>(I::decode(text.at(i)).immediate);
 
             std::println(
                 "recording relocation for .symtab entry {} against section "
@@ -2974,18 +2974,18 @@ auto make_reloc_table(
                 (i * sizeof(viua::arch::instruction_type)),
                 i);
         } else if (reloc_to_long_addr) {
-            using viua::arch::ops::F;
-            using viua::arch::ops::R;
+            using viua::arch::ops::I;
+            using viua::arch::ops::U;
 
             // the LUIU
             // FIXME This does not make any sense: we shift by 32 bits to the
             // left, only to later cut the value to the lowest 32 bits.
             auto const hi =
-                static_cast<uint64_t>(F::decode(text.at(i - 2)).immediate)
+                static_cast<uint64_t>(I::decode(text.at(i - 2)).immediate)
                 << 32;
 
             // the ADDIU
-            auto const lo = R::decode(text.at(i - 1)).immediate;
+            auto const lo = U::decode(text.at(i - 1)).immediate;
 
             symtab_entry_index = static_cast<uint32_t>(hi | lo);
 

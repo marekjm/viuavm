@@ -65,10 +65,10 @@ auto ins_to_string(
             return viua::arch::ops::D::decode(ip).to_string();
         case S:
             return viua::arch::ops::S::decode(ip).to_string();
-        case F:
-            return viua::arch::ops::F::decode(ip).to_string();
-        case R:
-            return viua::arch::ops::R::decode(ip).to_string();
+        case I:
+            return viua::arch::ops::I::decode(ip).to_string();
+        case U:
+            return viua::arch::ops::U::decode(ip).to_string();
         case M:
             return viua::arch::ops::M::decode(ip).to_string();
         default:
@@ -394,13 +394,13 @@ auto demangle_canonical_li(
     using enum viua::arch::ops::OPCODE;
     for (auto i = size_t{ 0 }; i < text.size(); ++i) {
         if (match_canonical_li(i, LUI) or match_canonical_li(i, LUIU)) {
-            using viua::arch::ops::F;
-            using viua::arch::ops::R;
+            using viua::arch::ops::I;
+            using viua::arch::ops::U;
 
-            auto const luiu = F::decode(ins_at(i));
+            auto const luiu = I::decode(ins_at(i));
             auto const high_part =
                 (static_cast<uint64_t>(luiu.immediate) << 32);
-            auto const addiu    = R::decode(ins_at(i + 1));
+            auto const addiu    = U::decode(ins_at(i + 1));
             auto const low_part = addiu.immediate;
 
             auto const value = (high_part | low_part);
@@ -459,9 +459,9 @@ auto demangle_short_li(
         using viua::arch::ops::GREEDY;
         if (m(i, ADDI) or m(i, ADDIU) or m(i, ADDI, GREEDY)
             or m(i, ADDIU, GREEDY)) {
-            using viua::arch::ops::R;
             using viua::arch::ops::S;
-            auto const addi = R::decode(ins_at(i));
+            using viua::arch::ops::U;
+            auto const addi = U::decode(ins_at(i));
             if (addi.in.is_void()) {
                 auto const needs_greedy = (addi.opcode & GREEDY);
                 auto const needs_unsigned =
@@ -508,9 +508,9 @@ auto demangle_addiu(
     for (auto i = size_t{ 0 }; i < text.size(); ++i) {
         using viua::arch::ops::GREEDY;
         if (m(i, ADDIU) or m(i, ADDIU, GREEDY)) {
-            using viua::arch::ops::R;
             using viua::arch::ops::S;
-            auto const addi         = R::decode(ins_at(i));
+            using viua::arch::ops::U;
+            auto const addi         = U::decode(ins_at(i));
             auto const needs_greedy = (addi.opcode & GREEDY);
 
             auto idx          = text.at(i).index;
@@ -549,8 +549,8 @@ auto demangle_arodp(
     for (auto i = size_t{ 0 }; i < text.size(); ++i) {
         using viua::arch::ops::GREEDY;
         if (m(i, ARODP) or m(i, ARODP, GREEDY)) {
-            using viua::arch::ops::F;
-            auto const arodp        = F::decode(ins_at(i));
+            using viua::arch::ops::I;
+            auto const arodp        = I::decode(ins_at(i));
             auto const needs_greedy = (arodp.opcode & GREEDY);
 
             auto const off = arodp.immediate;
@@ -578,8 +578,8 @@ auto demangle_arodp(
             continue;
         }
         if (m(i, ATXTP) or m(i, ATXTP, GREEDY)) {
-            using viua::arch::ops::F;
-            auto const atxtp        = F::decode(ins_at(i));
+            using viua::arch::ops::I;
+            auto const atxtp        = I::decode(ins_at(i));
             auto const needs_greedy = (atxtp.opcode & GREEDY);
 
             auto const off = atxtp.immediate;
@@ -709,9 +709,9 @@ auto demangle_memory(
             continue;
         }
         if (m(i, CAST)) {
-            using viua::arch::ops::F;
+            using viua::arch::ops::I;
             auto const raw_op = ins_at(i);
-            auto const op     = F::decode(raw_op);
+            auto const op     = I::decode(raw_op);
 
             auto desired_type = std::string{ "void" };
             switch (static_cast<viua::arch::FUNDAMENTAL_TYPES>(op.immediate)) {

@@ -126,18 +126,18 @@ auto execute(
                 }
                 break;
             }
-        case F:
+        case I:
             {
-                auto instruction = viua::arch::ops::F::decode(raw);
+                auto instruction = viua::arch::ops::I::decode(raw);
                 if constexpr (VIUA_TRACE_CYCLES) {
                     viua::TRACE_STREAM << "    " << instruction.to_string()
                                        << viua::TRACE_STREAM.endl;
                 }
 
-                using viua::arch::ops::OPCODE_F;
-                switch (static_cast<OPCODE_F>(opcode)) {
+                using viua::arch::ops::OPCODE_I;
+                switch (static_cast<OPCODE_I>(opcode)) {
 #define Work(OP)                               \
-    case OPCODE_F::OP:                         \
+    case OPCODE_I::OP:                         \
         execute(OP{ instruction }, stack, ip); \
         break
                     Work(LUI);
@@ -151,18 +151,18 @@ auto execute(
                 }
                 break;
             }
-        case R:
+        case U:
             {
-                auto instruction = viua::arch::ops::R::decode(raw);
+                auto instruction = viua::arch::ops::U::decode(raw);
                 if constexpr (VIUA_TRACE_CYCLES) {
                     viua::TRACE_STREAM << "    " << instruction.to_string()
                                        << viua::TRACE_STREAM.endl;
                 }
 
-                using viua::arch::ops::OPCODE_R;
-                switch (static_cast<OPCODE_R>(opcode)) {
+                using viua::arch::ops::OPCODE_U;
+                switch (static_cast<OPCODE_U>(opcode)) {
 #define Work(OP)                               \
-    case OPCODE_R::OP:                         \
+    case OPCODE_U::OP:                         \
         execute(OP{ instruction }, stack, ip); \
         break
                     Work(ADDI);

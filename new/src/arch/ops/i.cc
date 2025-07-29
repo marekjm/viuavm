@@ -28,7 +28,7 @@
 
 
 namespace viua::arch::ops {
-F::F(
+I::I(
     viua::arch::opcode_type const op,
     Register_access const o,
     uint32_t const i)
@@ -36,20 +36,20 @@ F::F(
     , out{ o }
     , immediate{ i }
 {}
-auto F::decode(
-    instruction_type const raw) -> F
+auto I::decode(
+    instruction_type const raw) -> I
 {
     auto const opcode = carve_opcode_out(raw);
-    if ((opcode & viua::arch::ops::FORMAT_MASK) != viua::arch::ops::FORMAT_F) {
-        throw std::runtime_error{ "F::decode: not an F format instruction" };
+    if ((opcode & viua::arch::ops::FORMAT_MASK) != viua::arch::ops::FORMAT_I) {
+        throw std::runtime_error{ "I::decode: not an I format instruction" };
     }
 
     auto const out = carve_bits_out<Register_access::underlying_type, 16>(raw);
     auto const value = carve_bits_out<uint32_t, 32>(raw);
 
-    return F{ opcode, Register_access::decode(out), le32toh(value) };
+    return I{ opcode, Register_access::decode(out), le32toh(value) };
 }
-auto F::encode() const -> instruction_type
+auto I::encode() const -> instruction_type
 {
     return viua::compose_bits_into<instruction_type>(
         opcode, out.encode(), viua::compose_filler{ 8 }, htole32(immediate));
@@ -57,7 +57,7 @@ auto F::encode() const -> instruction_type
     return viua::compose_bits_into<instruction_type>(
         out.encode(), htole32(immediate), viua::compose_filler{ 8 }, opcode);
 }
-auto F::to_string() const -> std::string
+auto I::to_string() const -> std::string
 {
     auto imm_str = std::to_string(immediate);
     using viua::arch::ops::OPCODE;

@@ -36,10 +36,10 @@ auto to_string(
             return "D";
         case FORMAT::S:
             return "S";
-        case FORMAT::F:
-            return "F";
-        case FORMAT::R:
-            return "R";
+        case FORMAT::I:
+            return "I";
+        case FORMAT::U:
+            return "U";
         case FORMAT::M:
             return "M";
     }

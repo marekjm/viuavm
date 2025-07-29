@@ -754,26 +754,26 @@ auto relocate(
             abort();
         }
 
-        using viua::arch::ops::F;
-        auto imm_op = F::decode(text.at(text_ndx));
+        using viua::arch::ops::I;
+        auto imm_op = I::decode(text.at(text_ndx));
         text.at(text_ndx) =
-            F{ imm_op.opcode, imm_op.out, static_cast<uint32_t>(value) }
+            I{ imm_op.opcode, imm_op.out, static_cast<uint32_t>(value) }
                 .encode();
     } else {
-        using viua::arch::ops::F;
-        using viua::arch::ops::R;
+        using viua::arch::ops::I;
+        using viua::arch::ops::U;
 
         // the LUIU
         auto const hi_ndx = text_ndx - 2;
-        auto hi_op        = F::decode(text.at(hi_ndx));
+        auto hi_op        = I::decode(text.at(hi_ndx));
         auto const hi     = static_cast<uint32_t>(value >> 32);
-        text.at(hi_ndx)   = F{ hi_op.opcode, hi_op.out, hi }.encode();
+        text.at(hi_ndx)   = I{ hi_op.opcode, hi_op.out, hi }.encode();
 
         // the ADDIU
         auto const lo_ndx = text_ndx - 1;
-        auto lo_op        = R::decode(text.at(lo_ndx));
+        auto lo_op        = U::decode(text.at(lo_ndx));
         auto const lo     = static_cast<uint32_t>(value);
-        text.at(lo_ndx) = R{ lo_op.opcode, lo_op.out, lo_op.out, lo }.encode();
+        text.at(lo_ndx) = U{ lo_op.opcode, lo_op.out, lo_op.out, lo }.encode();
     }
 }
 

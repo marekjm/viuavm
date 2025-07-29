@@ -317,59 +317,59 @@ struct DOUBLE : Instruction {
  * LUIU is the unsigned version of LUI and does not perform sign-extension.
  */
 struct LUI : Instruction {
-    viua::arch::ops::F instruction;
+    viua::arch::ops::I instruction;
 
     LUI(
-        viua::arch::ops::F i)
+        viua::arch::ops::I i)
         : instruction{ i }
     {}
 };
 struct LUIU : Instruction {
-    viua::arch::ops::F instruction;
+    viua::arch::ops::I instruction;
 
     LUIU(
-        viua::arch::ops::F i)
+        viua::arch::ops::I i)
         : instruction{ i }
     {}
 };
 struct LLI : Instruction {
-    viua::arch::ops::F instruction;
+    viua::arch::ops::I instruction;
 
     LLI(
-        viua::arch::ops::F i)
+        viua::arch::ops::I i)
         : instruction{ i }
     {}
 };
 struct FLOAT : Instruction {
-    viua::arch::ops::F instruction;
+    viua::arch::ops::I instruction;
 
     FLOAT(
-        viua::arch::ops::F i)
+        viua::arch::ops::I i)
         : instruction{ i }
     {}
 };
 
 struct CAST : Instruction {
-    viua::arch::ops::F instruction;
+    viua::arch::ops::I instruction;
 
     CAST(
-        viua::arch::ops::F i)
+        viua::arch::ops::I i)
         : instruction{ i }
     {}
 };
 struct ARODP : Instruction {
-    viua::arch::ops::F instruction;
+    viua::arch::ops::I instruction;
 
     ARODP(
-        viua::arch::ops::F i)
+        viua::arch::ops::I i)
         : instruction{ i }
     {}
 };
 struct ATXTP : Instruction {
-    viua::arch::ops::F instruction;
+    viua::arch::ops::I instruction;
 
     ATXTP(
-        viua::arch::ops::F i)
+        viua::arch::ops::I i)
         : instruction{ i }
     {}
 };
@@ -379,10 +379,10 @@ struct ADDI : Instruction {
     template<typename T = value_type>
     using functor_type = std::plus<T>;
 
-    viua::arch::ops::R instruction;
+    viua::arch::ops::U instruction;
 
     ADDI(
-        viua::arch::ops::R i)
+        viua::arch::ops::U i)
         : instruction{ i }
     {}
 };
@@ -391,10 +391,10 @@ struct ADDIU : Instruction {
     template<typename T = value_type>
     using functor_type = std::plus<T>;
 
-    viua::arch::ops::R instruction;
+    viua::arch::ops::U instruction;
 
     ADDIU(
-        viua::arch::ops::R i)
+        viua::arch::ops::U i)
         : instruction{ i }
     {}
 };
@@ -403,10 +403,10 @@ struct SUBI : Instruction {
     template<typename T = value_type>
     using functor_type = std::minus<T>;
 
-    viua::arch::ops::R instruction;
+    viua::arch::ops::U instruction;
 
     SUBI(
-        viua::arch::ops::R i)
+        viua::arch::ops::U i)
         : instruction{ i }
     {}
 };
@@ -415,10 +415,10 @@ struct SUBIU : Instruction {
     template<typename T = value_type>
     using functor_type = std::minus<T>;
 
-    viua::arch::ops::R instruction;
+    viua::arch::ops::U instruction;
 
     SUBIU(
-        viua::arch::ops::R i)
+        viua::arch::ops::U i)
         : instruction{ i }
     {}
 };
@@ -427,10 +427,10 @@ struct MULI : Instruction {
     template<typename T = value_type>
     using functor_type = std::multiplies<T>;
 
-    viua::arch::ops::R instruction;
+    viua::arch::ops::U instruction;
 
     MULI(
-        viua::arch::ops::R i)
+        viua::arch::ops::U i)
         : instruction{ i }
     {}
 };
@@ -439,10 +439,10 @@ struct MULIU : Instruction {
     template<typename T = value_type>
     using functor_type = std::multiplies<T>;
 
-    viua::arch::ops::R instruction;
+    viua::arch::ops::U instruction;
 
     MULIU(
-        viua::arch::ops::R i)
+        viua::arch::ops::U i)
         : instruction{ i }
     {}
 };
@@ -451,10 +451,10 @@ struct DIVI : Instruction {
     template<typename T = value_type>
     using functor_type = std::divides<T>;
 
-    viua::arch::ops::R instruction;
+    viua::arch::ops::U instruction;
 
     DIVI(
-        viua::arch::ops::R i)
+        viua::arch::ops::U i)
         : instruction{ i }
     {}
 };
@@ -463,10 +463,10 @@ struct DIVIU : Instruction {
     template<typename T = value_type>
     using functor_type = std::divides<T>;
 
-    viua::arch::ops::R instruction;
+    viua::arch::ops::U instruction;
 
     DIVIU(
-        viua::arch::ops::R i)
+        viua::arch::ops::U i)
         : instruction{ i }
     {}
 };
