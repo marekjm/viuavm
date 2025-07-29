@@ -44,6 +44,24 @@ namespace viua::vm::ins {
 using namespace viua::arch::ins;
 using viua::vm::Stack;
 
+#define Work(FORMAT, OP)                       \
+    case OPCODE_##FORMAT::OP:                  \
+        execute(OP{ instruction }, stack, ip); \
+        break
+
+#define Flow(FORMAT, OP)      \
+    case OPCODE_##FORMAT::OP: \
+        return execute(OP{ instruction }, stack, ip)
+
+#define Intro(FORMAT)                                           \
+    auto instruction = viua::arch::ops::FORMAT::decode(raw);    \
+    if constexpr (VIUA_TRACE_CYCLES) {                          \
+        viua::TRACE_STREAM << "    " << instruction.to_string() \
+                           << viua::TRACE_STREAM.endl;          \
+    }                                                           \
+    using viua::arch::ops::OPCODE_##FORMAT;                     \
+    switch (static_cast<OPCODE_##FORMAT>(opcode))
+
 auto execute(
     viua::vm::Stack& stack,
     viua::arch::instruction_type const* const ip)
@@ -60,120 +78,72 @@ auto execute(
         using enum viua::arch::ops::FORMAT;
         case T:
             {
-                auto instruction = viua::arch::ops::T::decode(raw);
-                if constexpr (VIUA_TRACE_CYCLES) {
-                    viua::TRACE_STREAM << "    " << instruction.to_string()
-                                       << viua::TRACE_STREAM.endl;
-                }
-
-                using viua::arch::ops::OPCODE_T;
-                switch (static_cast<OPCODE_T>(opcode)) {
-#define Work(OP)                               \
-    case OPCODE_T::OP:                         \
-        execute(OP{ instruction }, stack, ip); \
-        break
-                    Work(ADD);
-                    Work(SUB);
-                    Work(MUL);
-                    Work(DIV);
-                    Work(MOD);
-                    Work(BITSHL);
-                    Work(BITSHR);
-                    Work(BITASHR);
-                    Work(BITROL);
-                    Work(BITROR);
-                    Work(BITAND);
-                    Work(BITOR);
-                    Work(BITXOR);
-                    Work(EQ);
-                    Work(GT);
-                    Work(LT);
-                    Work(CMP);
-                    Work(AND);
-                    Work(OR);
-                    Work(IO_SUBMIT);
-                    Work(IO_WAIT);
-                    Work(IO_SHUTDOWN);
-                    Work(IO_CTL);
-#undef Work
+                Intro(T)
+                {
+                    Work(T, ADD);
+                    Work(T, SUB);
+                    Work(T, MUL);
+                    Work(T, DIV);
+                    Work(T, MOD);
+                    Work(T, BITSHL);
+                    Work(T, BITSHR);
+                    Work(T, BITASHR);
+                    Work(T, BITROL);
+                    Work(T, BITROR);
+                    Work(T, BITAND);
+                    Work(T, BITOR);
+                    Work(T, BITXOR);
+                    Work(T, EQ);
+                    Work(T, GT);
+                    Work(T, LT);
+                    Work(T, CMP);
+                    Work(T, AND);
+                    Work(T, OR);
+                    Work(T, IO_SUBMIT);
+                    Work(T, IO_WAIT);
+                    Work(T, IO_SHUTDOWN);
+                    Work(T, IO_CTL);
                 }
                 break;
             }
         case S:
             {
-                auto instruction = viua::arch::ops::S::decode(raw);
-                if constexpr (VIUA_TRACE_CYCLES) {
-                    viua::TRACE_STREAM << "    " << instruction.to_string()
-                                       << viua::TRACE_STREAM.endl;
-                }
-
-                using viua::arch::ops::OPCODE_S;
-                switch (static_cast<OPCODE_S>(opcode)) {
-#define Work(OP)                               \
-    case OPCODE_S::OP:                         \
-        execute(OP{ instruction }, stack, ip); \
-        break
-#define Flow(OP)       \
-    case OPCODE_S::OP: \
-        return execute(OP{ instruction }, stack, ip)
-                    Work(FRAME);
-                    Flow(RETURN);
-                    Work(ATOM);
-                    Work(DOUBLE);
-                    Work(SELF);
-#undef Work
-#undef Flow
+                Intro(S)
+                {
+                    Work(S, FRAME);
+                    Flow(S, RETURN);
+                    Work(S, ATOM);
+                    Work(S, DOUBLE);
+                    Work(S, SELF);
                 }
                 break;
             }
         case I:
             {
-                auto instruction = viua::arch::ops::I::decode(raw);
-                if constexpr (VIUA_TRACE_CYCLES) {
-                    viua::TRACE_STREAM << "    " << instruction.to_string()
-                                       << viua::TRACE_STREAM.endl;
-                }
-
-                using viua::arch::ops::OPCODE_I;
-                switch (static_cast<OPCODE_I>(opcode)) {
-#define Work(OP)                               \
-    case OPCODE_I::OP:                         \
-        execute(OP{ instruction }, stack, ip); \
-        break
-                    Work(LUI);
-                    Work(LUIU);
-                    Work(LLI);
-                    Work(FLOAT);
-                    Work(CAST);
-                    Work(ARODP);
-                    Work(ATXTP);
-#undef Work
+                Intro(I)
+                {
+                    Work(I, LUI);
+                    Work(I, LUIU);
+                    Work(I, LLI);
+                    Work(I, FLOAT);
+                    Work(I, CAST);
+                    Work(I, ARODP);
+                    Work(I, ATXTP);
                 }
                 break;
             }
         case U:
             {
-                auto instruction = viua::arch::ops::U::decode(raw);
-                if constexpr (VIUA_TRACE_CYCLES) {
-                    viua::TRACE_STREAM << "    " << instruction.to_string()
-                                       << viua::TRACE_STREAM.endl;
-                }
-
-                using viua::arch::ops::OPCODE_U;
-                switch (static_cast<OPCODE_U>(opcode)) {
-#define Work(OP)                               \
-    case OPCODE_U::OP:                         \
-        execute(OP{ instruction }, stack, ip); \
-        break
-                    Work(ADDI);
-                    Work(ADDIU);
-                    Work(SUBI);
-                    Work(SUBIU);
-                    Work(MULI);
-                    Work(MULIU);
-                    Work(DIVI);
-                    Work(DIVIU);
-#undef Work
+                Intro(U)
+                {
+                    Work(U, ADDI);
+                    Work(U, ADDIU);
+                    Work(U, SUBI);
+                    Work(U, SUBIU);
+                    Work(U, MULI);
+                    Work(U, MULIU);
+                    Work(U, DIVI);
+                    Work(U, DIVIU);
                 }
                 break;
             }
@@ -208,44 +178,20 @@ auto execute(
             }
         case M:
             {
-                auto instruction = viua::arch::ops::M::decode(raw);
-                if constexpr (VIUA_TRACE_CYCLES) {
-                    viua::TRACE_STREAM << "    " << instruction.to_string()
-                                       << viua::TRACE_STREAM.endl;
-                }
-
-                using viua::arch::ops::OPCODE_M;
-                switch (static_cast<OPCODE_M>(opcode)) {
-#define Work(OP)                               \
-    case OPCODE_M::OP:                         \
-        execute(OP{ instruction }, stack, ip); \
-        break
-                    Work(SM);
-                    Work(LM);
-                    Work(AA);
-                    Work(AD);
-                    Work(PTR);
-#undef Work
+                Intro(M)
+                {
+                    Work(M, SM);
+                    Work(M, LM);
+                    Work(M, AA);
+                    Work(M, AD);
+                    Work(M, PTR);
                 }
                 break;
             }
         case D:
             {
-                auto instruction = viua::arch::ops::D::decode(raw);
-                if constexpr (VIUA_TRACE_CYCLES) {
-                    viua::TRACE_STREAM << "    " << instruction.to_string()
-                                       << viua::TRACE_STREAM.endl;
-                }
-
-                using viua::arch::ops::OPCODE_D;
-                switch (static_cast<OPCODE_D>(opcode)) {
-#define Work(OP)                               \
-    case OPCODE_D::OP:                         \
-        execute(OP{ instruction }, stack, ip); \
-        break
-#define Flow(OP)       \
-    case OPCODE_D::OP: \
-        return execute(OP{ instruction }, stack, ip)
+                Intro(D)
+                {
                     /*
                      * Call is a special instruction. It transfers the IP to a
                      * semi-random location, instead of just increasing it to
@@ -254,25 +200,23 @@ auto execute(
                      * This is why we return here, and not use the default
                      * behaviour for most of the other instructions.
                      */
-                    Flow(CALL);
-                    Work(BITNOT);
-                    Work(NOT);
-                    Work(COPY);
-                    Work(MOVE);
-                    Work(SWAP);
+                    Flow(D, CALL);
+                    Work(D, BITNOT);
+                    Work(D, NOT);
+                    Work(D, COPY);
+                    Work(D, MOVE);
+                    Work(D, SWAP);
                     /*
                      * If is a special instruction. It transfers IP to a
                      * semi-random location instead of just increasing it to the
                      * next unit. This is why the return is used instead of
                      * break.
                      */
-                    Flow(IF);
-                    Work(IO_PEEK);
-                    Work(ACTOR);
-                    Work(GTS);
-                    Work(GTL);
-#undef Work
-#undef Flow
+                    Flow(D, IF);
+                    Work(D, IO_PEEK);
+                    Work(D, ACTOR);
+                    Work(D, GTS);
+                    Work(D, GTL);
                 }
                 break;
             }
