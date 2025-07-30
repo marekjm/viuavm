@@ -108,6 +108,10 @@ Work_instruction(GTL);
 
 Work_instruction(EARITHMETICSTYLE);
 Work_instruction(EARITHMETICWIDTH);
+Work_instruction(STDADD);
+Work_instruction(STDSUB);
+Work_instruction(STDMUL);
+Work_instruction(STDDIV);
 
 Work_instruction(SM);
 Work_instruction(LM);

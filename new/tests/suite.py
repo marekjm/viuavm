@@ -178,6 +178,7 @@ EBREAK_MEMORY_LINE = re.compile(
     r"([0-9a-f]{16}--[0-9a-f]{2})  ((?:[0-9a-f]{2} ){16})\| (.{16})"
 )
 EBREAK_GLOBALS_LINE = re.compile(r"([a-z_][a-zA-Z0-9_]*) = (is|iu|fl|db) (.*)")
+EBREAK_ENVIRONMENT_LINE = re.compile(r"\[([a-z_][a-zA-Z0-9_]*)\] (.+)")
 PERF_OPS_AND_RUNTIME = re.compile(r"\[vm:perf\] executed ops (\d+), run time (.+)")
 PERF_APPROX_FREQ = re.compile(r"\[vm:perf\] approximate frequency (.+ [kMG]?Hz)")
 
@@ -677,6 +678,16 @@ def consume_globals_contents(ebreak_lines):
     return contents
 
 
+def consume_environment_contents(ebreak_lines):
+    contents = {}
+
+    while ebreak_lines and (line := EBREAK_ENVIRONMENT_LINE.fullmatch(ebreak_lines[0])):
+        ebreak_lines.pop(0)
+        contents[line.group(1)] = line.group(2)
+
+    return contents
+
+
 def consume_live_ebreak_lines(ebreak_lines):
     ebreak = {
         "pid": None,
@@ -727,10 +738,21 @@ def consume_live_ebreak_lines(ebreak_lines):
     else:
         raise Exception("invalid ebreak snapshot (expected gloabls)")
 
+    if ebreak_lines[0] == "environment:":
+        ebreak_lines.pop(0)
+
+        ebreak["environment"] = consume_environment_contents(ebreak_lines)
+    else:
+        raise Exception("invalid ebreak snapshot (expected environment)")
+
     if pid := EBREAK_END.fullmatch(ebreak_lines[0]):
         ebreak_lines.pop(0)
     else:
-        raise Exception("missing ebreak end")
+        if not ebreak_lines:
+            raise Exception("missing ebreak end")
+        else:
+            line = ebreak_lines[0]
+            raise Exception(f"invalid ebreak snapshot (expected end): {line}")
 
     return ebreak
 

@@ -185,6 +185,7 @@ all-silent: \
 	$(BUILD_EXEDIR)/asm \
 	$(BUILD_EXEDIR)/ld \
 	$(BUILD_EXEDIR)/vm \
+	$(BUILD_EXEDIR)/binarith \
 	$(BUILD_BINDIR)/viua
 
 dist: all
@@ -476,6 +477,9 @@ $(BUILD_EXEDIR)/vm: \
 	$(VM_INSTRUCTION_IMPL) \
 	$(BUILD_PREFIX)/runtime/pid.o \
 	$(VM_OPERATION_TYPE_IMPL)
+
+$(BUILD_EXEDIR)/binarith: \
+	$(BUILD_PREFIX)/support/binarith.o
 
 $(BUILD_EXEDIR)/repl: \
 	$(BUILD_PREFIX)/libexec/common.o \

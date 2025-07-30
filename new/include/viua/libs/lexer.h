@@ -215,6 +215,19 @@ inline auto const OPCODE_NAMES = std::set<std::string_view>{
     "amd",
     "ptr",
 
+    "earithmeticstyle",
+    "g.earithmeticstyle",
+    "earithmeticwidth",
+    "g.earithmeticwidth",
+    "stdadd",
+    "g.stdadd",
+    "stdsub",
+    "g.stdsub",
+    "stdmul",
+    "g.stdmul",
+    "stddiv",
+    "g.stddiv",
+
     /*
      * Pseudoinstructions listed below.
      */
