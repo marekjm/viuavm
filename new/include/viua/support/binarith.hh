@@ -86,6 +86,18 @@ auto eq(arithmetic_type const, arithmetic_type const) -> bool;
 auto lt(arithmetic_type const, arithmetic_type const) -> bool;
 auto lte(arithmetic_type const, arithmetic_type const) -> bool;
 }
+
+namespace fixed {
+using with_carry_type = std::pair<bool, arithmetic_type>;
+
+auto inc(arithmetic_type) -> with_carry_type;
+auto dec(arithmetic_type) -> with_carry_type;
+
+auto add(arithmetic_type const, arithmetic_type const) -> with_carry_type;
+auto sub(arithmetic_type const, arithmetic_type const) -> with_carry_type;
+auto mul(arithmetic_type const, arithmetic_type const) -> with_carry_type;
+auto div(arithmetic_type const, arithmetic_type const) -> with_carry_type;
+}
 }
 }
 

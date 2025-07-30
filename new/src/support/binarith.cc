@@ -174,4 +174,44 @@ auto sub(arithmetic_type const lhs, arithmetic_type const rhs) -> arithmetic_typ
     return add(lhs, take_twos_complement(rhs));
 }
 }
+
+namespace fixed {
+auto inc(arithmetic_type v) -> with_carry_type
+{
+    auto tmp = bits::inc(v);
+    if (tmp.size() > v.size()) {
+        return { true, extend(tmp, v.size()) };
+    } else {
+        return { false, tmp };
+    }
+}
+auto dec(arithmetic_type v) -> with_carry_type
+{
+    auto tmp = bits::dec(v);
+    if (tmp.size() > v.size()) {
+        return { true, extend(tmp, v.size()) };
+    } else {
+        return { false, tmp };
+    }
+}
+
+auto add(arithmetic_type const lhs, arithmetic_type const rhs) -> with_carry_type
+{
+    auto tmp = bits::add(lhs, rhs);
+    if (tmp.size() > lhs.size()) {
+        return { true, extend(tmp, lhs.size()) };
+    } else {
+        return { false, tmp };
+    }
+}
+auto sub(arithmetic_type const lhs, arithmetic_type const rhs) -> with_carry_type
+{
+    auto tmp = bits::sub(lhs, rhs);
+    if (tmp.size() > lhs.size()) {
+        return { true, extend(tmp, lhs.size()) };
+    } else {
+        return { false, tmp };
+    }
+}
+}
 }
