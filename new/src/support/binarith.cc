@@ -143,7 +143,7 @@ auto add(arithmetic_type const lhs, arithmetic_type const rhs) -> arithmetic_typ
 
         if (bl and br) {
             v[i] = carry;
-            carry = true;
+            carry = bl and br;
         } else if (bl and not br) {
             if (carry) {
                 v[i] = false;
