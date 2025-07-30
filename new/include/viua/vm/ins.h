@@ -106,6 +106,9 @@ Work_instruction(SELF);
 Work_instruction(GTS);
 Work_instruction(GTL);
 
+Work_instruction(EARITHMETICSTYLE);
+Work_instruction(EARITHMETICWIDTH);
+
 Work_instruction(SM);
 Work_instruction(LM);
 Work_instruction(AA);

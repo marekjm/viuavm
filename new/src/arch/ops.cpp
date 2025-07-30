@@ -162,6 +162,10 @@ auto to_string_impl(
             return "gts";
         case OPCODE::GTL:
             return "gtl";
+        case OPCODE::EARITHMETICSTYLE:
+            return "earithmeticstyle";
+        case OPCODE::EARITHMETICWIDTH:
+            return "earithmeticwidth";
         case OPCODE::CAST:
             return "cast";
         case OPCODE::ARODP:
