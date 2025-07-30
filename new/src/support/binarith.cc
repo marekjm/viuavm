@@ -141,21 +141,11 @@ auto add(arithmetic_type const lhs, arithmetic_type const rhs) -> arithmetic_typ
         auto const bl = (i < lhs.size()) ? lhs[i] : false;
         auto const br = (i < rhs.size()) ? rhs[i] : false;
 
-        if (bl and br) {
-            v[i] = carry;
-            carry = bl and br;
-        } else if (bl and not br) {
+        if (bl xor br) {
             v[i] = not carry;
-            carry = carry;
-        } else if ((not bl) and br) {
-            v[i] = not carry;
-            carry = carry;
-        } else if ((not bl) and (not br)) {
-            v[i] = carry;
-            carry = bl and br;
         } else {
-            /* Impossible. */
-            abort();
+            v[i] = carry;
+            carry = bl and br;
         }
     }
 
