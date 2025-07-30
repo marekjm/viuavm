@@ -128,5 +128,56 @@ auto dec(arithmetic_type v) -> arithmetic_type
 
     return v;
 }
+
+auto add(arithmetic_type const lhs, arithmetic_type const rhs) -> arithmetic_type
+{
+    auto v = arithmetic_type{};
+    v.reserve(std::max(lhs.size(), rhs.size()) + 1);
+    v.resize(std::max(lhs.size(), rhs.size()));
+
+    auto carry = false;
+
+    for (auto i = size_type{ 0 }; i < v.size(); ++i) {
+        auto const bl = (i < lhs.size()) ? lhs[i] : false;
+        auto const br = (i < rhs.size()) ? rhs[i] : false;
+
+        if (bl and br) {
+            v[i] = carry;
+            carry = true;
+        } else if (bl and not br) {
+            if (carry) {
+                v[i] = false;
+                carry = true;
+            } else {
+                v[i] = true;
+                carry = false;
+            }
+        } else if ((not bl) and br) {
+            if (carry) {
+                v[i] = false;
+                carry = true;
+            } else {
+                v[i] = true;
+                carry = false;
+            }
+        } else if ((not bl) and (not br)) {
+            if (carry) {
+                v[i] = true;
+                carry = false;
+            } else {
+                /* do nothing */
+            }
+        } else {
+            /* Impossible. */
+            abort();
+        }
+    }
+
+    if (carry) {
+        v.push_back(carry);
+    }
+
+    return v;
+}
 }
 }
