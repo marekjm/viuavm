@@ -59,8 +59,12 @@ auto to_bool(arithmetic_type const) -> bool;
  * Sign-extend by default. Use the optional expander value to override.
  */
 auto extend(arithmetic_type, size_type const, std::optional<bool> const = std::nullopt) -> arithmetic_type;
+
+auto take_twos_complement(arithmetic_type const) -> arithmetic_type;
+
 auto clip(arithmetic_type const, size_type const) -> arithmetic_type;
-auto invert(arithmetic_type const) -> arithmetic_type;
+
+auto invert(arithmetic_type) -> arithmetic_type;
 auto zero(arithmetic_type const) -> arithmetic_type;
 
 auto is_negative(arithmetic_type const) -> bool;

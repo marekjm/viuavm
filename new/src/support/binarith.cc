@@ -75,6 +75,19 @@ auto extend(arithmetic_type v, size_type const size, std::optional<bool> const e
     return v;
 }
 
+auto invert(arithmetic_type v) -> arithmetic_type
+{
+    for (auto i = size_type{ 0 }; i < v.size(); ++i) {
+        v[i] = not v[i];
+    }
+    return v;
+}
+
+auto take_twos_complement(arithmetic_type const v) -> arithmetic_type
+{
+    return bits::inc(invert(v));
+}
+
 auto is_negative(arithmetic_type const v) -> bool
 {
     if (v.empty()) {
@@ -154,6 +167,11 @@ auto add(arithmetic_type const lhs, arithmetic_type const rhs) -> arithmetic_typ
     }
 
     return v;
+}
+
+auto sub(arithmetic_type const lhs, arithmetic_type const rhs) -> arithmetic_type
+{
+    return add(lhs, take_twos_complement(rhs));
 }
 }
 }
