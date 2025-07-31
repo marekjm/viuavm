@@ -459,7 +459,8 @@ VM_INSTRUCTION_IMPL=\
 	$(BUILD_PREFIX)/vm/ins/impl/earithmetic.o \
 	$(BUILD_PREFIX)/vm/ins/impl/ebreak.o \
 	$(BUILD_PREFIX)/vm/ins/impl/ecall.o \
-	$(BUILD_PREFIX)/vm/ins/impl/io.o
+	$(BUILD_PREFIX)/vm/ins/impl/io.o \
+	$(BUILD_PREFIX)/support/binarith.o
 
 $(BUILD_EXEDIR)/vm: \
 	$(BUILD_PREFIX)/libexec/common.o \

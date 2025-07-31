@@ -27,34 +27,67 @@
 
 
 namespace {
-auto make_saturated_uint(
-    size_t const width) -> uint64_t
+using viua::vm::Stack;
+
+auto calculate_add(
+    Stack& stack,
+    int64_t const lhs,
+    int64_t const rhs) -> int64_t
 {
-    auto v = uint64_t{ 1 };
-    for (auto i = size_t{ 1 }; i < width; ++i) {
-        v = (v << 1) | 1;
+    using namespace viua::arithmetic;
+
+    auto const arithmetic_width = stack.proc->arithmetic_width;
+    auto const arithmetic_lhs =
+        signed_type{ extend(arithmetic_type{ lhs }, arithmetic_width) };
+    auto const arithmetic_rhs =
+        signed_type{ extend(arithmetic_type{ rhs }, arithmetic_width) };
+
+    switch (stack.proc->arithmetic_style) {
+        using enum viua::vm::Process::Arithmetic_style;
+        case Wrapping:
+            {
+                using namespace viua::arithmetic::fixed;
+                return arithmetic_lhs + arithmetic_rhs;
+            }
+        case Trapping:
+            {
+                using namespace viua::arithmetic::fixed;
+                return arithmetic_lhs + arithmetic_rhs;
+            }
+        case Saturating:
+            {
+                using namespace viua::arithmetic::saturating;
+                return arithmetic_lhs + arithmetic_rhs;
+            }
     }
-    return v;
+
+    throw viua::vm::abort_execution{
+        stack, "broken environment: bad arithmetic style"
+    };
 }
 
-auto saturating_add(
+auto calculate_add(
+    Stack&,
     uint64_t const lhs,
-    uint64_t const rhs,
-    size_t const width) -> uint64_t
+    uint64_t const rhs) -> int64_t
 {
-    auto const result = (lhs + rhs);
-    auto const limit  = make_saturated_uint(width);
-    return (result > limit) ? limit : result;
+    return (lhs + rhs);
 }
 
-auto saturating_sub(
-    uint64_t const lhs,
-    uint64_t const rhs,
-    size_t const width) -> uint64_t
+auto calculate_sub(
+    Stack&,
+    int64_t const lhs,
+    int64_t const rhs) -> int64_t
 {
-    auto const result = (lhs >= rhs) ? (lhs - rhs) : 0;
-    auto const limit  = make_saturated_uint(width);
-    return (result > limit) ? limit : result;
+    return (lhs - rhs);
+}
+
+auto calculate_sub(
+    Stack&,
+    uint64_t const lhs,
+    uint64_t const rhs) -> int64_t
+{
+    return (lhs - rhs);
 }
 }  // namespace
 
@@ -140,15 +173,12 @@ auto execute(
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
 
-    using fn_type = std::plus<>;
-
     if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
-        out = fn_type{}(*lhs.get<int64_t>(), *v);
+        out = calculate_add(stack, *lhs.get<int64_t>(), *v);
         return;
     }
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
-        out = saturating_add(
-            *lhs.get<uint64_t>(), *v, stack.proc->arithmetic_width);
+        out = calculate_add(stack, *lhs.get<uint64_t>(), *v);
         return;
     }
 
@@ -169,15 +199,12 @@ auto execute(
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
 
-    using fn_type = std::minus<>;
-
     if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
-        out = fn_type{}(*lhs.get<int64_t>(), *v);
+        out = calculate_sub(stack, *lhs.get<int64_t>(), *v);
         return;
     }
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
-        out = saturating_sub(
-            *lhs.get<uint64_t>(), *v, stack.proc->arithmetic_width);
+        out = calculate_sub(stack, *lhs.get<uint64_t>(), *v);
         return;
     }
 
