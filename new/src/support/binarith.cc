@@ -112,7 +112,7 @@ auto operator-(
  * Implementation of saturating arithmetic.
  */
 namespace viua::arithmetic::saturating {
-constexpr auto DEBUG_SATURATING = true;
+constexpr auto DEBUG_SATURATING = false;
 
 auto operator+(
     signed_type const lhs,
