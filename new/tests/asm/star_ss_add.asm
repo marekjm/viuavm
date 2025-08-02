@@ -14,63 +14,154 @@
     li $1.l, 8u
     earithmeticwidth void, $1.l
 
-    ; zero op zero
+    ;---------------------------------------------------------------------------
+    ; MAIN BODY OF THE TEST
+    ;----------------------
+
+
+    ;-----------------------------------
+    ; ZERO
+
+    ; zero # zero
     li $1.l, 0
     li $2.l, 0
     stdadd $3.l, $1.l, $2.l
 
-    ; -1 op 1
-    li $1.l, -1
+    ; zero # one
+    li $1.l, 0
     li $2.l, 1
     stdadd $4.l, $1.l, $2.l
 
-    ; -1 op -1
-    li $1.l, -1
+    ; zero # -one
+    li $1.l, 0
     li $2.l, -1
     stdadd $5.l, $1.l, $2.l
 
-    ; 1 op 1
+    ; zero # max
     li $1.l, 1
-    li $2.l, 1
+    li $2.l, 127
     stdadd $6.l, $1.l, $2.l
 
-    ; negative limit op positive limit
-    li $1.l, -128
-    li $2.l, 127
+    ; zero # min
+    li $1.l, 0
+    li $2.l, -128
     stdadd $7.l, $1.l, $2.l
 
-    ; positive limit op negative limit
-    li $1.l, 127
-    li $2.l, -128
+
+    ;-----------------------------------
+    ; ONE
+
+    ; one # zero
+    li $1.l, 1
+    li $2.l, 0
     stdadd $8.l, $1.l, $2.l
 
-    ; negative limit op negative limit
-    li $1.l, -128
-    stdadd $9.l, $1.l, $1.l
-
-    ; positive limit op positive limit
-    li $1.l, 127
-    stdadd $10.l, $1.l, $1.l
-
-    ; negative limit op 1
-    li $1.l, -128
+    ; one # one
+    li $1.l, 1
     li $2.l, 1
+    stdadd $9.l, $1.l, $2.l
+
+    ; one # -one
+    li $1.l, 1
+    li $2.l, -1
+    stdadd $10.l, $1.l, $2.l
+
+    ; one # max
+    li $1.l, 1
+    li $2.l, 127
     stdadd $11.l, $1.l, $2.l
 
-    ; negative limit op -1
-    li $1.l, -128
-    li $2.l, -1
+    ; one # min
+    li $1.l, 1
+    li $2.l, -128
     stdadd $12.l, $1.l, $2.l
 
-    ; positive limit op 1
-    li $1.l, 127
-    li $2.l, 1
+
+    ;-----------------------------------
+    ; -ONE
+
+    ; -one # zero
+    li $1.l, -1
+    li $2.l, 0
     stdadd $13.l, $1.l, $2.l
 
-    ; positive limit op -1
+    ; -one # one
+    li $1.l, -1
+    li $2.l, 1
+    stdadd $14.l, $1.l, $2.l
+
+    ; -one # -one
+    li $1.l, -1
+    li $2.l, -1
+    stdadd $15.l, $1.l, $2.l
+
+    ; -one # max
+    li $1.l, -1
+    li $2.l, 127
+    stdadd $16.l, $1.l, $2.l
+
+    ; -one # min
+    li $1.l, -1
+    li $2.l, -128
+    stdadd $17.l, $1.l, $2.l
+
+
+    ;-----------------------------------
+    ; MAX
+
+    ; max # zero
+    li $1.l, 127
+    li $2.l, 0
+    stdadd $18.l, $1.l, $2.l
+
+    ; max # one
+    li $1.l, 127
+    li $2.l, 1
+    stdadd $19.l, $1.l, $2.l
+
+    ; max # -one
     li $1.l, 127
     li $2.l, -1
-    stdadd $14.l, $1.l, $2.l
+    stdadd $20.l, $1.l, $2.l
+
+    ; max # max
+    li $1.l, 127
+    li $2.l, 127
+    stdadd $21.l, $1.l, $2.l
+
+    ; max # min
+    li $1.l, 127
+    li $2.l, -128
+    stdadd $22.l, $1.l, $2.l
+
+
+    ;-----------------------------------
+    ; MIN
+
+    ; min # zero
+    li $1.l, -128
+    li $2.l, 0
+    stdadd $23.l, $1.l, $2.l
+
+    ; min # one
+    li $1.l, -128
+    li $2.l, 1
+    stdadd $24.l, $1.l, $2.l
+
+    ; min # -one
+    li $1.l, -128
+    li $2.l, -1
+    stdadd $25.l, $1.l, $2.l
+
+    ; min # max
+    li $1.l, -128
+    li $2.l, 127
+    stdadd $26.l, $1.l, $2.l
+
+    ; min # min
+    li $1.l, -128
+    li $2.l, -128
+    stdadd $27.l, $1.l, $2.l
 
     ebreak
     return

@@ -62,7 +62,7 @@ auto calculate_add(
     }
 
     throw viua::vm::abort_execution{
-        stack, "broken environment: bad arithmetic style"
+        stack, "broken environment: bad arithmetic style for addition"
     };
 }
 
