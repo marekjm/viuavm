@@ -38,7 +38,7 @@
     stdsub $5.l, $1.l, $2.l
 
     ; zero # max
-    li $1.l, 1
+    li $1.l, 0
     li $2.l, 127
     stdsub $6.l, $1.l, $2.l
 

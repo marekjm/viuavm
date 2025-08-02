@@ -2,7 +2,7 @@ of #last
 [3.l] is 0000000000000000 0
 [4.l] is ffffffffffffffff -1
 [5.l] is 0000000000000001 1
-[6.l] is ffffffffffffff82 -126
+[6.l] is ffffffffffffff81 -127
 [7.l] is 000000000000007f 127
 [8.l] is 0000000000000001 1
 [9.l] is 0000000000000000 0
