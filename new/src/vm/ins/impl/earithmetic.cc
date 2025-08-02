@@ -75,11 +75,40 @@ auto calculate_add(
 }
 
 auto calculate_sub(
-    Stack&,
+    Stack& stack,
     int64_t const lhs,
     int64_t const rhs) -> int64_t
 {
-    return (lhs - rhs);
+    using namespace viua::arithmetic;
+
+    auto const arithmetic_width = stack.proc->arithmetic_width;
+    auto const arithmetic_lhs =
+        signed_type{ extend(arithmetic_type{ lhs }, arithmetic_width) };
+    auto const arithmetic_rhs =
+        signed_type{ extend(arithmetic_type{ rhs }, arithmetic_width) };
+
+    switch (stack.proc->arithmetic_style) {
+        using enum viua::vm::Process::Arithmetic_style;
+        case Wrapping:
+            {
+                using namespace viua::arithmetic::fixed;
+                return arithmetic_lhs - arithmetic_rhs;
+            }
+        case Trapping:
+            {
+                using namespace viua::arithmetic::fixed;
+                return arithmetic_lhs - arithmetic_rhs;
+            }
+        case Saturating:
+            {
+                using namespace viua::arithmetic::saturating;
+                return arithmetic_lhs - arithmetic_rhs;
+            }
+    }
+
+    throw viua::vm::abort_execution{
+        stack, "broken environment: bad arithmetic style for subtraction"
+    };
 }
 
 auto calculate_sub(
