@@ -1539,7 +1539,7 @@ def main(args):
     CACHE_DIR = os.path.join(CASES_DIR, ".cache")
 
     if len(args) > 1:
-        run_only_these_cases = set(args[1].split(","))
+        run_only_these_cases = set(args[1:])
         d = dict(cases)
         if "@fail" in run_only_these_cases:
             run_only_these_cases.remove("@fail")
