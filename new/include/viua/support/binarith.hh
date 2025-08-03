@@ -65,6 +65,8 @@ struct arithmetic_type {
     auto at(size_type const) const -> bit_type;
 
     auto push_back(bit_type const) -> void;
+
+    static auto zero(size_type const) -> arithmetic_type;
 };
 using size_type = arithmetic_type::size_type;
 

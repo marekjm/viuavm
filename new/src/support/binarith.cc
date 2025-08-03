@@ -29,6 +29,11 @@
  * module.
  */
 namespace viua::arithmetic {
+auto arithmetic_type::zero(size_type const size) -> arithmetic_type
+{
+    return extend(arithmetic_type{}, size, false);
+}
+
 arithmetic_type::operator bool() const
 {
     return std::find(std::begin(n), std::end(n), true) != std::end(n);
