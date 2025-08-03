@@ -215,7 +215,9 @@ auto operator+(
     signed_type const rhs) -> signed_type
 {
     auto const lhs_is_neg = lhs < zero_type{};
+    auto const lhs_is_zer = not lhs;
     auto const rhs_is_neg = rhs < zero_type{};
+    auto const rhs_is_zer = not rhs;
 
     /*
      * Expect Greater or Equal to Zero only of both sides are non-negative.
@@ -232,11 +234,11 @@ auto operator+(
          *       0 + -1
          *      -1 + -1
          */
-        ((lhs_is_neg or (not lhs)) and rhs_is_neg)
+        ((lhs_is_neg or lhs_is_zer) and rhs_is_neg)
         /*
          * ...when left hand side is negative, and right hand size is zero.
          */
-        or (lhs_is_neg and (not rhs))
+        or (lhs_is_neg and rhs_is_zer)
         /*
          * ...when left hand side is negative, right hand side is non-negative,
          * and the right hand side is less than the twos-complement of left hand
@@ -256,6 +258,7 @@ auto operator+(
      * Raw result of the operation, assuming infinite-width integers.
      */
     auto const raw = signed_type{ bits::add(lhs.n, rhs.n) };
+    auto const raw_is_neg = raw < zero_type{};
 
     /*
      * Now let's detect overflow.
@@ -270,8 +273,8 @@ auto operator+(
      * otherwise, we need to fix the situation.
      */
     auto const oversize = (raw.size() > lhs.size());
-    auto const overflow = (expect_gez and (raw < zero_type{}))
-                          or (expect_ltz and not(raw < zero_type{}));
+    auto const overflow = (expect_gez and raw_is_neg)
+                          or (expect_ltz and (not raw_is_neg));
 
 
     if constexpr (DEBUG_SATURATING) {
@@ -295,12 +298,13 @@ auto operator+(
 
     if (oversize) {
         auto const clipped = signed_type{ extend(raw.n, lhs.size()) };
+        auto const clipped_is_neg = clipped < zero_type{};
 
-        if (expect_ltz and not(clipped < zero_type{})) {
+        if (expect_ltz and not clipped_is_neg) {
             return signed_type::min(lhs.size());
         }
 
-        if (expect_gez and (clipped < zero_type{})) {
+        if (expect_gez and clipped_is_neg) {
             return signed_type::max(lhs.size());
         }
 
