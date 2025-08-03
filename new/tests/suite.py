@@ -1639,6 +1639,7 @@ def main(args):
         tag: str = None
 
         internal_test_suite_failure: Exception = None
+        skipped = False
         try:
             if type(result := rc()) is tuple:
                 status, result, symptom, run_time, perf = result
@@ -1687,6 +1688,7 @@ def main(args):
                     tag = "skip"
                     tag_color = "yellow"
                     skip_cases += 1
+                    skipped = True
         except Exception as e:
             internal_test_suite_failure = e
             tag = "bork"
@@ -1697,7 +1699,11 @@ def main(args):
 
         print(
             "{}[{}] {}  {}".format(
-                (PROGRESS_INDICATOR_ERASER if PROGRESS_INDICATORS else ""),
+                (
+                    PROGRESS_INDICATOR_ERASER
+                    if (PROGRESS_INDICATORS and not skipped)
+                    else ""
+                ),
                 colorise(tag_color, f"{tag:^4s}")
                 + ((" => " + colorise("light_red", symptom)) if symptom else ""),
                 (
