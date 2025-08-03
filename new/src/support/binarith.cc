@@ -29,9 +29,13 @@
  * module.
  */
 namespace viua::arithmetic {
+auto arithmetic_type::of_size(size_type const size, bit_type const bit) -> arithmetic_type
+{
+    return extend(arithmetic_type{}, size, bit);
+}
 auto arithmetic_type::zero(size_type const size) -> arithmetic_type
 {
-    return extend(arithmetic_type{}, size, false);
+    return of_size(size, false);
 }
 
 arithmetic_type::operator bool() const
@@ -77,13 +81,31 @@ auto signed_type::size() const -> size_type
     return n.size();
 }
 
+auto signed_type::max(size_type const size) -> signed_type
+{
+    auto v     = arithmetic_type::of_size(size, true);
+    v.n.back() = false;
+    return signed_type{ v };
+}
+
+auto signed_type::min(size_type const size) -> signed_type
+{
+    auto v     = arithmetic_type::of_size(size, false);
+    v.n.back() = true;
+    return signed_type{ v };
+}
+
+auto signed_type::zero(size_type const size) -> signed_type
+{
+    return signed_type{ arithmetic_type::zero(size) };
+}
+
 auto operator<(
     signed_type const v,
     zero_type const) -> bool
 {
     return v.n.n.back() == true;
 }
-
 auto operator>(
     signed_type const v,
     zero_type const) -> bool
@@ -275,15 +297,11 @@ auto operator+(
         auto const clipped = signed_type{ extend(raw.n, lhs.size()) };
 
         if (expect_ltz and not(clipped < zero_type{})) {
-            auto lower_limit     = extend(arithmetic_type{}, lhs.size(), false);
-            lower_limit.n.back() = true;
-            return signed_type{ lower_limit };
+            return signed_type::min(lhs.size());
         }
 
         if (expect_gez and (clipped < zero_type{})) {
-            auto upper_limit     = extend(arithmetic_type{}, lhs.size(), true);
-            upper_limit.n.back() = false;
-            return signed_type{ upper_limit };
+            return signed_type::max(lhs.size());
         }
 
         return clipped;
@@ -294,15 +312,11 @@ auto operator+(
      * overflow: return the upper limit.
      */
     if (overflow and expect_gez) {
-        auto upper_limit     = extend(arithmetic_type{}, lhs.size(), true);
-        upper_limit.n.back() = false;
-        return signed_type{ upper_limit };
+        return signed_type::max(lhs.size());
     }
 
     if (overflow and expect_ltz) {
-        auto lower_limit     = extend(arithmetic_type{}, lhs.size(), false);
-        lower_limit.n.back() = true;
-        return signed_type{ lower_limit };
+        return signed_type::min(lhs.size());
     }
 
     return raw;
@@ -401,30 +415,22 @@ auto operator-(
         auto const clipped = signed_type{ extend(raw.n, lhs.size()) };
 
         if (expect_ltz and not(clipped < zero_type{})) {
-            auto lower_limit     = extend(arithmetic_type{}, lhs.size(), false);
-            lower_limit.n.back() = true;
-            return signed_type{ lower_limit };
+            return signed_type::min(lhs.size());
         }
 
         if (expect_gtz and (clipped < zero_type{})) {
-            auto upper_limit     = extend(arithmetic_type{}, lhs.size(), true);
-            upper_limit.n.back() = false;
-            return signed_type{ upper_limit };
+            return signed_type::max(lhs.size());
         }
 
         return clipped;
     }
 
     if (overflow and expect_gtz) {
-        auto upper_limit     = extend(arithmetic_type{}, lhs.size(), true);
-        upper_limit.n.back() = false;
-        return signed_type{ upper_limit };
+        return signed_type::max(lhs.size());
     }
 
     if (overflow and expect_ltz) {
-        auto lower_limit     = extend(arithmetic_type{}, lhs.size(), false);
-        lower_limit.n.back() = true;
-        return signed_type{ lower_limit };
+        return signed_type::min(lhs.size());
     }
 
     return raw;

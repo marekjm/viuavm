@@ -53,6 +53,9 @@ struct arithmetic_type {
         }
     }
 
+    static auto of_size(size_type const, bit_type const = false) -> arithmetic_type;
+    static auto zero(size_type const) -> arithmetic_type;
+
     explicit operator bool() const;
 
     inline auto operator[](size_type const i) const -> bit_type
@@ -65,8 +68,6 @@ struct arithmetic_type {
     auto at(size_type const) const -> bit_type;
 
     auto push_back(bit_type const) -> void;
-
-    static auto zero(size_type const) -> arithmetic_type;
 };
 using size_type = arithmetic_type::size_type;
 
@@ -94,6 +95,10 @@ struct signed_type {
         arithmetic_type v)
         : n{ std::move(v) }
     {}
+
+    static auto max(size_type const) -> signed_type;
+    static auto min(size_type const) -> signed_type;
+    static auto zero(size_type const) -> signed_type;
 
     template<typename T, typename = std::enable_if_t<std::is_signed_v<T>>>
     explicit operator T() const
@@ -142,6 +147,9 @@ struct unsigned_type {
         T const v)
         : n{ v }
     {}
+
+    static auto max(size_type const) -> signed_type;
+    static auto min(size_type const) -> signed_type;
 };
 
 
