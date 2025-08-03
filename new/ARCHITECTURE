@@ -88,12 +88,12 @@ S-FORMAT
 
 One-way (single) register access.
 
- 63                   32|31 24|23     8
+ 63                   24|23 16|15     0
 +-----------------------+-----+--------+
 |                       | rgr | opcode |
 +-----------------------+-----+--------+
 
-Bits 63...32 are reserved and have unspecified value.
+Bits 63...24 are reserved and have unspecified value.
 
 
 M-FORMAT
@@ -107,7 +107,7 @@ with -M-emory.
 |     | off | spc | src | dst | opcode |
 +-----+-----+-----+-----+-----+--------+
 
-Bits 63...58 are reserved and have unspecified value.
+Bits 63...56 are reserved and have unspecified value.
 
 
 I-FORMAT
@@ -120,7 +120,7 @@ One-way register access with 32-bit wide immediate value.
 |    immediate    |     | dst | opcode |
 +-----------------+-----+-----+--------+
 
-Bits 31...24 are reserved and have unspecified value.
+Bits 63...32 are reserved and have unspecified value.
 
 
 U-FORMAT
