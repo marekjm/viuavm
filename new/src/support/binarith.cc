@@ -139,6 +139,21 @@ auto operator<(
 
     return false;
 }
+auto operator==(
+    signed_type const lhs,
+    signed_type const rhs) -> bool
+{
+    if (lhs.size() != rhs.size()) {
+        throw std::runtime_error{"lt: mismatched bit widths"};
+    }
+
+    for (auto i = size_type{ 0 }; i < lhs.size(); ++i) {
+        if (lhs[i] != rhs[i]) {
+            return false;
+        }
+    }
+    return true;
+}
 }  // namespace viua::arithmetic
 
 

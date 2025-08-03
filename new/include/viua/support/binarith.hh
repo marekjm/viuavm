@@ -116,6 +116,7 @@ struct signed_type {
 auto operator<(signed_type const, zero_type const) -> bool;
 
 auto operator<(signed_type const, signed_type const) -> bool;
+auto operator==(signed_type const, signed_type const) -> bool;
 
 
 struct unsigned_type {
@@ -168,9 +169,6 @@ auto add(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
 auto sub(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
 auto mul(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
 auto div(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
-
-auto eq(arithmetic_type const, arithmetic_type const) -> bool;
-auto lte(arithmetic_type const, arithmetic_type const) -> bool;
 }  // namespace bits
 
 namespace fixed {
