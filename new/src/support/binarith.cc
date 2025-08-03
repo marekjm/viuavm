@@ -85,6 +85,60 @@ auto operator>(
 {
     return ((not(v < zero_type{})) and static_cast<bool>(v));
 }
+
+auto operator<(
+    signed_type const lhs,
+    signed_type const rhs) -> bool
+{
+    if (lhs.size() != rhs.size()) {
+        throw std::runtime_error{"lt: mismatched bit widths"};
+    }
+
+    auto const lhs_is_negative = lhs < zero_type{};
+    auto const rhs_is_negative = rhs < zero_type{};
+    if (lhs_is_negative and not rhs_is_negative) {
+        return true;
+    }
+    if (rhs_is_negative and not lhs_is_negative) {
+        return false;
+    }
+
+    /*
+     * At this point we are sure that both values have the same sign. This means
+     * we can convert them both to positive values and compare those, using a
+     * simple algorithm, with one important caveat.
+     *
+     * Let's consider two examples:
+     *
+     *   original |  working  |           |
+     *  ----+-----+-----+-----+ operation + result
+     *  lhs | rhs | lhs | rhs |           | 
+     *  ----+-----+-----+-----+-----------+-------
+     *    6 |   9 |  6  |  9  |   6 < 9   | true
+     *  ----+-----+-----+-----+-----------+-------+
+     *   -6 |  -9 |  6  |  9  |   6 < 9   | true  | THIS WOULD BE WRONG!
+     *  ----+-----+-----+-----+-----------+-------+
+     *   -6 |  -9 |  9  |  6  |   9 < 6   | false | LHS AND RHS MUST BE SWAPPED!
+     *
+     */
+    auto const negative_numbers = lhs_is_negative;
+    auto const working_lhs = negative_numbers ? ~rhs : lhs;
+    auto const working_rhs = negative_numbers ? ~lhs : rhs;
+
+    for (auto i = working_lhs.size(); i > 0; --i) {
+        auto const lb = working_lhs.n.at(i - 1);
+        auto const rb = working_rhs.n.at(i - 1);
+
+        if (lb < rb) {
+            return true;
+        }
+        if (lb > rb) {
+            return false;
+        }
+    }
+
+    return false;
+}
 }  // namespace viua::arithmetic
 
 
