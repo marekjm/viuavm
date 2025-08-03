@@ -53,7 +53,7 @@ struct arithmetic_type {
         }
     }
 
-    operator bool() const;
+    explicit operator bool() const;
 
     auto size() const -> size_type;
     auto test(size_type const) const -> bool;
@@ -88,7 +88,7 @@ struct signed_type {
     {}
 
     template<typename T, typename = std::enable_if_t<std::is_signed_v<T>>>
-    operator T() const
+    explicit operator T() const
     {
         constexpr auto target_width = (sizeof(T) * 8);
         if constexpr (false) {
@@ -107,7 +107,7 @@ struct signed_type {
         return static_cast<T>(bs.to_ullong());
     }
 
-    operator bool() const;
+    explicit operator bool() const;
 
     auto operator~() const -> signed_type;
 

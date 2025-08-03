@@ -47,17 +47,17 @@ auto calculate_add(
         case Wrapping:
             {
                 using namespace viua::arithmetic::fixed;
-                return arithmetic_lhs + arithmetic_rhs;
+                return static_cast<int64_t>(arithmetic_lhs + arithmetic_rhs);
             }
         case Trapping:
             {
                 using namespace viua::arithmetic::fixed;
-                return arithmetic_lhs + arithmetic_rhs;
+                return static_cast<int64_t>(arithmetic_lhs + arithmetic_rhs);
             }
         case Saturating:
             {
                 using namespace viua::arithmetic::saturating;
-                return arithmetic_lhs + arithmetic_rhs;
+                return static_cast<int64_t>(arithmetic_lhs + arithmetic_rhs);
             }
     }
 
@@ -92,17 +92,17 @@ auto calculate_sub(
         case Wrapping:
             {
                 using namespace viua::arithmetic::fixed;
-                return arithmetic_lhs - arithmetic_rhs;
+                return static_cast<int64_t>(arithmetic_lhs - arithmetic_rhs);
             }
         case Trapping:
             {
                 using namespace viua::arithmetic::fixed;
-                return arithmetic_lhs - arithmetic_rhs;
+                return static_cast<int64_t>(arithmetic_lhs - arithmetic_rhs);
             }
         case Saturating:
             {
                 using namespace viua::arithmetic::saturating;
-                return arithmetic_lhs - arithmetic_rhs;
+                return static_cast<int64_t>(arithmetic_lhs - arithmetic_rhs);
             }
     }
 
