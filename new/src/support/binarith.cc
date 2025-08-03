@@ -18,6 +18,7 @@
  */
 
 #include <algorithm>
+#include <numeric>
 #include <print>
 #include <sstream>
 
@@ -61,6 +62,15 @@ auto arithmetic_type::push_back(
     bit_type const bit) -> void
 {
     n.push_back(bit);
+}
+
+auto operator<<(
+    arithmetic_type const v,
+    size_t const shift) -> arithmetic_type
+{
+    auto a = arithmetic_type::zero(shift);
+    std::copy(v.n.begin(), v.n.end(), std::back_inserter(a.n));
+    return a;
 }
 }  // namespace viua::arithmetic
 
@@ -206,6 +216,13 @@ auto operator-(
     signed_type const rhs) -> signed_type
 {
     return signed_type{ extend(bits::sub(lhs.n, rhs.n), lhs.size()) };
+}
+
+auto operator*(
+    signed_type const lhs,
+    signed_type const rhs) -> signed_type
+{
+    return signed_type{ extend(bits::mul(lhs.n, rhs.n), lhs.size()) };
 }
 }  // namespace viua::arithmetic::fixed
 
@@ -445,6 +462,13 @@ auto operator-(
 
     return raw;
 }
+
+auto operator*(
+    signed_type const lhs,
+    signed_type const) -> signed_type
+{
+    return signed_type::zero(lhs.size());
+}
 }  // namespace viua::arithmetic::saturating
 
 
@@ -546,6 +570,41 @@ auto sub(
     }
 
     return add(lhs, take_twos_complement(rhs));
+}
+
+auto mul(
+    arithmetic_type const lhs,
+    arithmetic_type const rhs) -> arithmetic_type
+{
+    auto intermediates = std::vector<arithmetic_type>{};
+    intermediates.reserve(rhs.size() + 1);
+
+    /*
+     * Make sure the result is *always* has at least one entry (in case the rhs
+     * is all zero bits), and that the results width is *always* the sum of
+     * operands' widths.
+     */
+    intermediates.emplace_back(arithmetic_type::zero(lhs.size() + rhs.size()));
+
+    for (auto i = size_type{ 0 }; i < rhs.size(); ++i) {
+        if (not rhs[i]) {
+            /*
+             * Multiplication by zero is always zero, so this bit can be
+             * skipped. There is no reason to accumulate intermediate zero
+             * results and slow things down.
+             */
+            continue;
+        }
+
+        intermediates.emplace_back(lhs << i);
+    }
+
+    return std::accumulate(intermediates.begin(),
+                           intermediates.end(),
+                           arithmetic_type::zero(lhs.size() + rhs.size()),
+                           [](arithmetic_type const& l,
+                              arithmetic_type const& r) -> arithmetic_type
+                           { return bits::add(l, r); });
 }
 }  // namespace viua::arithmetic::bits
 

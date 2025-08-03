@@ -118,6 +118,51 @@ auto calculate_sub(
 {
     return (lhs - rhs);
 }
+
+auto calculate_mul(
+    Stack& stack,
+    int64_t const lhs,
+    int64_t const rhs) -> int64_t
+{
+    using namespace viua::arithmetic;
+
+    auto const arithmetic_width = stack.proc->arithmetic_width;
+    auto const arithmetic_lhs =
+        signed_type{ extend(arithmetic_type{ lhs }, arithmetic_width) };
+    auto const arithmetic_rhs =
+        signed_type{ extend(arithmetic_type{ rhs }, arithmetic_width) };
+
+    switch (stack.proc->arithmetic_style) {
+        using enum viua::vm::Process::Arithmetic_style;
+        case Wrapping:
+            {
+                using namespace viua::arithmetic::fixed;
+                return static_cast<int64_t>(arithmetic_lhs * arithmetic_rhs);
+            }
+        case Trapping:
+            {
+                using namespace viua::arithmetic::fixed;
+                return static_cast<int64_t>(arithmetic_lhs * arithmetic_rhs);
+            }
+        case Saturating:
+            {
+                using namespace viua::arithmetic::saturating;
+                return static_cast<int64_t>(arithmetic_lhs * arithmetic_rhs);
+            }
+    }
+
+    throw viua::vm::abort_execution{
+        stack, "broken environment: bad arithmetic style for subtraction"
+    };
+}
+
+auto calculate_mul(
+    Stack&,
+    uint64_t const lhs,
+    uint64_t const rhs) -> uint64_t
+{
+    return (lhs * rhs);
+}
 }  // namespace
 
 
@@ -254,14 +299,12 @@ auto execute(
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
 
-    using fn_type = std::multiplies<>;
-
     if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
-        out = fn_type{}(*lhs.get<int64_t>(), *v);
+        out = calculate_mul(stack, *lhs.get<int64_t>(), *v);
         return;
     }
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
-        out = fn_type{}(*lhs.get<uint64_t>(), *v);
+        out = calculate_mul(stack, *lhs.get<uint64_t>(), *v);
         return;
     }
 

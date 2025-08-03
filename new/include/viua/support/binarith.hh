@@ -73,6 +73,8 @@ struct arithmetic_type {
 };
 using size_type = arithmetic_type::size_type;
 
+auto operator<<(arithmetic_type const, size_t const) -> arithmetic_type;
+
 /*
  * Sign-extend by default. Use the optional expander value to override.
  */
@@ -134,6 +136,7 @@ struct signed_type {
     auto size() const -> size_type;
 };
 auto operator<(signed_type const, zero_type const) -> bool;
+auto operator>(signed_type const, zero_type const) -> bool;
 
 auto operator<(signed_type const, signed_type const) -> bool;
 auto operator==(signed_type const, signed_type const) -> bool;
@@ -197,11 +200,13 @@ auto div(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
 namespace fixed {
 auto operator+(signed_type const, signed_type const) -> signed_type;
 auto operator-(signed_type const, signed_type const) -> signed_type;
+auto operator*(signed_type const, signed_type const) -> signed_type;
 }  // namespace fixed
 
 namespace saturating {
 auto operator+(signed_type const, signed_type const) -> signed_type;
 auto operator-(signed_type const, signed_type const) -> signed_type;
+auto operator*(signed_type const, signed_type const) -> signed_type;
 }  // namespace saturating
 
 #if 0
