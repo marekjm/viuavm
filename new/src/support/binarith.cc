@@ -29,11 +29,14 @@
  * module.
  */
 namespace viua::arithmetic {
-auto arithmetic_type::of_size(size_type const size, bit_type const bit) -> arithmetic_type
+auto arithmetic_type::of_size(
+    size_type const size,
+    bit_type const bit) -> arithmetic_type
 {
     return extend(arithmetic_type{}, size, bit);
 }
-auto arithmetic_type::zero(size_type const size) -> arithmetic_type
+auto arithmetic_type::zero(
+    size_type const size) -> arithmetic_type
 {
     return of_size(size, false);
 }
@@ -81,21 +84,24 @@ auto signed_type::size() const -> size_type
     return n.size();
 }
 
-auto signed_type::max(size_type const size) -> signed_type
+auto signed_type::max(
+    size_type const size) -> signed_type
 {
     auto v     = arithmetic_type::of_size(size, true);
     v.n.back() = false;
     return signed_type{ v };
 }
 
-auto signed_type::min(size_type const size) -> signed_type
+auto signed_type::min(
+    size_type const size) -> signed_type
 {
     auto v     = arithmetic_type::of_size(size, false);
     v.n.back() = true;
     return signed_type{ v };
 }
 
-auto signed_type::zero(size_type const size) -> signed_type
+auto signed_type::zero(
+    size_type const size) -> signed_type
 {
     return signed_type{ arithmetic_type::zero(size) };
 }
@@ -118,7 +124,7 @@ auto operator<(
     signed_type const rhs) -> bool
 {
     if (lhs.size() != rhs.size()) {
-        throw std::runtime_error{"lt: mismatched bit widths"};
+        throw std::runtime_error{ "lt: mismatched bit widths" };
     }
 
     auto const lhs_is_negative = lhs < zero_type{};
@@ -139,7 +145,7 @@ auto operator<(
      *
      *   original |  working  |           |
      *  ----+-----+-----+-----+ operation + result
-     *  lhs | rhs | lhs | rhs |           | 
+     *  lhs | rhs | lhs | rhs |           |
      *  ----+-----+-----+-----+-----------+-------
      *    6 |   9 |  6  |  9  |   6 < 9   | true
      *  ----+-----+-----+-----+-----------+-------+
@@ -149,8 +155,8 @@ auto operator<(
      *
      */
     auto const negative_numbers = lhs_is_negative;
-    auto const working_lhs = negative_numbers ? ~rhs : lhs;
-    auto const working_rhs = negative_numbers ? ~lhs : rhs;
+    auto const working_lhs      = negative_numbers ? ~rhs : lhs;
+    auto const working_rhs      = negative_numbers ? ~lhs : rhs;
 
     for (auto i = working_lhs.size(); i > 0; --i) {
         auto const lb = working_lhs.n.at(i - 1);
@@ -171,7 +177,7 @@ auto operator==(
     signed_type const rhs) -> bool
 {
     if (lhs.size() != rhs.size()) {
-        throw std::runtime_error{"lt: mismatched bit widths"};
+        throw std::runtime_error{ "lt: mismatched bit widths" };
     }
 
     for (auto i = size_type{ 0 }; i < lhs.size(); ++i) {
@@ -257,7 +263,7 @@ auto operator+(
     /*
      * Raw result of the operation, assuming infinite-width integers.
      */
-    auto const raw = signed_type{ bits::add(lhs.n, rhs.n) };
+    auto const raw        = signed_type{ bits::add(lhs.n, rhs.n) };
     auto const raw_is_neg = raw < zero_type{};
 
     /*
@@ -273,8 +279,8 @@ auto operator+(
      * otherwise, we need to fix the situation.
      */
     auto const oversize = (raw.size() > lhs.size());
-    auto const overflow = (expect_gez and raw_is_neg)
-                          or (expect_ltz and (not raw_is_neg));
+    auto const overflow =
+        (expect_gez and raw_is_neg) or (expect_ltz and (not raw_is_neg));
 
 
     if constexpr (DEBUG_SATURATING) {
@@ -297,7 +303,7 @@ auto operator+(
     }
 
     if (oversize) {
-        auto const clipped = signed_type{ extend(raw.n, lhs.size()) };
+        auto const clipped        = signed_type{ extend(raw.n, lhs.size()) };
         auto const clipped_is_neg = clipped < zero_type{};
 
         if (expect_ltz and not clipped_is_neg) {

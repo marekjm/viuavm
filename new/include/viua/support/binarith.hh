@@ -53,12 +53,14 @@ struct arithmetic_type {
         }
     }
 
-    static auto of_size(size_type const, bit_type const = false) -> arithmetic_type;
+    static auto of_size(size_type const, bit_type const = false)
+        -> arithmetic_type;
     static auto zero(size_type const) -> arithmetic_type;
 
     explicit operator bool() const;
 
-    inline auto operator[](size_type const i) const -> bit_type
+    inline auto operator[](
+        size_type const i) const -> bit_type
     {
         return n[i];
     }
@@ -80,7 +82,7 @@ auto extend(arithmetic_type,
 
 
 struct signed_type {
-    using bit_type = arithmetic_type::bit_type;
+    using bit_type   = arithmetic_type::bit_type;
     using value_type = arithmetic_type;
     using size_type  = value_type::size_type;
 
@@ -123,7 +125,8 @@ struct signed_type {
     explicit operator bool() const;
 
     auto operator~() const -> signed_type;
-    inline auto operator[](size_type const i) const -> bit_type
+    inline auto operator[](
+        size_type const i) const -> bit_type
     {
         return n[i];
     }
