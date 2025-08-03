@@ -69,7 +69,7 @@ auto calculate_add(
 auto calculate_add(
     Stack&,
     uint64_t const lhs,
-    uint64_t const rhs) -> int64_t
+    uint64_t const rhs) -> uint64_t
 {
     return (lhs + rhs);
 }
@@ -114,7 +114,7 @@ auto calculate_sub(
 auto calculate_sub(
     Stack&,
     uint64_t const lhs,
-    uint64_t const rhs) -> int64_t
+    uint64_t const rhs) -> uint64_t
 {
     return (lhs - rhs);
 }
