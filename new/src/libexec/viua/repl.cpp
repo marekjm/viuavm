@@ -662,8 +662,7 @@ auto repl_eval(
                     instruction = *proc->stack.ip;
                     proc->stack.ip =
                         viua::vm::ins::execute(proc->stack, proc->stack.ip);
-                } while ((proc->stack.ip != nullptr)
-                         and (instruction & viua::arch::ops::GREEDY));
+                } while (proc->stack.ip != nullptr);
             }
         } catch (viua::vm::abort_execution const& e) {
             std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)

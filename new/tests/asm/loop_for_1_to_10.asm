@@ -18,7 +18,7 @@
     ; the assembler makes to convert logical indexes into physical indexes are
     ; correct. Why these two? Because li with big numbers expands to more than
     ; one instruction.
-    [[full]] g.li $4, 318736561391831
+    [[full]] li $4, 318736561391831
     delete $4
 
     ebreak

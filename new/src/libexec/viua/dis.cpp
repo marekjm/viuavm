@@ -384,11 +384,10 @@ auto demangle_canonical_li(
     auto match_canonical_li = [m](size_t const n,
                                   viua::arch::ops::OPCODE const lui) -> bool
     {
-        using viua::arch::ops::GREEDY;
         using enum viua::arch::ops::OPCODE;
 
-        auto const li = m((n + 0), lui, GREEDY);
-        return li and (m((n + 1), ADDI, GREEDY) or m((n + 1), ADDIU, GREEDY));
+        auto const li = m((n + 0), lui);
+        return li and (m((n + 1), ADDI) or m((n + 1), ADDIU));
     };
 
     using enum viua::arch::ops::OPCODE;
@@ -405,9 +404,7 @@ auto demangle_canonical_li(
 
             auto const value = (high_part | low_part);
 
-            using viua::arch::ops::GREEDY;
-            auto const needs_greedy   = m((i + 1), ADDIU, GREEDY);
-            auto const needs_unsigned = m(i, LUIU, GREEDY);
+            auto const needs_unsigned = m(i, LUIU);
 
             auto const literal =
                 needs_unsigned
@@ -425,9 +422,7 @@ auto demangle_canonical_li(
                 idx,
                 std::nullopt,
                 std::nullopt,
-                (std::string{ "[[full]] " } + (needs_greedy ? "g." : "")
-                 + std::string{ "li " } + luiu.out.to_string() + ", "
-                 + literal));
+                std::format("[[full]] li {}, {}", luiu.out.to_string(), literal));
 
             // FIXME calls are using ATXTP instead of LUIU
             if (needs_unsigned) {
@@ -456,16 +451,14 @@ auto demangle_short_li(
 
     using enum viua::arch::ops::OPCODE;
     for (auto i = size_t{ 0 }; i < text.size(); ++i) {
-        using viua::arch::ops::GREEDY;
-        if (m(i, ADDI) or m(i, ADDIU) or m(i, ADDI, GREEDY)
-            or m(i, ADDIU, GREEDY)) {
+        // FIXME Only match ADDI and check for UNSIGNED flag later.
+        if (m(i, ADDI) or m(i, ADDIU)) {
             using viua::arch::ops::S;
             using viua::arch::ops::U;
             auto const addi = U::decode(ins_at(i));
             if (addi.in.is_void()) {
-                auto const needs_greedy = (addi.opcode & GREEDY);
-                auto const needs_unsigned =
-                    (m(i, ADDIU, GREEDY) or m(i, ADDIU));
+                // FIXME Check for UNSIGNED FLAG, not for the instruction.
+                auto const needs_unsigned = m(i, ADDIU);
 
                 auto const value = addi.immediate;
                 auto const literal =
@@ -479,8 +472,7 @@ auto demangle_short_li(
                     idx,
                     std::nullopt,
                     std::nullopt,
-                    ((needs_greedy ? "g." : "") + std::string{ "li " }
-                     + addi.out.to_string() + ", " + literal));
+                    std::format("li {}, {}", addi.out.to_string(), literal));
 
                 continue;
             }
@@ -506,12 +498,10 @@ auto demangle_addiu(
 
     using enum viua::arch::ops::OPCODE;
     for (auto i = size_t{ 0 }; i < text.size(); ++i) {
-        using viua::arch::ops::GREEDY;
-        if (m(i, ADDIU) or m(i, ADDIU, GREEDY)) {
+        if (m(i, ADDIU) or m(i, ADDIU)) {
             using viua::arch::ops::S;
             using viua::arch::ops::U;
             auto const addi         = U::decode(ins_at(i));
-            auto const needs_greedy = (addi.opcode & GREEDY);
 
             auto idx          = text.at(i).index;
             idx.physical_span = idx.physical;
@@ -519,9 +509,10 @@ auto demangle_addiu(
                 idx,
                 std::nullopt,
                 std::nullopt,
-                ((needs_greedy ? "g." : "") + std::string{ "addi " }
-                 + addi.out.to_string() + ", " + addi.in.to_string() + ", "
-                 + std::to_string(addi.immediate) + 'u'));
+                std::format("addi {}, {}, {}u",
+                    addi.out.to_string(),
+                    addi.in.to_string(),
+                    std::to_string(addi.immediate)));
             continue;
         }
 
@@ -547,11 +538,9 @@ auto demangle_arodp(
 
     using enum viua::arch::ops::OPCODE;
     for (auto i = size_t{ 0 }; i < text.size(); ++i) {
-        using viua::arch::ops::GREEDY;
-        if (m(i, ARODP) or m(i, ARODP, GREEDY)) {
+        if (m(i, ARODP)) {
             using viua::arch::ops::I;
             auto const arodp        = I::decode(ins_at(i));
-            auto const needs_greedy = (arodp.opcode & GREEDY);
 
             auto const off = arodp.immediate;
 
@@ -573,14 +562,12 @@ auto demangle_arodp(
                 idx,
                 std::nullopt,
                 std::nullopt,
-                ((needs_greedy ? "g." : "") + std::string{ "arodp " }
-                 + arodp.out.to_string() + ", " + label_or_value));
+                std::format("arodp {}, {}", arodp.out.to_string(), label_or_value));
             continue;
         }
-        if (m(i, ATXTP) or m(i, ATXTP, GREEDY)) {
+        if (m(i, ATXTP)) {
             using viua::arch::ops::I;
             auto const atxtp        = I::decode(ins_at(i));
-            auto const needs_greedy = (atxtp.opcode & GREEDY);
 
             auto const off = atxtp.immediate;
 
@@ -607,8 +594,7 @@ auto demangle_arodp(
                 idx,
                 std::nullopt,
                 std::nullopt,
-                ((needs_greedy ? "g." : "") + std::string{ "atxtp " }
-                 + atxtp.out.to_string() + ", " + make_label_ref(strtab, sym)));
+                std::format("atxtp {}, {}", atxtp.out.to_string(), make_label_ref(strtab, sym)));
 
             demangle_symbol_load(text,
                                  tmp,
@@ -642,18 +628,14 @@ auto demangle_memory(
 
     using enum viua::arch::ops::OPCODE;
     for (auto i = size_t{ 0 }; i < text.size(); ++i) {
-        using viua::arch::ops::GREEDY;
-        auto const memory_op = (m(i, SM) or m(i, LM) or m(i, AA) or m(i, AD))
-                               or (m(i, SM, GREEDY) or m(i, LM, GREEDY)
-                                   or m(i, AA, GREEDY) or m(i, AD, GREEDY));
+        auto const memory_op = (m(i, SM) or m(i, LM) or m(i, AA) or m(i, AD));
         if (memory_op) {
             using viua::arch::ops::M;
             auto const raw_op       = ins_at(i);
             auto const op           = M::decode(raw_op);
-            auto const needs_greedy = (op.opcode & GREEDY);
 
-            auto name = std::string{ needs_greedy ? "g." : "" };
-            switch (static_cast<viua::arch::ops::OPCODE>(op.opcode & ~GREEDY)) {
+            auto name = std::string{};
+            switch (static_cast<viua::arch::ops::OPCODE>(op.opcode)) {
                 case SM:
                     name += "s";
                     break;
@@ -687,7 +669,7 @@ auto demangle_memory(
                     abort();
                     break;
             }
-            switch (static_cast<viua::arch::ops::OPCODE>(op.opcode & ~GREEDY)) {
+            switch (static_cast<viua::arch::ops::OPCODE>(op.opcode)) {
                 case AA:
                     name += "a";
                     break;
@@ -787,7 +769,7 @@ auto demangle_branches(
     for (auto i = size_t{ 0 }; i < raw.size(); ++i) {
         using enum viua::arch::ops::OPCODE;
         auto const s = raw.at(i).str();
-        if (s.starts_with("g.li") and m(i + 1, IF)) {
+        if (s.starts_with("li") and m(i + 1, IF)) {
             auto const phys_index    = std::stoull(s.substr(s.rfind(' ')));
             auto const logical_index = physical_to_logical.at(phys_index);
 

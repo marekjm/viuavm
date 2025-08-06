@@ -10,21 +10,21 @@
     li $8.l, 0
 
 .label "std::memcmp::loop"
-    g.lt $2.l, $1.l, $2.p
-    g.not $2.l, $2.l
+    lt $2.l, $1.l, $2.p
+    not $2.l, $2.l
     if $2.l, "std::memcmp::epilogue"
 
     ; load from s1
     add $3.l, $0.p, $1.l
-    g.lb $4.l, $3.l, 0
+    lb $4.l, $3.l, 0
     cast $4.l, uint
 
     ; load from s2
     add $5.l, $1.p, $1.l
-    g.lb $6.l, $5.l, 0
+    lb $6.l, $5.l, 0
     cast $6.l, uint
 
-    g.cmp $8.l, $4.l, $6.l
+    cmp $8.l, $4.l, $6.l
     if $8.l, "std::memcmp::epilogue"
 
     ; increase counter and repeat

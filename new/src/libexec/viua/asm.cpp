@@ -1453,7 +1453,7 @@ auto save_objects(
             auto& instr   = static_cast<ast::Instruction&>(*each);
             auto saved_at = size_t{ 0 };
 
-            if (instr.leader == "atom" or instr.leader == "g.atom") {
+            if (instr.leader == "atom") {
                 auto const lx = instr.operands.back().ingredients.front();
                 using enum viua::libs::lexer::TOKEN;
                 if (lx.token == LITERAL_STRING or lx.token == LITERAL_ATOM) {
@@ -1534,7 +1534,7 @@ auto save_objects(
 
                     throw e;
                 }
-            } else if (instr.leader == "arodp" or instr.leader == "g.arodp") {
+            } else if (instr.leader == "arodp") {
                 auto const lx = instr.operands.back().ingredients.front();
                 using enum viua::libs::lexer::TOKEN;
                 if (lx.token == viua::libs::lexer::TOKEN::AT) {
@@ -1577,7 +1577,7 @@ auto save_objects(
                     }
                     throw e;
                 }
-            } else if (instr.leader == "atxtp" or instr.leader == "g.atxtp") {
+            } else if (instr.leader == "atxtp") {
                 auto const lx = instr.operands.back().ingredients.front();
                 using enum viua::libs::lexer::TOKEN;
                 if (lx.token == viua::libs::lexer::TOKEN::AT) {
@@ -1620,7 +1620,7 @@ auto save_objects(
                     }
                     throw e;
                 }
-            } else if (instr.leader == "double" or instr.leader == "g.double") {
+            } else if (instr.leader == "double") {
                 auto const lx = instr.operands.back().ingredients.front();
                 using enum viua::libs::lexer::TOKEN;
                 if (lx.token == LITERAL_FLOAT) {
@@ -1982,7 +1982,6 @@ auto expand_li(
     using viua::libs::assembler::to_loading_parts_unsigned;
     auto const hi        = viua::carve_bits_out<uint32_t, 32>(value);
     auto const lo        = viua::carve_bits_out<uint32_t, 0>(value);
-    auto const is_greedy = (raw.leader.text.find("g.") == 0);
     auto const full_form = raw.has_attr("full") or force_full;
 
     std::println(stdout,
@@ -2022,7 +2021,7 @@ auto expand_li(
      *
      * In any case, for long immediates the sequence of
      *
-     *      g.lui $x, <high-word>
+     *      lui $x, <high-word>
      *      lli $x, <low-word>
      *
      * is emitted which is cheap and executed without releasing the virtual CPU.
@@ -2034,7 +2033,7 @@ auto expand_li(
     if (needs_leader) {
         using namespace std::string_literals;
         auto synth        = raw;
-        synth.leader.text = ((lo or is_greedy) ? "g.lui" : "lui");
+        synth.leader.text = "lui";
         if (is_unsigned) {
             synth.leader.text += 'u';
         }
@@ -2055,9 +2054,6 @@ auto expand_li(
     if (needs_leader) {
         auto synth        = raw;
         synth.leader.text = "addiu";
-        if (is_greedy) {
-            synth.leader.text = "g." + synth.leader.text;
-        }
 
         /*
          * Pop the immediate.
@@ -2086,7 +2082,7 @@ auto expand_li(
     } else {
         using namespace std::string_literals;
         auto synth        = raw;
-        synth.leader.text = (is_greedy ? "g." : "") + "addi"s;
+        synth.leader.text = "addi"s;
         if (is_unsigned) {
             synth.leader.text += 'u';
         }
@@ -2118,7 +2114,7 @@ auto expand_delete(
     using namespace std::string_literals;
     auto synth        = raw;
     synth.leader      = raw.leader;
-    synth.leader.text = (raw.leader.text.find("g.") == 0 ? "g." : "") + "move"s;
+    synth.leader.text = "move"s;
 
     // FIXME comment this to get a good example of borked-because-synth error
     // report
@@ -2162,7 +2158,7 @@ auto expand_flow_control(
     auto atxtp = ast::Instruction{};
     {
         atxtp.leader      = raw.leader;
-        atxtp.leader.text = "g.atxtp";
+        atxtp.leader.text = "atxtp";
 
         atxtp.operands.push_back(jmp_offset);
         atxtp.operands.push_back(raw.operands.back());
@@ -2273,7 +2269,7 @@ auto expand_call(
      *
      * ...is expanded into this sequence:
      *
-     *      g.atxtp $_, fn_tbl_offset(foo)
+     *      atxtp $_, fn_tbl_offset(foo)
      *      call $1, $_
      */
     auto const ret = raw.operands.front();
@@ -2306,7 +2302,7 @@ auto expand_call(
     auto atxtp = ast::Instruction{};
     {
         atxtp.leader      = raw.leader;
-        atxtp.leader.text = "g.atxtp";
+        atxtp.leader.text = "atxtp";
 
         atxtp.operands.push_back(fn_offset);
         atxtp.operands.push_back(fn_offset);
@@ -2399,7 +2395,7 @@ auto expand_atom(
     auto li = raw;
     {
         li.leader      = raw.leader;
-        li.leader.text = "g.li";
+        li.leader.text = "li";
     }
     std::ranges::copy(expand_li(li, true), std::back_inserter(cooked));
 
@@ -2437,7 +2433,7 @@ auto expand_double(
     auto li = raw;
     {
         li.leader      = raw.leader;
-        li.leader.text = "g.li";
+        li.leader.text = "li";
     }
     std::ranges::copy(expand_li(li, true), std::back_inserter(cooked));
 
@@ -2490,10 +2486,6 @@ auto expand_memory_access(
     auto synth = ast::Instruction{};
 
     auto opcode_view = std::string_view{ raw.leader.text };
-    auto greedy      = opcode_view.starts_with("g.");
-    if (greedy) {
-        opcode_view.remove_prefix(2);
-    }
 
     synth.leader         = raw.leader;
     synth.leader.text    = opcode_view;
@@ -2537,10 +2529,6 @@ auto expand_memory_access(
             abort();
     }
     synth.operands.front().ingredients.resize(1);
-
-    if (greedy) {
-        synth.leader.text = ("g." + synth.leader.text);
-    }
 
     return { emit_instruction(synth) };
 }
@@ -2615,17 +2603,6 @@ auto expand_instruction(
         "sq",
         "lq",
 
-        "g.sb",
-        "g.lb",
-        "g.sh",
-        "g.lh",
-        "g.sw",
-        "g.lw",
-        "g.sd",
-        "g.ld",
-        "g.sq",
-        "g.lq",
-
         /*
          * Allocation
          */
@@ -2641,17 +2618,10 @@ auto expand_instruction(
         "amqd",
     };
     auto const immediate_signed_arithmetic = std::set<std::string_view>{
-        "addi", "g.addi", "subi", "g.subi", "muli", "g.muli", "divi", "g.divi",
+        "addi", "subi", "muli", "divi",
     };
 
-    auto const strip_greedy = [](std::string_view op) -> std::string_view
-    {
-        if (op.starts_with("g.")) {
-            op.remove_prefix(2);
-        }
-        return op;
-    };
-    auto const opcode = strip_greedy(raw.leader.text);
+    auto const opcode = std::string_view{raw.leader.text};
 
     if (opcode == "li") {
         return expand_li(raw);

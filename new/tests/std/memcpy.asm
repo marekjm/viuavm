@@ -8,8 +8,8 @@
     li $1, 0u
 
 .label "std::memcpy::loop"
-    g.lt $2.l, $1.l, $2.p
-    g.not $2.l, $2.l
+    lt $2.l, $1.l, $2.p
+    not $2.l, $2.l
     if $2.l, "std::memcpy::epilogue"
 
     ; load from src

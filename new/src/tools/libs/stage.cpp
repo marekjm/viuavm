@@ -436,7 +436,7 @@ auto cook_long_immediates(
     // anonymous symbols must be saved into .symtab to be processed by the
     // linker.
 
-    if (insn.opcode == "atom" or insn.opcode == "g.atom") {
+    if (insn.opcode == "atom") {
         auto const lx = insn.operands.back().ingredients.front();
         auto s        = lx.text;
         auto saved_at = size_t{ 0 };
@@ -534,7 +534,7 @@ auto cook_long_immediates(
         auto synth = viua::libs::parser::ast::Instruction{};
         {
             synth.opcode         = insn.opcode;
-            synth.opcode.text    = "g.li";
+            synth.opcode.text    = "li";
             synth.physical_index = insn.physical_index;
 
             synth.operands.push_back(insn.operands.front());
@@ -546,7 +546,7 @@ auto cook_long_immediates(
 
         insn.operands.pop_back();
         cooked.push_back(std::move(insn));
-    } else if (insn.opcode == "arodp" or insn.opcode == "g.arodp") {
+    } else if (insn.opcode == "arodp") {
         auto const lx = insn.operands.back().ingredients.front();
         auto saved_at = size_t{ 0 };
         if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
@@ -609,7 +609,7 @@ auto cook_long_immediates(
             std::to_string(saved_at) + 'u';
 
         cooked.push_back(synth);
-    } else if (insn.opcode == "double" or insn.opcode == "g.double") {
+    } else if (insn.opcode == "double") {
         constexpr auto SIZE_OF_DOUBLE_PRECISION_FLOAT = size_t{ 8 };
         auto f = std::stod(insn.operands.back().ingredients.front().text);
         auto s = std::string(SIZE_OF_DOUBLE_PRECISION_FLOAT, '\0');
@@ -619,7 +619,7 @@ auto cook_long_immediates(
         auto synth = viua::libs::parser::ast::Instruction{};
         {
             synth.opcode         = insn.opcode;
-            synth.opcode.text    = "g.li";
+            synth.opcode.text    = "li";
             synth.physical_index = insn.physical_index;
 
             synth.operands.push_back(insn.operands.front());
@@ -645,7 +645,7 @@ auto expand_pseudoinstructions(
     -> std::vector<ast::Instruction>
 {
     auto const immediate_signed_arithmetic = std::set<std::string>{
-        "addi", "g.addi", "subi", "g.subi", "muli", "g.muli", "divi", "g.divi",
+        "addi", "subi", "muli", "divi",
     };
     auto const memory_access = std::set<std::string>{
         /*
@@ -661,17 +661,6 @@ auto expand_pseudoinstructions(
         "ld",
         "sq",
         "lq",
-
-        "g.sb",
-        "g.lb",
-        "g.sh",
-        "g.lh",
-        "g.sw",
-        "g.lw",
-        "g.sd",
-        "g.ld",
-        "g.sq",
-        "g.lq",
 
         /*
          * Allocation
@@ -726,14 +715,11 @@ auto expand_pseudoinstructions(
         physical_ops = each.physical_index;
         l2p.insert({ physical_ops, logical_ops + branch_ops_baggage });
 
-        // FIXME remove checking for "g.li" here to test errors with synthesized
-        // instructions
-        if (each.opcode == "li" or each.opcode == "g.li") {
+        if (each.opcode == "li") {
             expand_li(cooked, each);
-        } else if (each.opcode == "delete" or each.opcode == "g.delete") {
+        } else if (each.opcode == "delete") {
             expand_delete(cooked, each);
-        } else if (each.opcode == "call" or each.opcode == "actor"
-                   or each.opcode == "g.actor") {
+        } else if (each.opcode == "call" or each.opcode == "actor") {
             /*
              * Call instructions expansion is simple.
              *
@@ -790,7 +776,7 @@ auto expand_pseudoinstructions(
             auto li = ast::Instruction{};
             {
                 li.opcode      = each.opcode;
-                li.opcode.text = "g.li";
+                li.opcode.text = "li";
 
                 li.operands.push_back(fn_offset);
                 li.operands.push_back(ast::Operand{});

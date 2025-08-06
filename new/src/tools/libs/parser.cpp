@@ -322,7 +322,7 @@ auto parse_instruction(
     auto valid_cast =
         [&lexemes, &instruction, &fundamental_type_names]() -> bool
     {
-        if (instruction.opcode != "cast" and instruction.opcode != "g.cast") {
+        if (instruction.opcode != "cast") {
             return false;
         }
 

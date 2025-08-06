@@ -186,148 +186,140 @@ auto to_string_impl(
 auto to_string(
     opcode_type const raw) -> std::string
 {
-    auto const greedy =
-        std::string{ static_cast<bool>(raw & GREEDY) ? "g." : "" };
     auto const opcode = (raw & OPCODE_MASK);
-    return greedy + to_string_impl(static_cast<opcode_type>(opcode));
+    return to_string_impl(static_cast<opcode_type>(opcode));
 }
 auto parse_opcode(
     std::string_view const raw) -> opcode_type
 {
     auto sv = raw;
 
-    auto const greedy = sv.starts_with("g.");
-    if (greedy) {
-        sv.remove_prefix(2);
-    }
-
-    auto op = (greedy ? GREEDY : opcode_type{});
     if (sv == "noop") {
-        return (op | static_cast<opcode_type>(OPCODE::NOOP));
+        return static_cast<opcode_type>(OPCODE::NOOP);
     } else if (sv == "halt") {
-        return (op | static_cast<opcode_type>(OPCODE::HALT));
+        return static_cast<opcode_type>(OPCODE::HALT);
     } else if (sv == "ebreak") {
-        return (op | static_cast<opcode_type>(OPCODE::EBREAK));
+        return static_cast<opcode_type>(OPCODE::EBREAK);
     } else if (sv == "ecall") {
-        return (op | static_cast<opcode_type>(OPCODE::ECALL));
+        return static_cast<opcode_type>(OPCODE::ECALL);
     } else if (sv == "return") {
-        return (op | static_cast<opcode_type>(OPCODE::RETURN));
+        return static_cast<opcode_type>(OPCODE::RETURN);
     } else if (sv == "add") {
-        return (op | static_cast<opcode_type>(OPCODE::ADD));
+        return static_cast<opcode_type>(OPCODE::ADD);
     } else if (sv == "sub") {
-        return (op | static_cast<opcode_type>(OPCODE::SUB));
+        return static_cast<opcode_type>(OPCODE::SUB);
     } else if (sv == "mul") {
-        return (op | static_cast<opcode_type>(OPCODE::MUL));
+        return static_cast<opcode_type>(OPCODE::MUL);
     } else if (sv == "div") {
-        return (op | static_cast<opcode_type>(OPCODE::DIV));
+        return static_cast<opcode_type>(OPCODE::DIV);
     } else if (sv == "mod") {
-        return (op | static_cast<opcode_type>(OPCODE::MOD));
+        return static_cast<opcode_type>(OPCODE::MOD);
     } else if (sv == "bitshl") {
-        return (op | static_cast<opcode_type>(OPCODE::BITSHL));
+        return static_cast<opcode_type>(OPCODE::BITSHL);
     } else if (sv == "bitshr") {
-        return (op | static_cast<opcode_type>(OPCODE::BITSHR));
+        return static_cast<opcode_type>(OPCODE::BITSHR);
     } else if (sv == "bitashr") {
-        return (op | static_cast<opcode_type>(OPCODE::BITASHR));
+        return static_cast<opcode_type>(OPCODE::BITASHR);
     } else if (sv == "bitrol") {
-        return (op | static_cast<opcode_type>(OPCODE::BITROL));
+        return static_cast<opcode_type>(OPCODE::BITROL);
     } else if (sv == "bitror") {
-        return (op | static_cast<opcode_type>(OPCODE::BITROR));
+        return static_cast<opcode_type>(OPCODE::BITROR);
     } else if (sv == "bitand") {
-        return (op | static_cast<opcode_type>(OPCODE::BITAND));
+        return static_cast<opcode_type>(OPCODE::BITAND);
     } else if (sv == "bitor") {
-        return (op | static_cast<opcode_type>(OPCODE::BITOR));
+        return static_cast<opcode_type>(OPCODE::BITOR);
     } else if (sv == "bitxor") {
-        return (op | static_cast<opcode_type>(OPCODE::BITXOR));
+        return static_cast<opcode_type>(OPCODE::BITXOR);
     } else if (sv == "eq") {
-        return (op | static_cast<opcode_type>(OPCODE::EQ));
+        return static_cast<opcode_type>(OPCODE::EQ);
     } else if (sv == "lt") {
-        return (op | static_cast<opcode_type>(OPCODE::LT));
+        return static_cast<opcode_type>(OPCODE::LT);
     } else if (sv == "gt") {
-        return (op | static_cast<opcode_type>(OPCODE::GT));
+        return static_cast<opcode_type>(OPCODE::GT);
     } else if (sv == "cmp") {
-        return (op | static_cast<opcode_type>(OPCODE::CMP));
+        return static_cast<opcode_type>(OPCODE::CMP);
     } else if (sv == "and") {
-        return (op | static_cast<opcode_type>(OPCODE::AND));
+        return static_cast<opcode_type>(OPCODE::AND);
     } else if (sv == "or") {
-        return (op | static_cast<opcode_type>(OPCODE::OR));
+        return static_cast<opcode_type>(OPCODE::OR);
     } else if (sv == "call") {
         return static_cast<opcode_type>(OPCODE::CALL);
     } else if (sv == "bitnot") {
-        return (op | static_cast<opcode_type>(OPCODE::BITNOT));
+        return static_cast<opcode_type>(OPCODE::BITNOT);
     } else if (sv == "not") {
-        return (op | static_cast<opcode_type>(OPCODE::NOT));
+        return static_cast<opcode_type>(OPCODE::NOT);
     } else if (sv == "atom") {
-        return (op | static_cast<opcode_type>(OPCODE::ATOM));
+        return static_cast<opcode_type>(OPCODE::ATOM);
     } else if (sv == "frame") {
-        return (op | static_cast<opcode_type>(OPCODE::FRAME));
+        return static_cast<opcode_type>(OPCODE::FRAME);
     } else if (sv == "lui") {
-        return (op | static_cast<opcode_type>(OPCODE::LUI));
+        return static_cast<opcode_type>(OPCODE::LUI);
     } else if (sv == "luiu") {
-        return (op | static_cast<opcode_type>(OPCODE::LUIU));
+        return static_cast<opcode_type>(OPCODE::LUIU);
     } else if (sv == "lli") {
-        return (op | static_cast<opcode_type>(OPCODE::LLI));
+        return static_cast<opcode_type>(OPCODE::LLI);
     } else if (sv == "addi") {
-        return (op | static_cast<opcode_type>(OPCODE::ADDI));
+        return static_cast<opcode_type>(OPCODE::ADDI);
     } else if (sv == "addiu") {
-        return (op | static_cast<opcode_type>(OPCODE::ADDIU));
+        return static_cast<opcode_type>(OPCODE::ADDIU);
     } else if (sv == "subi") {
-        return (op | static_cast<opcode_type>(OPCODE::SUBI));
+        return static_cast<opcode_type>(OPCODE::SUBI);
     } else if (sv == "subiu") {
-        return (op | static_cast<opcode_type>(OPCODE::SUBIU));
+        return static_cast<opcode_type>(OPCODE::SUBIU);
     } else if (sv == "muli") {
-        return (op | static_cast<opcode_type>(OPCODE::MULI));
+        return static_cast<opcode_type>(OPCODE::MULI);
     } else if (sv == "muliu") {
-        return (op | static_cast<opcode_type>(OPCODE::MULIU));
+        return static_cast<opcode_type>(OPCODE::MULIU);
     } else if (sv == "divi") {
-        return (op | static_cast<opcode_type>(OPCODE::DIVI));
+        return static_cast<opcode_type>(OPCODE::DIVI);
     } else if (sv == "diviu") {
-        return (op | static_cast<opcode_type>(OPCODE::DIVIU));
+        return static_cast<opcode_type>(OPCODE::DIVIU);
     } else if (sv == "float") {
-        return (op | static_cast<opcode_type>(OPCODE::FLOAT));
+        return static_cast<opcode_type>(OPCODE::FLOAT);
     } else if (sv == "double") {
-        return (op | static_cast<opcode_type>(OPCODE::DOUBLE));
+        return static_cast<opcode_type>(OPCODE::DOUBLE);
     } else if (sv == "copy") {
-        return (op | static_cast<opcode_type>(OPCODE::COPY));
+        return static_cast<opcode_type>(OPCODE::COPY);
     } else if (sv == "move") {
-        return (op | static_cast<opcode_type>(OPCODE::MOVE));
+        return static_cast<opcode_type>(OPCODE::MOVE);
     } else if (sv == "swap") {
-        return (op | static_cast<opcode_type>(OPCODE::SWAP));
+        return static_cast<opcode_type>(OPCODE::SWAP);
     } else if (sv == "if") {
-        return (op | static_cast<opcode_type>(OPCODE::IF));
+        return static_cast<opcode_type>(OPCODE::IF);
     } else if (sv == "io_submit") {
-        return (op | static_cast<opcode_type>(OPCODE::IO_SUBMIT));
+        return static_cast<opcode_type>(OPCODE::IO_SUBMIT);
     } else if (sv == "io_wait") {
-        return (op | static_cast<opcode_type>(OPCODE::IO_WAIT));
+        return static_cast<opcode_type>(OPCODE::IO_WAIT);
     } else if (sv == "io_shutdown") {
-        return (op | static_cast<opcode_type>(OPCODE::IO_SHUTDOWN));
+        return static_cast<opcode_type>(OPCODE::IO_SHUTDOWN);
     } else if (sv == "io_ctl") {
-        return (op | static_cast<opcode_type>(OPCODE::IO_CTL));
+        return static_cast<opcode_type>(OPCODE::IO_CTL);
     } else if (sv == "io_peek") {
-        return (op | static_cast<opcode_type>(OPCODE::IO_PEEK));
+        return static_cast<opcode_type>(OPCODE::IO_PEEK);
     } else if (sv == "actor") {
-        return (op | static_cast<opcode_type>(OPCODE::ACTOR));
+        return static_cast<opcode_type>(OPCODE::ACTOR);
     } else if (sv == "self") {
-        return (op | static_cast<opcode_type>(OPCODE::SELF));
+        return static_cast<opcode_type>(OPCODE::SELF);
     } else if (sv == "gts") {
-        return (op | static_cast<opcode_type>(OPCODE::GTS));
+        return static_cast<opcode_type>(OPCODE::GTS);
     } else if (sv == "gtl") {
-        return (op | static_cast<opcode_type>(OPCODE::GTL));
+        return static_cast<opcode_type>(OPCODE::GTL);
     } else if (sv == "cast") {
-        return (op | static_cast<opcode_type>(OPCODE::CAST));
+        return static_cast<opcode_type>(OPCODE::CAST);
     } else if (sv == "arodp") {
-        return (op | static_cast<opcode_type>(OPCODE::ARODP));
+        return static_cast<opcode_type>(OPCODE::ARODP);
     } else if (sv == "atxtp") {
-        return (op | static_cast<opcode_type>(OPCODE::ATXTP));
+        return static_cast<opcode_type>(OPCODE::ATXTP);
     } else if (sv == "sm") {
-        return (op | static_cast<opcode_type>(OPCODE::SM));
+        return static_cast<opcode_type>(OPCODE::SM);
     } else if (sv == "lm") {
-        return (op | static_cast<opcode_type>(OPCODE::LM));
+        return static_cast<opcode_type>(OPCODE::LM);
     } else if (sv == "ama") {
-        return (op | static_cast<opcode_type>(OPCODE::AA));
+        return static_cast<opcode_type>(OPCODE::AA);
     } else if (sv == "amd") {
-        return (op | static_cast<opcode_type>(OPCODE::AD));
+        return static_cast<opcode_type>(OPCODE::AD);
     } else if (sv == "ptr") {
-        return (op | static_cast<opcode_type>(OPCODE::PTR));
+        return static_cast<opcode_type>(OPCODE::PTR);
     } else {
         throw std::invalid_argument{ "viua::arch::ops::parse_opcode: "
                                      + std::string{ raw } };

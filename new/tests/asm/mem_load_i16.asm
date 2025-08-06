@@ -8,7 +8,7 @@
     li $2.l, -1
     sh $2.l, $1.l, 0
 
-    g.lh $3.l, $1.l, 0
+    lh $3.l, $1.l, 0
     cast $3.l, int
 
     ebreak

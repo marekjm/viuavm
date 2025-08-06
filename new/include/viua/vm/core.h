@@ -357,6 +357,14 @@ struct Frame {
 
 struct Process;
 
+/*
+ * Why 42?
+ * Because it is the meaning of Life, Universe, and everything; and everything
+ * includes in itself "reasonable number of instructions an actor can execute
+ * before the CPU is taken away from it".
+ */
+inline constexpr auto PREEMPTION_THRESHOLD = size_t{ 42 };
+
 struct Core {
     std::map<std::string, Module> modules;
 

@@ -69,19 +69,6 @@ auto TRACE_STREAM = viua::support::fdstream{ 2 };
 }
 
 namespace {
-auto run_instruction(
-    viua::vm::Stack& stack) -> viua::arch::instruction_type const*
-{
-    auto instruction = viua::arch::instruction_type{};
-    do {
-        instruction = *stack.ip;
-        stack.ip    = viua::vm::ins::execute(stack, stack.ip);
-        ++stack.proc->core->perf_counters.total_ops_executed;
-    } while ((stack.ip != nullptr) and (instruction & viua::arch::ops::GREEDY));
-
-    return stack.ip;
-}
-
 auto format_time(
     std::chrono::microseconds const us) -> std::string
 {
@@ -126,27 +113,10 @@ auto run(
             << viua::TRACE_STREAM.endl;
     }
 
-    constexpr auto PREEMPTION_THRESHOLD = size_t{ 42 };
+    using viua::vm::PREEMPTION_THRESHOLD;
     for (auto i = size_t{ 0 }; i < PREEMPTION_THRESHOLD and ip_ok(); ++i) {
-        /*
-         * This is needed to detect greedy bundles and adjust preemption
-         * counter appropriately. If a greedy bundle contains more
-         * instructions than the preemption threshold allows the process
-         * will be suspended immediately.
-         */
-        auto const greedy    = (*proc.stack.ip & viua::arch::ops::GREEDY);
-        auto const bundle_ip = proc.stack.ip;
-
-        proc.stack.ip = run_instruction(proc.stack);
-
-        /*
-         * If the instruction was a greedy bundle instead of a single
-         * one, the preemption counter has to be adjusted. It may be the
-         * case that the bundle already hit the preemption threshold.
-         */
-        if (greedy and ip_ok()) {
-            i += (proc.stack.ip - bundle_ip) - 1;
-        }
+        proc.stack.ip = viua::vm::ins::execute(proc.stack, proc.stack.ip);
+        ++proc.core->perf_counters.total_ops_executed;
     }
 
     if (proc.stack.frames.empty()) {

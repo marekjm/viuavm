@@ -200,8 +200,6 @@ struct N {
     auto to_string() const -> std::string;
 };
 
-// FIXME Remove the greedy flag to gain 1 extra bit for opcodes.
-constexpr auto GREEDY      = opcode_type{ 0x80'00 };
 constexpr auto UNSIGNED    = opcode_type{ 0x08'00 };
 constexpr auto INSTR_MASK  = opcode_type{ 0x0f'ff };
 constexpr auto FORMAT_MASK = opcode_type{ 0x70'00 };
