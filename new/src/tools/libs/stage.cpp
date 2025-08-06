@@ -1006,7 +1006,7 @@ auto emit_instruction(
             {
                 auto const imm = insn.operands.back().ingredients.front();
                 auto const is_unsigned = (static_cast<opcode_type>(opcode)
-                                          & viua::arch::ops::UNSIGNED);
+                                          & viua::arch::ops::OPCODE_FLAGS::UNSIGNED);
                 if (is_unsigned and imm.text.at(0) == '-'
                     and (imm.text != "-1" and imm.text != "-1u")) {
                     using viua::libs::errors::compile_time::Cause;

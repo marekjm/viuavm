@@ -473,6 +473,21 @@ lui  $1.l, 0xdeadbeef
 addi $1.l, $1.l, 0xbadc0ffe
 ```
 
+## Opcode encoding
+
+```
+ 15    13|12        9|8               0
++--------+-----------+-----------------+
+|  fmt   |   flags   |    operation    |
++--------+-----------+-----------------+
+```
+
+Bits 15-13 encode the instruction format; and bits 12-0 encode the actual
+operation.
+All 13 bits are available for operations (8192 possible instructions ought to be
+enough for everyone), but for some formats (currently, only the *M*-format) the
+_flags_ bits are reserved and carry special meaning.
+
 
 # OPCODES AND INSTRUCTIONS
 

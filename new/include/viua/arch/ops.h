@@ -28,13 +28,13 @@
 
 
 namespace viua::arch::ops {
-constexpr auto FORMAT_N = opcode_type{ 0x00'00 };
-constexpr auto FORMAT_T = opcode_type{ 0x10'00 };
-constexpr auto FORMAT_D = opcode_type{ 0x20'00 };
-constexpr auto FORMAT_S = opcode_type{ 0x30'00 };
-constexpr auto FORMAT_I = opcode_type{ 0x40'00 };
-constexpr auto FORMAT_U = opcode_type{ 0x50'00 };
-constexpr auto FORMAT_M = opcode_type{ 0x60'00 };
+constexpr auto FORMAT_N = opcode_type{ 0b000 << 13 };
+constexpr auto FORMAT_T = opcode_type{ 0b001 << 13 };
+constexpr auto FORMAT_D = opcode_type{ 0b010 << 13 };
+constexpr auto FORMAT_S = opcode_type{ 0b011 << 13 };
+constexpr auto FORMAT_I = opcode_type{ 0b100 << 13 };
+constexpr auto FORMAT_U = opcode_type{ 0b101 << 13 };
+constexpr auto FORMAT_M = opcode_type{ 0b110 << 13 };
 
 /*
  * Create an enum to make use of switch statement's exhaustiveness checks.
@@ -52,11 +52,25 @@ enum class FORMAT : opcode_type
     T = FORMAT_T,
     D = FORMAT_D,
     S = FORMAT_S,
+    M = FORMAT_M,
     I = FORMAT_I,
     U = FORMAT_U,
-    M = FORMAT_M,
 };
 auto to_string(FORMAT const) -> std::string;
+
+/*
+ * No operands.
+ */
+struct N {
+    viua::arch::opcode_type opcode;
+
+    N(viua::arch::opcode_type const);
+
+    static auto decode(instruction_type const) -> N;
+    auto encode() const -> instruction_type;
+
+    auto to_string() const -> std::string;
+};
 
 /*
  * Three-way (triple) register access.
@@ -97,6 +111,21 @@ struct D {
 };
 
 /*
+ * One-way (single) register access.
+ */
+struct S {
+    viua::arch::opcode_type opcode;
+    Register_access const out;
+
+    S(viua::arch::opcode_type const, Register_access const);
+
+    static auto decode(instruction_type const) -> S;
+    auto encode() const -> instruction_type;
+
+    auto to_string() const -> std::string;
+};
+
+/*
  * Two-way register access, with 16-bit memory offset, and 8-bit specifier.
  * "M" because it is used for loads and stored, which interact with "memory".
  */
@@ -114,21 +143,6 @@ struct M {
       uint8_t const);
 
     static auto decode(instruction_type const) -> M;
-    auto encode() const -> instruction_type;
-
-    auto to_string() const -> std::string;
-};
-
-/*
- * One-way (single) register access.
- */
-struct S {
-    viua::arch::opcode_type opcode;
-    Register_access const out;
-
-    S(viua::arch::opcode_type const, Register_access const);
-
-    static auto decode(instruction_type const) -> S;
     auto encode() const -> instruction_type;
 
     auto to_string() const -> std::string;
@@ -186,24 +200,13 @@ struct U {
     auto to_string() const -> std::string;
 };
 
-/*
- * No operands.
- */
-struct N {
-    viua::arch::opcode_type opcode;
-
-    N(viua::arch::opcode_type const);
-
-    static auto decode(instruction_type const) -> N;
-    auto encode() const -> instruction_type;
-
-    auto to_string() const -> std::string;
-};
-
-constexpr auto UNSIGNED    = opcode_type{ 0x08'00 };
-constexpr auto INSTR_MASK  = opcode_type{ 0x0f'ff };
-constexpr auto FORMAT_MASK = opcode_type{ 0x70'00 };
+constexpr auto INSTR_MASK  = opcode_type{ 0x1f'ff };
+constexpr auto FORMAT_MASK = opcode_type{ 0xe0'00 };
 constexpr auto OPCODE_MASK = opcode_type{ FORMAT_MASK | INSTR_MASK };
+
+constexpr auto OPCODE_FMT_MASK = opcode_type{ 0xe0'00 };
+constexpr auto OPCODE_FLG_MASK = opcode_type{ 0x1e'00 };
+constexpr auto OPCODE_OPR_MASK = opcode_type{ 0x1f'ff };
 
 /*
  * How about something different:
@@ -279,25 +282,39 @@ constexpr auto OPCODE_MASK = opcode_type{ FORMAT_MASK | INSTR_MASK };
  * I think the design is shaping up nicely, after all.
  */
 
+namespace OPCODE_FLAGS {
 /*
- * Used for memory operations (instructions in M format). The SM, LM, MM, and AA
- * instructions are all encoded on the lowest nibble of the opcode. The highest
- * nibble is reserved for the format and the unsigned flag, but the second
- * nibble could be used to encode the unit of the memory instruction.
+ * Used for memory operations (instructions in M format).
+ *
+ * The SM, LM, MM, and AA instructions are all encoded on the lowest nibble of
+ * the opcode. The highest nibble is reserved for the format and the unsigned
+ * flag, but the second nibble could be used to encode the unit of the memory
+ * instruction.
  *
  * See https://www.numberbases.com/terms/basename1.html for the origin of the
- * "duotrigesimal".
+ * "duotrigesimal" name and the UNIT_DUOTRI_WORD flag.
  */
-enum UNIT_FLAGS : uint8_t {
-    BYTE          = 0x00,    /* B:   1 byte */
-    HALF_WORD     = 0x10,    /* H:   2 bytes */
-    WORD          = 0x20,    /* W:   4 bytes */
-    DOUBLE_WORD   = 0x30,    /* D:   8 bytes */
-    QUAD_WORD     = 0x40,    /* Q:  16 bytes */
-    OCTA_WORD     = 0x50,    /* O:  32 bytes */
-    HEXA_WORD     = 0x60,    /* X:  64 bytes */
-    DUOTRI_WORD   = 0x70,    /* U: 128 bytes (duotrigesimal ie, 32 words) */
-};
+constexpr auto UNIT_BYTE = opcode_type{ 0b0000 << 9 };
+constexpr auto UNIT_HALF_WORD = opcode_type{ 0b0001 << 9 };
+constexpr auto UNIT_WORD = opcode_type{ 0b0010 << 9 };
+constexpr auto UNIT_DOUBLE_WORD = opcode_type{ 0b0011 << 9 };
+constexpr auto UNIT_QUAD_WORD = opcode_type{ 0b0100 << 9 };
+constexpr auto UNIT_OCTA_WORD = opcode_type{ 0b0101 << 9 };
+constexpr auto UNIT_HEXA_WORD = opcode_type{ 0b0110 << 9 };
+constexpr auto UNIT_DUOTRI_WORD = opcode_type{ 0b0111 << 9 };
+
+/*
+ * Used for arithmetic instructions.
+ */
+constexpr auto ARITHMETIC_STYLE_WRAP = opcode_type{ 0b0000 << 9 };
+constexpr auto ARITHMETIC_STYLE_SATURATE = opcode_type{ 0b0001 << 9 };
+constexpr auto ARITHMETIC_STYLE_TRAP = opcode_type{ 0b0010 << 9 };
+/*
+ * Unsigned MUST NOT conflict with any of the other arithmetic flags.
+ */
+// constexpr auto UNSIGNED = opcode_type{ 0x10'00 };
+constexpr auto UNSIGNED = opcode_type{ 0b0100 << 9 };
+}
 
 enum class OPCODE : opcode_type
 {
@@ -349,7 +366,8 @@ enum class OPCODE : opcode_type
     SELF   = (FORMAT_S | 0x00'05),
 
     LUI   = (FORMAT_I | 0x00'01),
-    LUIU  = (FORMAT_I | 0x00'01 | UNSIGNED),
+    LUIU  = (FORMAT_I | LUI | OPCODE_FLAGS::UNSIGNED),
+    // FIXME remove the lli instruction, use addi/addiu instead
     LLI   = (FORMAT_I | 0x00'02),
     FLOAT = (FORMAT_I | 0x00'03),
     CAST  = (FORMAT_I | 0x00'04),
@@ -357,13 +375,13 @@ enum class OPCODE : opcode_type
     ATXTP = (FORMAT_I | 0x00'06),
 
     ADDI  = (FORMAT_U | 0x00'01),
-    ADDIU = (FORMAT_U | 0x00'01 | UNSIGNED),
+    ADDIU = (FORMAT_U | ADDI | OPCODE_FLAGS::UNSIGNED),
     SUBI  = (FORMAT_U | 0x00'02),
-    SUBIU = (FORMAT_U | 0x00'02 | UNSIGNED),
+    SUBIU = (FORMAT_U | SUBI | OPCODE_FLAGS::UNSIGNED),
     MULI  = (FORMAT_U | 0x00'03),
-    MULIU = (FORMAT_U | 0x00'03 | UNSIGNED),
+    MULIU = (FORMAT_U | MULI | OPCODE_FLAGS::UNSIGNED),
     DIVI  = (FORMAT_U | 0x00'04),
-    DIVIU = (FORMAT_U | 0x00'04 | UNSIGNED),
+    DIVIU = (FORMAT_U | DIVI | OPCODE_FLAGS::UNSIGNED),
 
     SM  = (FORMAT_M | 0x00'01), /* Store Memory */
     // SMI =
