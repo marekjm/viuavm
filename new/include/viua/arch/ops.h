@@ -200,11 +200,106 @@ struct N {
     auto to_string() const -> std::string;
 };
 
+// FIXME Remove the greedy flag to gain 1 extra bit for opcodes.
 constexpr auto GREEDY      = opcode_type{ 0x80'00 };
 constexpr auto UNSIGNED    = opcode_type{ 0x08'00 };
 constexpr auto INSTR_MASK  = opcode_type{ 0x0f'ff };
 constexpr auto FORMAT_MASK = opcode_type{ 0x70'00 };
 constexpr auto OPCODE_MASK = opcode_type{ FORMAT_MASK | INSTR_MASK };
+
+/*
+ * How about something different:
+ *
+ *      FORMAT_MASK     e0'00   1110'0000'0000'0000
+ *      FLAGS_MASK      1e'00   0001'1110'0000'0000
+ *      OPCODE_MASK     11'ff   0001'0001'1111'1111
+ *      INSTR_MASK      1f'ff   0001'1111'1111'1111
+ *
+ * CPU would only dispatch on OPCODE_MASK bits, which looks like we only have 10
+ * bits available for instructions. However, it is 10 bits time three bits for
+ * every format, so actually 13 bits.
+ *
+ * Given that flags are only relevant to M-format we could also count those bits
+ * for every other instruction format to gain even more bits.
+ *
+ * Memory instructions would have to be a little bit different because of the
+ * unit flags, but other instructions do not need flags... except for maybe the
+ * "styled arithmetic" instructions with their styles, but the units would not
+ * work there: styled arithmetic can use single bit resolution widths, which is
+ * a much finer level of control than the word resolution used by memory
+ * instructions.
+ *
+ * Maybe have an 8-bit ememoryunit register to specify the unit for memory
+ * instructions, and a group of E[LSM]M instructions--Environment
+ * Load|Store|Move Memory--that would take their unit from that register:
+ *
+ *      ; Load Byte Immediate
+ *      lbi void, $src.l, <offset>
+ *
+ *      ; Load Byte
+ *      lb void, $src.l, $offset.l
+ *
+ *      ; Environment Load Memory Immediate
+ *      elmi void, $src.l, <offset>
+ *
+ *      ; Environment Load Memory
+ *      elm void, $src.l, $offset.l
+ *
+ * Having the ExM instructions means that only the most useful units need to be
+ * encoded directly into the instruction ie, ones that represent units up to the
+ * width of a register; which is 64 bits (16 bytes) ie, a quad-word. For such a
+ * design we need three bits for the flags, so we may as well go up to the
+ * duotrigesimal word. (This would also bring us to a nice, round 1024-bit wide
+ * register, which could be useful for page tables with 1024 entries.)
+ *
+ * But wait, there is more! Having whole three bits for flags means that we
+ * could actually embed the arithmetic style into an instruction! So
+ *
+ *      earithmeticstyle void, <saturating>
+ *      stdadd ...
+ *
+ * can become
+ *
+ *      add.saturate ...
+ *
+ * or even (if we go the attributes route)
+ *
+ *      add [[style=saturate]] ...
+ *
+ * There is no space to encode all the possible widths of the integer, but we
+ * can leave that in an environment register. (As we would for the vector
+ * registers.)
+ *
+ * Loading vector registers would be done with the usual memory instructions,
+ * but could be made incredibly easy by the ELM instruction: everything could be
+ * detected and configured at runtime, and nothing would be hardcoded.
+ *
+ *      ; Notice the similarity to stdadd. The vecxyz instructions would use the
+ *      ; earithmeticwidth register for the size of their elements.
+ *      vecadd [[style=saturate]] ...
+ *
+ * I think the design is shaping up nicely, after all.
+ */
+
+/*
+ * Used for memory operations (instructions in M format). The SM, LM, MM, and AA
+ * instructions are all encoded on the lowest nibble of the opcode. The highest
+ * nibble is reserved for the format and the unsigned flag, but the second
+ * nibble could be used to encode the unit of the memory instruction.
+ *
+ * See https://www.numberbases.com/terms/basename1.html for the origin of the
+ * "duotrigesimal".
+ */
+enum UNIT_FLAGS : uint8_t {
+    BYTE          = 0x00,    /* B:   1 byte */
+    HALF_WORD     = 0x10,    /* H:   2 bytes */
+    WORD          = 0x20,    /* W:   4 bytes */
+    DOUBLE_WORD   = 0x30,    /* D:   8 bytes */
+    QUAD_WORD     = 0x40,    /* Q:  16 bytes */
+    OCTA_WORD     = 0x50,    /* O:  32 bytes */
+    HEXA_WORD     = 0x60,    /* X:  64 bytes */
+    DUOTRI_WORD   = 0x70,    /* U: 128 bytes (duotrigesimal ie, 32 words) */
+};
 
 enum class OPCODE : opcode_type
 {
@@ -273,10 +368,13 @@ enum class OPCODE : opcode_type
     DIVIU = (FORMAT_U | 0x00'04 | UNSIGNED),
 
     SM  = (FORMAT_M | 0x00'01), /* Store Memory */
+    // SMI =
     LM  = (FORMAT_M | 0x00'02), /* Load Memory */
-    AA  = (FORMAT_M | 0x00'03), /* Allocate Automatic */
-    AD  = (FORMAT_M | 0x00'04), /* Allocate Dynamic */
-    PTR = (FORMAT_M | 0x00'05), /* PoinTeR */
+    // LMI
+    // MM  = (FORMAT_M | 0x00'03), /* Move Memory */
+    AA  = (FORMAT_M | 0x00'04), /* Allocate Automatic */
+    AD  = (FORMAT_M | 0x00'05), /* Allocate Dynamic */
+    PTR = (FORMAT_M | 0x00'07), /* PoinTeR */
 };
 auto to_string(opcode_type const) -> std::string;
 auto parse_opcode(std::string_view) -> opcode_type;

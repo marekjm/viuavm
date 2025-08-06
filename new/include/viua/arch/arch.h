@@ -38,6 +38,7 @@ using opcode_type = uint16_t;
 
 /*
  * Instructions are encoded on 64 bits.
+ *
  * Full instruction is composed of the opcode and the operands. Having all
  * instructions be the same width makes it easier to count jump widths and
  * allocate memory for instructions, but imposes some restrictions. For
@@ -46,10 +47,7 @@ using opcode_type = uint16_t;
  */
 using instruction_type = uint64_t;
 
-constexpr auto REGISTER_WIDTH = size_t{ 64 };
-using register_type           = uint64_t;
-
-enum class REGISTER_SET
+enum class REGISTER_SET : uint8_t
 {
     /*
      * Void register used as an input register means that the instruction
@@ -96,6 +94,15 @@ enum class REGISTER_SET
      */
     ARGUMENT,
     PARAMETER,
+};
+
+/*
+ * Can only go up to 0x3f, because there are only 6 bits available for the
+ * register's "index".
+ */
+enum class SPECIAL_REGISTER : uint8_t {
+    ZERO = 0x00,
+    VOID = 0x01,
 };
 
 using register_index_type                 = uint8_t;

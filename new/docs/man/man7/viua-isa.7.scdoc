@@ -1,0 +1,498 @@
+VIUA-ISA(5) "Viua VM PUT_VIUAVM_VERSION_HERE" "Viua VM Manual"
+
+include(viua.m4)
+
+# NAME
+
+viua-isa - Viua VM instruction set architecture
+
+
+# SYNOPSIS
+
+Viua is a RISC-style architecture, with:
+
+- 128-bit wide type-aware registers
+- dedicated call instructions, and no manual call stack management
+- built-in memory allocation and deallocation instructions
+- pointer tracking
+- I/O through asynchronous ports
+
+
+# DESCRIPTION
+
+In Viua VM's ISA design the emphasis is put on *reliability* of the programs,
+performance begin a secondary consideration--the guiding idea being that an
+answer delivered *quickly* is useless if it is *wrong*; or that a program that
+runs *fast* but *crashes* often is less useful than one that works correctly.
+
+
+# REGISTERS
+
+Registers are organised in sets.
+
+[[ set
+:[ label
+:< no. of registers/description
+|  *local*
+:  *l*
+:  64, fixed
+|  *argument*
+:  *a*
+:  0-64, variable
+|  *parameter*
+:  *p*
+:  0-64, variable
+|  special
+:  *zero*
+:  wired to zero for arithmetic types, invalid for other types
+|  special
+:  *void*
+:  nothing
+
+A general purpose register is accessed using the following notation:
+
+```
+$I.S
+```
+
+where _I_ is the index of a register, and _S_ is the register set label eg,
+
+- $1.l means register 1 from local register set
+- $0.p means register 0 from parameter register set
+- $2.a means register 2 from argument register set
+
+A special register is accessed using its label eg,
+
+- *zero* means 0
+- *void* means nothing (exact meaning depends on the context)
+
+
+## General purpose registers
+
+There are three general-purpose register sets:
+
+- *local* with 64 registers numbered from 0 to 63
+- *parameter* with between 0 and 64 registers
+- *argument* with between 0 and 64 registers
+
+All three register sets are allocated per-frame.
+
+The *local* register set is always local to a frame.
+In contrast, *parameter* and *argument* register sets "move" during a call.
+The caller allocates the *argument* register set using the *frame* instruction
+eg,
+
+```
+frame $4.a
+```
+
+The example above allocates a frame with 4 registers in the *argument* register
+set. The program then sets the registers as appropriate, and issues a *call*
+instruction eg,
+
+```
+call void, foo
+```
+
+In the example above, the *call* instruction uses the allocated frame for a call
+to the foo function. Inside foo, the callee, the *argument* register set
+allocated by the caller is visible as the *parameter* register set. Why?
+
+Arguments are the *actual parameters* ie, what the caller actually gives to the
+callee.
+Parameters are the *formal parameters* ie, what the callee expects to receive
+from the caller.
+The difference in how the register set is viewed by the caller and the callee
+signifies this change in meaning.
+
+
+# FUNDAMENTAL TYPES
+
+Registers in Viua are aware of the type of the value they hold, and may only
+hold values of the *fundamental types*.
+Each of the fundamental types is described below.
+
+Some instructions may require the use of a specific fundamental type for an
+operand, but apply further restrictions on the exactl values consumed or
+produced; eg, a saturating addition of 8-bit wide signed integers expects to
+receive a *signed integer* as its input and will produce the same type as its
+output, but will never produce a value outside of the [-128, 127] range.
+
+
+## void
+
+The void type.
+
+
+## signed integer
+
+The 64-bit signed integer type, in twos-complement format.
+
+
+## unsigned integer
+
+The 64-bit unsigned integer type.
+
+
+## 32-bit floating point number
+
+The C float.
+
+
+## 64-bit floating point number
+
+The C double.
+
+
+## pointer
+
+The type representing memory location addresses.
+
+
+## atom
+
+The type of values representing themselves.
+
+
+## pid
+
+The type representing process (or actor) identifiers.
+
+
+## undefined
+
+The type of uninterpreted values loaded from memory.
+Such values must be converted to another type using the *cast* instruction
+before they are consumed by any other instruction, but may be copied and moved
+freely.
+
+
+# INSTRUCTION FORMATS AND ENCODING
+
+The general instruction format looks like this:
+
+```
+ 63                         16|15     0
++-----------------------------+--------+
+|           workload          | opcode |
++-----------------------------+--------+
+```
+
+Every instruction is encoded on 64 bits, with the opcode always occupying the
+lowest half-word.
+
+If an instruction stores a value in a register the output register is always
+encoded in the third least-significant byte, immediately adjacent to the opcode.
+
+
+## N-format
+
+An instruction with no (*N*) operands.
+
+```
+ 63                         16|15     0
++-----------------------------+--------+
+|                             | opcode |
++-----------------------------+--------+
+```
+
+Bits 63-16 are reserved, and have unspecified value.
+
+
+## T-format
+
+An instruction with a three-way (triple - *T*) register access.
+T-format instructions are used, for example, for arithmetic and logic
+operations, which have two inputs and a single output.
+
+```
+ 63       40|39 32|31 24|23 16|15     0
++-----------+-----+-----+-----+--------+
+|           | snd | src | dst | opcode |
++-----------+-----+-----+-----+--------+
+```
+
+Bits 63-40 are reserved, and have unspecified value.
+
+When the order is relevant, _src_ is the left-hand side of the operation, and
+_snd_ is the right-hand side of the operation.
+
+
+## D-format
+
+An instruction with a two-way (double - *D*) register access.
+
+```
+ 63             32|31 24|23 16|15     0
++-----------------+-----+-----+--------+
+|                 | src | dst | opcode |
++-----------------+-----+-----+--------+
+```
+
+Bits 63-32 are reserved and have unspecified value.
+
+
+## S-format
+
+An instruction with a one-way (single - *S*) register access.
+
+```
+ 63                   24|23 16|15     0
++-----------------------+-----+--------+
+|                       | rgr | opcode |
++-----------------------+-----+--------+
+```
+
+Bits 63-24 are reserved and have unspecified value.
+
+
+## M-FORMAT
+
+An instruction with a two-way register access, a 16-bit memory offset, and an
+8-bit specifier.
+*M*, because the format is used for memory loads and stores.
+
+```
+ 63 56|55 40|39 32|31 24|23 16|15     0
++-----+-----+-----+-----+-----+--------+
+|     | off | spc | src | dst | opcode |
++-----+-----+-----+-----+-----+--------+
+```
+
+Bits 63-56 are reserved and have unspecified value.
+
+For loads *and* stores, _dst_ is the register into which the data will be put or
+from which it will be taken, and _src_ is the register that holds the pointer to
+the memory location.
+
+The _spc_ field, the specifier, informs the VM about the *unit* of the
+operation ie, the amount of moved bytes and the number by which the offset,
+_off_, is multiplied before being added to the pointer in _src_:
+
+[[ spc
+:] moved bytes
+:< meaning
+|  *b*
+:  1
+:  byte
+|  *h*
+:  2
+:  half-word
+|  *w*
+:  4
+:  word
+|  *d*
+:  8
+:  double-word
+|  *q*
+:  16
+:  quad-word
+|  *o*
+:  32
+:  octa-word
+|  *x*
+:  64
+:  hexadecimal-word
+|  *u*
+:  128
+:  duotrigesimal-word
+
+Let us examine a sample of code which would load a quad-word from address
+0xdeadbeef into register $2.l:
+
+```
+li $1.l, 0xdeadbeef
+lq $2.l, $1.l, 0
+```
+
+The value of the _off_ operand is 0, meaning that there is no additional offset
+to add to the base pointer from _src_.
+This is the simplest form of the *lq* (*L*oad *Q*uad-word) instruction, and is
+equivalent to loading the first element of an array at an address.
+
+However, what if we wanted to load the, for example, fourth double-word at an
+address? Something like to the following C code:
+
+```
+uint64_t arr[];
+uint64_t ele = arr[3];  /* what do we do here? */
+```
+
+The translation is simple:
+
+```
+; get the base pointer ie, the address of the array
+li $1.l, arr
+
+; load the double-word at offset (unit * 3) from
+; the base address
+ld $2.l, $1.l, 3
+```
+
+This design makes sequence access easy, but also nudges compilers to lay
+structures out in memory in a certain way for greatest flexibility and
+efficiency.
+
+Given the following C struct:
+
+```
+struct example {
+	uint64_t dw;
+	uint16_t hw;
+	uint8_t  b1;
+	uint32_t w;
+	uint8_t  b2;
+};
+```
+
+let us examine the code accessing the struct's fields if the compiler could not
+reorder fields and had to lay them out in memory in the order specified by the
+programmer (assuming no padding is added for alignment):
+
+```
+; get the address of the struct
+li $1.l, ...
+
+; field: dw
+lq void, $1.l, 0
+
+; field: hw
+lh void, $1.l, 4
+
+; field: b1
+lb void, $1.l, 6
+
+; field: w1
+; The base pointer has to be adjusted because
+; there is no way to make the offset work here.
+addi $2.l, $1.l, 9u
+lw void, $2.l, 0
+
+; field: b2
+lb void, $1.l, 13
+```
+
+Most cases are simple, but there are two weird ones: loading b2 and w1 looks
+"bad" with the high offset or base address manipulation.
+
+To fix the situation the compiler could either insert padding, or reorder the
+fields in such a way:
+
+```
+struct example {
+	uint8_t  b1;
+	uint8_t  b2;
+	uint16_t hw;
+	uint32_t w;
+	uint64_t dw;
+};
+```
+
+Then, the access code is greatly simplified:
+
+```
+; get the address of the struct
+li $1.l, ...
+
+; field: b1
+lb void, $1.l, 0
+
+; field: b2
+lb void, $1.l, 1
+
+; field: hw
+lh void, $1.l, 1
+
+; field: w1
+lw void, $2.l, 1
+
+; field: dw
+ld void, $1.l, 1
+```
+
+In general, it is a good idea to put the smallest fields first, and align the
+first field with an increased size (ie, align half-words on 2 bytes, words on 4
+bytes, etc).
+This will make field accesses easy write and read.
+
+The offset being multiplied by unit also means that putting the smallest fields
+first allows manipulating bigger structs than putting biggest fields first
+would; because the maximum reach of the *lb* (load byte) instruction is 65'536
+bytes (64 KiB), and the maximum reach of the *lq* (load quad-word) instruction
+is 1'048'560 bytes (1 MiB).
+Ordering the fields from the smallest lets a single instruction access any field
+in structs of up to 1 MiB without any extra processing.
+
+
+## I-format
+
+An instruction with one-way register access, and a 32-bit wide immediate (hence
+*I*) value.
+
+```
+ 63             32|31 24|23 16|15     0
++-----------------+-----+-----+--------+
+|    immediate    |     | dst | opcode |
++-----------------+-----+-----+--------+
+```
+
+Bits 63-32 are reserved and have unspecified value.
+
+One of the most useful I-format instructions is *lui* ie, the Load Upper
+Intermediate, which may be familiar to people who have some RISC-V background.
+It loads an immediate value into the higher 32 bits of a register:
+
+```
+lui $1.l, 0xdeadbeef
+```
+
+
+## U-format
+
+An instruction with a two-way register access, and a 32-bit immediate value.
+It is a useful (hence *U*) format.
+
+```
+ 63             32|31 24|23 16|15     0
++-----------------+-----+-----+--------+
+|    immediate    | src | dst | opcode |
++-----------------+-----+-----+--------+
+```
+
+This format is used for eg, the *addi* instruction, which adds a 32-bit
+immediate to the value stored in the _src_ register, and places the result in
+the _dst_ register.
+Combined with the I-format *lui* instruction, it can be used to efficiently load
+a 64-bit value:
+
+```
+; load the upper half of the value
+lui  $1.l, 0xdeadbeef
+
+; add the lower half of the value
+addi $1.l, $1.l, 0xbadc0ffe
+```
+
+
+# OPCODES AND INSTRUCTIONS
+
+The instructions the VM makes available to programmers.
+
+
+# ENVIRONMENT
+
+Describe the environment flags the machine exposes; describe *ebreak*, *ecall*,
+and other environment-related instructions.
+
+
+# SEE ALSO
+
+*viua-asm*(5).
+
+Patterson, David A. and Waterman, Andrew. _The RISC-V Reader_. Strawberry Canyon
+LLC, 2017.++
+ISBN 978-09-9924-911-6
+
+include(common/footer.scdoc)
+
+; vim:ft=scdoc:

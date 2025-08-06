@@ -296,6 +296,7 @@ man: \
 	$(BUILD_MANDIR)/man1/viua-readelf.1 \
 	$(BUILD_MANDIR)/man1/viua-vm.1 \
 	$(BUILD_MANDIR)/man5/viua-asm.5 \
+	$(BUILD_MANDIR)/man7/viua-isa.7 \
 	$(BUILD_MANDIR)/man1/viua.1
 
 $(BUILD_MANDIR)/%: docs/man/%.scdoc docs/man/common/*.scdoc docs/man/viua.m4
