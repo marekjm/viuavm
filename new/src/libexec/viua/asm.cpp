@@ -1839,10 +1839,10 @@ auto emit_instruction(
             {
                 auto fst_register_operand = size_t{ 0 };
                 auto const is_styled_arithmetic =
-                    (opcode == static_cast<opcode_type>(OPCODE::STDADD)
-                     or opcode == static_cast<opcode_type>(OPCODE::STDSUB)
-                     or opcode == static_cast<opcode_type>(OPCODE::STDMUL)
-                     or opcode == static_cast<opcode_type>(OPCODE::STDDIV));
+                    (opcode == static_cast<opcode_type>(OPCODE::ADD)
+                     or opcode == static_cast<opcode_type>(OPCODE::SUB)
+                     or opcode == static_cast<opcode_type>(OPCODE::MUL)
+                     or opcode == static_cast<opcode_type>(OPCODE::DIV));
                 if (is_styled_arithmetic) {
                     /*
                      * Skip the style operand.
@@ -1851,7 +1851,9 @@ auto emit_instruction(
 
                     using namespace viua::arch::ops::OPCODE_FLAGS;
                     auto const style = operand_or_throw(insn, 0).ingredients.front();
-                    if (style == "saturate") {
+                    if (style == "native") {
+                        opcode = (opcode | ARITHMETIC_STYLE_NATIVE);
+                    } else if (style == "saturate") {
                         opcode = (opcode | ARITHMETIC_STYLE_SATURATE);
                     } else if (style == "wrap") {
                         opcode = (opcode | ARITHMETIC_STYLE_WRAP);
@@ -2582,16 +2584,16 @@ auto expand_styled_arithmetic(
 
     auto opcode_view = std::string_view{ raw.leader.text };
     auto const operation = opcode_view.substr(0, opcode_view.find('.'));
-    auto const style = opcode_view.substr(opcode_view.find('.') + 1);
+    auto const style = (opcode_view.find('.') == std::string_view::npos)
+        ? "native"
+        : opcode_view.substr(opcode_view.find('.') + 1);
 
     synth.leader         = raw.leader;
-    synth.leader.text    = operation.starts_with("std")
-        ? std::string{operation}
-        : ("std" + std::string{operation});
+    synth.leader.text    = operation;
 
     synth.operands.push_back(raw.operands.at(0));
     synth.operands.front().ingredients.resize(1);
-    if (style == "saturate" or style == "wrap" or style == "trap") {
+    if (style == "saturate" or style == "wrap" or style == "trap" or style == "native") {
         synth.operands.front().ingredients.front().text = style;
     } else {
         using viua::libs::errors::compile_time::Cause;
@@ -2602,7 +2604,6 @@ auto expand_styled_arithmetic(
     synth.operands.push_back(raw.operands.at(0));
     synth.operands.push_back(raw.operands.at(1));
     synth.operands.push_back(raw.operands.at(2));
-
 
     return { emit_instruction(synth) };
 }
@@ -2711,32 +2712,30 @@ auto expand_instruction(
         "addi", "subi", "muli", "divi",
     };
     auto const styled_arithmetic = std::set<std::string_view>{
+        "add",
+        "sub",
+        "mul",
+        "div",
+
+        "add.native",
+        "sub.native",
+        "mul.native",
+        "div.native",
+
         "add.wrap",
         "sub.wrap",
         "mul.wrap",
         "div.wrap",
-        "stdadd.wrap",
-        "stdsub.wrap",
-        "stdmul.wrap",
-        "stddiv.wrap",
 
         "add.saturate",
         "sub.saturate",
         "mul.saturate",
         "div.saturate",
-        "stdadd.saturate",
-        "stdsub.saturate",
-        "stdmul.saturate",
-        "stddiv.saturate",
 
         "add.trap",
         "sub.trap",
         "mul.trap",
         "div.trap",
-        "stdadd.trap",
-        "stdsub.trap",
-        "stdmul.trap",
-        "stddiv.trap",
     };
 
     auto const opcode = std::string_view{raw.leader.text};

@@ -20,27 +20,27 @@
     ; zero # zero
     li $1.l, 0
     li $2.l, 0
-    stdadd.wrap $3.l, $1.l, $2.l
+    add.wrap $3.l, $1.l, $2.l
 
     ; zero # one
     li $1.l, 0
     li $2.l, 1
-    stdadd.wrap $4.l, $1.l, $2.l
+    add.wrap $4.l, $1.l, $2.l
 
     ; zero # -one
     li $1.l, 0
     li $2.l, -1
-    stdadd.wrap $5.l, $1.l, $2.l
+    add.wrap $5.l, $1.l, $2.l
 
     ; zero # max
     li $1.l, 0
     li $2.l, 127
-    stdadd.wrap $6.l, $1.l, $2.l
+    add.wrap $6.l, $1.l, $2.l
 
     ; zero # min
     li $1.l, 0
     li $2.l, -128
-    stdadd.wrap $7.l, $1.l, $2.l
+    add.wrap $7.l, $1.l, $2.l
 
 
     ;-----------------------------------
@@ -49,27 +49,27 @@
     ; one # zero
     li $1.l, 1
     li $2.l, 0
-    stdadd.wrap $8.l, $1.l, $2.l
+    add.wrap $8.l, $1.l, $2.l
 
     ; one # one
     li $1.l, 1
     li $2.l, 1
-    stdadd.wrap $9.l, $1.l, $2.l
+    add.wrap $9.l, $1.l, $2.l
 
     ; one # -one
     li $1.l, 1
     li $2.l, -1
-    stdadd.wrap $10.l, $1.l, $2.l
+    add.wrap $10.l, $1.l, $2.l
 
     ; one # max
     li $1.l, 1
     li $2.l, 127
-    stdadd.wrap $11.l, $1.l, $2.l
+    add.wrap $11.l, $1.l, $2.l
 
     ; one # min
     li $1.l, 1
     li $2.l, -128
-    stdadd.wrap $12.l, $1.l, $2.l
+    add.wrap $12.l, $1.l, $2.l
 
 
     ;-----------------------------------
@@ -78,27 +78,27 @@
     ; -one # zero
     li $1.l, -1
     li $2.l, 0
-    stdadd.wrap $13.l, $1.l, $2.l
+    add.wrap $13.l, $1.l, $2.l
 
     ; -one # one
     li $1.l, -1
     li $2.l, 1
-    stdadd.wrap $14.l, $1.l, $2.l
+    add.wrap $14.l, $1.l, $2.l
 
     ; -one # -one
     li $1.l, -1
     li $2.l, -1
-    stdadd.wrap $15.l, $1.l, $2.l
+    add.wrap $15.l, $1.l, $2.l
 
     ; -one # max
     li $1.l, -1
     li $2.l, 127
-    stdadd.wrap $16.l, $1.l, $2.l
+    add.wrap $16.l, $1.l, $2.l
 
     ; -one # min
     li $1.l, -1
     li $2.l, -128
-    stdadd.wrap $17.l, $1.l, $2.l
+    add.wrap $17.l, $1.l, $2.l
 
 
     ;-----------------------------------
@@ -107,27 +107,27 @@
     ; max # zero
     li $1.l, 127
     li $2.l, 0
-    stdadd.wrap $18.l, $1.l, $2.l
+    add.wrap $18.l, $1.l, $2.l
 
     ; max # one
     li $1.l, 127
     li $2.l, 1
-    stdadd.wrap $19.l, $1.l, $2.l
+    add.wrap $19.l, $1.l, $2.l
 
     ; max # -one
     li $1.l, 127
     li $2.l, -1
-    stdadd.wrap $20.l, $1.l, $2.l
+    add.wrap $20.l, $1.l, $2.l
 
     ; max # max
     li $1.l, 127
     li $2.l, 127
-    stdadd.wrap $21.l, $1.l, $2.l
+    add.wrap $21.l, $1.l, $2.l
 
     ; max # min
     li $1.l, 127
     li $2.l, -128
-    stdadd.wrap $22.l, $1.l, $2.l
+    add.wrap $22.l, $1.l, $2.l
 
 
     ;-----------------------------------
@@ -136,27 +136,27 @@
     ; min # zero
     li $1.l, -128
     li $2.l, 0
-    stdadd.wrap $23.l, $1.l, $2.l
+    add.wrap $23.l, $1.l, $2.l
 
     ; min # one
     li $1.l, -128
     li $2.l, 1
-    stdadd.wrap $24.l, $1.l, $2.l
+    add.wrap $24.l, $1.l, $2.l
 
     ; min # -one
     li $1.l, -128
     li $2.l, -1
-    stdadd.wrap $25.l, $1.l, $2.l
+    add.wrap $25.l, $1.l, $2.l
 
     ; min # max
     li $1.l, -128
     li $2.l, 127
-    stdadd.wrap $26.l, $1.l, $2.l
+    add.wrap $26.l, $1.l, $2.l
 
     ; min # min
     li $1.l, -128
     li $2.l, -128
-    stdadd.wrap $27.l, $1.l, $2.l
+    add.wrap $27.l, $1.l, $2.l
 
     ebreak
     return

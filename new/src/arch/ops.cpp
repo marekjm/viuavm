@@ -164,14 +164,6 @@ auto to_string_impl(
             return "gtl";
         case OPCODE::EARITHMETICWIDTH:
             return "earithmeticwidth";
-        case OPCODE::STDADD:
-            return "stdadd";
-        case OPCODE::STDSUB:
-            return "stdsub";
-        case OPCODE::STDMUL:
-            return "stdmul";
-        case OPCODE::STDDIV:
-            return "stddiv";
         case OPCODE::CAST:
             return "cast";
         case OPCODE::ARODP:
@@ -332,14 +324,6 @@ auto parse_opcode(
         return static_cast<opcode_type>(OPCODE::PTR);
     } else if (sv == "earithmeticwidth") {
         return static_cast<opcode_type>(OPCODE::EARITHMETICWIDTH);
-    } else if (sv == "stdadd") {
-        return static_cast<opcode_type>(OPCODE::STDADD);
-    } else if (sv == "stdsub") {
-        return static_cast<opcode_type>(OPCODE::STDSUB);
-    } else if (sv == "stdmul") {
-        return static_cast<opcode_type>(OPCODE::STDMUL);
-    } else if (sv == "stddiv") {
-        return static_cast<opcode_type>(OPCODE::STDDIV);
     } else {
         throw std::invalid_argument{ "viua::arch::ops::parse_opcode: "
                                      + std::string{ raw } };

@@ -201,118 +201,6 @@ auto execute(
 
     stack.proc->arithmetic_width = static_cast<uint8_t>(*new_width);
 }
-
-auto execute(
-    STDADD const op,
-    Stack& stack,
-    ip_type const) -> void
-{
-    auto const out = mutable_proxy(stack, op.instruction.out);
-    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
-    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
-
-    auto const lhs_i64 = lhs.holds<register_type::int_type>();
-    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
-
-    auto const style = op.instruction.opcode & viua::arch::ops::OPCODE_FLG_MASK;
-
-    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
-        out = calculate_add(stack, style, *lhs.get<int64_t>(), *v);
-        return;
-    }
-    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
-        out = calculate_add(stack, style, *lhs.get<uint64_t>(), *v);
-        return;
-    }
-
-    throw abort_execution{
-        stack, "unsupported operand types for styled arithmetic operation"
-    };
-}
-
-auto execute(
-    STDSUB const op,
-    Stack& stack,
-    ip_type const) -> void
-{
-    auto const out = mutable_proxy(stack, op.instruction.out);
-    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
-    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
-
-    auto const lhs_i64 = lhs.holds<register_type::int_type>();
-    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
-
-    auto const style = op.instruction.opcode & viua::arch::ops::OPCODE_FLG_MASK;
-
-    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
-        out = calculate_sub(stack, style, *lhs.get<int64_t>(), *v);
-        return;
-    }
-    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
-        out = calculate_sub(stack, style, *lhs.get<uint64_t>(), *v);
-        return;
-    }
-
-    throw abort_execution{
-        stack, "unsupported operand types for styled arithmetic operation"
-    };
-}
-
-auto execute(
-    STDMUL const op,
-    Stack& stack,
-    ip_type const) -> void
-{
-    auto const out = mutable_proxy(stack, op.instruction.out);
-    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
-    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
-
-    auto const lhs_i64 = lhs.holds<register_type::int_type>();
-    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
-
-    auto const style = op.instruction.opcode & viua::arch::ops::OPCODE_FLG_MASK;
-
-    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
-        out = calculate_mul(stack, style, *lhs.get<int64_t>(), *v);
-        return;
-    }
-    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
-        out = calculate_mul(stack, style, *lhs.get<uint64_t>(), *v);
-        return;
-    }
-
-    throw abort_execution{
-        stack, "unsupported operand types for styled arithmetic operation"
-    };
-}
-
-auto execute(
-    STDDIV const op,
-    Stack& stack,
-    ip_type const) -> void
-{
-    auto const out = mutable_proxy(stack, op.instruction.out);
-    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
-    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
-
-    auto const lhs_i64 = lhs.holds<register_type::int_type>();
-    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
-
-    using fn_type = std::divides<>;
-
-    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
-        out = fn_type{}(*lhs.get<int64_t>(), *v);
-        return;
-    }
-    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
-        out = fn_type{}(*lhs.get<uint64_t>(), *v);
-        return;
-    }
-
-    throw abort_execution{
-        stack, "unsupported operand types for styled arithmetic operation"
-    };
-}
 }  // namespace viua::vm::ins
 
 
@@ -321,7 +209,7 @@ using namespace viua::arch::ins;
 using viua::vm::Stack;
 using ip_type = viua::arch::instruction_type const*;
 
-auto execute(
+auto native_add(
     ADD const op,
     Stack& stack,
     ip_type const) -> void
@@ -386,7 +274,47 @@ auto execute(
         stack, "unsupported operand types for arithmetic operation"
     };
 }
+auto styled_add(
+    ADD const op,
+    viua::arch::opcode_type const style,
+    Stack& stack,
+    ip_type const) -> void
+{
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
+
+    auto const lhs_i64 = lhs.holds<register_type::int_type>();
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+
+    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
+        out = calculate_add(stack, style, *lhs.get<int64_t>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        out = calculate_add(stack, style, *lhs.get<uint64_t>(), *v);
+        return;
+    }
+
+    throw abort_execution{
+        stack, "unsupported operand types for styled arithmetic operation"
+    };
+}
 auto execute(
+    ADD const op,
+    Stack& stack,
+    ip_type const ip) -> void
+{
+    using namespace viua::arch::ops;
+    auto const style = op.instruction.opcode & OPCODE_FLG_MASK;
+    if (style == OPCODE_FLAGS::ARITHMETIC_STYLE_NATIVE) {
+        return native_add(op, stack, ip);
+    } else {
+        return styled_add(op, style, stack, ip);
+    }
+}
+
+auto native_sub(
     SUB const op,
     Stack& stack,
     ip_type const) -> void
@@ -423,7 +351,47 @@ auto execute(
         stack, "unsupported operand types for arithmetic operation"
     };
 }
+auto styled_sub(
+    SUB const op,
+    viua::arch::opcode_type const style,
+    Stack& stack,
+    ip_type const) -> void
+{
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
+
+    auto const lhs_i64 = lhs.holds<register_type::int_type>();
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+
+    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
+        out = calculate_sub(stack, style, *lhs.get<int64_t>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        out = calculate_sub(stack, style, *lhs.get<uint64_t>(), *v);
+        return;
+    }
+
+    throw abort_execution{
+        stack, "unsupported operand types for styled arithmetic operation"
+    };
+}
 auto execute(
+    SUB const op,
+    Stack& stack,
+    ip_type const ip) -> void
+{
+    using namespace viua::arch::ops;
+    auto const style = op.instruction.opcode & OPCODE_FLG_MASK;
+    if (style == OPCODE_FLAGS::ARITHMETIC_STYLE_NATIVE) {
+        return native_sub(op, stack, ip);
+    } else {
+        return styled_sub(op, style, stack, ip);
+    }
+}
+
+auto native_mul(
     MUL const op,
     Stack& stack,
     ip_type const) -> void
@@ -460,6 +428,46 @@ auto execute(
         stack, "unsupported operand types for arithmetic operation"
     };
 }
+auto styled_mul(
+    MUL const op,
+    viua::arch::opcode_type const style,
+    Stack& stack,
+    ip_type const) -> void
+{
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
+
+    auto const lhs_i64 = lhs.holds<register_type::int_type>();
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+
+    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
+        out = calculate_mul(stack, style, *lhs.get<int64_t>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        out = calculate_mul(stack, style, *lhs.get<uint64_t>(), *v);
+        return;
+    }
+
+    throw abort_execution{
+        stack, "unsupported operand types for styled arithmetic operation"
+    };
+}
+auto execute(
+    MUL const op,
+    Stack& stack,
+    ip_type const ip) -> void
+{
+    using namespace viua::arch::ops;
+    auto const style = op.instruction.opcode & OPCODE_FLG_MASK;
+    if (style == OPCODE_FLAGS::ARITHMETIC_STYLE_NATIVE) {
+        return native_mul(op, stack, ip);
+    } else {
+        return styled_mul(op, style, stack, ip);
+    }
+}
+
 auto execute(
     DIV const op,
     Stack& stack,
@@ -497,6 +505,7 @@ auto execute(
         stack, "unsupported operand types for arithmetic operation"
     };
 }
+
 auto execute(
     MOD const op,
     Stack& stack,

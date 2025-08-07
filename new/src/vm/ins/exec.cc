@@ -103,10 +103,6 @@ auto execute(
                     Work(T, IO_WAIT);
                     Work(T, IO_SHUTDOWN);
                     Work(T, IO_CTL);
-                    Work(T, STDADD);
-                    Work(T, STDSUB);
-                    Work(T, STDMUL);
-                    Work(T, STDDIV);
                 }
                 break;
             }

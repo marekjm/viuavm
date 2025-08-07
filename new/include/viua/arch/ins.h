@@ -563,38 +563,6 @@ struct EARITHMETICWIDTH : Instruction {
         : instruction{ i }
     {}
 };
-struct STDADD : Instruction {
-    viua::arch::ops::T instruction;
-
-    STDADD(
-        viua::arch::ops::T i)
-        : instruction{ i }
-    {}
-};
-struct STDSUB : Instruction {
-    viua::arch::ops::T instruction;
-
-    STDSUB(
-        viua::arch::ops::T i)
-        : instruction{ i }
-    {}
-};
-struct STDMUL : Instruction {
-    viua::arch::ops::T instruction;
-
-    STDMUL(
-        viua::arch::ops::T i)
-        : instruction{ i }
-    {}
-};
-struct STDDIV : Instruction {
-    viua::arch::ops::T instruction;
-
-    STDDIV(
-        viua::arch::ops::T i)
-        : instruction{ i }
-    {}
-};
 
 struct SM : Instruction {
     viua::arch::ops::M instruction;

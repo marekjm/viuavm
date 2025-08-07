@@ -381,14 +381,6 @@ enum class OPCODE : opcode_type
     IO_SHUTDOWN = (FORMAT_T | 0x00'16),
     IO_CTL      = (FORMAT_T | 0x00'17),
 
-    /*
-     * STyleD arithmetic operations
-     */
-    STDADD = (FORMAT_T | 0x00'18),
-    STDSUB = (FORMAT_T | 0x00'19),
-    STDMUL = (FORMAT_T | 0x00'20),
-    STDDIV = (FORMAT_T | 0x00'21),
-
     CALL             = (FORMAT_D | 0x00'01),
     BITNOT           = (FORMAT_D | 0x00'02),
     NOT              = (FORMAT_D | 0x00'03),
@@ -468,10 +460,6 @@ enum class OPCODE_T : opcode_type
     Make_entry(IO_WAIT),
     Make_entry(IO_SHUTDOWN),
     Make_entry(IO_CTL),
-    Make_entry(STDADD),
-    Make_entry(STDSUB),
-    Make_entry(STDMUL),
-    Make_entry(STDDIV),
 };
 enum class OPCODE_D : opcode_type
 {
