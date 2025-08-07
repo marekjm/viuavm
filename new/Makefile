@@ -456,7 +456,6 @@ VM_INSTRUCTION_IMPL=\
 	$(BUILD_PREFIX)/vm/ins/impl/arithmetic.o \
 	$(BUILD_PREFIX)/vm/ins/impl/constructors.o \
 	$(BUILD_PREFIX)/vm/ins/impl/flow.o \
-	$(BUILD_PREFIX)/vm/ins/impl/earithmetic.o \
 	$(BUILD_PREFIX)/vm/ins/impl/ebreak.o \
 	$(BUILD_PREFIX)/vm/ins/impl/ecall.o \
 	$(BUILD_PREFIX)/vm/ins/impl/io.o \
