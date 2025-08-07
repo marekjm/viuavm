@@ -1818,8 +1818,8 @@ auto emit_instruction(
 {
     using viua::arch::opcode_type;
     using viua::arch::ops::FORMAT;
-    using viua::arch::ops::FORMAT_MASK;
     using viua::arch::ops::OPCODE;
+    using viua::arch::ops::OPCODE_FMT_MASK;
 
     auto opcode = opcode_type{};
     try {
@@ -1831,7 +1831,7 @@ auto emit_instruction(
         using viua::libs::errors::compile_time::Error;
         throw Error{ e, Cause::Unknown_opcode, e.text };
     }
-    auto format = static_cast<FORMAT>(opcode & FORMAT_MASK);
+    auto format = static_cast<FORMAT>(opcode & OPCODE_FMT_MASK);
     switch (format) {
         case FORMAT::N:
             return viua::arch::ops::N{ opcode }.encode();
@@ -1963,13 +1963,16 @@ auto emit_instruction(
                     insn.operands.front().ingredients.front().text));
                 auto const off  = insn.operands.back().ingredients.front();
 
-                // FIXME Use one of the UNIT_* flags from OPCODE_FLAGS instead
-                // of the magic shift by 9.
+                // FIXME UNIT Use symbolic units instead of numbers, and use one
+                // of the UNIT flags instead of raw shift. This is mostly
+                // cosmetic, as the current code works and adjusts automatically
+                // to changes in the architecture header; but I would feel
+                // better if the values were symbold and not hardcoded.
                 return viua::arch::ops::M{
-                    static_cast<opcode_type>(opcode | (unit << 9)),
+                    static_cast<opcode_type>(opcode | (unit << viua::arch::ops::OPCODE_FLAGS::FLAGS_SHIFT)),
                     insn.operands.at(1).make_access(),
                     insn.operands.at(2).make_access(),
-                    static_cast<uint32_t>(std::stoull(off.text))
+                    viua::support::ston<uint32_t>(off.text)
                 }
                     .encode();
             }
@@ -3040,12 +3043,11 @@ auto make_reloc_table(
                                  or (op == OPCODE::ARODP);
         auto const type = into_rodata ? R_VIUA_OBJECT : R_VIUA_JUMP_SLOT;
 
-        using viua::arch::ops::FORMAT_MASK;
-        using viua::arch::ops::FORMAT_U;
         auto const reloc_to_section_ptr =
             op == OPCODE::ARODP or op == OPCODE::ATXTP;
         auto const prev_op            = viua::carve_opcode_out(text.at(i - 1));
-        auto const reloc_to_long_addr = (prev_op & FORMAT_MASK) == FORMAT_U;
+        auto const reloc_to_long_addr =
+            viua::arch::ops::is_format(viua::arch::ops::FORMAT::U, prev_op);
 
         auto symtab_entry_index = uint32_t{};
         if (reloc_to_section_ptr) {

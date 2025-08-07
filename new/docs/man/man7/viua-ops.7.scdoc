@@ -1,0 +1,87 @@
+VIUA-OPS(7) "Viua VM PUT_VIUAVM_VERSION_HERE" "Viua VM Manual"
+
+include(viua.m4)
+
+# NAME
+
+viua-ops - Viua VM opcodes and instructions
+
+
+# SYNOPSIS
+
+Viua is a RISC-style architecture, with:
+
+- 128-bit wide type-aware registers
+- dedicated call instructions, and no manual call stack management
+- built-in memory allocation and deallocation instructions
+- pointer tracking
+- I/O through asynchronous ports
+
+
+# DESCRIPTION
+
+In Viua VM's ISA design the emphasis is put on *reliability* of the programs,
+performance begin a secondary consideration--the guiding idea being that an
+answer delivered *quickly* is useless if it is *wrong*; or that a program that
+runs *fast* but *crashes* often is less useful than one that works correctly.
+
+
+# REGISTER MANAGEMENT
+
+Moves, copies, swaps, etc.
+
+
+# ARITHMETIC
+
+Arithmetic instructions.
+
+
+# LOGIC
+
+Logic instructions.
+
+
+# BIT ARITHMETIC
+
+Bitwise operations.
+
+
+# CONTROL FLOW
+
+Control flow instructions.
+
+
+# MEMORY
+
+Memory interaction.
+
+
+# I/O
+
+Input and output, interaction with the outside world.
+
+
+# CONCURRENCY
+
+Actors and message passing.
+
+
+# ENVIRONMENT
+
+Describe the environment flags the machine exposes; describe *ebreak*, *ecall*,
+and other environment-related instructions.
+
+
+# SEE ALSO
+
+*viua-asm*(5),
+*viua-isa*(7).
+
+Patterson, David A. and Waterman, Andrew. _The RISC-V Reader_. Strawberry Canyon
+LLC, 2017.++
+ISBN 978-09-9924-911-6
+
+include(common/footer.scdoc)
+
+; vim:ft=scdoc:
+

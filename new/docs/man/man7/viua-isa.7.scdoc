@@ -1,4 +1,4 @@
-VIUA-ISA(5) "Viua VM PUT_VIUAVM_VERSION_HERE" "Viua VM Manual"
+VIUA-ISA(7) "Viua VM PUT_VIUAVM_VERSION_HERE" "Viua VM Manual"
 
 include(viua.m4)
 
@@ -172,10 +172,10 @@ freely.
 The general instruction format looks like this:
 
 ```
- 63                         16|15     0
-+-----------------------------+--------+
-|           workload          | opcode |
-+-----------------------------+--------+
+ 63                         16│15     0
+┌─────────────────────────────┼────────┐
+│           workload          │ opcode │
+└─────────────────────────────┴────────┘
 ```
 
 Every instruction is encoded on 64 bits, with the opcode always occupying the
@@ -190,10 +190,10 @@ encoded in the third least-significant byte, immediately adjacent to the opcode.
 An instruction with no (*N*) operands.
 
 ```
- 63                         16|15     0
-+-----------------------------+--------+
-|                             | opcode |
-+-----------------------------+--------+
+ 63                         16│15     0
+┌─────────────────────────────┼────────┐
+│                             │ opcode │
+└─────────────────────────────┴────────┘
 ```
 
 Bits 63-16 are reserved, and have unspecified value.
@@ -206,10 +206,10 @@ T-format instructions are used, for example, for arithmetic and logic
 operations, which have two inputs and a single output.
 
 ```
- 63       40|39 32|31 24|23 16|15     0
-+-----------+-----+-----+-----+--------+
-|           | snd | src | dst | opcode |
-+-----------+-----+-----+-----+--------+
+ 63       40│39 32│31 24│23 16│15     0
+┌───────────┼─────┼─────┼─────┼────────┐
+│           │ snd │ src │ dst │ opcode │
+└───────────┴─────┴─────┴─────┴────────┘
 ```
 
 Bits 63-40 are reserved, and have unspecified value.
@@ -223,10 +223,10 @@ _snd_ is the right-hand side of the operation.
 An instruction with a two-way (double - *D*) register access.
 
 ```
- 63             32|31 24|23 16|15     0
-+-----------------+-----+-----+--------+
-|                 | src | dst | opcode |
-+-----------------+-----+-----+--------+
+ 63             32│31 24│23 16│15     0
+┌─────────────────┼─────┼─────┼────────┐
+│                 │ src │ dst │ opcode │
+└─────────────────┴─────┴─────┴────────┘
 ```
 
 Bits 63-32 are reserved and have unspecified value.
@@ -237,10 +237,10 @@ Bits 63-32 are reserved and have unspecified value.
 An instruction with a one-way (single - *S*) register access.
 
 ```
- 63                   24|23 16|15     0
-+-----------------------+-----+--------+
-|                       | rgr | opcode |
-+-----------------------+-----+--------+
+ 63                   32│31 24│23     8
+┌───────────────────────┼─────┼────────┐
+│                       │ rgr │ opcode │
+└───────────────────────┴─────┴────────┘
 ```
 
 Bits 63-24 are reserved and have unspecified value.
@@ -248,29 +248,24 @@ Bits 63-24 are reserved and have unspecified value.
 
 ## M-FORMAT
 
-An instruction with a two-way register access, a 16-bit memory offset, and an
-8-bit specifier.
+An instruction with a two-way register access, and a 32-bit memory offset.
 *M*, because the format is used for memory loads and stores.
 
 ```
- 63 56|55 40|39 32|31 24|23 16|15     0
-+-----+-----+-----+-----+-----+--------+
-|     | off | spc | src | dst | opcode |
-+-----+-----+-----+-----+-----+--------+
+ 63             32│31 24│23 16│15     0
+┌─────────────────┼─────┼─────┼────────┐
+│     offset      │ src │ dst │ opcode │
+└─────────────────┴─────┴─────┴────────┘
 ```
-
-Bits 63-56 are reserved and have unspecified value.
 
 For loads *and* stores, _dst_ is the register into which the data will be put or
 from which it will be taken, and _src_ is the register that holds the pointer to
 the memory location.
 
-The _spc_ field, the specifier, informs the VM about the *unit* of the
-operation ie, the amount of moved bytes and the number by which the offset,
-_off_, is multiplied before being added to the pointer in _src_:
+Every memory instruction has a _unit_ embedded in its opcode:
 
-[[ spc
-:] moved bytes
+[[ unit
+:] sizeof
 :< meaning
 |  *b*
 :  1
@@ -296,6 +291,14 @@ _off_, is multiplied before being added to the pointer in _src_:
 |  *u*
 :  128
 :  duotrigesimal-word
+
+This _unit_ appears as a part of an instruction's name.
+
+For example, the *lm* (load memory, not actually usable as assembler will reject
+the base unit-less form) instruction may be written as *lb* (load byte), or as
+*lq* (load quad-word).
+
+## Struct layout considerations
 
 Let us examine a sample of code which would load a quad-word from address
 0xdeadbeef into register $2.l:
@@ -417,11 +420,15 @@ This will make field accesses easy write and read.
 
 The offset being multiplied by unit also means that putting the smallest fields
 first allows manipulating bigger structs than putting biggest fields first
-would; because the maximum reach of the *lb* (load byte) instruction is 65'536
-bytes (64 KiB), and the maximum reach of the *lq* (load quad-word) instruction
-is 1'048'560 bytes (1 MiB).
+would; because while the maximum reach of the *lb* instruction is a respectable
+4'294'967'296 bytes (4GiB),
+the reach of the *lq* instruction is an even more impressive 34'359'738'368
+bytes (32GiB), and
+the reach of the *lu* (load duotrigesimal-word) is a stunning 549'755'813'888
+bytes (512GiB)—all with a single instruction!
+
 Ordering the fields from the smallest lets a single instruction access any field
-in structs of up to 1 MiB without any extra processing.
+in structs of up to 512GiB without any extra processing.
 
 
 ## I-format
@@ -430,10 +437,10 @@ An instruction with one-way register access, and a 32-bit wide immediate (hence
 *I*) value.
 
 ```
- 63             32|31 24|23 16|15     0
-+-----------------+-----+-----+--------+
-|    immediate    |     | dst | opcode |
-+-----------------+-----+-----+--------+
+ 63             32│31 24│23 16│15     0
+┌─────────────────┼─────┼─────┼────────┐
+│    immediate    │     │ dst │ opcode │
+└─────────────────┴─────┴─────┴────────┘
 ```
 
 Bits 63-32 are reserved and have unspecified value.
@@ -453,10 +460,10 @@ An instruction with a two-way register access, and a 32-bit immediate value.
 It is a useful (hence *U*) format.
 
 ```
- 63             32|31 24|23 16|15     0
-+-----------------+-----+-----+--------+
-|    immediate    | src | dst | opcode |
-+-----------------+-----+-----+--------+
+ 63             32│31 24│23 16│15     0
+┌─────────────────┼─────┼─────┼────────┐
+│    immediate    │ src │ dst │ opcode │
+└─────────────────┴─────┴─────┴────────┘
 ```
 
 This format is used for eg, the *addi* instruction, which adds a 32-bit
@@ -473,25 +480,225 @@ lui  $1.l, 0xdeadbeef
 addi $1.l, $1.l, 0xbadc0ffe
 ```
 
-## Opcode encoding
+# OPCODE ENCODING
+
+Opcodes are encoded on the lowest 16 bits of an instruction.
 
 ```
- 15    13|12        9|8               0
-+--------+-----------+-----------------+
-|  fmt   |   flags   |    operation    |
-+--------+-----------+-----------------+
+ 15   13│12   10│ 9 │8                0
+┌───────┼───────┼───┼──────────────────┐
+│  fmt  │  flg  │ u │    operation     │
+└───────┴───────┴───┴──────────────────┘
 ```
 
-Bits 15-13 encode the instruction format; and bits 12-0 encode the actual
-operation.
-All 13 bits are available for operations (8192 possible instructions ought to be
-enough for everyone), but for some formats (currently, only the *M*-format) the
-_flags_ bits are reserved and carry special meaning.
+Bits 15-13 encode the instruction format.
+The formats are described in section *INSTRUCTION FORMATS AND ENCODING*.
+
+Bits 12-10 encode the flags, which are mostly relevant for memory and arithmetic
+instructions.
+
+Bit 9 encodes the unsigned flag, which is relevant for some arithmetic
+instructions, and for the *luiu* (load upper intermediate unsigned) instruction.
+
+Bits 8-0 encode the actual operation code.
+
+Instruction dispatch depends on bits 15-13 and 9-0.
+This means there are 8192 possible instructions.
 
 
-# OPCODES AND INSTRUCTIONS
+# LISTING OF INSTRUCTIONS
 
-The instructions the VM makes available to programmers.
+The following instructions are available:
+
+[[ 
+:] fmt
+:< meaning
+|  noop
+:  N
+:  no operation
+|  halt
+:  N
+:  halt the machine
+|  ebreak
+:  N
+:  break execution, shows environment dump by default
+|  ecall
+:  N
+:  issue an environment call (a system call)
+|  add
+:  T
+:  addition
+|  addi
+:  U
+:  add immediate
+|  addiu
+:  U
+:  add (unsigned) immediate
+|  sub
+:  T
+:  subtraction
+|  subi
+:  U
+:  subtract immediate
+|  subiu
+:  U
+:  subtract (unsigned) immediate
+|  mul
+:  T
+:  multiplication
+|  muli
+:  U
+:  multiply by immediate
+|  muliu
+:  U
+:  multiply by (unsigned) immediate
+|  div
+:  T
+:  division
+|  divi
+:  U
+:  divide by immediate
+|  diviu
+:  U
+:  divide by (unsigned) immediate
+|  earithmeticwidth
+:  D
+:  limit bit width of some operations
+|  bitshl
+:  T
+:  left bit shift
+|  bitshr
+:  T
+:  right bit shift
+|  bitashr
+:  T
+:  arithmetic (sign-preserving) right bit shift
+|  bitrol
+:  T
+:  left bit roll
+|  bitror
+:  T
+:  right bit roll
+|  bitand
+:  T
+:  bitwise "and"
+|  bitor
+:  T
+:  bitwise "or"
+|  bitxor
+:  T
+:  bitwise "xor"
+|  bitnot
+:  D
+:  bitwise "not"
+|  eq
+:  T
+:  lhs = rhs
+|  lt
+:  T
+:  lhs < rhs
+|  gt
+:  T
+:  lhs > rhs
+|  cmp
+:  T
+:  compare two values, returning -1 for less-than, 0 for equal-to, and 1 for
+   greater-than relation
+|  and
+:  T
+:  logical "and"
+|  or
+:  T
+:  logical "or"
+|  not
+:  D
+:  logical "not"
+|  io_submit
+:  T
+:  submit an I/O request to an I/O port
+|  io_wait
+:  T
+:  wait for a completion of an I/O request
+|  io_shutdown
+:  T
+:  shut an I/O port down
+|  io_ctl
+:  T
+:  inspect and manipulate an I/O port
+|  io_peek
+:  D
+:  inspect an in–flight I/O request
+|  frame
+:  S
+:  allocate a frame for a call
+|  call
+:  D
+:  call a function
+|  actor
+:  D
+:  spawn a new actor (a concurrent function call)
+|  return
+:  S
+:  return from a function call
+|  copy
+:  D
+:  copy bits between two registers
+|  move
+:  D
+:  move bits between two registers, erasing the source
+|  swap
+:  D
+:  swap bits between two registers
+|  if
+:  D
+:  take a conditional branch
+|  gts
+:  D
+:  store value in the Global Table
+|  gtl
+:  D
+:  load value from the Global Table
+|  atom
+:  S
+:  load an atom
+|  double
+:  S
+:  load a double
+|  float
+:  I
+:  load a float
+|  self
+:  S
+:  load the PID of the current actor
+|  lui
+:  I
+:  load upper intermediate
+|  luiu
+:  I
+:  load upper (unsigned) intermediate
+|  arodp
+:  I
+:  create a pointer to a .rodata symbol
+|  atxtp
+:  I
+:  create a pointer to a .text symbol
+|  sm
+:  M
+:  store in memory
+|  lm
+:  M
+:  load from memory
+|  cast
+:  I
+:  cast a raw value loaded from memory
+|  aa
+:  M
+:  allocate automatic memory
+|  ad
+:  M
+:  allocate dynamic memory
+
+Detailed descriptions are provided in *viua-ops*(7).
 
 
 # ENVIRONMENT
@@ -502,7 +709,8 @@ and other environment-related instructions.
 
 # SEE ALSO
 
-*viua-asm*(5).
+*viua-asm*(5),
+*viua-ops*(7).
 
 Patterson, David A. and Waterman, Andrew. _The RISC-V Reader_. Strawberry Canyon
 LLC, 2017.++

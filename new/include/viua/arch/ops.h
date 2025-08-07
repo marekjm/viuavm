@@ -201,19 +201,15 @@ struct U {
     auto to_string() const -> std::string;
 };
 
-constexpr auto INSTR_MASK  = opcode_type{ 0x1f'ff };
-constexpr auto FORMAT_MASK = opcode_type{ 0xe0'00 };
-constexpr auto OPCODE_MASK = opcode_type{ FORMAT_MASK | INSTR_MASK };
-
-constexpr auto OPCODE_FMT_MASK = opcode_type{ 0xe0'00 };
-constexpr auto OPCODE_FLG_MASK = opcode_type{ 0x1e'00 };
-constexpr auto OPCODE_OPR_MASK = opcode_type{ 0x1f'ff };
-constexpr auto OPCODE_OPC_MASK = opcode_type{ 0xf1'ff };
+constexpr auto OPCODE_FMT_MASK = opcode_type{ 0b1110'0000'0000'0000 };
+constexpr auto OPCODE_FLG_MASK = opcode_type{ 0b0001'1100'0000'0000 };
+constexpr auto OPCODE_OPR_MASK = opcode_type{ 0b0000'0011'1111'1111 };
+constexpr auto OPCODE_OPC_MASK = opcode_type{ OPCODE_FMT_MASK | OPCODE_OPR_MASK };
 
 /*
  * How about something different:
  *
- *      FORMAT_MASK     e0'00   1110'0000'0000'0000
+ *      OPCODE_FMT_MASK     e0'00   1110'0000'0000'0000
  *      FLAGS_MASK      1e'00   0001'1110'0000'0000
  *      OPCODE_MASK     11'ff   0001'0001'1111'1111
  *      INSTR_MASK      1f'ff   0001'1111'1111'1111
@@ -285,6 +281,8 @@ constexpr auto OPCODE_OPC_MASK = opcode_type{ 0xf1'ff };
  */
 
 namespace OPCODE_FLAGS {
+constexpr auto FLAGS_SHIFT = size_t{ 10 };
+
 /*
  * Used for memory operations (instructions in M format).
  *
@@ -296,22 +294,22 @@ namespace OPCODE_FLAGS {
  * See https://www.numberbases.com/terms/basename1.html for the origin of the
  * "duotrigesimal" name and the UNIT_DUOTRI_WORD flag.
  */
-constexpr auto UNIT_BYTE        = opcode_type{ 0b0000 << 9 };
-constexpr auto UNIT_HALF_WORD   = opcode_type{ 0b0001 << 9 };
-constexpr auto UNIT_WORD        = opcode_type{ 0b0010 << 9 };
-constexpr auto UNIT_DOUBLE_WORD = opcode_type{ 0b0011 << 9 };
-constexpr auto UNIT_QUAD_WORD   = opcode_type{ 0b0100 << 9 };
-constexpr auto UNIT_OCTA_WORD   = opcode_type{ 0b0101 << 9 };
-constexpr auto UNIT_HEXA_WORD   = opcode_type{ 0b0110 << 9 };
-constexpr auto UNIT_DUOTRI_WORD = opcode_type{ 0b0111 << 9 };
+constexpr auto UNIT_BYTE        = opcode_type{ 0b000 << FLAGS_SHIFT };
+constexpr auto UNIT_HALF_WORD   = opcode_type{ 0b001 << FLAGS_SHIFT };
+constexpr auto UNIT_WORD        = opcode_type{ 0b010 << FLAGS_SHIFT };
+constexpr auto UNIT_DOUBLE_WORD = opcode_type{ 0b011 << FLAGS_SHIFT };
+constexpr auto UNIT_QUAD_WORD   = opcode_type{ 0b100 << FLAGS_SHIFT };
+constexpr auto UNIT_OCTA_WORD   = opcode_type{ 0b101 << FLAGS_SHIFT };
+constexpr auto UNIT_HEXA_WORD   = opcode_type{ 0b110 << FLAGS_SHIFT };
+constexpr auto UNIT_DUOTRI_WORD = opcode_type{ 0b111 << FLAGS_SHIFT };
 
 /*
  * Used for arithmetic instructions.
  */
-constexpr auto ARITHMETIC_STYLE_NATIVE   = opcode_type{ 0b0000 << 9 };
-constexpr auto ARITHMETIC_STYLE_WRAP     = opcode_type{ 0b0001 << 9 };
-constexpr auto ARITHMETIC_STYLE_SATURATE = opcode_type{ 0b0010 << 9 };
-constexpr auto ARITHMETIC_STYLE_TRAP     = opcode_type{ 0b0011 << 9 };
+constexpr auto ARITHMETIC_STYLE_NATIVE   = opcode_type{ 0b000 << FLAGS_SHIFT };
+constexpr auto ARITHMETIC_STYLE_WRAP     = opcode_type{ 0b001 << FLAGS_SHIFT };
+constexpr auto ARITHMETIC_STYLE_SATURATE = opcode_type{ 0b010 << FLAGS_SHIFT };
+constexpr auto ARITHMETIC_STYLE_TRAP     = opcode_type{ 0b011 << FLAGS_SHIFT };
 /*
  * Unsigned MUST NOT conflict with any of the other arithmetic flags.
  *
@@ -347,7 +345,7 @@ constexpr auto ARITHMETIC_STYLE_TRAP     = opcode_type{ 0b0011 << 9 };
  *
  * The same transformation is also valid for multiplication and division.
  */
-constexpr auto UNSIGNED = opcode_type{ 0b1000 << 9 };
+constexpr auto UNSIGNED = opcode_type{ 0x02'00 };
 }  // namespace OPCODE_FLAGS
 
 enum class OPCODE : opcode_type
@@ -429,6 +427,8 @@ enum class OPCODE : opcode_type
 };
 auto to_string(opcode_type const) -> std::string;
 auto parse_opcode(std::string_view) -> opcode_type;
+auto is_format(FORMAT const, opcode_type const) -> bool;
+auto is_format(FORMAT const, OPCODE const) -> bool;
 
 /*
  * These are helper enums to provide exhaustiveness checks for switch
@@ -548,8 +548,8 @@ constexpr inline auto carve_just_opcode_out(
 constexpr inline auto carve_format_out(
     viua::arch::opcode_type const o) -> viua::arch::ops::FORMAT
 {
-    return static_cast<viua::arch::ops::FORMAT>(o
-                                                & viua::arch::ops::FORMAT_MASK);
+    return static_cast<viua::arch::ops::FORMAT>(
+        o & viua::arch::ops::OPCODE_FMT_MASK);
 }
 constexpr inline auto carve_format_out(
     viua::arch::ops::OPCODE const o) -> viua::arch::ops::FORMAT

@@ -40,7 +40,7 @@ auto I::decode(
     instruction_type const raw) -> I
 {
     auto const opcode = carve_opcode_out(raw);
-    if ((opcode & viua::arch::ops::FORMAT_MASK) != viua::arch::ops::FORMAT_I) {
+    if (not viua::arch::ops::is_format(viua::arch::ops::FORMAT::I, opcode)) {
         throw std::runtime_error{ "I::decode: not an I format instruction" };
     }
 

@@ -950,8 +950,8 @@ auto emit_instruction(
 {
     using viua::arch::opcode_type;
     using viua::arch::ops::FORMAT;
-    using viua::arch::ops::FORMAT_MASK;
     using viua::arch::ops::OPCODE;
+    using viua::arch::ops::OPCODE_FMT_MASK;
 
     auto opcode = opcode_type{};
     try {
@@ -963,7 +963,7 @@ auto emit_instruction(
         using viua::libs::errors::compile_time::Error;
         throw Error{ e, Cause::Unknown_opcode, e.text };
     }
-    auto format = static_cast<FORMAT>(opcode & FORMAT_MASK);
+    auto format = static_cast<FORMAT>(opcode & OPCODE_FMT_MASK);
     switch (format) {
         case FORMAT::N:
             return static_cast<uint64_t>(opcode);

@@ -72,6 +72,6 @@ auto M::get_spec() const -> opcode_type
 
 auto M::get_shift_size() const -> size_t
 {
-    return get_spec() >> 9;
+    return get_spec() >> viua::arch::ops::OPCODE_FLAGS::FLAGS_SHIFT;
 }
 }  // namespace viua::arch::ops
