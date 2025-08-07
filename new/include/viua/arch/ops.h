@@ -126,26 +126,27 @@ struct S {
 };
 
 /*
- * Two-way register access, with 16-bit memory offset, and 8-bit specifier.
+ * Two-way register access, with 32-bit memory offset specifier.
  * "M" because it is used for loads and stored, which interact with "memory".
  */
 struct M {
     viua::arch::opcode_type opcode;
     Register_access const out;
     Register_access const in;
-    uint16_t const immediate;
-    uint8_t const spec;
+    uint32_t const immediate;
 
     M(viua::arch::opcode_type const,
       Register_access const,
       Register_access const,
-      uint16_t const,
-      uint8_t const);
+      uint32_t const);
 
     static auto decode(instruction_type const) -> M;
     auto encode() const -> instruction_type;
 
     auto to_string() const -> std::string;
+
+    auto get_spec() const -> opcode_type;
+    auto get_shift_size() const -> size_t;
 };
 
 /*
@@ -207,6 +208,7 @@ constexpr auto OPCODE_MASK = opcode_type{ FORMAT_MASK | INSTR_MASK };
 constexpr auto OPCODE_FMT_MASK = opcode_type{ 0xe0'00 };
 constexpr auto OPCODE_FLG_MASK = opcode_type{ 0x1e'00 };
 constexpr auto OPCODE_OPR_MASK = opcode_type{ 0x1f'ff };
+constexpr auto OPCODE_OPC_MASK = opcode_type{ 0xf1'ff };
 
 /*
  * How about something different:
@@ -312,8 +314,7 @@ constexpr auto ARITHMETIC_STYLE_TRAP = opcode_type{ 0b0010 << 9 };
 /*
  * Unsigned MUST NOT conflict with any of the other arithmetic flags.
  */
-// constexpr auto UNSIGNED = opcode_type{ 0x10'00 };
-constexpr auto UNSIGNED = opcode_type{ 0b0100 << 9 };
+constexpr auto UNSIGNED = opcode_type{ 0b1000 << 9 };
 }
 
 enum class OPCODE : opcode_type
@@ -506,7 +507,7 @@ constexpr inline auto carve_just_opcode_out(
     viua::arch::instruction_type const i) -> viua::arch::ops::OPCODE
 {
     return static_cast<viua::arch::ops::OPCODE>(carve_opcode_out(i)
-                                                & viua::arch::ops::OPCODE_MASK);
+                                                & viua::arch::ops::OPCODE_OPC_MASK);
 }
 
 constexpr inline auto carve_format_out(

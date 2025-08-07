@@ -43,7 +43,7 @@ auto execute(
     auto const base = immutable_proxy(stack, op.instruction.in)
                           .get<register_type::pointer_type>();
 
-    auto const unit      = op.instruction.spec;
+    auto const unit      = op.instruction.get_shift_size();
     auto const copy_size = (1u << unit);
     auto const offset    = (op.instruction.immediate * copy_size);
 
@@ -102,7 +102,7 @@ auto execute(
     auto const base = immutable_proxy(stack, op.instruction.in)
                           .get<register_type::pointer_type>();
 
-    auto const unit      = op.instruction.spec;
+    auto const unit      = op.instruction.get_shift_size();
     auto const copy_size = (1u << unit);
     auto const offset    = (op.instruction.immediate * copy_size);
 
@@ -159,7 +159,7 @@ auto execute(
     ip_type const) -> void
 {
     auto const base = immutable_proxy(stack, op.instruction.in).get<uint64_t>();
-    auto const alignment = (1u << op.instruction.spec);
+    auto const alignment = (1u << op.instruction.get_shift_size());
 
     if (not base.has_value()) {
         throw abort_execution{ stack,

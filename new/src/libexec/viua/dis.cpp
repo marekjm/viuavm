@@ -649,21 +649,31 @@ auto demangle_memory(
                 default:
                     abort();
             }
-            switch (op.spec) {
-                case 0:
+            switch (op.get_spec()) {
+                using namespace viua::arch::ops::OPCODE_FLAGS;
+                case UNIT_BYTE:
                     name += "b";
                     break;
-                case 1:
+                case UNIT_HALF_WORD:
                     name += "h";
                     break;
-                case 2:
+                case UNIT_WORD:
                     name += "w";
                     break;
-                case 3:
+                case UNIT_DOUBLE_WORD:
                     name += "d";
                     break;
-                case 4:
+                case UNIT_QUAD_WORD:
                     name += "q";
+                    break;
+                case UNIT_OCTA_WORD:
+                    name += "o";
+                    break;
+                case UNIT_HEXA_WORD:
+                    name += "x";
+                    break;
+                case UNIT_DUOTRI_WORD:
+                    name += "u";
                     break;
                 default:
                     abort();

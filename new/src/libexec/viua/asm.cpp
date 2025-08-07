@@ -1919,15 +1919,17 @@ auto emit_instruction(
             }
         case FORMAT::M:
             {
-                auto const unit = insn.operands.front().ingredients.front();
+                auto const unit = static_cast<opcode_type>(
+                        std::stoull(insn.operands.front().ingredients.front().text));
                 auto const off  = insn.operands.back().ingredients.front();
 
+                // FIXME Use one of the UNIT_* flags from OPCODE_FLAGS instead
+                // of the magic shift by 9.
                 return viua::arch::ops::M{
-                    opcode,
+                    static_cast<opcode_type>(opcode | (unit << 9)),
                     insn.operands.at(1).make_access(),
                     insn.operands.at(2).make_access(),
-                    static_cast<uint16_t>(std::stoull(off.text)),
-                    static_cast<uint8_t>(std::stoull(unit.text))
+                    static_cast<uint32_t>(std::stoull(off.text))
                 }
                     .encode();
             }
@@ -2525,6 +2527,15 @@ auto expand_memory_access(
         case 'q':
             synth.operands.front().ingredients.front().text = "4";
             break;
+        case 'o':
+            synth.operands.front().ingredients.front().text = "5";
+            break;
+        case 'x':
+            synth.operands.front().ingredients.front().text = "6";
+            break;
+        case 'u':
+            synth.operands.front().ingredients.front().text = "7";
+            break;
         default:
             abort();
     }
@@ -2590,18 +2601,28 @@ auto expand_instruction(
 {
     auto const memory_access = std::set<std::string_view>{
         /*
-         * Access
+         * Loads
+         */
+        "lb",
+        "lh",
+        "lw",
+        "ld",
+        "lq",
+        "lo",
+        "lx",
+        "lu",
+
+        /*
+         * Stores
          */
         "sb",
-        "lb",
         "sh",
-        "lh",
         "sw",
-        "lw",
         "sd",
-        "ld",
         "sq",
-        "lq",
+        "so",
+        "sx",
+        "su",
 
         /*
          * Allocation
@@ -2611,11 +2632,17 @@ auto expand_instruction(
         "amwa",
         "amda",
         "amqa",
+        "amoa",
+        "amxa",
+        "amua",
         "ambd",
         "amhd",
         "amwd",
         "amdd",
         "amqd",
+        "amod",
+        "amxd",
+        "amud",
     };
     auto const immediate_signed_arithmetic = std::set<std::string_view>{
         "addi", "subi", "muli", "divi",
