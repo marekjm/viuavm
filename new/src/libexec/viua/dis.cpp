@@ -422,7 +422,8 @@ auto demangle_canonical_li(
                 idx,
                 std::nullopt,
                 std::nullopt,
-                std::format("[[full]] li {}, {}", luiu.out.to_string(), literal));
+                std::format(
+                    "[[full]] li {}, {}", luiu.out.to_string(), literal));
 
             // FIXME calls are using ATXTP instead of LUIU
             if (needs_unsigned) {
@@ -501,18 +502,17 @@ auto demangle_addiu(
         if (m(i, ADDIU) or m(i, ADDIU)) {
             using viua::arch::ops::S;
             using viua::arch::ops::U;
-            auto const addi         = U::decode(ins_at(i));
+            auto const addi = U::decode(ins_at(i));
 
             auto idx          = text.at(i).index;
             idx.physical_span = idx.physical;
-            tmp.emplace_back(
-                idx,
-                std::nullopt,
-                std::nullopt,
-                std::format("addi {}, {}, {}u",
-                    addi.out.to_string(),
-                    addi.in.to_string(),
-                    std::to_string(addi.immediate)));
+            tmp.emplace_back(idx,
+                             std::nullopt,
+                             std::nullopt,
+                             std::format("addi {}, {}, {}u",
+                                         addi.out.to_string(),
+                                         addi.in.to_string(),
+                                         std::to_string(addi.immediate)));
             continue;
         }
 
@@ -540,7 +540,7 @@ auto demangle_arodp(
     for (auto i = size_t{ 0 }; i < text.size(); ++i) {
         if (m(i, ARODP)) {
             using viua::arch::ops::I;
-            auto const arodp        = I::decode(ins_at(i));
+            auto const arodp = I::decode(ins_at(i));
 
             auto const off = arodp.immediate;
 
@@ -562,12 +562,13 @@ auto demangle_arodp(
                 idx,
                 std::nullopt,
                 std::nullopt,
-                std::format("arodp {}, {}", arodp.out.to_string(), label_or_value));
+                std::format(
+                    "arodp {}, {}", arodp.out.to_string(), label_or_value));
             continue;
         }
         if (m(i, ATXTP)) {
             using viua::arch::ops::I;
-            auto const atxtp        = I::decode(ins_at(i));
+            auto const atxtp = I::decode(ins_at(i));
 
             auto const off = atxtp.immediate;
 
@@ -590,11 +591,12 @@ auto demangle_arodp(
 
             auto idx          = text.at(i).index;
             idx.physical_span = idx.physical;
-            tmp.emplace_back(
-                idx,
-                std::nullopt,
-                std::nullopt,
-                std::format("atxtp {}, {}", atxtp.out.to_string(), make_label_ref(strtab, sym)));
+            tmp.emplace_back(idx,
+                             std::nullopt,
+                             std::nullopt,
+                             std::format("atxtp {}, {}",
+                                         atxtp.out.to_string(),
+                                         make_label_ref(strtab, sym)));
 
             demangle_symbol_load(text,
                                  tmp,
@@ -631,8 +633,8 @@ auto demangle_memory(
         auto const memory_op = (m(i, SM) or m(i, LM) or m(i, AA) or m(i, AD));
         if (memory_op) {
             using viua::arch::ops::M;
-            auto const raw_op       = ins_at(i);
-            auto const op           = M::decode(raw_op);
+            auto const raw_op = ins_at(i);
+            auto const op     = M::decode(raw_op);
 
             auto name = std::string{};
             switch (static_cast<viua::arch::ops::OPCODE>(op.opcode)) {

@@ -56,7 +56,8 @@ auto M::encode() const -> instruction_type
 auto M::to_string() const -> std::string
 {
     auto const unit = get_shift_size();
-    return std::format("{} {}, {}, {}, {}",
+    return std::format(
+        "{} {}, {}, {}, {}",
         viua::arch::ops::to_string(opcode & viua::arch::ops::OPCODE_OPC_MASK),
         unit,
         out.to_string(),

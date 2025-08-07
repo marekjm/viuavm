@@ -296,22 +296,22 @@ namespace OPCODE_FLAGS {
  * See https://www.numberbases.com/terms/basename1.html for the origin of the
  * "duotrigesimal" name and the UNIT_DUOTRI_WORD flag.
  */
-constexpr auto UNIT_BYTE = opcode_type{ 0b0000 << 9 };
-constexpr auto UNIT_HALF_WORD = opcode_type{ 0b0001 << 9 };
-constexpr auto UNIT_WORD = opcode_type{ 0b0010 << 9 };
+constexpr auto UNIT_BYTE        = opcode_type{ 0b0000 << 9 };
+constexpr auto UNIT_HALF_WORD   = opcode_type{ 0b0001 << 9 };
+constexpr auto UNIT_WORD        = opcode_type{ 0b0010 << 9 };
 constexpr auto UNIT_DOUBLE_WORD = opcode_type{ 0b0011 << 9 };
-constexpr auto UNIT_QUAD_WORD = opcode_type{ 0b0100 << 9 };
-constexpr auto UNIT_OCTA_WORD = opcode_type{ 0b0101 << 9 };
-constexpr auto UNIT_HEXA_WORD = opcode_type{ 0b0110 << 9 };
+constexpr auto UNIT_QUAD_WORD   = opcode_type{ 0b0100 << 9 };
+constexpr auto UNIT_OCTA_WORD   = opcode_type{ 0b0101 << 9 };
+constexpr auto UNIT_HEXA_WORD   = opcode_type{ 0b0110 << 9 };
 constexpr auto UNIT_DUOTRI_WORD = opcode_type{ 0b0111 << 9 };
 
 /*
  * Used for arithmetic instructions.
  */
-constexpr auto ARITHMETIC_STYLE_NATIVE = opcode_type{ 0b0000 << 9 };
-constexpr auto ARITHMETIC_STYLE_WRAP = opcode_type{ 0b0001 << 9 };
+constexpr auto ARITHMETIC_STYLE_NATIVE   = opcode_type{ 0b0000 << 9 };
+constexpr auto ARITHMETIC_STYLE_WRAP     = opcode_type{ 0b0001 << 9 };
 constexpr auto ARITHMETIC_STYLE_SATURATE = opcode_type{ 0b0010 << 9 };
-constexpr auto ARITHMETIC_STYLE_TRAP = opcode_type{ 0b0011 << 9 };
+constexpr auto ARITHMETIC_STYLE_TRAP     = opcode_type{ 0b0011 << 9 };
 /*
  * Unsigned MUST NOT conflict with any of the other arithmetic flags.
  *
@@ -348,7 +348,7 @@ constexpr auto ARITHMETIC_STYLE_TRAP = opcode_type{ 0b0011 << 9 };
  * The same transformation is also valid for multiplication and division.
  */
 constexpr auto UNSIGNED = opcode_type{ 0b1000 << 9 };
-}
+}  // namespace OPCODE_FLAGS
 
 enum class OPCODE : opcode_type
 {
@@ -400,8 +400,8 @@ enum class OPCODE : opcode_type
     DOUBLE = (FORMAT_S | 0x00'04),
     SELF   = (FORMAT_S | 0x00'05),
 
-    LUI   = (FORMAT_I | 0x00'01),
-    LUIU  = (FORMAT_I | LUI | OPCODE_FLAGS::UNSIGNED),
+    LUI  = (FORMAT_I | 0x00'01),
+    LUIU = (FORMAT_I | LUI | OPCODE_FLAGS::UNSIGNED),
     // FIXME remove the lli instruction, use addi/addiu instead
     LLI   = (FORMAT_I | 0x00'02),
     FLOAT = (FORMAT_I | 0x00'03),
@@ -418,9 +418,9 @@ enum class OPCODE : opcode_type
     DIVI  = (FORMAT_U | 0x00'04),
     DIVIU = (FORMAT_U | DIVI | OPCODE_FLAGS::UNSIGNED),
 
-    SM  = (FORMAT_M | 0x00'01), /* Store Memory */
+    SM = (FORMAT_M | 0x00'01), /* Store Memory */
     // SMI =
-    LM  = (FORMAT_M | 0x00'02), /* Load Memory */
+    LM = (FORMAT_M | 0x00'02), /* Load Memory */
     // LMI
     // MM  = (FORMAT_M | 0x00'03), /* Move Memory */
     AA  = (FORMAT_M | 0x00'04), /* Allocate Automatic */
@@ -541,8 +541,8 @@ constexpr inline auto carve_opcode_out(
 constexpr inline auto carve_just_opcode_out(
     viua::arch::instruction_type const i) -> viua::arch::ops::OPCODE
 {
-    return static_cast<viua::arch::ops::OPCODE>(carve_opcode_out(i)
-                                                & viua::arch::ops::OPCODE_OPC_MASK);
+    return static_cast<viua::arch::ops::OPCODE>(
+        carve_opcode_out(i) & viua::arch::ops::OPCODE_OPC_MASK);
 }
 
 constexpr inline auto carve_format_out(

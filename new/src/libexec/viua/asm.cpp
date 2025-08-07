@@ -1850,7 +1850,8 @@ auto emit_instruction(
                     ++fst_register_operand;
 
                     using namespace viua::arch::ops::OPCODE_FLAGS;
-                    auto const style = operand_or_throw(insn, 0).ingredients.front();
+                    auto const style =
+                        operand_or_throw(insn, 0).ingredients.front();
                     if (style == "native") {
                         opcode = (opcode | ARITHMETIC_STYLE_NATIVE);
                     } else if (style == "saturate") {
@@ -1862,17 +1863,22 @@ auto emit_instruction(
                     } else {
                         using viua::libs::errors::compile_time::Cause;
                         using viua::libs::errors::compile_time::Error;
-                        throw Error{
-                            style,
-                            Cause::Invalid_arithmetic_style,
-                            style.text }.add(operand_or_throw(insn, 0).leader);
+                        throw Error{ style,
+                                     Cause::Invalid_arithmetic_style,
+                                     style.text }
+                            .add(operand_or_throw(insn, 0).leader);
                     }
                 }
-            return viua::arch::ops::T{ opcode,
-                                       operand_or_throw(insn, fst_register_operand + 0).make_access(),
-                                       operand_or_throw(insn, fst_register_operand + 1).make_access(),
-                                       operand_or_throw(insn, fst_register_operand + 2).make_access() }
-                .encode();
+                return viua::arch::ops::T{
+                    opcode,
+                    operand_or_throw(insn, fst_register_operand + 0)
+                        .make_access(),
+                    operand_or_throw(insn, fst_register_operand + 1)
+                        .make_access(),
+                    operand_or_throw(insn, fst_register_operand + 2)
+                        .make_access()
+                }
+                    .encode();
             }
         case FORMAT::D:
             return viua::arch::ops::D{ opcode,
@@ -1900,8 +1906,9 @@ auto emit_instruction(
         case FORMAT::U:
             {
                 auto const imm = insn.operands.at(2).ingredients.front();
-                auto const is_unsigned = (static_cast<opcode_type>(opcode)
-                                          & viua::arch::ops::OPCODE_FLAGS::UNSIGNED);
+                auto const is_unsigned =
+                    (static_cast<opcode_type>(opcode)
+                     & viua::arch::ops::OPCODE_FLAGS::UNSIGNED);
                 if (is_unsigned and imm.text.at(0) == '-'
                     and (imm.text != "-1" and imm.text != "-1u")) {
                     using viua::libs::errors::compile_time::Cause;
@@ -1952,8 +1959,8 @@ auto emit_instruction(
             }
         case FORMAT::M:
             {
-                auto const unit = static_cast<opcode_type>(
-                        std::stoull(insn.operands.front().ingredients.front().text));
+                auto const unit = static_cast<opcode_type>(std::stoull(
+                    insn.operands.front().ingredients.front().text));
                 auto const off  = insn.operands.back().ingredients.front();
 
                 // FIXME Use one of the UNIT_* flags from OPCODE_FLAGS instead
@@ -2582,23 +2589,26 @@ auto expand_styled_arithmetic(
     using namespace std::string_literals;
     auto synth = ast::Instruction{};
 
-    auto opcode_view = std::string_view{ raw.leader.text };
+    auto opcode_view     = std::string_view{ raw.leader.text };
     auto const operation = opcode_view.substr(0, opcode_view.find('.'));
-    auto const style = (opcode_view.find('.') == std::string_view::npos)
-        ? "native"
-        : opcode_view.substr(opcode_view.find('.') + 1);
+    auto const style     = (opcode_view.find('.') == std::string_view::npos)
+                               ? "native"
+                               : opcode_view.substr(opcode_view.find('.') + 1);
 
-    synth.leader         = raw.leader;
-    synth.leader.text    = operation;
+    synth.leader      = raw.leader;
+    synth.leader.text = operation;
 
     synth.operands.push_back(raw.operands.at(0));
     synth.operands.front().ingredients.resize(1);
-    if (style == "saturate" or style == "wrap" or style == "trap" or style == "native") {
+    if (style == "saturate" or style == "wrap" or style == "trap"
+        or style == "native") {
         synth.operands.front().ingredients.front().text = style;
     } else {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{ raw.leader, Cause::Invalid_arithmetic_style, std::string{style} };
+        throw Error{ raw.leader,
+                     Cause::Invalid_arithmetic_style,
+                     std::string{ style } };
     }
 
     synth.operands.push_back(raw.operands.at(0));
@@ -2709,36 +2719,24 @@ auto expand_instruction(
         "amud",
     };
     auto const immediate_signed_arithmetic = std::set<std::string_view>{
-        "addi", "subi", "muli", "divi",
+        "addi",
+        "subi",
+        "muli",
+        "divi",
     };
     auto const styled_arithmetic = std::set<std::string_view>{
-        "add",
-        "sub",
-        "mul",
-        "div",
+        "add",          "sub",          "mul",          "div",
 
-        "add.native",
-        "sub.native",
-        "mul.native",
-        "div.native",
+        "add.native",   "sub.native",   "mul.native",   "div.native",
 
-        "add.wrap",
-        "sub.wrap",
-        "mul.wrap",
-        "div.wrap",
+        "add.wrap",     "sub.wrap",     "mul.wrap",     "div.wrap",
 
-        "add.saturate",
-        "sub.saturate",
-        "mul.saturate",
-        "div.saturate",
+        "add.saturate", "sub.saturate", "mul.saturate", "div.saturate",
 
-        "add.trap",
-        "sub.trap",
-        "mul.trap",
-        "div.trap",
+        "add.trap",     "sub.trap",     "mul.trap",     "div.trap",
     };
 
-    auto const opcode = std::string_view{raw.leader.text};
+    auto const opcode = std::string_view{ raw.leader.text };
 
     if (opcode == "li") {
         return expand_li(raw);

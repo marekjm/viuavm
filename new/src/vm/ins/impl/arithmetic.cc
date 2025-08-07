@@ -22,8 +22,6 @@
 #include <print>
 
 #include <viua/arch/arch.h>
-#include <viua/vm/ins.h>
-#include <viua/arch/arch.h>
 #include <viua/support/binarith.hh>
 #include <viua/vm/ins.h>
 

@@ -100,7 +100,8 @@ enum class REGISTER_SET : uint8_t
  * Can only go up to 0x3f, because there are only 6 bits available for the
  * register's "index".
  */
-enum class SPECIAL_REGISTER : uint8_t {
+enum class SPECIAL_REGISTER : uint8_t
+{
     ZERO = 0x00,
     VOID = 0x01,
 };

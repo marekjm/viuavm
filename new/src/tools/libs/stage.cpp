@@ -645,7 +645,10 @@ auto expand_pseudoinstructions(
     -> std::vector<ast::Instruction>
 {
     auto const immediate_signed_arithmetic = std::set<std::string>{
-        "addi", "subi", "muli", "divi",
+        "addi",
+        "subi",
+        "muli",
+        "divi",
     };
     auto const memory_access = std::set<std::string>{
         /*
@@ -1005,8 +1008,9 @@ auto emit_instruction(
         case FORMAT::R:
             {
                 auto const imm = insn.operands.back().ingredients.front();
-                auto const is_unsigned = (static_cast<opcode_type>(opcode)
-                                          & viua::arch::ops::OPCODE_FLAGS::UNSIGNED);
+                auto const is_unsigned =
+                    (static_cast<opcode_type>(opcode)
+                     & viua::arch::ops::OPCODE_FLAGS::UNSIGNED);
                 if (is_unsigned and imm.text.at(0) == '-'
                     and (imm.text != "-1" and imm.text != "-1u")) {
                     using viua::libs::errors::compile_time::Cause;
