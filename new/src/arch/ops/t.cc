@@ -60,7 +60,21 @@ auto T::encode() const -> instruction_type
 }
 auto T::to_string() const -> std::string
 {
-    return (viua::arch::ops::to_string(opcode) + " " + out.to_string() + ", "
-            + lhs.to_string() + ", " + rhs.to_string());
+    using namespace viua::arch::ops;
+    auto const flags = (opcode & OPCODE_FLG_MASK);
+    auto const style =
+        (flags == OPCODE_FLAGS::ARITHMETIC_STYLE_WRAP)
+        ? ".wrap"
+        : (flags == OPCODE_FLAGS::ARITHMETIC_STYLE_SATURATE)
+        ? ".saturate"
+        : (flags == OPCODE_FLAGS::ARITHMETIC_STYLE_TRAP)
+        ? ".trap"
+        : "";
+    return std::format("{}{} {}, {}, {}",
+        viua::arch::ops::to_string(opcode & OPCODE_OPC_MASK),
+        style,
+        out.to_string(),
+        lhs.to_string(),
+        rhs.to_string());
 }
 }  // namespace viua::arch::ops

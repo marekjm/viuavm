@@ -308,11 +308,44 @@ constexpr auto UNIT_DUOTRI_WORD = opcode_type{ 0b0111 << 9 };
 /*
  * Used for arithmetic instructions.
  */
-constexpr auto ARITHMETIC_STYLE_WRAP = opcode_type{ 0b0000 << 9 };
-constexpr auto ARITHMETIC_STYLE_SATURATE = opcode_type{ 0b0001 << 9 };
-constexpr auto ARITHMETIC_STYLE_TRAP = opcode_type{ 0b0010 << 9 };
+constexpr auto ARITHMETIC_STYLE_NATIVE = opcode_type{ 0b0000 << 9 };
+constexpr auto ARITHMETIC_STYLE_WRAP = opcode_type{ 0b0001 << 9 };
+constexpr auto ARITHMETIC_STYLE_SATURATE = opcode_type{ 0b0010 << 9 };
+constexpr auto ARITHMETIC_STYLE_TRAP = opcode_type{ 0b0011 << 9 };
 /*
  * Unsigned MUST NOT conflict with any of the other arithmetic flags.
+ *
+ * The unsigned flag is used to denote instructions constructing unsigned
+ * values, but is actually irrelevant for arithmetic, since the arithmetic
+ * instructions' output type depends on the type of their left-hand side
+ * operand.
+ *
+ * The flag is necessary for constructors because the VM must have some way of
+ * creating an unsigned value, without being able to construct unsigned integers
+ * the lhs-derived type trickery would not be possible.
+ *
+ * But. This means that the flag is not really a flag, and could be rolled into
+ * the operation mask proper ie, into the lowest 9 bits. If it were, the bit
+ * reserved for it would be freed and the opcode encoding could be changed to:
+ *
+ *  - 3 bits for the format
+ *  - 3 bits for the flags
+ *  - 10 bits for the operation
+ *
+ * I think this is reasonable. What is more, I think that the only two
+ * instructions that have to be explicitly-unsigned are LUIU and ADDIU, as they
+ * are the means of loading unsigned and 64-bit values. But the SUBIU, MULIU,
+ * and DIVIU? They could all be replaced be a combination of ADDIU and the
+ * non-unsigned variant; for example
+ *
+ *      subiu a, b, 42
+ *
+ * might be written as:
+ *
+ *      addiu c, void, 42
+ *      sub a, b, c
+ *
+ * The same transformation is also valid for multiplication and division.
  */
 constexpr auto UNSIGNED = opcode_type{ 0b1000 << 9 };
 }
@@ -367,8 +400,7 @@ enum class OPCODE : opcode_type
     ACTOR            = (FORMAT_D | 0x00'09),
     GTS              = (FORMAT_D | 0x00'0a),
     GTL              = (FORMAT_D | 0x00'0b),
-    EARITHMETICSTYLE = (FORMAT_D | 0x00'0c),
-    EARITHMETICWIDTH = (FORMAT_D | 0x00'0d),
+    EARITHMETICWIDTH = (FORMAT_D | 0x00'0c),
 
     FRAME  = (FORMAT_S | 0x00'01),
     RETURN = (FORMAT_S | 0x00'02),
@@ -454,7 +486,6 @@ enum class OPCODE_D : opcode_type
     Make_entry(ACTOR),
     Make_entry(GTS),
     Make_entry(GTL),
-    Make_entry(EARITHMETICSTYLE),
     Make_entry(EARITHMETICWIDTH),
 };
 enum class OPCODE_S : opcode_type

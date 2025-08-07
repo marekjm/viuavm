@@ -555,14 +555,6 @@ struct GTL : Instruction {
     {}
 };
 
-struct EARITHMETICSTYLE : Instruction {
-    viua::arch::ops::D instruction;
-
-    EARITHMETICSTYLE(
-        viua::arch::ops::D i)
-        : instruction{ i }
-    {}
-};
 struct EARITHMETICWIDTH : Instruction {
     viua::arch::ops::D instruction;
 

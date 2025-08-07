@@ -65,6 +65,8 @@ auto to_string(
             return "unknown label";
         case Cause::Invalid_cast:
             return "invalid cast";
+        case Cause::Invalid_arithmetic_style:
+            return "invalid arithmetic style";
     }
     return "illegal error";
 }

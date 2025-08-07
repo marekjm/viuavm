@@ -1836,11 +1836,42 @@ auto emit_instruction(
         case FORMAT::N:
             return viua::arch::ops::N{ opcode }.encode();
         case FORMAT::T:
+            {
+                auto fst_register_operand = size_t{ 0 };
+                auto const is_styled_arithmetic =
+                    (opcode == static_cast<opcode_type>(OPCODE::STDADD)
+                     or opcode == static_cast<opcode_type>(OPCODE::STDSUB)
+                     or opcode == static_cast<opcode_type>(OPCODE::STDMUL)
+                     or opcode == static_cast<opcode_type>(OPCODE::STDDIV));
+                if (is_styled_arithmetic) {
+                    /*
+                     * Skip the style operand.
+                     */
+                    ++fst_register_operand;
+
+                    using namespace viua::arch::ops::OPCODE_FLAGS;
+                    auto const style = operand_or_throw(insn, 0).ingredients.front();
+                    if (style == "saturate") {
+                        opcode = (opcode | ARITHMETIC_STYLE_SATURATE);
+                    } else if (style == "wrap") {
+                        opcode = (opcode | ARITHMETIC_STYLE_WRAP);
+                    } else if (style == "trap") {
+                        opcode = (opcode | ARITHMETIC_STYLE_TRAP);
+                    } else {
+                        using viua::libs::errors::compile_time::Cause;
+                        using viua::libs::errors::compile_time::Error;
+                        throw Error{
+                            style,
+                            Cause::Invalid_arithmetic_style,
+                            style.text }.add(operand_or_throw(insn, 0).leader);
+                    }
+                }
             return viua::arch::ops::T{ opcode,
-                                       operand_or_throw(insn, 0).make_access(),
-                                       operand_or_throw(insn, 1).make_access(),
-                                       operand_or_throw(insn, 2).make_access() }
+                                       operand_or_throw(insn, fst_register_operand + 0).make_access(),
+                                       operand_or_throw(insn, fst_register_operand + 1).make_access(),
+                                       operand_or_throw(insn, fst_register_operand + 2).make_access() }
                 .encode();
+            }
         case FORMAT::D:
             return viua::arch::ops::D{ opcode,
                                        operand_or_throw(insn, 0).make_access(),
@@ -2543,6 +2574,38 @@ auto expand_memory_access(
 
     return { emit_instruction(synth) };
 }
+auto expand_styled_arithmetic(
+    ast::Instruction const& raw) -> Text
+{
+    using namespace std::string_literals;
+    auto synth = ast::Instruction{};
+
+    auto opcode_view = std::string_view{ raw.leader.text };
+    auto const operation = opcode_view.substr(0, opcode_view.find('.'));
+    auto const style = opcode_view.substr(opcode_view.find('.') + 1);
+
+    synth.leader         = raw.leader;
+    synth.leader.text    = operation.starts_with("std")
+        ? std::string{operation}
+        : ("std" + std::string{operation});
+
+    synth.operands.push_back(raw.operands.at(0));
+    synth.operands.front().ingredients.resize(1);
+    if (style == "saturate" or style == "wrap" or style == "trap") {
+        synth.operands.front().ingredients.front().text = style;
+    } else {
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{ raw.leader, Cause::Invalid_arithmetic_style, std::string{style} };
+    }
+
+    synth.operands.push_back(raw.operands.at(0));
+    synth.operands.push_back(raw.operands.at(1));
+    synth.operands.push_back(raw.operands.at(2));
+
+
+    return { emit_instruction(synth) };
+}
 auto expand_immediate_arithmetic(
     ast::Instruction const& raw) -> Text
 {
@@ -2647,6 +2710,34 @@ auto expand_instruction(
     auto const immediate_signed_arithmetic = std::set<std::string_view>{
         "addi", "subi", "muli", "divi",
     };
+    auto const styled_arithmetic = std::set<std::string_view>{
+        "add.wrap",
+        "sub.wrap",
+        "mul.wrap",
+        "div.wrap",
+        "stdadd.wrap",
+        "stdsub.wrap",
+        "stdmul.wrap",
+        "stddiv.wrap",
+
+        "add.saturate",
+        "sub.saturate",
+        "mul.saturate",
+        "div.saturate",
+        "stdadd.saturate",
+        "stdsub.saturate",
+        "stdmul.saturate",
+        "stddiv.saturate",
+
+        "add.trap",
+        "sub.trap",
+        "mul.trap",
+        "div.trap",
+        "stdadd.trap",
+        "stdsub.trap",
+        "stdmul.trap",
+        "stddiv.trap",
+    };
 
     auto const opcode = std::string_view{raw.leader.text};
 
@@ -2666,6 +2757,8 @@ auto expand_instruction(
         return expand_double(raw);
     } else if (memory_access.contains(opcode)) {
         return expand_memory_access(raw);
+    } else if (styled_arithmetic.contains(opcode)) {
+        return expand_styled_arithmetic(raw);
     } else if (opcode == "cast") {
         return expand_cast(raw);
     } else if (immediate_signed_arithmetic.contains(opcode)) {

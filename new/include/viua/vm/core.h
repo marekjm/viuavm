@@ -570,14 +570,6 @@ struct Process {
     using globals_map_type = std::map<atom_key_type, Register>;
     globals_map_type globals;
 
-    enum class Arithmetic_style : uint16_t
-    {
-        Wrapping   = 0,
-        Trapping   = 1,
-        Saturating = 2,
-    };
-    Arithmetic_style arithmetic_style = Arithmetic_style::Wrapping;
-
     constexpr static auto ARITHMETIC_WIDTH_MAX = uint16_t{ 64 };
     constexpr static auto ARITHMETIC_WIDTH_MIN = uint16_t{ 1 };
     uint16_t arithmetic_width{ 64 };

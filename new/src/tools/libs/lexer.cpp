@@ -170,7 +170,7 @@ const auto STAR            = std::regex{ "^\\*" };
 const auto ATTR_LIST_OPEN  = std::regex{ "^\\[\\[" };
 const auto ATTR_LIST_CLOSE = std::regex{ "^\\]\\]" };
 
-const auto OPCODE = std::regex{ "^[a-z_]+(?:.[stw])?\\b" };
+const auto OPCODE = std::regex{ "^[a-z_]+(?:\\.(?:native|saturate|wrap|trap))?\\b" };
 
 namespace {
 auto match_lookbehind [[maybe_unused]] (

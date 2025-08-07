@@ -31,6 +31,7 @@ using viua::vm::Stack;
 
 auto calculate_add(
     Stack& stack,
+    viua::arch::opcode_type const style,
     int64_t const lhs,
     int64_t const rhs) -> int64_t
 {
@@ -42,19 +43,19 @@ auto calculate_add(
     auto const arithmetic_rhs =
         signed_type{ extend(arithmetic_type{ rhs }, arithmetic_width) };
 
-    switch (stack.proc->arithmetic_style) {
-        using enum viua::vm::Process::Arithmetic_style;
-        case Wrapping:
+    switch (style) {
+        using namespace viua::arch::ops::OPCODE_FLAGS;
+        case ARITHMETIC_STYLE_WRAP:
             {
                 using namespace viua::arithmetic::fixed;
                 return static_cast<int64_t>(arithmetic_lhs + arithmetic_rhs);
             }
-        case Trapping:
+        case ARITHMETIC_STYLE_TRAP:
             {
                 using namespace viua::arithmetic::fixed;
                 return static_cast<int64_t>(arithmetic_lhs + arithmetic_rhs);
             }
-        case Saturating:
+        case ARITHMETIC_STYLE_SATURATE:
             {
                 using namespace viua::arithmetic::saturating;
                 return static_cast<int64_t>(arithmetic_lhs + arithmetic_rhs);
@@ -68,6 +69,7 @@ auto calculate_add(
 
 auto calculate_add(
     Stack&,
+    viua::arch::opcode_type const,
     uint64_t const lhs,
     uint64_t const rhs) -> uint64_t
 {
@@ -76,6 +78,7 @@ auto calculate_add(
 
 auto calculate_sub(
     Stack& stack,
+    viua::arch::opcode_type const style,
     int64_t const lhs,
     int64_t const rhs) -> int64_t
 {
@@ -87,19 +90,19 @@ auto calculate_sub(
     auto const arithmetic_rhs =
         signed_type{ extend(arithmetic_type{ rhs }, arithmetic_width) };
 
-    switch (stack.proc->arithmetic_style) {
-        using enum viua::vm::Process::Arithmetic_style;
-        case Wrapping:
+    switch (style) {
+        using namespace viua::arch::ops::OPCODE_FLAGS;
+        case ARITHMETIC_STYLE_WRAP:
             {
                 using namespace viua::arithmetic::fixed;
                 return static_cast<int64_t>(arithmetic_lhs - arithmetic_rhs);
             }
-        case Trapping:
+        case ARITHMETIC_STYLE_TRAP:
             {
                 using namespace viua::arithmetic::fixed;
                 return static_cast<int64_t>(arithmetic_lhs - arithmetic_rhs);
             }
-        case Saturating:
+        case ARITHMETIC_STYLE_SATURATE:
             {
                 using namespace viua::arithmetic::saturating;
                 return static_cast<int64_t>(arithmetic_lhs - arithmetic_rhs);
@@ -113,6 +116,7 @@ auto calculate_sub(
 
 auto calculate_sub(
     Stack&,
+    viua::arch::opcode_type const,
     uint64_t const lhs,
     uint64_t const rhs) -> uint64_t
 {
@@ -121,6 +125,7 @@ auto calculate_sub(
 
 auto calculate_mul(
     Stack& stack,
+    viua::arch::opcode_type const style,
     int64_t const lhs,
     int64_t const rhs) -> int64_t
 {
@@ -132,19 +137,19 @@ auto calculate_mul(
     auto const arithmetic_rhs =
         signed_type{ extend(arithmetic_type{ rhs }, arithmetic_width) };
 
-    switch (stack.proc->arithmetic_style) {
-        using enum viua::vm::Process::Arithmetic_style;
-        case Wrapping:
+    switch (style) {
+        using namespace viua::arch::ops::OPCODE_FLAGS;
+        case ARITHMETIC_STYLE_WRAP:
             {
                 using namespace viua::arithmetic::fixed;
                 return static_cast<int64_t>(arithmetic_lhs * arithmetic_rhs);
             }
-        case Trapping:
+        case ARITHMETIC_STYLE_TRAP:
             {
                 using namespace viua::arithmetic::fixed;
                 return static_cast<int64_t>(arithmetic_lhs * arithmetic_rhs);
             }
-        case Saturating:
+        case ARITHMETIC_STYLE_SATURATE:
             {
                 using namespace viua::arithmetic::saturating;
                 return static_cast<int64_t>(arithmetic_lhs * arithmetic_rhs);
@@ -158,6 +163,7 @@ auto calculate_mul(
 
 auto calculate_mul(
     Stack&,
+    viua::arch::opcode_type const,
     uint64_t const lhs,
     uint64_t const rhs) -> uint64_t
 {
@@ -170,45 +176,6 @@ namespace viua::vm::ins {
 using namespace viua::arch::ins;
 using viua::vm::Stack;
 using ip_type = viua::arch::instruction_type const*;
-
-auto execute(
-    EARITHMETICSTYLE const op,
-    Stack& stack,
-    ip_type const) -> void
-{
-    auto const out = mutable_proxy(stack, op.instruction.out);
-    auto const in  = immutable_proxy(stack, op.instruction.in);
-
-    auto const current_style = stack.proc->arithmetic_style;
-    out                      = static_cast<uint64_t>(current_style);
-
-    if (in.is_void()) {
-        return;
-    }
-
-    auto const new_style = in.cast_to<uint64_t>();
-    if (not new_style.has_value()) {
-        throw abort_execution{ stack,
-                               "invalid input operand for earithmeticstyle in "
-                                   + op.instruction.in.to_string() };
-    }
-
-    auto const ns = static_cast<viua::vm::Process::Arithmetic_style>(
-        static_cast<uint64_t>(*new_style));
-    switch (ns) {
-        using enum viua::vm::Process::Arithmetic_style;
-        case Wrapping:
-        case Trapping:
-        case Saturating:
-            stack.proc->arithmetic_style = ns;
-            break;
-        default:
-            throw abort_execution{ stack,
-                                   "unknown style for earithmeticstyle: "
-                                       + std::to_string(
-                                           static_cast<uint64_t>(*new_style)) };
-    }
-}
 
 auto execute(
     EARITHMETICWIDTH const op,
@@ -247,12 +214,14 @@ auto execute(
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
 
+    auto const style = op.instruction.opcode & viua::arch::ops::OPCODE_FLG_MASK;
+
     if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
-        out = calculate_add(stack, *lhs.get<int64_t>(), *v);
+        out = calculate_add(stack, style, *lhs.get<int64_t>(), *v);
         return;
     }
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
-        out = calculate_add(stack, *lhs.get<uint64_t>(), *v);
+        out = calculate_add(stack, style, *lhs.get<uint64_t>(), *v);
         return;
     }
 
@@ -273,12 +242,14 @@ auto execute(
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
 
+    auto const style = op.instruction.opcode & viua::arch::ops::OPCODE_FLG_MASK;
+
     if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
-        out = calculate_sub(stack, *lhs.get<int64_t>(), *v);
+        out = calculate_sub(stack, style, *lhs.get<int64_t>(), *v);
         return;
     }
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
-        out = calculate_sub(stack, *lhs.get<uint64_t>(), *v);
+        out = calculate_sub(stack, style, *lhs.get<uint64_t>(), *v);
         return;
     }
 
@@ -299,12 +270,14 @@ auto execute(
     auto const lhs_i64 = lhs.holds<register_type::int_type>();
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
 
+    auto const style = op.instruction.opcode & viua::arch::ops::OPCODE_FLG_MASK;
+
     if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
-        out = calculate_mul(stack, *lhs.get<int64_t>(), *v);
+        out = calculate_mul(stack, style, *lhs.get<int64_t>(), *v);
         return;
     }
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
-        out = calculate_mul(stack, *lhs.get<uint64_t>(), *v);
+        out = calculate_mul(stack, style, *lhs.get<uint64_t>(), *v);
         return;
     }
 

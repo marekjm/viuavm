@@ -162,8 +162,6 @@ auto to_string_impl(
             return "gts";
         case OPCODE::GTL:
             return "gtl";
-        case OPCODE::EARITHMETICSTYLE:
-            return "earithmeticstyle";
         case OPCODE::EARITHMETICWIDTH:
             return "earithmeticwidth";
         case OPCODE::STDADD:
@@ -332,8 +330,6 @@ auto parse_opcode(
         return static_cast<opcode_type>(OPCODE::AD);
     } else if (sv == "ptr") {
         return static_cast<opcode_type>(OPCODE::PTR);
-    } else if (sv == "earithmeticstyle") {
-        return static_cast<opcode_type>(OPCODE::EARITHMETICSTYLE);
     } else if (sv == "earithmeticwidth") {
         return static_cast<opcode_type>(OPCODE::EARITHMETICWIDTH);
     } else if (sv == "stdadd") {

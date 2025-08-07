@@ -221,7 +221,6 @@ auto execute(
                     Work(D, ACTOR);
                     Work(D, GTS);
                     Work(D, GTL);
-                    Work(D, EARITHMETICSTYLE);
                     Work(D, EARITHMETICWIDTH);
                 }
                 break;

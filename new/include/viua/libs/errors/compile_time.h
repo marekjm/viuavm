@@ -77,6 +77,8 @@ enum class Cause
     Unknown_label,
 
     Invalid_cast,
+
+    Invalid_arithmetic_style,
 };
 auto to_string(Cause const) -> std::string_view;
 

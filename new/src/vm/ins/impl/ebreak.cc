@@ -130,24 +130,6 @@ auto execute(
     dump_globals(stack);
 
     viua::TRACE_STREAM << "  environment:" << viua::TRACE_STREAM.endl;
-    TRACE_STREAM
-        << "    [ears] " << std::hex << std::setw(2) << std::setfill('0')
-        << static_cast<uint16_t>(stack.proc->arithmetic_style) << std::dec
-        << " ";
-    switch (stack.proc->arithmetic_style) {
-        using enum viua::vm::Process::Arithmetic_style;
-        case Wrapping:
-            TRACE_STREAM << "wrap";
-            break;
-        case Trapping:
-            TRACE_STREAM << "trap";
-            break;
-        case Saturating:
-            viua::TRACE_STREAM << "saturate";
-            break;
-    }
-    TRACE_STREAM << TRACE_STREAM.endl;
-
     TRACE_STREAM << "    [earw] " << std::hex << std::setw(2)
                  << std::setfill('0') << stack.proc->arithmetic_width
                  << std::dec << " " << stack.proc->arithmetic_width
