@@ -61,15 +61,21 @@ auto T::encode() const -> instruction_type
 auto T::to_string() const -> std::string
 {
     using namespace viua::arch::ops;
-    auto const flags = (opcode & OPCODE_FLG_MASK);
+
+    auto const flags     = (opcode & OPCODE_FLG_MASK);
+    auto const operation = static_cast<OPCODE>(opcode & OPCODE_OPC_MASK);
+    auto const is_arithmetic =
+        (operation == OPCODE::ADD or operation == OPCODE::SUB
+         or operation == OPCODE::MUL or operation == OPCODE::DIV);
     auto const style =
-        (flags == OPCODE_FLAGS::ARITHMETIC_STYLE_WRAP)       ? ".wrap"
+        (flags == OPCODE_FLAGS::ARITHMETIC_STYLE_NATIVE)     ? ".native"
+        : (flags == OPCODE_FLAGS::ARITHMETIC_STYLE_WRAP)     ? ".wrap"
         : (flags == OPCODE_FLAGS::ARITHMETIC_STYLE_SATURATE) ? ".saturate"
         : (flags == OPCODE_FLAGS::ARITHMETIC_STYLE_TRAP)     ? ".trap"
                                                              : "";
     return std::format("{}{} {}, {}, {}",
                        viua::arch::ops::to_string(opcode & OPCODE_OPC_MASK),
-                       style,
+                       (is_arithmetic ? style : ""),
                        out.to_string(),
                        lhs.to_string(),
                        rhs.to_string());
