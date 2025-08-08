@@ -703,8 +703,17 @@ Detailed descriptions are provided in *viua-ops*(7).
 
 # ENVIRONMENT
 
-Describe the environment flags the machine exposes; describe *ebreak*, *ecall*,
-and other environment-related instructions.
+Some of the machine's behaviour is affected by its internal environment eg, the
+bit width of some arithmetic operations (see the *earithmeticwidth*
+instruction).
+The following table lists the environment registers:
+
+[[ register
+:] values
+:< meaning
+|  *earw*
+:  1-64
+:  bit width of styled arithmetic operations
 
 
 # SEE ALSO
