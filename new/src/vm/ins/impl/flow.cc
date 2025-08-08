@@ -104,7 +104,7 @@ auto execute(
     stack.frames.back().result_to  = op.instruction.out;
 
     /*
-     * Set the frame pointer to stack break to. Usually, one of the first
+     * Set the frame pointer to stack break. Usually, one of the first
      * instructions in the callee is AMA which will increase the stack break
      * giving the function some memory to work with.
      */

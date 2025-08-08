@@ -716,6 +716,85 @@ The following table lists the environment registers:
 :  bit width of styled arithmetic operations
 
 
+# MEMORY
+
+Memory provides additional storage and work space to a process, in addition to
+the registers.
+While registers are fixed-size and can only hold a limited amount of data,
+objects stored in memory can be nearly unlimited in size and complexity.
+
+## The .rodata section
+
+Objects in the *.rodata* section are available to all functions.
+
+## The .data and the .bss sections
+
+The *.data* and the *.bss* sections are not used by the VM, and the concept of
+globally accessible read-write segment of memory does not exist.
+
+## Layout
+
+Executable code ie, the *.text* section, and the read-only global data ie, the
+*.rodata* section are allocated in the regions of memory with low addresses.
+The programs are not able to manipulate memory in those regions.
+
+Memory that programs _are_ able to manipulate begins near the highest address
+and grows downwards, as the program allocates more memory.
+The first read-write byte a process can access is always allocated at the
+address *0xbfff'ffff'ffff'fff0*.
+
+Each process receives a *page* of memory when it starts.
+The size of a page is 256 bytes, divided into lines of 16 bytes.
+
+	*NOTE*: The 256-byte pages are just a temporary measure during the alpha
+	stage of development, to make it easier to inspect the machine's internal
+	state in tests.
+	This is not the intended final page size.
+
+## The stack
+
+Memory on the stack is allocated using the *aa* (allocate automatic)
+instruction.
+
+The virtual machine manages stack memory automatically: the programmer is
+expected to request memory to be allocated, but the deallocation is handled by
+the machine.
+
+Each allocation is assigned to a call frame, and the machine drops allocated
+chunks as soon as the frame they were allocated in is popped off the call stack.
+If a function needs memory to return a result, the memory *MUST* be allocated by
+the caller.
+
+Usable stack memory lies between the addresses stored in the *fp* and *sbrk*
+registers:
+
+[[ *fp* (frame pointer)
+:< Points at the first byte directly accessible from within the frame.
+|  *sbrk* (stack break)
+:  Points at the byte _one past_ the last byte directly accessible from within
+   the frame.
+
+Since the stack grows downwards, the *fp* is also the highest address, and the
+*sbrk*-plus-one the lowest address, directly accessible from within the frame.
+To get the amount of memory allocated to a process, simply subtract *sbrk* from
+*fp*.
+
+Objects located in the *.rodata* section are treated differently and are
+available from anywhere; however, since they exist outside of the stack, this
+does not break the rule of "no direct access to the stack beyond the frame's
+boundaries from within the frame".
+
+What does _direct access_ mean?
+It means that no stack address above the *fp* or below-or-at the *sbrk* is
+accessible, unless the frame received a pointer to it from the caller.
+
+## The heap
+
+Memory on the heap is allocated using the *ad* (allocate dynamic) instruction.
+
+Heap memory is not implemented at the current moment.
+
+
 # SEE ALSO
 
 *viua-asm*(5),
