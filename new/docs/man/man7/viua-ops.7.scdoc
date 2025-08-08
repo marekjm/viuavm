@@ -142,22 +142,18 @@ _immediate_ operand is unsigned; while
 
 creates a signed integer.
 
-*addi* $_dst_, $_lhs_, _immediate_++
-*addi* $_dst_, *zero*, _immediate_
+*addi* $_dst_, $_lhs_|*zero*, _immediate_
 	Add _immediate_ to $_lhs_ (or *zero*), and store the output in $_dst_.
 
-*subi* $_dst_, $_lhs_, _immediate_++
-*subi* $_dst_, *zero*, _immediate_
+*subi* $_dst_, $_lhs_|*zero*, _immediate_
 	Subtract _immediate_ from $_lhs_ (or *zero*), and store the output in
 	$_dst_.
 
-*muli* $_dst_, $_lhs_, _immediate_++
-*muli* $_dst_, *zero*, _immediate_
+*muli* $_dst_, $_lhs_|*zero*, _immediate_
 	Multiply $_lhs_ (or *zero*) by _immediate_, and store the output in $_dst_.
 	Using *zero* in place of $_lhs_ does not make much sense, but is legal.
 
-*divi* $_dst_, $_lhs_, _immediate_++
-*divi* $_dst_, *zero*, _immediate_
+*divi* $_dst_, $_lhs_|*zero*, _immediate_
 	Divide $_lhs_ (or *zero*) by _immediate_, and store the output in $_dst_.
 	Using *zero* in place of $_lhs_ does not make much sense, but is legal.
 
