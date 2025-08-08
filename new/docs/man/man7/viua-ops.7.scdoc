@@ -9,13 +9,32 @@ viua-ops - Viua VM opcodes and instructions
 
 # SYNOPSIS
 
-Viua is a RISC-style architecture, with:
+The following style is used in the instruction descriptions:
 
-- 128-bit wide type-aware registers
-- dedicated call instructions, and no manual call stack management
-- built-in memory allocation and deallocation instructions
-- pointer tracking
-- I/O through asynchronous ports
+[[ symbol
+:[ example
+:< meaning
+|  *op*
+:  *move*
+:  an instruction
+|  *void*
+:  
+:  the special register *void*
+|  *zero*
+:  
+:  the special register *zero*
+|  $_reg_
+:  $0.a
+:  a general-purpose register
+|  $_reg_.x
+:  $1.p
+:  a general-purpose register in a specific register set
+|  _imm_
+:  -1, 42u, 3.14
+:  an immediate value of an arithmetic type
+|  "_str_"
+:  "Hello, World!"
+:  an immediate value of a string type
 
 
 # DESCRIPTION
@@ -28,48 +47,154 @@ runs *fast* but *crashes* often is less useful than one that works correctly.
 
 # REGISTER MANAGEMENT
 
-Moves, copies, swaps, etc.
+These instructions allow direct management of register contents.
+
+*copy* $_dst_, $_src_
+	Copy bits between two registers, preserving the source.
+
+*move* $_dst_, $_src_++
+*move* *void*, $_src_
+	Move bits between two registers, erasing the source.
+
+*swap* $_dst_, $_src_
+	Swap bits between two registers.
+
+*delete* $_dst_ (pseudoinstruction)
+	Erase the $_dst_ register.
 
 
 # ARITHMETIC
 
-Arithmetic instructions.
+Instructions marked with [*.native*] accept style flags; instructions not marked
+so do not accept style flags.
+The *.native* flag can be stated explicitly, but is the implicit default in the
+absence of any other style flag.
+
+Style flags are explained in *Arithmetic styles*.
 
 
-# LOGIC
+## Base arithmetic instructions
 
-Logic instructions.
+For base arithmetic instructions the type of the output value depends on the
+type of the value in the $_lhs_ register, and so neither *zero* nor *void* can
+be used for the $_lhs_ operand.
 
+*add*[.*native*] $_dst_, $_lhs_, $_rhs_
+	Add $_rhs_ to $_lhs_, and store the output in $_dst_.
 
-# BIT ARITHMETIC
+*sub*[.*native*] $_dst_, $_lhs_, $_rhs_
+	Subtract $_rhs_ from $_lhs_, and store the output in $_dst_.
 
-Bitwise operations.
+*mul*[.*native*] $_dst_, $_lhs_, $_rhs_
+	Multiply $_lhs_ by $_rhs_, and store the output in $_dst_.
 
+*div*[.*native*] $_dst_, $_lhs_, $_rhs_
+	Divide $_lhs_ by $_rhs_, and store the output in $_dst_.
 
-# CONTROL FLOW
-
-Control flow instructions.
-
-
-# MEMORY
-
-Memory interaction.
-
-
-# I/O
-
-Input and output, interaction with the outside world.
+*mod* _dst_, _lhs_, _rhs_
+	Calculate ($_lhs_ modulo $_rhs_), and store the output in $_dst_.
 
 
-# CONCURRENCY
+## Arithmetic with an immediate value
 
-Actors and message passing.
+These instructions are similar to the base arithmetic instructions, but instead
+of $_rhs_ they take an _immediate_ value; and they can take a *zero* as the
+$_lhs_ value, while the base instructions could not.
+
+If *zero* is used instead of $_lhs_ the output type is the same as the type
+of the _immediate_ operand.
+For example:
+
+	addi $2.l, zero, 0u
+
+creates an unsigned integer (note the *u* after the number zero), because the
+_immediate_ operand is unsigned; while
+
+	addi $2.l, zero, 0
+
+creates a signed integer.
+
+*addi* $_dst_, $_lhs_, _immediate_++
+*addi* $_dst_, *zero*, _immediate_
+	Add _immediate_ to $_lhs_ (or *zero*), and store the output in $_dst_.
+
+*subi* $_dst_, $_lhs_, _immediate_++
+*subi* $_dst_, *zero*, _immediate_
+	Subtract _immediate_ from $_lhs_ (or *zero*), and store the output in
+	$_dst_.
+
+*muli* $_dst_, $_lhs_, _immediate_++
+*muli* $_dst_, *zero*, _immediate_
+	Multiply $_lhs_ (or *zero*) by _immediate_, and store the output in $_dst_.
+	Using *zero* in place of $_lhs_ does not make much sense, but is legal.
+
+*divi* $_dst_, $_lhs_, _immediate_++
+*divi* $_dst_, *zero*, _immediate_
+	Divide $_lhs_ (or *zero*) by _immediate_, and store the output in $_dst_.
+	Using *zero* in place of $_lhs_ does not make much sense, but is legal.
 
 
-# ENVIRONMENT
+## Arithmetic styles
 
-Describe the environment flags the machine exposes; describe *ebreak*, *ecall*,
-and other environment-related instructions.
+Viua offers several styles of arithmetic:
+
+[[ style flag
+:< style description
+|  .*native*
+:  fast, works on floating point and integer types
+|  *.wrap*
+:  wraps on overflow, only works on integer types
+|  *.trap*
+:  traps on overflow, only works on integer types
+|  *.saturate*
+:  saturates on overflow, only works on integer types
+
+A style flag can be appended to an arithmetic instruction to enable the specific
+style.
+For example, to execute saturating addition one would write:
+
+	add.saturate $4.l, $2.l, $3.l
+
+Styles other than .*native* take into account the state of the *earw*
+environment register (manipulated using the *earithmeticwidth* instruction), and
+can be made to work on integers of specific width; eg, on 8-bit or 42-bit
+integers (the width does not have to be a multiple of 8).
+
+
+; # LOGIC
+
+; Logic instructions.
+
+
+; # BIT ARITHMETIC
+
+; Bitwise operations.
+
+
+; # CONTROL FLOW
+
+; Control flow instructions.
+
+
+; # MEMORY
+
+; Memory interaction.
+
+
+; # I/O
+
+; Input and output, interaction with the outside world.
+
+
+; # CONCURRENCY
+
+; Actors and message passing.
+
+
+; # ENVIRONMENT
+
+; Describe the environment flags the machine exposes; describe *ebreak*, *ecall*,
+; and other environment-related instructions.
 
 
 # SEE ALSO
