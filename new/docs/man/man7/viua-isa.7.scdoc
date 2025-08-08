@@ -518,7 +518,7 @@ The following instructions are available:
 :  no operation
 |  halt
 :  N
-:  halt the machine
+:  halt the process
 |  ebreak
 :  N
 :  break execution, shows environment dump by default

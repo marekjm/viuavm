@@ -45,6 +45,34 @@ answer delivered *quickly* is useless if it is *wrong*; or that a program that
 runs *fast* but *crashes* often is less useful than one that works correctly.
 
 
+# ENVIRONMENT
+
+The instructions controlling the execution environment.
+
+*noop*
+	No operation.
+	The instruction does nothing at all.
+
+*halt*
+	Halt the process.
+	The instruction stops execution immediately.
+
+*ebreak*
+	Environment break.
+	By default dumps the state of the process.
+
+*earithmeticwidth* $_dst_|*void*, $_src_|*zero*++
+*earithmeticwidth* $_dst_, *void*
+	Manipulates the *earw* (arithmetic width) environment register.
+	Stores its current value in $_dst_ (if not *void*), and replaces it with the
+	value from $_src_.
+
+	If *void* is supplied instead of $_src_, the current value is not replaced.
+
+	If *zero* is supplied instead of $_src_, the current value is set to the
+	default value.
+
+
 # REGISTER MANAGEMENT
 
 These instructions allow direct management of register contents.
@@ -189,12 +217,6 @@ integers (the width does not have to be a multiple of 8).
 ; # CONCURRENCY
 
 ; Actors and message passing.
-
-
-; # ENVIRONMENT
-
-; Describe the environment flags the machine exposes; describe *ebreak*, *ecall*,
-; and other environment-related instructions.
 
 
 # SEE ALSO
