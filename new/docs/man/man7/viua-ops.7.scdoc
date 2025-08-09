@@ -185,9 +185,43 @@ can be made to work on integers of specific width; eg, on 8-bit or 42-bit
 integers (the width does not have to be a multiple of 8).
 
 
-; # LOGIC
+# LOGIC
 
-; Logic instructions.
+Logic instructions.
+
+*eq* $_dst_, $_lhs_, $_rhs_
+	Compare $_lhs_ with $_rhs_; store 1 in $_dst_ if both values are
+	equal, store 0 otherwise.
+
+*lt* $_dst_, $_lhs_, $_rhs_
+	Compare $_lhs_ less-than $_rhs_; store 1 in $_dst_ if the
+	comparison is true, store 0 otherwise.
+
+*gt* $_dst_, $_lhs_, $_rhs_
+	Compare $_lhs_ greater-than $_rhs_; store 1 in $_dst_ if the
+	comparison is true, store 0 otherwise.
+
+*cmp* $_dst_, $_lhs_, $_rhs_
+	Compare $_lhs_ with $_rhs_, and store result in $_dst_ according
+	to the following table:
+
+[] $_dst_
+:[ condition
+|  -1
+:  left-hand < right-hand
+|  0
+:  left-hand = right-hand
+|  1
+:  left-hand > right-hand
+
+*and* $_dst_, $_lhs_, $_rhs_
+	Execute $_lhs_ logical-and $_rhs_, and store the result in $_dst_.
+
+*or* $_dst_, $_lhs_, $_rhs_
+	Execute $_lhs_ logical-or $_rhs_, and store the result in $_dst_.
+
+*not* $_dst_, $_src_
+	Store the logical negation of $_src_ in $_dst_.
 
 
 ; # BIT ARITHMETIC
