@@ -185,6 +185,15 @@ can be made to work on integers of specific width; eg, on 8-bit or 42-bit
 integers (the width does not have to be a multiple of 8).
 
 
+## Floating-point constructors
+
+*double* $_dst_, _immediate_ (pseudoinstruction)
+	Store the _immediate_ of type double in $_dst_.
+
+*float* $_dst_, _immediate_
+	Store the _immediate_ of type float in $_dst_.
+
+
 # LOGIC
 
 Logic instructions.
