@@ -78,14 +78,14 @@ The instructions controlling the execution environment.
 These instructions allow direct management of register contents.
 
 *copy* $_dst_, $_src_
-	Copy bits between two registers, preserving the source.
+	Copy bits from $_src_ to $_dst_, preserving $_src_.
 
 *move* $_dst_, $_src_++
 *move* *void*, $_src_
-	Move bits between two registers, erasing the source.
+	Move bits from $_src_ to $_dst_, preserving $_src_.
 
 *swap* $_dst_, $_src_
-	Swap bits between two registers.
+	Swap bits between $_src_ and $_dst_.
 
 *delete* $_dst_ (pseudoinstruction)
 	Erase the $_dst_ register.
