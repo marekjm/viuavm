@@ -397,14 +397,85 @@ Control flow instructions.
 
 # MEMORY
 
-Memory interaction.
+The _unit_ operand of memory instructions is not symbolic, but given as the
+number of bits the 1u value should be shifted left.
+
+Its legal range is 0 (a byte) to 7 (a duotrigesimal-word).
+
+The effective address is the result of the following calculation:
+
+	$_addr_ + (_offset_ \* (1u << _unit_))
+
+For example, if the _unit_ is *2* (a word), the _offset_ 42 the
+effective address would be:
+
+	$_addr_ + (42 \* (1u << 2)) =++
+$_addr_ + (42 \* 4) =++
+$_addr_ + 168
+
+For an extended discussion about loads and stores, refer to the *M-FORMAT*
+chapter of *viua-isa*(7).
+
+
+## Constructors
+
+The "current module" used in the descriptions of constructor instructions means
+the module at which the program counter is pointing.
+
+This can usually be thought of as a static-linked ELF emitted by an invocation
+of *viua-ld*(1).
+In case of dynamic linking, the *.got* must be used to get pointers to objects
+in other modules.
+
+; Allocate Read-Only Data Pointer
+*arodp* $_dst_, _offset_
+	Create a pointer pointing at _offset_ bytes into the *.rodata* section of
+	the current module, and store the result in $_dst_.
+
+	If the _offset_ is invalid the operation aborts execution.
 
 ; Allocate TeXT Pointer
 *atxtp* $_dst_, _offset_
-	Create a pointer pointing at _offset_ bytes into the *.text* section, and
-	store the result in $_dst_.
+	Create a pointer pointing at _offset_ bytes into the *.text* section of the
+	current module, and store the result in $_dst_.
 
 	If the _offset_ is invalid the operation aborts execution.
+
+*atom* $_reg_
+	Use the unsigned integer in $_reg_ as offset into the strings table, load an
+	atom, and store the result back in $_reg_.
+
+*cast* $_reg_, _type_
+	Interpret an undefined value contained in $_reg_ as _type_.
+
+	Refer to chapter *FUNDAMENTAL TYPES* of *viua-isa*(7) to learn what symbols
+	are available for the _type_ operand.
+
+
+## Loads and stores
+
+For *lm* and *sm* instructions only _unit_ values up to 4 (a quad-word) are
+useful, since Viua registers can only hold 128 bits.
+
+*lm* _unit_, $_reg_, $_addr_, _offset_
+	Load a _unit_ of memory eg, a word, from the _effective address_ into
+	$_reg_.
+
+*sm* _unit_, $_reg_, $_addr_, _offset_
+	Store a _unit_ of memory eg, a word, from $_reg_ at the _effective address_.
+
+
+## Allocation
+
+For *aa* and *ad* instructions all _unit_ values are useful.
+
+*aa* _unit_, $_ptr_, $_count_
+	Allocate an amount of automatic (stack) memory equal to $_count_ times
+	_unit_.
+
+*ad* _unit_, $_ptr_, $_count_ (!!! *NOT IMPLEMENTED* !!!)
+	Allocate an amount of dynamic (heap) memory equal to $_count_ times
+	_unit_.
 
 
 ; # I/O
@@ -418,6 +489,33 @@ Memory interaction.
 
 
 # PSEUDOINSTRUCTIONS
+
+*lb* $_reg_, $_addr_, _offset_++
+*lh* $_reg_, $_addr_, _offset_++
+*lw* $_reg_, $_addr_, _offset_++
+*ld* $_reg_, $_addr_, _offset_++
+*lq* $_reg_, $_addr_, _offset_
+	Load a value from memory and into $_reg_.
+	See discussion of the *lm* instruction for more detailed information.
+
+*sb* $_reg_, $_addr_, _offset_++
+*sh* $_reg_, $_addr_, _offset_++
+*sw* $_reg_, $_addr_, _offset_++
+*sd* $_reg_, $_addr_, _offset_++
+*sq* $_reg_, $_addr_, _offset_
+	Store a value from $_reg_ in memory.
+	See discussion of the *lm* instruction for more detailed information.
+
+*amba* $_ptr_, $_size_, 0++
+*amha* $_ptr_, $_size_, 0++
+*amwa* $_ptr_, $_size_, 0++
+*amda* $_ptr_, $_size_, 0++
+*amqa* $_ptr_, $_size_, 0++
+*amoa* $_ptr_, $_size_, 0++
+*amxa* $_ptr_, $_size_, 0++
+*amua* $_ptr_, $_size_, 0
+	Allocate automatic memory.
+	See discussion of the *aa* instruction for more detailed information.
 
 
 # SEE ALSO

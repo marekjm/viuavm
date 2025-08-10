@@ -119,52 +119,66 @@ receive a *signed integer* as its input and will produce the same type as its
 output, but will never produce a value outside of the [-128, 127] range.
 
 
-## void
-
-The void type.
-
-
-## signed integer
-
-The 64-bit signed integer type, in twos-complement format.
-
-
-## unsigned integer
-
-The 64-bit unsigned integer type.
-
-
-## 32-bit floating point number
-
-The C float.
-
-
-## 64-bit floating point number
-
-The C double.
-
-
-## pointer
-
-The type representing memory location addresses.
-
-
-## atom
-
-The type of values representing themselves.
+[[ symbol
+:[ type name
+:< short type description
+|  
+:  void
+:  represents "nothing"
+|  
+:  undefined
+:  represents raw, uninterpreted values loaded from memory
+|  *atom*
+:  atom
+:  represents values that represent themselves
+|  *double*
+:  double
+:  the C double
+|  *float*
+:  float
+:  the C float
+|  *int*
+:  signed integer
+:  signed 64-bit integer, in twos-complement format
+|  *uint*
+:  unsigned integer
+:  unsigned 64-bit integer
+|  *pid*
+:  process id
+:  represents actor (process) identifiers
+|  *pointer*
+:  pointer
+:  represents memory addresses
 
 
-## pid
+## Weird types
 
-The type representing process (or actor) identifiers.
+There are two "weird" types, which are not immediately useful: void and
+undefined.
 
+*void*
+	The *void* type represents the concept of "nothing".
+	It has no bit representation, and exists only as a flag marking a register
+	as containing nothing.
 
-## undefined
+*undefined*
+	The *undefined* type represents values loaded from memory that have not yet
+	been interpreted.
+	Attempts to interpret such values by any instruction other than *cast* will
+	abort execution of the offending process immediately.
 
-The type of uninterpreted values loaded from memory.
-Such values must be converted to another type using the *cast* instruction
-before they are consumed by any other instruction, but may be copied and moved
-freely.
+	However, values of the *undefined* type may be safely handled _as long as
+	they are not interpreted_.
+	The following instructions may be used to shuttle undefined values around:
+
+	- *copy*
+	- *move*
+	- *swap*
+	- *return*
+
+	Since they do not try to use the values in any way, they do not have to
+	interpret them and do not run afoul of the "undefined cannot be interpreted"
+	rule.
 
 
 # INSTRUCTION FORMATS AND ENCODING
