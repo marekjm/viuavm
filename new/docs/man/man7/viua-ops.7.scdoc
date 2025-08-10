@@ -187,8 +187,9 @@ integers (the width does not have to be a multiple of 8).
 
 ## Floating-point constructors
 
-*double* $_dst_, _immediate_ (pseudoinstruction)
-	Store the _immediate_ of type double in $_dst_.
+*double* $_reg_
+	Use the unsigned integer in $_reg_ as offset into the strings table, load a
+	double, and store the result back in $_reg_.
 
 *float* $_dst_, _immediate_
 	Store the _immediate_ of type float in $_dst_.
@@ -490,6 +491,12 @@ For *aa* and *ad* instructions all _unit_ values are useful.
 
 # PSEUDOINSTRUCTIONS
 
+*atom* $_dst_, _atom_
+	Store the _atom_ in $_dst_.
+
+*double* $_dst_, _immediate_
+	Store the _immediate_ of type double in $_dst_.
+
 *lb* $_reg_, $_addr_, _offset_++
 *lh* $_reg_, $_addr_, _offset_++
 *lw* $_reg_, $_addr_, _offset_++
@@ -516,6 +523,14 @@ For *aa* and *ad* instructions all _unit_ values are useful.
 *amua* $_ptr_, $_size_, 0
 	Allocate automatic memory.
 	See discussion of the *aa* instruction for more detailed information.
+
+*call* $_retval_|*void*, _symbol_
+	Call a _symbol_ defined by a *.symbol* directive.
+	See discussion of the *call* instruction for more detailed information.
+
+*if* $_condition_, _label_
+	Jump to a  _label_ defined by a *.label* directive.
+	See discussion of the *if* instruction for more detailed information.
 
 
 # SEE ALSO
