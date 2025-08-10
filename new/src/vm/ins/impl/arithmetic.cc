@@ -550,11 +550,6 @@ auto execute_arithmetic_immediate_op(
                    op.instruction.immediate)
              : static_cast<immediate_type>(op.instruction.immediate));
 
-    if (in.template holds<void>()) {
-        out =
-            typename Op::template functor_type<immediate_type>{}(0, immediate);
-        return;
-    }
     if (auto const v = in.template get<uint64_t>(); v) {
         out = typename Op::template functor_type<uint64_t>{}(*v, immediate);
         return;

@@ -204,7 +204,8 @@ struct U {
 constexpr auto OPCODE_FMT_MASK = opcode_type{ 0b1110'0000'0000'0000 };
 constexpr auto OPCODE_FLG_MASK = opcode_type{ 0b0001'1100'0000'0000 };
 constexpr auto OPCODE_OPR_MASK = opcode_type{ 0b0000'0011'1111'1111 };
-constexpr auto OPCODE_OPC_MASK = opcode_type{ OPCODE_FMT_MASK | OPCODE_OPR_MASK };
+constexpr auto OPCODE_OPC_MASK =
+    opcode_type{ OPCODE_FMT_MASK | OPCODE_OPR_MASK };
 
 /*
  * How about something different:

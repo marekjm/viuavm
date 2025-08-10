@@ -69,6 +69,8 @@ enum class TOKEN
     OPCODE,
 
     VOID,
+    ZERO_SIGNED,
+    ZERO_UNSIGNED,
 
     /*
      * Literals.

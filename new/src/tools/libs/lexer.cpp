@@ -96,6 +96,10 @@ auto to_string(
             return "OPCODE";
         case VOID:
             return "VOID";
+        case ZERO_SIGNED:
+            return "ZERO_SIGNED";
+        case ZERO_UNSIGNED:
+            return "ZERO_UNSIGNED";
         case LITERAL_ATOM:
             return "LITERAL_ATOM";
         case LITERAL_INTEGER:
@@ -153,7 +157,9 @@ const auto SECTION_NAME = std::regex{ "^(\\.[A-Za-z][A-Za-z0-9_]+)+\\b" };
  * accepted valid names the errors could get weird, and it would be much more
  * difficult to provide sane diagnostics.
  */
-const auto VOID = std::regex{ "^\\bvoid\\b" };
+const auto VOID          = std::regex{ "^\\bvoid\\b" };
+const auto ZERO_SIGNED   = std::regex{ "^\\bzero\\b" };
+const auto ZERO_UNSIGNED = std::regex{ "^\\buzero\\b" };
 
 const auto LITERAL_ATOM = std::regex{ pattern::LITERAL_ATOM };
 const auto LITERAL_INTEGER =
@@ -389,6 +395,13 @@ auto lex(
         }
 
         if (try_match(VOID, TOKEN::VOID)) {
+            continue;
+        }
+
+        if (try_match(ZERO_SIGNED, TOKEN::ZERO_SIGNED)) {
+            continue;
+        }
+        if (try_match(ZERO_UNSIGNED, TOKEN::ZERO_UNSIGNED)) {
             continue;
         }
 

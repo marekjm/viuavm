@@ -74,8 +74,14 @@ auto mutable_proxy(
 
     switch (a.set) {
         using enum viua::arch::REGISTER_SET;
-        case VOID:
-            return { nullptr };
+        case SPECIAL:
+            if (a.is_void()) {
+                return { nullptr };
+            } else {
+                throw abort_execution{
+                    stack, "illegal write access to register " + a.to_string()
+                };
+            }
         case LOCAL:
             return { &stack.frames.back().registers.at(a.index) };
         case PARAMETER:
@@ -89,44 +95,53 @@ auto mutable_proxy(
     }
 }
 auto immutable_proxy(
-    Stack& stack,
+    Stack const& stack,
     access_type const a) -> Immutable_proxy
 {
-    static register_type const void_placeholder;
-    switch (a.set) {
-        using enum viua::arch::REGISTER_SET;
-        case VOID:
-            return void_placeholder;
-        case LOCAL:
-            return stack.frames.back().registers.at(a.index);
-        case PARAMETER:
-            return stack.frames.back().parameters.at(a.index);
-        case ARGUMENT:
-            return stack.args.at(a.index);
-        default:
-            throw abort_execution{
-                stack, "illegal read access to register " + a.to_string()
-            };
-    }
+    return immutable_proxy(stack.frames.back(), a, stack);
 }
 auto immutable_proxy(
-    Frame& frame,
+    Frame const& frame,
     access_type const a,
     Stack const& stack) -> Immutable_proxy
 {
-    static register_type const void_placeholder;
     switch (a.set) {
         using enum viua::arch::REGISTER_SET;
-        case VOID:
-            return void_placeholder;
+        case SPECIAL:
+            return immutable_proxy(
+                stack, static_cast<viua::arch::SPECIAL_REGISTER>(a.index));
         case LOCAL:
             return frame.registers.at(a.index);
         case PARAMETER:
             return frame.parameters.at(a.index);
-        default:
-            throw abort_execution{
-                stack, "illegal read access to register " + a.to_string()
-            };
+        case ARGUMENT:
+            return stack.args.at(a.index);
     }
+    throw abort_execution{ stack,
+                           "illegal read access to register " + a.to_string() };
+}
+auto immutable_proxy(
+    Stack const& stack,
+    viua::arch::SPECIAL_REGISTER const r) -> Immutable_proxy
+{
+    static register_type const placeholder_void;
+    static register_type const placeholder_zero_signed{
+        register_type::int_type{}
+    };
+    static register_type const placeholder_zero_unsigned{
+        register_type::uint_type{}
+    };
+    switch (r) {
+        using enum viua::arch::SPECIAL_REGISTER;
+        case VOID:
+            return placeholder_void;
+        case ZERO_SIGNED:
+            return placeholder_zero_signed;
+        case ZERO_UNSIGNED:
+            return placeholder_zero_unsigned;
+    }
+    throw abort_execution{ stack,
+                           "illegal special register "
+                               + std::to_string(static_cast<unsigned int>(r)) };
 }
 }  // namespace viua::vm::ins

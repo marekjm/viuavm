@@ -43,11 +43,14 @@ Registers are organised in sets.
 :  *p*
 :  0-64, variable
 |  special
-:  *zero*
-:  wired to zero for arithmetic types, invalid for other types
-|  special
 :  *void*
 :  nothing
+|  special
+:  *zero*
+:  wired to signed zero for arithmetic types, invalid for other types
+|  special
+:  *uzero*
+:  wired to unsigned zero for arithmetic types, invalid for other types
 
 A general purpose register is accessed using the following notation:
 
@@ -63,8 +66,9 @@ where _I_ is the index of a register, and _S_ is the register set label eg,
 
 A special register is accessed using its label eg,
 
-- *zero* means 0
-- *void* means nothing (exact meaning depends on the context)
+- *void* means an empty register
+- *zero* means a signed 0
+- *uzero* means an unsigned 0
 
 
 ## General purpose registers

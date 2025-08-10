@@ -25,8 +25,14 @@
 
 namespace viua::arch {
 Register_access::Register_access()
-    : set{ viua::arch::REGISTER_SET::VOID }
-    , index{ 0 }
+    : set{ viua::arch::REGISTER_SET::SPECIAL }
+    , index{ static_cast<register_index_type>(
+          viua::arch::SPECIAL_REGISTER::VOID) }
+{}
+Register_access::Register_access(
+    viua::arch::SPECIAL_REGISTER const r)
+    : set{ viua::arch::REGISTER_SET::SPECIAL }
+    , index{ static_cast<register_index_type>(r) }
 {}
 Register_access::Register_access(
     viua::arch::REGISTER_SET const s,
@@ -67,33 +73,45 @@ auto Register_access::make_parameter(
 }
 auto Register_access::make_void() -> Register_access
 {
-    return Register_access{ viua::arch::REGISTER_SET::VOID, 0 };
+    return Register_access{ viua::arch::SPECIAL_REGISTER::VOID };
+}
+auto Register_access::make_zero_signed() -> Register_access
+{
+    return Register_access{ viua::arch::SPECIAL_REGISTER::ZERO_SIGNED };
+}
+auto Register_access::make_zero_unsigned() -> Register_access
+{
+    return Register_access{ viua::arch::SPECIAL_REGISTER::ZERO_UNSIGNED };
 }
 
-auto Register_access::to_string() const -> std::string
+auto to_string(
+    viua::arch::SPECIAL_REGISTER const r) -> std::string
 {
-    if (is_void()) {
-        return "void";
-    }
-
-    auto out = std::ostringstream{};
-    out << '$';
-    out << static_cast<unsigned int>(index);
-    out << '.';
-    switch (set) {
-        using enum viua::arch::REGISTER_SET;
+    switch (r) {
+        using enum viua::arch::SPECIAL_REGISTER;
         case VOID:
             return "void";
-        case LOCAL:
-            out << 'l';
-            break;
-        case ARGUMENT:
-            out << 'a';
-            break;
-        case PARAMETER:
-            out << 'p';
-            break;
+        case ZERO_SIGNED:
+            return "zero";
+        case ZERO_UNSIGNED:
+            return "uzero";
     }
-    return out.str();
+    return "<invalid special register>";
+}
+auto Register_access::to_string() const -> std::string
+{
+    switch (set) {
+        using enum viua::arch::REGISTER_SET;
+        case SPECIAL:
+            return viua::arch::to_string(
+                static_cast<viua::arch::SPECIAL_REGISTER>(index));
+        case LOCAL:
+            return std::format("${}.l", static_cast<unsigned int>(index));
+        case ARGUMENT:
+            return std::format("${}.a", static_cast<unsigned int>(index));
+        case PARAMETER:
+            return std::format("${}.p", static_cast<unsigned int>(index));
+    }
+    return "<invalid register set>";
 }
 }  // namespace viua::arch

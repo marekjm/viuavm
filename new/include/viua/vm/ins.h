@@ -234,10 +234,13 @@ struct Mutable_proxy {
     }
 };
 auto mutable_proxy(viua::vm::Stack&, access_type const) -> Mutable_proxy;
-auto immutable_proxy(viua::vm::Stack&, access_type const) -> Immutable_proxy;
-auto immutable_proxy(viua::vm::Frame&,
+auto immutable_proxy(viua::vm::Stack const&, access_type const)
+    -> Immutable_proxy;
+auto immutable_proxy(viua::vm::Frame const&,
                      access_type const,
                      viua::vm::Stack const&) -> Immutable_proxy;
+auto immutable_proxy(viua::vm::Stack const&, viua::arch::SPECIAL_REGISTER const)
+    -> Immutable_proxy;
 }  // namespace viua::vm::ins
 
 #endif

@@ -377,7 +377,13 @@ struct Operand : Node {
 auto Operand::make_access() const -> viua::arch::Register_access
 {
     if (ingredients.front() == "void") {
-        return viua::arch::Register_access{};
+        return viua::arch::Register_access::make_void();
+    }
+    if (ingredients.front() == "zero") {
+        return viua::arch::Register_access::make_zero_signed();
+    }
+    if (ingredients.front() == "uzero") {
+        return viua::arch::Register_access::make_zero_unsigned();
     }
 
     using viua::libs::lexer::TOKEN;
@@ -853,6 +859,12 @@ auto consume_instruction(
         if (lexemes.front() == TOKEN::VOID) {
             operand.ingredients.push_back(
                 consume_token_of(TOKEN::VOID, lexemes));
+        } else if (lexemes.front() == TOKEN::ZERO_SIGNED) {
+            operand.ingredients.push_back(
+                consume_token_of(TOKEN::ZERO_SIGNED, lexemes));
+        } else if (lexemes.front() == TOKEN::ZERO_UNSIGNED) {
+            operand.ingredients.push_back(
+                consume_token_of(TOKEN::ZERO_UNSIGNED, lexemes));
         } else if (look_ahead(TOKEN::DOLLAR, lexemes)) {
             auto const leader = consume_token_of(TOKEN::DOLLAR, lexemes);
             auto index        = Lexeme{};
@@ -1969,7 +1981,9 @@ auto emit_instruction(
                 // to changes in the architecture header; but I would feel
                 // better if the values were symbold and not hardcoded.
                 return viua::arch::ops::M{
-                    static_cast<opcode_type>(opcode | (unit << viua::arch::ops::OPCODE_FLAGS::FLAGS_SHIFT)),
+                    static_cast<opcode_type>(
+                        opcode
+                        | (unit << viua::arch::ops::OPCODE_FLAGS::FLAGS_SHIFT)),
                     insn.operands.at(1).make_access(),
                     insn.operands.at(2).make_access(),
                     viua::support::ston<uint32_t>(off.text)
@@ -2140,11 +2154,17 @@ auto expand_li(
         /*
          * If the first part of the load (the high 32 bits) was zero then it
          * means we don't have anything to add to so the source (left-hand side
-         * operand) should be void ie, the default value.
+         * operand) should be zero.
          */
-        synth.operands.at(1).ingredients.front().text = "void";
-        synth.operands.at(1).ingredients.front().token =
-            viua::libs::lexer::TOKEN::VOID;
+        if (is_unsigned) {
+            synth.operands.at(1).ingredients.front().text = "uzero";
+            synth.operands.at(1).ingredients.front().token =
+                viua::libs::lexer::TOKEN::ZERO_UNSIGNED;
+        } else {
+            synth.operands.at(1).ingredients.front().text = "zero";
+            synth.operands.at(1).ingredients.front().token =
+                viua::libs::lexer::TOKEN::ZERO_SIGNED;
+        }
 
         cooked.push_back(emit_instruction(synth));
     }
@@ -3045,7 +3065,7 @@ auto make_reloc_table(
 
         auto const reloc_to_section_ptr =
             op == OPCODE::ARODP or op == OPCODE::ATXTP;
-        auto const prev_op            = viua::carve_opcode_out(text.at(i - 1));
+        auto const prev_op = viua::carve_opcode_out(text.at(i - 1));
         auto const reloc_to_long_addr =
             viua::arch::ops::is_format(viua::arch::ops::FORMAT::U, prev_op);
 

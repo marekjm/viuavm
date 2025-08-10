@@ -330,11 +330,15 @@ auto parse_opcode(
     }
 }
 
-auto is_format(FORMAT const fmt, opcode_type const op) -> bool
+auto is_format(
+    FORMAT const fmt,
+    opcode_type const op) -> bool
 {
     return static_cast<FORMAT>(op & OPCODE_FMT_MASK) == fmt;
 }
-auto is_format(FORMAT const fmt, OPCODE const op) -> bool
+auto is_format(
+    FORMAT const fmt,
+    OPCODE const op) -> bool
 {
     return is_format(fmt, static_cast<opcode_type>(op));
 }

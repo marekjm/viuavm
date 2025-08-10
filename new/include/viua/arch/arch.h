@@ -61,7 +61,7 @@ enum class REGISTER_SET : uint8_t
      * Void register used as an output register means that the value
      * that would be produced and put inside it should be dropped instead.
      */
-    VOID = 0,
+    SPECIAL = 0b00,
 
     /*
      * Local registers are used to store local variables of a function.
@@ -69,7 +69,7 @@ enum class REGISTER_SET : uint8_t
      * not share registers (every call frame has its own local register set
      * allocated).
      */
-    LOCAL,
+    LOCAL = 0b01,
 
     /*
      * Parameter registers are used by callees to read the values assigned
@@ -92,8 +92,8 @@ enum class REGISTER_SET : uint8_t
      * The argument registers are moved into parameter registers on a CALL
      * INSTRUCTION of any kind.
      */
-    ARGUMENT,
-    PARAMETER,
+    ARGUMENT  = 0b10,
+    PARAMETER = 0b11,
 };
 
 /*
@@ -102,9 +102,11 @@ enum class REGISTER_SET : uint8_t
  */
 enum class SPECIAL_REGISTER : uint8_t
 {
-    ZERO = 0x00,
-    VOID = 0x01,
+    VOID          = 0b000000,
+    ZERO_SIGNED   = 0b000001,
+    ZERO_UNSIGNED = 0b000010,
 };
+auto to_string(SPECIAL_REGISTER const) -> std::string;
 
 using register_index_type                 = uint8_t;
 constexpr auto REGISTER_ACCESS_INDEX_MASK = uint8_t{ 0b0011'1111 };
@@ -119,6 +121,7 @@ struct Register_access {
     register_index_type index;
 
     Register_access();
+    Register_access(SPECIAL_REGISTER const);
     Register_access(set_type const, register_index_type const);
 
     static auto decode(underlying_type const) -> Register_access;
@@ -140,13 +143,24 @@ struct Register_access {
 
     inline auto is_void() const -> bool
     {
-        return (set == set_type::VOID);
+        using enum SPECIAL_REGISTER;
+        return (set == set_type::SPECIAL)
+               and (static_cast<SPECIAL_REGISTER>(index) == VOID);
     }
 
+    /*
+     * General purpose register sets.
+     */
     static auto make_local(register_index_type const) -> Register_access;
     static auto make_argument(register_index_type const) -> Register_access;
     static auto make_parameter(register_index_type const) -> Register_access;
+
+    /*
+     * Special register sets.
+     */
     static auto make_void() -> Register_access;
+    static auto make_zero_signed() -> Register_access;
+    static auto make_zero_unsigned() -> Register_access;
 
     auto to_string() const -> std::string;
 };
