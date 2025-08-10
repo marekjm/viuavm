@@ -133,14 +133,42 @@ If *zero* is used instead of $_lhs_ the output type is the same as the type
 of the _immediate_ operand.
 For example:
 
-	addi $2.l, zero, 0u
+	addiu $2.l, zero, 0
+	luiu $2.l, 0
 
 creates an unsigned integer (note the *u* after the number zero), because the
 _immediate_ operand is unsigned; while
 
 	addi $2.l, zero, 0
+	lui $2.l, 0
 
 creates a signed integer.
+
+The unsigned versions are not directly available to programmers, though, and
+must be accessed through the pseudoinstructions that infer the desired sign of
+the output from the sign of the immediate.
+A few examples to show the idea:
+
+	; Crates a signed integer.
+	addi $2.l, zero, 1
+
+	; Crates an unsigned integer.
+	addi $2.l, zero, 1u
+
+In general, all of the above should be handed off to the assembler and the
+programmers should only rely on the *li* pseudoinstruction.
+
+*lui* $_dst_, _immediate_
+	Create a signed integer with its highest 32 bits set to _immediate_, and
+	store the result in $_dst_.
+
+	Use *addi* or *addiu* to fill the lower 32 bits.
+
+*luiu* $_dst_, _immediate_
+	Create an usigned integer with its highest 32 bits set to _immediate_, and
+	store the result in $_dst_.
+
+	Use *addi* or *addiu* to fill the lower 32 bits.
 
 *addi* $_dst_, $_lhs_|*zero*, _immediate_
 	Add _immediate_ to $_lhs_ (or *zero*), and store the output in $_dst_.
@@ -531,6 +559,23 @@ For *aa* and *ad* instructions all _unit_ values are useful.
 *if* $_condition_, _label_
 	Jump to a  _label_ defined by a *.label* directive.
 	See discussion of the *if* instruction for more detailed information.
+
+*li* $_reg_, _immediate_
+	Load an _immediate_ integer value into $_reg_.
+	The _immediate_ must be representable on 64 bits, and its signedness is
+	inferred by the assembler.
+
+	By default, signed integers are loaded:
+
+		li $2.l, 1
+
+	Use the u suffix may be used to force unsigned integers:
+
+		li $3.l, 1u
+
+	Use the special -1u case to load maximal value of an unsigned integer:
+
+		li #4.l, -1u
 
 
 # SEE ALSO
