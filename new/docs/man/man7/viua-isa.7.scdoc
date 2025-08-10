@@ -800,6 +800,8 @@ Heap memory is not implemented at the current moment.
 *viua-asm*(5),
 *viua-ops*(7).
 
+*elf*(5).
+
 Patterson, David A. and Waterman, Andrew. _The RISC-V Reader_. Strawberry Canyon
 LLC, 2017.++
 ISBN 978-09-9924-911-6
