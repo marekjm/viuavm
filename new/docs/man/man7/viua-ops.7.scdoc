@@ -326,14 +326,85 @@ they always work on full-width values.
 	Invert the bits of $_src_, and store the result in $_dst_.
 
 
-; # CONTROL FLOW
+# CONTROL FLOW
 
-; Control flow instructions.
+Control flow instructions.
+
+*if* $_condition_|void, $_address_
+	Jump to $_address_ if the $_condition_ is true; perform an unconditional
+	jump if the operand is the *void* register.
+
+	If the $_condition_ operand is non-*void*, the operation will attempt to
+	cast it as a boolean value.
+	The operation aborts execution if this is not possible.
+
+	See the description of the *atxtp* instruction to learn how to create a
+	pointer usable as the $_address_ operand.
+
+*frame* $_argcount_.a++
+*frame* $_argcount_.l
+	Allocate a frame.
+
+	If the $_argcount_.a form is used ie, the count is taken as-if from the
+	arguments register set, the number of allocated argument/parameter registers
+	(see the *REGISTERS* chapter of *viua-isa*(7) for the distinction) is equal
+	to the _argcount_ value, as if it were an immediate value.
+
+	If the $_argcount_.l form is used ie, the count is taken from the local
+	register set, the number of allocated argument/parameter registers is equal
+	to the value in $_argcount_.l register.
+	That value must be an unsigned integer, or the operation will abort
+	execution.
+
+*call* $_retval_|*void*, $_address_
+	Use a previously allocated frame (see the description of the *frame*
+	instruction above) to perform a call to the _address_.
+
+	After control returns from the callee, the result of the call is stored in
+	$_retval_ (or discarded if the operand was *void*).
+
+	If a non-*void* $_retval_ operand is provided and the callee does return a
+	value, the operation aborts execution.
+	Execution is aborted _after_ the call finishes, not before.
+
+	The callee receives a fresh local register set, and has no access to the
+	caller's frame.
+
+	The only fully open communication channel between the caller and the
+	callee are the registers in the arguments/parameters register set, and the
+	value moved from the callee to the caller with the *return* instruction.
+	See the *MEMORY* chapter of *viua-isa*(7) to learn about the restrictions
+	on memory access between frames.
+
+	See the description of the *atxtp* instruction to learn how to create a
+	pointer usable as the $_address_ operand.
+
+*return* $_retval_|*void*
+	Return control to the caller frame.
+	If the current frame is the only frame on the stack, the execution of the
+	whole actor ends.
+	If the current actor was the only one, the execution of the whole program
+	ends.
+
+	If the $_retval_ operand is a non-*void* register, return the value
+	contained in it.
+
+	The operation aborts execution if a non-*void* register is supplied that is
+	empty.
+	Return nothing requires explicitly supplying the *void* register for the
+	$_retval_ operand.
 
 
-; # MEMORY
+# MEMORY
 
-; Memory interaction.
+Memory interaction.
+
+; Allocate TeXT Pointer
+*atxtp* $_dst_, _offset_
+	Create a pointer pointing at _offset_ bytes into the *.text* section, and
+	store the result in $_dst_.
+
+	If the _offset_ is invalid the operation aborts execution.
 
 
 ; # I/O
@@ -344,6 +415,9 @@ they always work on full-width values.
 ; # CONCURRENCY
 
 ; Actors and message passing.
+
+
+# PSEUDOINSTRUCTIONS
 
 
 # SEE ALSO
