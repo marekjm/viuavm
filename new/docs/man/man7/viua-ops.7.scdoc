@@ -258,9 +258,72 @@ Logic instructions.
 	Output is always an unsigned integer.
 
 
-; # BIT ARITHMETIC
+# BIT ARITHMETIC
 
-; Bitwise operations.
+Bitwise operations require an unsigned integer value in their $_src_ or $_lhs_
+operands, and will attempt to cast the value in $_shift_ or $_rhs_ to an
+unsigned integer.
+The instructions will abort execution unless both of the aforementioned
+conditions are satisified.
+
+*NOTE*: The *earw* register has no effect on the bit arithmetic instructions;
+they always work on full-width values.
+
+
+## Shifts
+
+*bitshl* $_dst_, $_src_, $_shift_
+	Shift the value from $_src_ left by $_shift_ bits, and store the result in
+	$_dst_.
+	The result is filled with zeroes on the right.
+
+*bitshr* $_dst_, $_src_, $_shift_
+	Shift the value from $_src_ right by $_shift_ bits, and store the result in
+	$_dst_.
+	The result is filled with zeroes on the left.
+
+*bitashr* $_dst_, $_src_, $_shift_
+	Shift the value from $_src_ right by $_shift_ bits, and store the result in
+	$_dst_.
+	The result is filled with the highest bit of the input on the left;
+	*bitashr* is the _arithmetic_ right bit shift ie, it preserves the sign of
+	the input.
+
+
+## Rotations
+
+*bitrol* $_dst_, $_src_, $_shift_
+	Rotate the value from $_src_ to the left by $_shift_ bits, and store the
+	result in $_dst_.
+	The bits "shifted out" from the input ie, its highest bits, are "shifted in"
+	as the lowest bits of the output.
+
+	For example, if *bitrol* was applied to 0b1100'0100 with a shift value of 2,
+	the result would be 0b0001'0011.
+
+*bitror* $_dst_, $_src_, $_shift_
+	Rotate the value from $_src_ to the right by $_shift_ bits, and store the
+	result in $_dst_.
+	The bits "shifted out" from the input ie, its lowest bits, are "shifted in"
+	as the highest bits of the output.
+
+	For example, if *bitror* was applied to 0b1100'0100 with a shift value of 2,
+	the result would be 0b0011'0001.
+
+
+## Masks
+
+*bitand* $_dst_, $_lhs_, $_rhs_
+	Perform $_lhs_ bitwise-and $_rhs_, and store the result in $_dst_.
+
+*bitor* $_dst_, $_lhs_, $_rhs_
+	Perform $_lhs_ bitwise-or $_rhs_, and store the result in $_dst_.
+
+*bitxor* $_dst_, $_lhs_, $_rhs_
+	Perform $_lhs_ bitwise-xor $_rhs_, and store the result in $_dst_.
+
+*bitnot* $_dst_, $_src_
+	Invert the bits of $_src_, and store the result in $_dst_.
 
 
 ; # CONTROL FLOW
