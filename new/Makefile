@@ -411,7 +411,6 @@ VM_OPERATION_TYPE_IMPL=\
 
 $(BUILD_EXEDIR)/dis: \
 	$(BUILD_PREFIX)/libexec/common.o \
-	$(BUILD_PREFIX)/tools/libs/assembler.o \
 	$(BUILD_PREFIX)/support/errno.o \
 	$(BUILD_PREFIX)/support/fdio.o \
 	$(BUILD_PREFIX)/support/string.o \
@@ -429,7 +428,6 @@ $(BUILD_EXEDIR)/asm: \
 	$(BUILD_PREFIX)/tools/libs/lexer.o \
 	$(BUILD_PREFIX)/tools/libs/stage/error.o \
 	$(BUILD_PREFIX)/tools/libs/stage/save.o \
-	$(BUILD_PREFIX)/tools/libs/assembler.o \
 	$(VM_OPERATION_TYPE_IMPL)
 
 $(BUILD_EXEDIR)/ld: \
@@ -495,7 +493,6 @@ $(BUILD_EXEDIR)/repl: \
 	$(BUILD_PREFIX)/support/tty.o \
 	$(BUILD_PREFIX)/tools/libs/errors/compile_time.o \
 	$(BUILD_PREFIX)/tools/libs/stage.o \
-	$(BUILD_PREFIX)/tools/libs/assembler.o \
 	$(BUILD_PREFIX)/tools/libs/lexer.o \
 	$(BUILD_PREFIX)/tools/libs/parser.o \
 	$(BUILD_PREFIX)/runtime/pid.o \

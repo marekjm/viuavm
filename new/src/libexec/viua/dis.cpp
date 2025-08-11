@@ -34,7 +34,6 @@
 
 #include <viua/arch/ops.h>
 #include <viua/libexec/common.hh>
-#include <viua/libs/assembler.h>
 #include <viua/libs/lexer.h>
 #include <viua/support/errno.h>
 #include <viua/support/memory.h>

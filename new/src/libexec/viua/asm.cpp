@@ -54,7 +54,6 @@
 #include <viua/arch/elf.h>
 #include <viua/arch/ops.h>
 #include <viua/libexec/common.hh>
-#include <viua/libs/assembler.h>
 #include <viua/libs/errors/compile_time.h>
 #include <viua/libs/lexer.h>
 #include <viua/libs/stage.h>
@@ -1824,6 +1823,12 @@ auto operand_or_throw(
                      ("operand " + std::to_string(index) + " not found") };
     }
 }
+
+/*
+ * emit_instruction() DOES NOT accept pseudoinstructions. All instructions
+ * passed to it MUST be in the canonical format, fully expanded, and ready for
+ * processing without further adjustments.
+ */
 auto emit_instruction(
     ast::Instruction const insn) -> viua::arch::instruction_type
 {
@@ -1831,6 +1836,8 @@ auto emit_instruction(
     using viua::arch::ops::FORMAT;
     using viua::arch::ops::OPCODE;
     using viua::arch::ops::OPCODE_FMT_MASK;
+
+    std::println("emitting: {}", insn.leader.text);
 
     auto opcode = opcode_type{};
     try {
@@ -1919,11 +1926,15 @@ auto emit_instruction(
         case FORMAT::U:
             {
                 auto fst_register_operand = size_t{ 0 };
-                auto const is_styled_arithmetic = (
-                     opcode == static_cast<opcode_type>(OPCODE::ADDI)
+                auto const is_styled_arithmetic =
+                    (opcode == static_cast<opcode_type>(OPCODE::ADDI)
                      or opcode == static_cast<opcode_type>(OPCODE::SUBI)
                      or opcode == static_cast<opcode_type>(OPCODE::MULI)
-                     or opcode == static_cast<opcode_type>(OPCODE::DIVI));
+                     or opcode == static_cast<opcode_type>(OPCODE::DIVI)
+                     or opcode == static_cast<opcode_type>(OPCODE::ADDIU)
+                     or opcode == static_cast<opcode_type>(OPCODE::SUBIU)
+                     or opcode == static_cast<opcode_type>(OPCODE::MULIU)
+                     or opcode == static_cast<opcode_type>(OPCODE::DIVIU));
                 if (is_styled_arithmetic) {
                     /*
                      * Skip the style operand.
@@ -1951,7 +1962,8 @@ auto emit_instruction(
                     }
                 }
 
-                auto const imm = insn.operands.at(fst_register_operand + 2).ingredients.front();
+                auto const imm = insn.operands.at(fst_register_operand + 2)
+                                     .ingredients.front();
                 auto const is_unsigned =
                     (static_cast<opcode_type>(opcode)
                      & viua::arch::ops::OPCODE_FLAGS::UNSIGNED);
@@ -1987,11 +1999,14 @@ auto emit_instruction(
                     std::println("cooked imm for U: {}u ({}s)",
                                  val,
                                  static_cast<int32_t>(val));
-                    auto const r =
-                        viua::arch::ops::U{ opcode,
-                                            insn.operands.at(fst_register_operand + 0).make_access(),
-                                            insn.operands.at(fst_register_operand + 1).make_access(),
-                                            val };
+                    auto const r = viua::arch::ops::U{
+                        opcode,
+                        insn.operands.at(fst_register_operand + 0)
+                            .make_access(),
+                        insn.operands.at(fst_register_operand + 1)
+                            .make_access(),
+                        val
+                    };
                     std::println("cooked U: {}", r.to_string());
                     return r.encode();
                 } catch (std::invalid_argument const&) {
@@ -2035,6 +2050,131 @@ auto emit_instruction(
 }
 
 using Text = std::vector<viua::arch::instruction_type>;
+
+auto expand_arithmetic_operation_and_style(
+    ast::Instruction const& raw) -> ast::Instruction
+{
+    auto synth = ast::Instruction{};
+
+    auto opcode_view     = std::string_view{ raw.leader.text };
+    auto const operation = opcode_view.substr(0, opcode_view.find('.'));
+    auto const style     = (opcode_view.find('.') == std::string_view::npos)
+                               ? "native"
+                               : opcode_view.substr(opcode_view.find('.') + 1);
+
+    std::println("expanding operation and style: {}", opcode_view);
+
+    auto const legal_styles = std::set<std::string_view>{
+        "native",
+        "wrap",
+        "saturate",
+        "trap",
+    };
+    if (not legal_styles.contains(style)) {
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{ raw.leader,
+                     Cause::Invalid_arithmetic_style,
+                     std::string{ style } };
+    }
+
+    synth.leader      = raw.leader;
+    synth.leader.text = operation;
+
+    synth.operands.push_back(raw.operands.at(0));
+    synth.operands.front().ingredients.front().text = style;
+    synth.operands.front().ingredients.resize(1);
+
+    return synth;
+}
+auto expand_styled_arithmetic(
+    ast::Instruction const& raw) -> Text
+{
+    using namespace std::string_literals;
+    auto synth = ast::Instruction{};
+
+    auto opcode_view     = std::string_view{ raw.leader.text };
+    auto const operation = opcode_view.substr(0, opcode_view.find('.'));
+    auto const style     = (opcode_view.find('.') == std::string_view::npos)
+                               ? "native"
+                               : opcode_view.substr(opcode_view.find('.') + 1);
+
+    std::println("expanding arithmetic: {}", opcode_view);
+
+    auto const legal_styles = std::set<std::string_view>{
+        "native",
+        "wrap",
+        "saturate",
+        "trap",
+    };
+    if (not legal_styles.contains(style)) {
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{ raw.leader,
+                     Cause::Invalid_arithmetic_style,
+                     std::string{ style } };
+    }
+
+    synth.leader      = raw.leader;
+    synth.leader.text = operation;
+
+    synth.operands.push_back(raw.operands.at(0));
+    synth.operands.front().ingredients.front().text = style;
+    synth.operands.front().ingredients.resize(1);
+
+    synth.operands.push_back(raw.operands.at(0));
+    synth.operands.push_back(raw.operands.at(1));
+    synth.operands.push_back(raw.operands.at(2));
+
+    return { emit_instruction(synth) };
+}
+auto expand_immediate_arithmetic(
+    ast::Instruction const& raw) -> Text
+{
+    auto synth = expand_arithmetic_operation_and_style(raw);
+
+    std::println("expanding immediate arithmetic: {}", synth.leader.text);
+
+    synth.operands.push_back(raw.operands.at(0));
+    synth.operands.push_back(raw.operands.at(1));
+    synth.operands.push_back(raw.operands.at(2));
+
+    /*
+     * The assembler does not accept ADDIU and friends (the unsigned versions of
+     * the immediate arithmetic instructions), and instead requires the
+     * programmer to add a sign to the operand. Then, the assembler infers the
+     * sign from the operand.
+     *
+     * A bit roundabout, but I think it makes sense.
+     */
+    auto const immediate_is_unsigned =
+        raw.operands.back().ingredients.back().text.back() == 'u';
+    if (immediate_is_unsigned) {
+        synth.leader.text += 'u';
+
+        auto& src_register = synth.operands.at(2);
+        if (src_register.ingredients.front() == "zero") {
+            /*
+             * It would be a little ridiculous if we had an instruction that
+             * treated its immediate operand as unsigned, and at the same time
+             * used a hard-wired signed zero to force it to produce a signed
+             * output anyway.
+             *
+             * So, let's treat the special register "zero" as a bit of a
+             * smartass in this case: if the immediate operand is unsigned and
+             * the source register is "zero" we change it to "uzero", to make
+             * the instruction produce the expected output.
+             *
+             * If someone does not want this behaviour, they should not use an
+             * unsigned immediate.
+             */
+            src_register.ingredients.front().text = "uzero";
+        }
+    }
+
+    return { emit_instruction(synth) };
+}
+
 auto expand_li(
     ast::Instruction const& raw,
     bool const force_full = false) -> Text
@@ -2073,7 +2213,6 @@ auto expand_li(
             .add(raw.leader);
     }
 
-    using viua::libs::assembler::to_loading_parts_unsigned;
     auto const hi        = viua::carve_bits_out<uint32_t, 32>(value);
     auto const lo        = viua::carve_bits_out<uint32_t, 0>(value);
     auto const full_form = raw.has_attr("full") or force_full;
@@ -2146,8 +2285,9 @@ auto expand_li(
      * with a long immediate; or ADDI if we have a short immediate to deal with.
      */
     if (needs_leader) {
+        using namespace std::string_literals;
         auto synth        = raw;
-        synth.leader.text = "addiu";
+        synth.leader.text = "addi"s;
 
         /*
          * Pop the immediate.
@@ -2159,7 +2299,6 @@ auto expand_li(
          */
         synth.operands.push_back(synth.operands.back());
 
-
         /*
          * Synthesise out own immediate.
          */
@@ -2169,17 +2308,19 @@ auto expand_li(
             auto immediate = ast::Operand{};
             immediate.ingredients.push_back(lx.make_synth(
                 std::format("0x{:x}", lo), TOKEN::LITERAL_INTEGER));
+
+            if (is_unsigned or important_hi) {
+                immediate.ingredients.back().text += 'u';
+            }
+
             synth.operands.push_back(immediate);
         }
 
-        cooked.push_back(emit_instruction(synth));
+        cooked.push_back(expand_immediate_arithmetic(synth).front());
     } else {
         using namespace std::string_literals;
         auto synth        = raw;
         synth.leader.text = "addi"s;
-        if (is_unsigned) {
-            synth.leader.text += 'u';
-        }
 
         /*
          * Copy the last element (ie, the immediate operand) to easily reuse it.
@@ -2201,13 +2342,32 @@ auto expand_li(
                 viua::libs::lexer::TOKEN::ZERO_SIGNED;
         }
 
-        cooked.push_back(emit_instruction(synth));
+        /*
+         * Synthesise out own immediate.
+         */
+        {
+            using viua::libs::lexer::TOKEN;
+            auto const& lx = raw.operands.back().ingredients.at(0);
+            auto immediate = ast::Operand{};
+            immediate.ingredients.push_back(lx.make_synth(
+                std::format("0x{:x}", lo), TOKEN::LITERAL_INTEGER));
+
+            if (is_unsigned) {
+                immediate.ingredients.back().text += 'u';
+            }
+
+            synth.operands.pop_back();
+            synth.operands.push_back(immediate);
+        }
+
+        cooked.push_back(expand_immediate_arithmetic(synth).front());
     }
 
     std::println(stdout, "        cooked into {} op(s)", cooked.size());
 
     return cooked;
 }
+
 auto expand_delete(
     ast::Instruction const& raw) -> Text
 {
@@ -2225,6 +2385,7 @@ auto expand_delete(
 
     return { emit_instruction(synth) };
 }
+
 auto expand_flow_control(
     ast::Instruction const& raw,
     std::vector<Elf64_Sym>& symbol_table,
@@ -2334,6 +2495,7 @@ auto expand_flow_control(
 
     return cooked;
 }
+
 auto expand_call(
     ast::Instruction const& raw,
     std::vector<Elf64_Sym>& symbol_table,
@@ -2481,6 +2643,7 @@ auto expand_call(
 
     return cooked;
 }
+
 auto expand_atom(
     ast::Instruction const& raw) -> Text
 {
@@ -2519,6 +2682,7 @@ auto expand_atom(
 
     return cooked;
 }
+
 auto expand_double(
     ast::Instruction const& raw) -> Text
 {
@@ -2557,6 +2721,7 @@ auto expand_double(
 
     return cooked;
 }
+
 auto expand_return(
     ast::Instruction const& raw) -> Text
 {
@@ -2579,6 +2744,7 @@ auto expand_return(
 
     return { emit_instruction(synth) };
 }
+
 auto expand_memory_access(
     ast::Instruction const& raw) -> Text
 {
@@ -2641,78 +2807,7 @@ auto expand_memory_access(
 
     return { emit_instruction(synth) };
 }
-auto expand_styled_arithmetic(
-    ast::Instruction const& raw) -> Text
-{
-    using namespace std::string_literals;
-    auto synth = ast::Instruction{};
 
-    auto opcode_view     = std::string_view{ raw.leader.text };
-    auto const operation = opcode_view.substr(0, opcode_view.find('.'));
-    auto const style     = (opcode_view.find('.') == std::string_view::npos)
-                               ? "native"
-                               : opcode_view.substr(opcode_view.find('.') + 1);
-
-    synth.leader      = raw.leader;
-    synth.leader.text = operation;
-
-    synth.operands.push_back(raw.operands.at(0));
-    synth.operands.front().ingredients.resize(1);
-    if (style == "saturate" or style == "wrap" or style == "trap"
-        or style == "native") {
-        synth.operands.front().ingredients.front().text = style;
-    } else {
-        using viua::libs::errors::compile_time::Cause;
-        using viua::libs::errors::compile_time::Error;
-        throw Error{ raw.leader,
-                     Cause::Invalid_arithmetic_style,
-                     std::string{ style } };
-    }
-
-    synth.operands.push_back(raw.operands.at(0));
-    synth.operands.push_back(raw.operands.at(1));
-    synth.operands.push_back(raw.operands.at(2));
-
-    return { emit_instruction(synth) };
-}
-auto expand_immediate_arithmetic(
-    ast::Instruction const& raw) -> Text
-{
-    using namespace std::string_literals;
-    auto synth = ast::Instruction{};
-
-    auto opcode_view     = std::string_view{ raw.leader.text };
-    auto const operation = opcode_view.substr(0, opcode_view.find('.'));
-    auto const style     = (opcode_view.find('.') == std::string_view::npos)
-                               ? "native"
-                               : opcode_view.substr(opcode_view.find('.') + 1);
-
-    synth.leader      = raw.leader;
-    synth.leader.text = operation;
-
-    synth.operands.push_back(raw.operands.at(0));
-    synth.operands.front().ingredients.resize(1);
-    if (style == "saturate" or style == "wrap" or style == "trap"
-        or style == "native") {
-        synth.operands.front().ingredients.front().text = style;
-    } else {
-        using viua::libs::errors::compile_time::Cause;
-        using viua::libs::errors::compile_time::Error;
-        throw Error{ raw.leader,
-                     Cause::Invalid_arithmetic_style,
-                     std::string{ style } };
-    }
-
-    if (raw.operands.back().ingredients.back().text.back() == 'u') {
-        synth.leader.text += 'u';
-    }
-
-    synth.operands.push_back(raw.operands.at(0));
-    synth.operands.push_back(raw.operands.at(1));
-    synth.operands.push_back(raw.operands.at(2));
-
-    return { emit_instruction(synth) };
-}
 auto expand_cast(
     ast::Instruction const& raw) -> Text
 {
@@ -2754,6 +2849,13 @@ auto expand_cast(
     return { emit_instruction(synth) };
 }
 
+/*
+ * expand_instruction() takes an AST node representing an instruction or a
+ * pseudoinstruction, and returns a sequence of encoded instructions.
+ *
+ * This is the main function responsible for turning pseudoinstructions into
+ * real instructions.
+ */
 auto expand_instruction(
     ast::Instruction const& raw,
     std::vector<Elf64_Sym>& symbol_table,
@@ -2810,68 +2912,62 @@ auto expand_instruction(
         "subi",
         "muli",
         "divi",
-
-        "addi.native",
-        "subi.native",
-        "muli.native",
-        "divi.native",
-
-        "addi.wrap",
-        "subi.wrap",
-        "muli.wrap",
-        "divi.wrap",
-
-        "addi.saturate",
-        "subi.saturate",
-        "muli.saturate",
-        "divi.saturate",
-
-        "addi.trap",
-        "subi.trap",
-        "muli.trap",
-        "divi.trap",
     };
     auto const styled_arithmetic = std::set<std::string_view>{
-        "add",          "sub",          "mul",          "div",
-
-        "add.native",   "sub.native",   "mul.native",   "div.native",
-
-        "add.wrap",     "sub.wrap",     "mul.wrap",     "div.wrap",
-
-        "add.saturate", "sub.saturate", "mul.saturate", "div.saturate",
-
-        "add.trap",     "sub.trap",     "mul.trap",     "div.trap",
+        "add",
+        "sub",
+        "mul",
+        "div",
     };
 
-    auto const opcode = std::string_view{ raw.leader.text };
+    /*
+     * The full view is whatever is found in the source. This is not always what
+     * we want, since eg, an arithmetic instruction may be followed by a style
+     * flag. Thus, we also have the base view ie, the "core" of the opcode
+     * without anything tacked on to it.
+     */
+    auto const full_opcode_view = std::string_view{ raw.leader.text };
+    auto const base_opcode_view =
+        full_opcode_view.substr(0, full_opcode_view.find('.'));
 
-    if (opcode == "li") {
+    std::println("considering for expansion: {} ({})",
+                 base_opcode_view,
+                 full_opcode_view);
+
+    if (base_opcode_view == "li") {
         return expand_li(raw);
-    } else if (opcode == "delete") {
+    } else if (base_opcode_view == "delete") {
         return expand_delete(raw);
-    } else if (opcode == "if") {
+    } else if (base_opcode_view == "if") {
         return expand_flow_control(raw, symbol_table, symbol_map, decl_map);
-    } else if (opcode == "call" or opcode == "actor") {
+    } else if (base_opcode_view == "call" or base_opcode_view == "actor") {
         return expand_call(raw, symbol_table, symbol_map);
-    } else if (opcode == "return") {
+    } else if (base_opcode_view == "return") {
         return expand_return(raw);
-    } else if (opcode == "atom") {
+    } else if (base_opcode_view == "atom") {
         return expand_atom(raw);
-    } else if (opcode == "double") {
+    } else if (base_opcode_view == "double") {
         return expand_double(raw);
-    } else if (memory_access.contains(opcode)) {
+    } else if (memory_access.contains(base_opcode_view)) {
         return expand_memory_access(raw);
-    } else if (styled_arithmetic.contains(opcode)) {
+    } else if (styled_arithmetic.contains(base_opcode_view)) {
         return expand_styled_arithmetic(raw);
-    } else if (opcode == "cast") {
+    } else if (base_opcode_view == "cast") {
         return expand_cast(raw);
-    } else if (immediate_signed_arithmetic.contains(opcode)) {
+    } else if (immediate_signed_arithmetic.contains(base_opcode_view)) {
         return expand_immediate_arithmetic(raw);
     } else {
         return { emit_instruction(raw) };
     }
 }
 
+/*
+ * cook_instructions() takes in a sequence of AST nodes and returns a sequence
+ * of encoded instructions ie, the text of the program; it also populates the
+ * symbol table.
+ *
+ * The function assumes input containing pseudoinstructions.
+ */
 auto cook_instructions(
     std::vector<std::unique_ptr<ast::Node>> const& nodes,
     std::vector<uint8_t> const& rodata_buf,
