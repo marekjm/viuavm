@@ -47,7 +47,7 @@ auto ston_int_impl(
     -> std::conditional_t<std::is_signed_v<T>, int64_t, uint64_t>
 {
     if constexpr (std::is_signed_v<T>) {
-        return viua::support::sign_extend<T>(std::stoll(n, nullptr, base));
+        return std::stoll(n, nullptr, base);
     } else {
         return std::stoull(n, nullptr, base);
     }

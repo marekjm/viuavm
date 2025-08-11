@@ -2009,6 +2009,16 @@ auto emit_instruction(
                     };
                     std::println("cooked U: {}", r.to_string());
                     return r.encode();
+                } catch (std::out_of_range const&) {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+                    throw Error{ imm,
+                                 Cause::Invalid_operand,
+                                 "value out of range" }
+                        .add(insn.leader)
+                        .aside(
+                            std::format("immediate of {} must fit into 32 bits",
+                                        insn.leader.text));
                 } catch (std::invalid_argument const&) {
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
@@ -2205,7 +2215,8 @@ auto expand_li(
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
         throw Error{ raw_value, Cause::Invalid_operand, "value out of range" }
-            .add(raw.leader);
+            .add(raw.leader)
+            .aside("immediate of li must fit into 64 bits");
     } catch (std::invalid_argument const&) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
@@ -2350,7 +2361,9 @@ auto expand_li(
             auto const& lx = raw.operands.back().ingredients.at(0);
             auto immediate = ast::Operand{};
             immediate.ingredients.push_back(lx.make_synth(
-                std::format("0x{:x}", lo), TOKEN::LITERAL_INTEGER));
+                (is_unsigned ? std::to_string(lo)
+                             : std::to_string(static_cast<int32_t>(lo))),
+                TOKEN::LITERAL_INTEGER));
 
             if (is_unsigned) {
                 immediate.ingredients.back().text += 'u';
