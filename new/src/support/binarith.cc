@@ -93,6 +93,45 @@ auto signed_type::size() const -> size_type
 {
     return n.size();
 }
+auto signed_type::in_range(
+    size_type const width) const -> bool
+{
+    if (width == 0) {
+        return false;
+    }
+
+    /*
+     * A smaller sized integer is always representable in a bigger sized
+     * integer.
+     */
+    if (size() <= width) {
+        return true;
+    }
+
+    /*
+     * A zero is always a zero, so we can take the easy way out if one is found.
+     */
+    if (not static_cast<bool>(*this)) {
+        return true;
+    }
+
+    /*
+     * If the expected width is smaller than the current width, we have to check
+     * if all the bits after the would-be sign bit are the same.
+     *
+     * Why? Becuase it ensures that we can cut the number of bits to the
+     * expected size, but preserve the value represented by those bits. This is
+     * only possible with a consistent pattern of bits.
+     */
+    auto sign_bit = n.at(width - 1);
+    for (auto i = width; i < size(); ++i) {
+        if (n.at(i) != sign_bit) {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 auto signed_type::sign() const -> int
 {
@@ -262,15 +301,23 @@ auto make_arithmetic(
     auto const raw = signed_type{ arithmetic_type{ v } };
     auto const val = signed_type{ extend(raw.n, width) };
 
-    if (raw.sign() == val.sign()) {
+    if (raw.in_range(width)) {
         return val;
     }
 
-    if ((raw.sign() == 1) and (val.sign() == -1)) {
-        return signed_type::max(width);
-    } else {
-        return signed_type::min(width);
-    }
+    /*
+     * If the value is not in range there are only two options we have to
+     * consider: either the maximum or the minimum has been exceeded.
+     *
+     * It is not actually necessary to know what the exact original value was,
+     * as we are not able to represent it anyway, and just knowing the sign is
+     * enough to produce correct behaviour.
+     *
+     * If the value was too, big return the maximum; if it was too small, return
+     * the minimum. Et voila!
+     */
+    return (raw.sign() == 1) ? signed_type::max(width)
+                             : signed_type::min(width);
 }
 
 auto operator+(

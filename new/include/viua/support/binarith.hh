@@ -134,6 +134,7 @@ struct signed_type {
     }
 
     auto size() const -> size_type;
+    auto in_range(size_type const) const -> bool;
 
     auto sign() const -> int;
 };
