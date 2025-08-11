@@ -41,8 +41,8 @@ def colorise_repr(color, s, style=DEFAULT_QUOTE_STYLE):
             "’",  # U+2019
         ),
     }
-    left_quote = "⌞"
-    right_quote = "⌝"
+    left_quote = styles[style][0]
+    right_quote = styles[style][1]
     c = colorise(color, repr(s)[1:-1])
     return f"{left_quote}{c}{right_quote}"
 
