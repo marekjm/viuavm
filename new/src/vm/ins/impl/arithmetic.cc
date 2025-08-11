@@ -19,14 +19,35 @@
 
 #include <stdint.h>
 
+#include <optional>
 #include <print>
 
 #include <viua/arch/arch.h>
 #include <viua/support/binarith.hh>
 #include <viua/vm/ins.h>
 
+
 namespace {
 using viua::vm::Stack;
+
+auto make_arithmetic(
+    int64_t const v,
+    size_t const width,
+    viua::arch::opcode_type const style)
+    -> std::optional<viua::arithmetic::signed_type>
+{
+    switch (style) {
+        using namespace viua::arch::ops::OPCODE_FLAGS;
+        case ARITHMETIC_STYLE_WRAP:
+            return viua::arithmetic::fixed::make_arithmetic(v, width);
+        case ARITHMETIC_STYLE_TRAP:
+            return viua::arithmetic::fixed::make_arithmetic(v, width);
+        case ARITHMETIC_STYLE_SATURATE:
+            return viua::arithmetic::saturating::make_arithmetic(v, width);
+    }
+
+    return std::nullopt;
+}
 
 auto calculate_add(
     Stack& stack,
@@ -38,9 +59,25 @@ auto calculate_add(
 
     auto const arithmetic_width = stack.proc->arithmetic_width;
     auto const arithmetic_lhs =
-        signed_type{ extend(arithmetic_type{ lhs }, arithmetic_width) };
+        make_arithmetic(lhs, arithmetic_width, style)
+            .or_else(
+                [&stack]() -> std::optional<signed_type>
+                {
+                    throw viua::vm::abort_execution{
+                        stack, "cannot make arithmetic value with bad style"
+                    };
+                })
+            .value();
     auto const arithmetic_rhs =
-        signed_type{ extend(arithmetic_type{ rhs }, arithmetic_width) };
+        make_arithmetic(rhs, arithmetic_width, style)
+            .or_else(
+                [&stack]() -> std::optional<signed_type>
+                {
+                    throw viua::vm::abort_execution{
+                        stack, "cannot make arithmetic value with bad style"
+                    };
+                })
+            .value();
 
     switch (style) {
         using namespace viua::arch::ops::OPCODE_FLAGS;
@@ -533,7 +570,7 @@ auto execute(
 }
 
 template<typename Op>
-auto execute_arithmetic_immediate_op(
+auto native_arithmetic_immediate_op(
     Op const op,
     Stack& stack) -> void
 {
@@ -583,6 +620,62 @@ auto execute_arithmetic_immediate_op(
         "unsupported lhs operand type for immediate arithmetic operation: "
             + std::string{ in.type_name() }
     };
+}
+template<typename Op>
+auto styled_arithmetic_immediate_op(
+    Op const op,
+    viua::arch::opcode_type const style,
+    Stack& stack) -> void
+{
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.in);
+
+    constexpr auto const signed_immediate =
+        std::is_signed_v<typename Op::value_type>;
+    using immediate_type =
+        typename std::conditional<signed_immediate, int64_t, uint64_t>::type;
+    auto const immediate =
+        (signed_immediate
+             ? viua::support::sign_extend<immediate_type>(
+                   op.instruction.immediate)
+             : static_cast<immediate_type>(op.instruction.immediate));
+
+    auto const lhs_i64 = lhs.template holds<register_type::int_type>();
+    auto const lhs_u64 = lhs.template holds<register_type::uint_type>();
+
+    if (lhs_i64) {
+        out = calculate_add(stack,
+                            style,
+                            *lhs.template get<int64_t>(),
+                            static_cast<int64_t>(immediate));
+        return;
+    }
+    if (lhs_u64) {
+        out = calculate_add(stack,
+                            style,
+                            *lhs.template get<uint64_t>(),
+                            static_cast<uint64_t>(immediate));
+        return;
+    }
+
+    throw abort_execution{
+        stack,
+        "unsupported operand types for styled immediate arithmetic operation"
+    };
+}
+
+template<typename Op>
+auto execute_arithmetic_immediate_op(
+    Op const op,
+    Stack& stack) -> void
+{
+    using namespace viua::arch::ops;
+    auto const style = op.instruction.opcode & OPCODE_FLG_MASK;
+    if (style == OPCODE_FLAGS::ARITHMETIC_STYLE_NATIVE) {
+        return native_arithmetic_immediate_op(op, stack);
+    } else {
+        return styled_arithmetic_immediate_op(op, style, stack);
+    }
 }
 auto execute(
     ADDI const op,

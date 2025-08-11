@@ -134,6 +134,8 @@ struct signed_type {
     }
 
     auto size() const -> size_type;
+
+    auto sign() const -> int;
 };
 auto operator<(signed_type const, zero_type const) -> bool;
 auto operator>(signed_type const, zero_type const) -> bool;
@@ -198,12 +200,16 @@ auto div(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
 }  // namespace bits
 
 namespace fixed {
+auto make_arithmetic(int64_t const, size_t const) -> signed_type;
+
 auto operator+(signed_type const, signed_type const) -> signed_type;
 auto operator-(signed_type const, signed_type const) -> signed_type;
 auto operator*(signed_type const, signed_type const) -> signed_type;
 }  // namespace fixed
 
 namespace saturating {
+auto make_arithmetic(int64_t const, size_t const) -> signed_type;
+
 auto operator+(signed_type const, signed_type const) -> signed_type;
 auto operator-(signed_type const, signed_type const) -> signed_type;
 auto operator*(signed_type const, signed_type const) -> signed_type;

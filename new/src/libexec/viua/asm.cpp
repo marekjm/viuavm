@@ -1905,11 +1905,13 @@ auto emit_instruction(
             {
                 auto const raw =
                     operand_or_throw(insn, 1).ingredients.front().text;
+
                 auto val = static_cast<uint32_t>(std::stoul(raw, nullptr, 0));
                 if (static_cast<OPCODE>(opcode) == OPCODE::FLOAT) {
                     auto tmp = std::stof(raw);
                     memcpy(&val, &tmp, sizeof(val));
                 }
+
                 return viua::arch::ops::I{
                     opcode, operand_or_throw(insn, 0).make_access(), val
                 }
@@ -1917,7 +1919,40 @@ auto emit_instruction(
             }
         case FORMAT::U:
             {
-                auto const imm = insn.operands.at(2).ingredients.front();
+                auto fst_register_operand = size_t{ 0 };
+                auto const is_styled_arithmetic = (
+                     opcode == static_cast<opcode_type>(OPCODE::ADDI)
+                     or opcode == static_cast<opcode_type>(OPCODE::SUBI)
+                     or opcode == static_cast<opcode_type>(OPCODE::MULI)
+                     or opcode == static_cast<opcode_type>(OPCODE::DIVI));
+                if (is_styled_arithmetic) {
+                    /*
+                     * Skip the style operand.
+                     */
+                    ++fst_register_operand;
+
+                    using namespace viua::arch::ops::OPCODE_FLAGS;
+                    auto const style =
+                        operand_or_throw(insn, 0).ingredients.front();
+                    if (style == "native") {
+                        opcode = (opcode | ARITHMETIC_STYLE_NATIVE);
+                    } else if (style == "saturate") {
+                        opcode = (opcode | ARITHMETIC_STYLE_SATURATE);
+                    } else if (style == "wrap") {
+                        opcode = (opcode | ARITHMETIC_STYLE_WRAP);
+                    } else if (style == "trap") {
+                        opcode = (opcode | ARITHMETIC_STYLE_TRAP);
+                    } else {
+                        using viua::libs::errors::compile_time::Cause;
+                        using viua::libs::errors::compile_time::Error;
+                        throw Error{ style,
+                                     Cause::Invalid_arithmetic_style,
+                                     style.text }
+                            .add(operand_or_throw(insn, 0).leader);
+                    }
+                }
+
+                auto const imm = insn.operands.at(fst_register_operand + 2).ingredients.front();
                 auto const is_unsigned =
                     (static_cast<opcode_type>(opcode)
                      & viua::arch::ops::OPCODE_FLAGS::UNSIGNED);
@@ -1941,6 +1976,7 @@ auto emit_instruction(
                                  Cause::Value_out_of_range,
                                  "unsigned integer used for signed immediate" };
                 }
+
                 try {
                     auto val = uint32_t{};
                     if (is_unsigned) {
@@ -1954,8 +1990,8 @@ auto emit_instruction(
                                  static_cast<int32_t>(val));
                     auto const r =
                         viua::arch::ops::U{ opcode,
-                                            insn.operands.at(0).make_access(),
-                                            insn.operands.at(1).make_access(),
+                                            insn.operands.at(fst_register_operand + 0).make_access(),
+                                            insn.operands.at(fst_register_operand + 1).make_access(),
                                             val };
                     std::println("cooked U: {}", r.to_string());
                     return r.encode();
@@ -2643,10 +2679,39 @@ auto expand_styled_arithmetic(
 auto expand_immediate_arithmetic(
     ast::Instruction const& raw) -> Text
 {
-    auto synth = raw;
-    if (synth.operands.back().ingredients.back().text.back() == 'u') {
+    using namespace std::string_literals;
+    auto synth = ast::Instruction{};
+
+    auto opcode_view     = std::string_view{ raw.leader.text };
+    auto const operation = opcode_view.substr(0, opcode_view.find('.'));
+    auto const style     = (opcode_view.find('.') == std::string_view::npos)
+                               ? "native"
+                               : opcode_view.substr(opcode_view.find('.') + 1);
+
+    synth.leader      = raw.leader;
+    synth.leader.text = operation;
+
+    synth.operands.push_back(raw.operands.at(0));
+    synth.operands.front().ingredients.resize(1);
+    if (style == "saturate" or style == "wrap" or style == "trap"
+        or style == "native") {
+        synth.operands.front().ingredients.front().text = style;
+    } else {
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{ raw.leader,
+                     Cause::Invalid_arithmetic_style,
+                     std::string{ style } };
+    }
+
+    if (raw.operands.back().ingredients.back().text.back() == 'u') {
         synth.leader.text += 'u';
     }
+
+    synth.operands.push_back(raw.operands.at(0));
+    synth.operands.push_back(raw.operands.at(1));
+    synth.operands.push_back(raw.operands.at(2));
+
     return { emit_instruction(synth) };
 }
 auto expand_cast(
@@ -2746,6 +2811,26 @@ auto expand_instruction(
         "subi",
         "muli",
         "divi",
+
+        "addi.native",
+        "subi.native",
+        "muli.native",
+        "divi.native",
+
+        "addi.wrap",
+        "subi.wrap",
+        "muli.wrap",
+        "divi.wrap",
+
+        "addi.saturate",
+        "subi.saturate",
+        "muli.saturate",
+        "divi.saturate",
+
+        "addi.trap",
+        "subi.trap",
+        "muli.trap",
+        "divi.trap",
     };
     auto const styled_arithmetic = std::set<std::string_view>{
         "add",          "sub",          "mul",          "div",

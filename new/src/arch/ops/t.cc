@@ -66,7 +66,9 @@ auto T::to_string() const -> std::string
     auto const operation = static_cast<OPCODE>(opcode & OPCODE_OPC_MASK);
     auto const is_arithmetic =
         (operation == OPCODE::ADD or operation == OPCODE::SUB
-         or operation == OPCODE::MUL or operation == OPCODE::DIV);
+         or operation == OPCODE::MUL or operation == OPCODE::DIV
+         or operation == OPCODE::ADDI or operation == OPCODE::SUBI
+         or operation == OPCODE::MULI or operation == OPCODE::DIVI);
     auto const style =
         (flags == OPCODE_FLAGS::ARITHMETIC_STYLE_NATIVE)     ? ".native"
         : (flags == OPCODE_FLAGS::ARITHMETIC_STYLE_WRAP)     ? ".wrap"

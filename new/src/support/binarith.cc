@@ -94,6 +94,21 @@ auto signed_type::size() const -> size_type
     return n.size();
 }
 
+auto signed_type::sign() const -> int
+{
+    auto sign_bit = n[size() - 1];
+
+    if (sign_bit) {
+        return -1;
+    }
+
+    if (static_cast<bool>(*this)) {
+        return 1;
+    }
+
+    return 0;
+}
+
 auto signed_type::max(
     size_type const size) -> signed_type
 {
@@ -204,6 +219,13 @@ auto operator==(
  * Implementation of wrapping arithmetic.
  */
 namespace viua::arithmetic::fixed {
+auto make_arithmetic(
+    int64_t const v,
+    size_t const width) -> signed_type
+{
+    return signed_type{ extend(arithmetic_type{ v }, width) };
+}
+
 auto operator+(
     signed_type const lhs,
     signed_type const rhs) -> signed_type
@@ -232,6 +254,24 @@ auto operator*(
  */
 namespace viua::arithmetic::saturating {
 constexpr auto DEBUG_SATURATING = false;
+
+auto make_arithmetic(
+    int64_t const v,
+    size_t const width) -> signed_type
+{
+    auto const raw = signed_type{ arithmetic_type{ v } };
+    auto const val = signed_type{ extend(raw.n, width) };
+
+    if (raw.sign() == val.sign()) {
+        return val;
+    }
+
+    if ((raw.sign() == 1) and (val.sign() == -1)) {
+        return signed_type::max(width);
+    } else {
+        return signed_type::min(width);
+    }
+}
 
 auto operator+(
     signed_type const lhs,
