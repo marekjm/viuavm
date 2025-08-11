@@ -23,6 +23,7 @@
 #include <stdint.h>
 
 #include <chrono>
+#include <map>
 
 
 namespace viua::vm {
@@ -34,6 +35,8 @@ struct Performance_counters {
     using time_point_type = std::chrono::time_point<std::chrono::steady_clock>;
     time_point_type bang{};
     time_point_type death{};
+
+    std::map<uint16_t, uint64_t> ops_counter;
 
     inline auto start() -> void
     {

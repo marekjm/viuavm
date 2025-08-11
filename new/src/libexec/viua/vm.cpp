@@ -115,7 +115,14 @@ auto run(
 
     using viua::vm::PREEMPTION_THRESHOLD;
     for (auto i = size_t{ 0 }; i < PREEMPTION_THRESHOLD and ip_ok(); ++i) {
+        if (proc.stack.ip) {
+            auto const opcode = static_cast<viua::arch::opcode_type>(
+                *proc.stack.ip & viua::arch::ops::OPCODE_OPC_MASK);
+            ++proc.core->perf_counters.ops_counter[opcode];
+        }
+
         proc.stack.ip = viua::vm::ins::execute(proc.stack, proc.stack.ip);
+
         ++proc.core->perf_counters.total_ops_executed;
     }
 
@@ -177,6 +184,14 @@ auto run(
                            << viua::TRACE_STREAM.endl;
         viua::TRACE_STREAM << "[vm:perf] approximate frequency "
                            << format_hz(approx_hz) << viua::TRACE_STREAM.endl;
+
+        for (auto const [opcode, counter] : core.perf_counters.ops_counter) {
+            viua::TRACE_STREAM
+                << std::format("[vm:perf:hit-rate] {} {}",
+                               counter,
+                               viua::arch::ops::to_string(opcode))
+                << viua::TRACE_STREAM.endl;
+        }
     }
 }
 }  // namespace

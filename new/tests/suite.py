@@ -4,6 +4,7 @@ import datetime
 import enum
 import glob
 import io
+import math
 import os
 import re
 import random
@@ -180,6 +181,7 @@ EBREAK_MEMORY_LINE = re.compile(
 EBREAK_GLOBALS_LINE = re.compile(r"([a-z_][a-zA-Z0-9_]*) = (is|iu|fl|db) (.*)")
 EBREAK_ENVIRONMENT_LINE = re.compile(r"\[([a-z_][a-zA-Z0-9_]*)\] (.+)")
 PERF_OPS_AND_RUNTIME = re.compile(r"\[vm:perf\] executed ops (\d+), run time (.+)")
+PERF_HIT_RATE = re.compile(r"\[vm:perf:hit-rate\] (\d+) (.+)")
 PERF_APPROX_FREQ = re.compile(r"\[vm:perf\] approximate frequency (.+ [kMG]?Hz)")
 
 
@@ -902,6 +904,7 @@ def run_and_capture(start_timepoint, interpreter, executable, *, args=(), stdin=
         "ops": 0,
         "run_time": None,
         "freq": None,
+        "hit-rate": {},
     }
 
     for each in lines[::-1]:
@@ -910,6 +913,10 @@ def run_and_capture(start_timepoint, interpreter, executable, *, args=(), stdin=
             perf["run_time"] = m.group(2)
         elif m := PERF_APPROX_FREQ.fullmatch(each):
             perf["freq"] = m.group(1)
+        elif m := PERF_HIT_RATE.fullmatch(each):
+            counter = int(m.group(1))
+            opcode = m.group(2)
+            perf["hit-rate"][opcode] = counter
         else:
             break
 
@@ -1696,6 +1703,7 @@ def main(args):
                                 perf["ops"],
                                 vm_time,
                                 freq,
+                                perf["hit-rate"],
                             )
                         )
 
@@ -1905,6 +1913,60 @@ def main(args):
             colorise(MAX_COLOUR, format_freq(perf_freq_max)) if perf_time else "--",
         )
     )
+
+    print("\ninstruction hit rate")
+    perf_hit_rates = {}
+    for hit_rates in map(lambda x: x[3], perf_stats):
+        for opcode, counter in hit_rates.items():
+            perf_hit_rates.setdefault(opcode, 0)
+            perf_hit_rates[opcode] += counter
+
+    total_hits = sum(perf_hit_rates.values())
+    perf_hit_rates = sorted(perf_hit_rates.items(), key=lambda x: x[1], reverse=True)
+    highest_share = perf_hit_rates[0][1]
+    for i, (
+        opcode,
+        counter,
+    ) in enumerate(perf_hit_rates):
+        share_of_total = (counter / total_hits) * 100.0
+
+        # Why 66? Because it is 101 - (length of the report text).
+        #
+        # Where did the 101 came from? It is the length of a case report line.
+        bar_size = 66
+        bar_size = math.ceil(bar_size * (counter / highest_share))
+        bar = "#" * bar_size
+
+        fillchar = " "
+        op_connecting_char = " "
+        cr_connecting_char = " "
+        if colored is None:
+            fillchar = "–" if (i % 2) else " "
+            op_connecting_char = ">" if (i % 2) else " "
+            cr_connecting_char = "<" if (i % 2) else " "
+        opcode = (f"{opcode} {op_connecting_char}").ljust(18, fillchar)
+        counter = (f"{cr_connecting_char} {counter}").rjust(6, fillchar)
+
+        hit_report = "{}{}  {:5.2f}% {}".format(
+            opcode,
+            counter,
+            share_of_total,
+            bar,
+        )
+        if colored is not None:
+            fg = i % 2
+            bg = int(not fg)
+
+            colors = (
+                "white",
+                "black",
+            )
+            fg = colored.fg(colors[fg])
+            bg = colored.bg(colors[bg])
+
+            hit_report = fg + bg + hit_report + colored.attr("reset")
+
+        print(f"  {hit_report}")
 
     return run_exit_code
 
