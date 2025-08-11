@@ -1049,8 +1049,7 @@ auto parse(
                 auto m =
                     q(BOLD + viua::libs::lexer::to_string(each.token) + NORM)
                     + " cannot appear at top level";
-                throw Error{ each, Cause::Unexpected_token, std::move(m) }.note(
-                    "refer to viua-asm-lang(1) for more information");
+                throw Error{ each, Cause::Unexpected_token, std::move(m) };
         }
     }
 
