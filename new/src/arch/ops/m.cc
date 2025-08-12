@@ -20,6 +20,8 @@
 #include <endian.h>
 #include <stdint.h>
 
+#include <format>
+
 #include <viua/arch/arch.h>
 #include <viua/arch/ops.h>
 

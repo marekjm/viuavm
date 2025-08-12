@@ -558,6 +558,18 @@ constexpr inline auto carve_format_out(
     return carve_format_out(static_cast<viua::arch::opcode_type>(o));
 }
 
+constexpr inline auto carve_flags_out(
+    viua::arch::opcode_type const o) -> viua::arch::opcode_type
+{
+    return static_cast<viua::arch::opcode_type>(
+        o & viua::arch::ops::OPCODE_FLG_MASK);
+}
+constexpr inline auto carve_flags_out(
+    viua::arch::ops::OPCODE const o) -> viua::arch::opcode_type
+{
+    return carve_flags_out(static_cast<viua::arch::opcode_type>(o));
+}
+
 struct compose_filler {
     size_t const size;
 };

@@ -19,6 +19,7 @@
 
 #include <stdint.h>
 
+#include <format>
 #include <string>
 
 #include <viua/arch/arch.h>

@@ -340,9 +340,8 @@ auto execute(
     Stack& stack,
     ip_type const ip) -> void
 {
-    using namespace viua::arch::ops;
-    auto const style = op.instruction.opcode & OPCODE_FLG_MASK;
-    if (style == OPCODE_FLAGS::ARITHMETIC_STYLE_NATIVE) {
+    auto const style = viua::carve_flags_out(op.instruction.opcode);
+    if (style == viua::arch::ops::OPCODE_FLAGS::ARITHMETIC_STYLE_NATIVE) {
         return native_add(op, stack, ip);
     } else {
         return styled_add(op, style, stack, ip);
@@ -417,9 +416,8 @@ auto execute(
     Stack& stack,
     ip_type const ip) -> void
 {
-    using namespace viua::arch::ops;
-    auto const style = op.instruction.opcode & OPCODE_FLG_MASK;
-    if (style == OPCODE_FLAGS::ARITHMETIC_STYLE_NATIVE) {
+    auto const style = viua::carve_flags_out(op.instruction.opcode);
+    if (style == viua::arch::ops::OPCODE_FLAGS::ARITHMETIC_STYLE_NATIVE) {
         return native_sub(op, stack, ip);
     } else {
         return styled_sub(op, style, stack, ip);
@@ -494,9 +492,8 @@ auto execute(
     Stack& stack,
     ip_type const ip) -> void
 {
-    using namespace viua::arch::ops;
-    auto const style = op.instruction.opcode & OPCODE_FLG_MASK;
-    if (style == OPCODE_FLAGS::ARITHMETIC_STYLE_NATIVE) {
+    auto const style = viua::carve_flags_out(op.instruction.opcode);
+    if (style == viua::arch::ops::OPCODE_FLAGS::ARITHMETIC_STYLE_NATIVE) {
         return native_mul(op, stack, ip);
     } else {
         return styled_mul(op, style, stack, ip);
@@ -669,9 +666,9 @@ auto execute_arithmetic_immediate_op(
     Op const op,
     Stack& stack) -> void
 {
-    using namespace viua::arch::ops;
-    auto const style = op.instruction.opcode & OPCODE_FLG_MASK;
-    if (style == OPCODE_FLAGS::ARITHMETIC_STYLE_NATIVE) {
+    auto const style = viua::carve_flags_out(op.instruction.opcode);
+
+    if (style == viua::arch::ops::OPCODE_FLAGS::ARITHMETIC_STYLE_NATIVE) {
         return native_arithmetic_immediate_op(op, stack);
     } else {
         return styled_arithmetic_immediate_op(op, style, stack);
