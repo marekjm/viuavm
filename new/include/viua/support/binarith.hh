@@ -156,9 +156,38 @@ struct unsigned_type {
         T const v)
         : n{ v }
     {}
+    inline explicit unsigned_type(
+        arithmetic_type v)
+        : n{ std::move(v) }
+    {}
 
-    static auto max(size_type const) -> signed_type;
-    static auto min(size_type const) -> signed_type;
+    static auto max(size_type const) -> unsigned_type;
+    static auto min(size_type const) -> unsigned_type;
+    static auto zero(size_type const) -> unsigned_type;
+
+    template<typename T, typename = std::enable_if_t<std::is_unsigned_v<T>>>
+    explicit operator T() const
+    {
+        constexpr auto target_width = (sizeof(T) * 8);
+        if constexpr (false) {
+            if (target_width < n.size()) {
+                throw std::runtime_error{
+                    "narrowing direct static_cast from unsigned_type"
+                };
+            }
+        }
+
+        auto const fixed = extend(n, target_width, false);
+        std::bitset<target_width> bs{};
+        for (auto i = size_type{ 0 }; i < fixed.size(); ++i) {
+            bs.set(i, fixed.at(i));
+        }
+        return static_cast<T>(bs.to_ullong());
+    }
+
+    explicit operator bool() const;
+
+    auto size() const -> size_type;
 };
 
 

@@ -76,7 +76,7 @@ auto operator<<(
 
 
 /*
- * Details of the signed_type and unsigned_type.
+ * Details of the signed_type.
  */
 namespace viua::arithmetic {
 signed_type::operator bool() const
@@ -250,6 +250,39 @@ auto operator==(
         }
     }
     return true;
+}
+}  // namespace viua::arithmetic
+
+/*
+ * Details of the unsigned_type.
+ */
+namespace viua::arithmetic {
+unsigned_type::operator bool() const
+{
+    return static_cast<bool>(n);
+}
+
+auto unsigned_type::size() const -> size_type
+{
+    return n.size();
+}
+
+auto unsigned_type::max(
+    size_type const size) -> unsigned_type
+{
+    return unsigned_type{ arithmetic_type::of_size(size, true) };
+}
+
+auto unsigned_type::min(
+    size_type const size) -> unsigned_type
+{
+    return zero(size);
+}
+
+auto unsigned_type::zero(
+    size_type const size) -> unsigned_type
+{
+    return unsigned_type{ arithmetic_type::zero(size) };
 }
 }  // namespace viua::arithmetic
 
@@ -445,7 +478,7 @@ auto operator-(
      * function.
      */
     if (lhs == rhs) {
-        return signed_type{ extend(arithmetic_type{}, lhs.size(), false) };
+        return signed_type::zero(lhs.size());
     }
 
     auto const lhs_is_neg = lhs < zero_type{};
@@ -552,9 +585,101 @@ auto operator-(
 
 auto operator*(
     signed_type const lhs,
-    signed_type const) -> signed_type
+    signed_type const rhs) -> signed_type
 {
-    return signed_type::zero(lhs.size());
+    auto const raw = signed_type{ bits::mul(lhs.n, rhs.n) };
+
+    /*
+     * Detect zero early. Not having to deal with a zero and being able to only
+     * consider negative or positive numbers makes the algorithm surprisingly
+     * simpler. I did not expect it to be so, but someties life can be
+     * surprising.
+     */
+    if (not static_cast<bool>(raw)) {
+        return signed_type::zero(lhs.size());
+    }
+
+    /*
+     * At this point we are sure that we are dealing with non-zero values. First
+     * thing we should do is determine the expected sign of the result, as it is
+     * the easiest (but not foolproof!) way of determining whether or not
+     * overflow happened.
+     */
+    auto const lhs_negative                 = lhs < zero_type{};
+    auto const rhs_negative                 = rhs < zero_type{};
+    auto const expect_negative              = lhs_negative xor rhs_negative;
+    auto const expect_sign [[maybe_unused]] = expect_negative ? -1 : 1;
+
+    /*
+     * Cut the raw value to target size plus one, to detect if a carry happened.
+     * This is another easy (but, again, not foolproof!) way of spotting cases
+     * where we need to saturate.
+     */
+    auto const car = signed_type{ extend(raw.n, lhs.size() + 1) };
+    auto const val = signed_type{ extend(raw.n, lhs.size()) };
+
+    if constexpr (true) {
+        std::println("saturating operator*:");
+        std::println("  lhs: {}", to_string(lhs, false, DEFAULT_SEPARATOR));
+        std::println("  rhs: {}", to_string(rhs, false, DEFAULT_SEPARATOR));
+        std::println("  raw: {} ({})",
+                     to_string(raw, false, DEFAULT_SEPARATOR),
+                     static_cast<int16_t>(raw));
+        std::println("  car: {} (in range)",
+                     to_string(car, false, DEFAULT_SEPARATOR),
+                     (car.in_range(lhs.size()) ? "" : "not "));
+        std::println("  val: {}", to_string(val, false, DEFAULT_SEPARATOR));
+        std::println("  sign:");
+        std::println("    lhs: {:2d}", lhs_negative ? -1 : 1);
+        std::println("    rhs: {:2d}", rhs_negative ? -1 : 1);
+        std::println("    exp: {:2d}", expect_negative ? -1 : 1);
+        std::println("    raw: {:2d}", raw.sign());
+        std::println("    car: {:2d}", car.sign());
+        std::println("    val: {:2d}", val.sign());
+    }
+
+    /*
+     * Sometimes, the value is in range, but the sign is incorrect. This can
+     * happen when two negative numbers are multiplied. Consider:
+     *
+     *      -1  *sat8  -128
+     *
+     * The left hand operand (-1) is 1111'1111; and the right hand operand
+     * (-128) is 1000'000. They are both negative, so the expected sign of the
+     * result is positive.
+     *
+     * However, notice what the car and val look like in this case:
+     *
+     *      car  1'1000'0000
+     *      val    1000'0000
+     *
+     * The car is simply sign-extended val! Obviously, this means that car fits
+     * perfectly in our target range, so no overflow happened. This is an
+     * incorrect conclusion, since val is negative while we expect to get a
+     * positive result.
+     *
+     * Thus the need to make sure that the sign of the value actually matches
+     * what we expect, even if the value is seemingly in range.
+     */
+    if (car.in_range(lhs.size()) and (val.sign() == expect_sign)) {
+        return val;
+    }
+
+    /*
+     * Consider the case of:
+     *
+     *      127  *sat8  127
+     */
+    if ((car.sign() == 1) and (val.sign() == expect_sign)) {
+        return val;
+    }
+
+    /*
+     * In case of overflow, just return the positive or negative maximum, as
+     * necessary depending on the expected sign.
+     */
+    return expect_negative ? signed_type::min(lhs.size())
+                           : signed_type::max(lhs.size());
 }
 }  // namespace viua::arithmetic::saturating
 
