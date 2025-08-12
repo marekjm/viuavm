@@ -1914,7 +1914,6 @@ def main(args):
         )
     )
 
-    print("\ninstruction hit rate")
     perf_hit_rates = {}
     for hit_rates in map(lambda x: x[3], perf_stats):
         for opcode, counter in hit_rates.items():
@@ -1923,7 +1922,10 @@ def main(args):
 
     total_hits = sum(perf_hit_rates.values())
     perf_hit_rates = sorted(perf_hit_rates.items(), key=lambda x: x[1], reverse=True)
-    highest_share = perf_hit_rates[0][1]
+    highest_share = perf_hit_rates[0][1] if perf_hit_rates else 0
+
+    if perf_hit_rates:
+        print("\ninstruction hit rate")
     for i, (
         opcode,
         counter,
