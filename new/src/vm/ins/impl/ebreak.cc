@@ -20,9 +20,11 @@
 #include <endian.h>
 #include <string.h>
 
+#include <format>
 #include <iostream>
 
 #include <viua/arch/arch.h>
+#include <viua/support/binarith.hh>
 #include <viua/support/fdstream.h>
 #include <viua/vm/backtrace.h>
 #include <viua/vm/ins.h>
@@ -130,10 +132,22 @@ auto execute(
     dump_globals(stack);
 
     viua::TRACE_STREAM << "  environment:" << viua::TRACE_STREAM.endl;
-    TRACE_STREAM << "    [earw] " << std::hex << std::setw(2)
-                 << std::setfill('0') << stack.proc->arithmetic_width
-                 << std::dec << " " << stack.proc->arithmetic_width
-                 << TRACE_STREAM.endl;
+    {
+        auto const aw = stack.proc->arithmetic_width;
+
+        using namespace viua::arithmetic;
+        auto const smax = static_cast<int64_t>(signed_type::max(aw));
+        auto const smin = static_cast<int64_t>(signed_type::min(aw));
+        auto const umax = static_cast<uint64_t>(unsigned_type::max(aw));
+
+        TRACE_STREAM << std::format("    [earw] 0x{:02x} {:<2d}  [{}, {}] {}u",
+                                    aw,
+                                    aw,
+                                    smin,
+                                    smax,
+                                    umax)
+                     << TRACE_STREAM.endl;
+    }
 
     viua::TRACE_STREAM << "end ebreak in process "
                        << stack.proc->pid.to_string()
