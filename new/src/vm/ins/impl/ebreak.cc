@@ -113,12 +113,10 @@ auto execute(
 
         auto const fptr = each.saved.fp;
         auto const sbrk = each.saved.sbrk;
-        TRACE_STREAM << "        [fptr] "
-                     << "iu " << std::hex << std::setw(16) << std::setfill('0')
-                     << fptr << " " << std::dec << fptr << '\n';
-        TRACE_STREAM << "        [sbrk] "
-                     << "iu " << std::hex << std::setw(16) << std::setfill('0')
-                     << sbrk << " " << std::dec << sbrk << '\n';
+        TRACE_STREAM
+            << std::format("       [fptr] iu {:016x} {}\n", fptr, fptr);
+        TRACE_STREAM
+            << std::format("       [sbrk] iu {:016x} {}\n", sbrk, sbrk);
 
         viua::vm::backtrace::dump_registers(
             each.parameters, stack.proc->atoms, "p");
