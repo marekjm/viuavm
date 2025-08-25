@@ -859,6 +859,13 @@ auto extend(
     return v;
 }
 
+auto reverse(
+    arithmetic_type v) -> arithmetic_type
+{
+    std::reverse(std::begin(v.n), std::end(v.n));
+    return v;
+}
+
 auto invert(
     arithmetic_type v) -> arithmetic_type
 {

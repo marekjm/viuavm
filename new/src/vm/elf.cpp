@@ -20,6 +20,7 @@
 #include <endian.h>
 #include <stdint.h>
 
+#include <algorithm>
 #include <map>
 #include <optional>
 #include <print>

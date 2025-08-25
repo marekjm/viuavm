@@ -339,6 +339,20 @@ they always work on full-width values.
 	For example, if *bitror* was applied to 0b1100'0100 with a shift value of 2,
 	the result would be 0b0011'0001.
 
+*bitrev* $_dst_, $_src_
+	Reverse the bits of $_src_, and store the result in $_dst_.
+	The result inherits signedness from the source.
+
+	If *earithmeticwidth* instruction was used to limit the width of arithmetic
+	operations, the result is zero-extended to full integer width.
+
+*bitarev* $_dst_, $_src_
+	Reverse the bits of $_src_, and store the result in $_dst_.
+	The result inherits signedness from the source.
+
+	If *earithmeticwidth* instruction was used to limit the width of arithmetic
+	operations, the result is sign-extended to full integer-width.
+
 
 ## Masks
 

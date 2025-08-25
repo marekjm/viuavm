@@ -88,6 +88,10 @@ auto to_string_impl(
             return "bitor";
         case OPCODE::BITXOR:
             return "bitxor";
+        case OPCODE::BITREV:
+            return "bitrev";
+        case OPCODE::BITAREV:
+            return "bitarev";
         case OPCODE::EQ:
             return "eq";
         case OPCODE::LT:
@@ -232,6 +236,10 @@ auto parse_opcode(
         return static_cast<opcode_type>(OPCODE::BITOR);
     } else if (sv == "bitxor") {
         return static_cast<opcode_type>(OPCODE::BITXOR);
+    } else if (sv == "bitrev") {
+        return static_cast<opcode_type>(OPCODE::BITREV);
+    } else if (sv == "bitarev") {
+        return static_cast<opcode_type>(OPCODE::BITAREV);
     } else if (sv == "eq") {
         return static_cast<opcode_type>(OPCODE::EQ);
     } else if (sv == "lt") {

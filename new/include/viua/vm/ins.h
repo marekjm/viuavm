@@ -50,6 +50,8 @@ Work_instruction(BITAND);
 Work_instruction(BITOR);
 Work_instruction(BITXOR);
 Work_instruction(BITNOT);
+Work_instruction(BITREV);
+Work_instruction(BITAREV);
 
 Work_instruction(EQ);
 Work_instruction(LT);

@@ -218,6 +218,9 @@ auto execute(
                     Work(D, GTS);
                     Work(D, GTL);
                     Work(D, EARITHMETICWIDTH);
+
+                    Work(D, BITREV);
+                    Work(D, BITAREV);
                 }
                 break;
             }

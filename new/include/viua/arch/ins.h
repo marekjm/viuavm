@@ -180,6 +180,22 @@ struct BITXOR : Instruction {
         : instruction{ i }
     {}
 };
+struct BITREV : Instruction {
+    viua::arch::ops::D instruction;
+
+    BITREV(
+        viua::arch::ops::D i)
+        : instruction{ i }
+    {}
+};
+struct BITAREV : Instruction {
+    viua::arch::ops::D instruction;
+
+    BITAREV(
+        viua::arch::ops::D i)
+        : instruction{ i }
+    {}
+};
 struct EQ : Instruction {
     using functor_type = std::equal_to<>;
 

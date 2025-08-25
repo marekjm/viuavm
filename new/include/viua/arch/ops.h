@@ -392,6 +392,8 @@ enum class OPCODE : opcode_type
     GTS              = (FORMAT_D | 0x00'0a),
     GTL              = (FORMAT_D | 0x00'0b),
     EARITHMETICWIDTH = (FORMAT_D | 0x00'0c),
+    BITREV           = (FORMAT_D | 0x00'0d),
+    BITAREV          = (FORMAT_D | 0x00'0e),
 
     FRAME  = (FORMAT_S | 0x00'01),
     RETURN = (FORMAT_S | 0x00'02),
@@ -476,6 +478,8 @@ enum class OPCODE_D : opcode_type
     Make_entry(GTS),
     Make_entry(GTL),
     Make_entry(EARITHMETICWIDTH),
+    Make_entry(BITREV),
+    Make_entry(BITAREV),
 };
 enum class OPCODE_S : opcode_type
 {

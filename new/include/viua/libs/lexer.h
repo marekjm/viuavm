@@ -160,6 +160,8 @@ inline auto const OPCODE_NAMES = std::set<std::string_view>{
     "bitor",
     "bitxor",
     "bitnot",
+    "bitrev",
+    "bitarev",
 
     "eq",
     "lt",

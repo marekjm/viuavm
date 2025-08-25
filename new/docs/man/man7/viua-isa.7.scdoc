@@ -609,6 +609,12 @@ The following instructions are available:
 |  bitnot
 :  D
 :  bitwise "not"
+|  bitrev
+:  D
+:  bit reversal
+|  bitarev
+:  D
+:  arithmetic (sign-preserving) bit reversal
 |  eq
 :  T
 :  lhs = rhs

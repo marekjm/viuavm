@@ -82,6 +82,11 @@ auto extend(arithmetic_type,
             size_type const,
             std::optional<bool> const = std::nullopt) -> arithmetic_type;
 
+/*
+ * Reverse bits of a value.
+ */
+auto reverse(arithmetic_type const) -> arithmetic_type;
+
 
 struct signed_type {
     using bit_type   = arithmetic_type::bit_type;

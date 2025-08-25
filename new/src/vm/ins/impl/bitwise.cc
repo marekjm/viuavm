@@ -20,6 +20,7 @@
 #include <stdint.h>
 
 #include <viua/arch/arch.h>
+#include <viua/support/binarith.hh>
 #include <viua/vm/ins.h>
 
 
@@ -74,14 +75,20 @@ auto execute(
     auto const rhs = immutable_proxy(stack, op.instruction.rhs);
 
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+    auto const lhs_i64 = lhs.holds<register_type::int_type>();
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
         auto const tmp = static_cast<int64_t>(*lhs.get<uint64_t>());
         out            = static_cast<uint64_t>(tmp >> *v);
         return;
+    } else if (auto const v = rhs.cast_to<uint64_t>(); lhs_i64 and v) {
+        auto const tmp = *lhs.get<int64_t>();
+        out            = tmp >> *v;
+        return;
     }
 
-    throw abort_execution{ stack,
-                           "unsupported operand types for bit operation" };
+    throw abort_execution{
+        stack, "unsupported operand types for arithmetic bit right shift"
+    };
 }
 auto execute(
     BITROL const,
@@ -161,5 +168,60 @@ auto execute(
 
     throw abort_execution{ stack,
                            "unsupported operand types for bit operation" };
+}
+
+auto execute(
+    BITREV const op,
+    Stack& stack,
+    ip_type const) -> void
+{
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const in  = immutable_proxy(stack, op.instruction.in);
+    if (auto const v = in.get<uint64_t>(); v) {
+        auto const arithmetic_width = stack.proc->arithmetic_width;
+
+        using namespace viua::arithmetic;
+        auto const raw = extend(arithmetic_type{ *v }, arithmetic_width);
+        auto const rev = reverse(raw);
+
+        out = static_cast<uint64_t>(unsigned_type{ rev });
+        return;
+    }
+
+    throw abort_execution{ stack,
+                           "unsupported operand types for bit reversal" };
+}
+
+auto execute(
+    BITAREV const op,
+    Stack& stack,
+    ip_type const) -> void
+{
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const in  = immutable_proxy(stack, op.instruction.in);
+    if (auto const v = in.get<uint64_t>(); v) {
+        auto const arithmetic_width = stack.proc->arithmetic_width;
+
+        using namespace viua::arithmetic;
+        auto const raw = extend(arithmetic_type{ *v }, arithmetic_width);
+        auto const rev = reverse(raw);
+
+        out = static_cast<uint64_t>(unsigned_type{ rev });
+        return;
+    } else if (auto const v = in.get<int64_t>(); v) {
+        auto const arithmetic_width = stack.proc->arithmetic_width;
+
+        using namespace viua::arithmetic;
+        auto const raw = extend(
+            arithmetic_type{ static_cast<uint64_t>(*v) }, arithmetic_width);
+        auto const rev = reverse(raw);
+
+        out = static_cast<int64_t>(signed_type{ rev });
+        return;
+    }
+
+    throw abort_execution{
+        stack, "unsupported operand types for arithmetic bit reversal"
+    };
 }
 }  // namespace viua::vm::ins
