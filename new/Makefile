@@ -201,6 +201,13 @@ dist: all
 		viua-$(VIUAVM_VERSION).tar \
 		-o viua-$(VIUAVM_VERSION).tar.zstd
 
+
+list-preset:
+	@cd Makefile.d/Preset ; ls -1 | grep -v README | sort
+
+list-platform:
+	@cd Makefile.d/Platform ; ls -1 | grep -v README | sort
+
 test_prefix?=$(BUILD_PREFIX)
 test_exec_prefix?=$(test_prefix)
 test: all
