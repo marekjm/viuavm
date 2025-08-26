@@ -1279,11 +1279,27 @@ def test_case_impl(case_log, case_name, test_program, errors):
     case_log.write("First run\n")
     indicate_progress(start_timepoint, "r1")
 
-    asm = lambda out_reloc, in_asm: test_case_impl_asm(
-        (start_timepoint, case_log),
-        out_reloc,
-        in_asm,
-    )
+    toolchain_perf = {
+        "asm": {
+            "time": datetime.timedelta(),
+        },
+        "ld": {
+            "time": datetime.timedelta(),
+        },
+        "vm": {
+            "time": datetime.timedelta(),
+        },
+    }
+
+    def asm(out_reloc, in_asm):
+        asm_start_timepoint = datetime.datetime.now()
+        r = test_case_impl_asm(
+            (start_timepoint, case_log),
+            out_reloc,
+            in_asm,
+        )
+        toolchain_perf["asm"]["time"] += datetime.datetime.now() - asm_start_timepoint
+        return r
 
     # Some tests (usually for the linker) have their source split over several
     # files. Gather and assemble them all here, before the main file is
@@ -1331,15 +1347,23 @@ def test_case_impl(case_log, case_name, test_program, errors):
     # dependent on the order of input files.
     random.shuffle(extra_relocatable_files)
 
-    ld = lambda out_exec, in_reloc, extras=(): test_case_impl_ld(
-        (start_timepoint, case_log), out_exec, in_reloc, extras
-    )
-    run_test = lambda: run_and_capture(
-        start_timepoint,
-        INTERPRETER,
-        test_executable,
-        stdin=test_stdin,
-    )
+    def ld(out_exec, in_reloc, extras=()):
+        ld_start_timepoint = datetime.datetime.now()
+        r = test_case_impl_ld((start_timepoint, case_log), out_exec, in_reloc, extras)
+        toolchain_perf["ld"]["time"] += datetime.datetime.now() - ld_start_timepoint
+        return r
+
+    def run_test():
+        vm_start_timepoint = datetime.datetime.now()
+        r = run_and_capture(
+            start_timepoint,
+            INTERPRETER,
+            test_executable,
+            stdin=test_stdin,
+        )
+        toolchain_perf["vm"]["time"] += datetime.datetime.now() - vm_start_timepoint
+        return r
+
     run_checks = lambda r, e, a, d: test_case_impl_checks(
         (start_timepoint, case_log),
         errors,
@@ -1399,6 +1423,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
         None,
         count_runtime(),
         (None if check_kind == "abort" else perf),
+        toolchain_perf,
     )
 
     if SKIP_DISASSEMBLER_TESTS:
@@ -1627,6 +1652,7 @@ def main(args):
 
     run_times = []
     perf_stats = []
+    toolchain_perf_stats = []
 
     os.makedirs(CACHE_DIR, exist_ok=True)
     list_of_ok = []
@@ -1671,7 +1697,7 @@ def main(args):
         skipped = False
         try:
             if type(result := rc()) is tuple:
-                status, result, symptom, run_time, perf = result
+                status, result, symptom, run_time, perf, toolchain_perf = result
                 if status == Status.Normal:
                     if run_time:
                         run_times.append(run_time)
@@ -1706,6 +1732,9 @@ def main(args):
                                 perf["hit-rate"],
                             )
                         )
+
+                    if toolchain_perf:
+                        toolchain_perf_stats.append(toolchain_perf)
 
                     if result:
                         tag = "ok"
@@ -1793,27 +1822,29 @@ def main(args):
         )
     )
 
+    suite_run_time = SUITE_STOP_TIMEPOINT - SUITE_START_TIMEPOINT
     print(
         "\nsuite run time was {}".format(
             colorise(
                 "white",
-                format_run_time(SUITE_STOP_TIMEPOINT - SUITE_START_TIMEPOINT).strip(),
+                format_run_time(suite_run_time).strip(),
             ),
         )
     )
 
-    # If all tests failed, then we do not have anything in the run statistics lists. This
-    # breaks the code in many places, so let's just put dummy values where necessary to
-    # avoid crashes.
+    # If all tests failed, then we do not have anything in the run statistics
+    # lists. This breaks the code in many places, so let's just put dummy values
+    # where necessary to avoid crashes.
     #
-    # Sure, the report may look weird, but at least the test suite will run to completion.
+    # Sure, the report may look weird, but at least the test suite will run to
+    # completion.
     if not run_times:
         run_times = [datetime.timedelta()]
 
     total_run_time = sum(run_times[1:], start=run_times[0])
     print(
-        "\ntotal run time was {} ({} ~ {} per case)".format(
-            colorise("white", format_run_time(total_run_time)),
+        "\ncases run time was {} ({} ~ {} per case)".format(
+            colorise("white", format_run_time(total_run_time).strip()),
             colorise(MIN_COLOUR, format_run_time(min(run_times)).strip()),
             colorise(MAX_COLOUR, format_run_time(max(run_times)).strip()),
         )
@@ -1828,7 +1859,7 @@ def main(args):
         middle = 0
 
     print(
-        "median run time was {}".format(
+        "  median  {}".format(
             colorise(
                 MED_COLOUR,
                 format_run_time(
@@ -1837,7 +1868,17 @@ def main(args):
                         if (len(run_times) % 2)
                         else ((run_times[middle] + run_times[middle + 1]) / 2)
                     )
-                ).strip(),
+                ),
+            ),
+        )
+    )
+    print(
+        "  average {}".format(
+            colorise(
+                MED_COLOUR,
+                format_run_time(
+                    sum(run_times[1:], start=run_times[0]) / len(run_times)
+                ),
             ),
         )
     )
@@ -1872,6 +1913,95 @@ def main(args):
     perf_freq_med = med(perf_freq)
     perf_freq_min = min(perf_freq)
     perf_freq_max = max(perf_freq)
+
+    def draw_bar(size: int, fill: float = 1.0) -> str:
+        blocks = size * fill
+
+        full_blocks = int(blocks)
+        part_blocks = blocks - full_blocks
+
+        FULL_BLOCK = "\u2588"
+        LEFT_SEVEN_EIGHTHS_BLOCK = "\u2589"
+        LEFT_THREE_QUARTERS_BLOCK = "\u258a"
+        LEFT_FIVE_EIGHTS_BLOCK = "\u258b"
+        LEFT_HALF_BLOCK = "\u258c"
+        LEFT_THREE_EIGHTHS_BLOCK = "\u258d"
+        LEFT_ONE_QUARTER_BLOCK = "\u258e"
+        LEFT_ONE_EIGHT_BLOCK = "\u258f"
+
+        def get_part_block(n):
+            one_eight = 0.125
+            if n >= (7 * one_eight):
+                return LEFT_SEVEN_EIGHTHS_BLOCK
+            if n >= 0.75:
+                return LEFT_THREE_QUARTERS_BLOCK
+            if n >= (5 * one_eight):
+                return LEFT_FIVE_EIGHTS_BLOCK
+            if n >= 0.5:
+                return LEFT_HALF_BLOCK
+            if n >= (3 * one_eight):
+                return LEFT_THREE_EIGHTHS_BLOCK
+            if n >= 0.25:
+                return LEFT_ONE_QUARTER_BLOCK
+            if n >= (1 * one_eight):
+                return LEFT_ONE_EIGHT_BLOCK
+            return LEFT_ONE_EIGHT_BLOCK
+
+        return (full_blocks * FULL_BLOCK) + get_part_block(part_blocks)
+
+    time_spent_in_asm = sum(
+        map(lambda e: e["asm"]["time"], toolchain_perf_stats),
+        start=datetime.timedelta(),
+    )
+    time_spent_in_ld = sum(
+        map(lambda e: e["ld"]["time"], toolchain_perf_stats), start=datetime.timedelta()
+    )
+    time_spent_in_vm = sum(
+        map(lambda e: e["vm"]["time"], toolchain_perf_stats), start=datetime.timedelta()
+    )
+    time_spent_total = sum(
+        (
+            time_spent_in_asm,
+            time_spent_in_ld,
+            time_spent_in_vm,
+        ),
+        start=datetime.timedelta(),
+    )
+    time_spent_longest = max(
+        time_spent_in_asm,
+        time_spent_in_ld,
+        time_spent_in_vm,
+    )
+
+    toolchain_times = sorted(
+        (
+            (
+                "asm",
+                time_spent_in_asm,
+            ),
+            (
+                "ld",
+                time_spent_in_ld,
+            ),
+            (
+                "vm",
+                time_spent_in_vm,
+            ),
+        ),
+        key=lambda i: i[1],
+        reverse=True,
+    )
+    toolchain_time_bar_size = 101 - 24
+    print("\ntoolchain time")
+    for tool_name, time_spent in toolchain_times:
+        print(
+            "  {:3} {} {:6.2f}% {}".format(
+                tool_name,
+                format_run_time(time_spent),
+                ((time_spent / time_spent_total) * 100),
+                draw_bar(toolchain_time_bar_size, (time_spent / time_spent_longest)),
+            )
+        )
 
     print(
         "\nperf counter     {}    /  {}     ({} ~        {}):".format(
@@ -1924,6 +2054,12 @@ def main(args):
     perf_hit_rates = sorted(perf_hit_rates.items(), key=lambda x: x[1], reverse=True)
     highest_share = perf_hit_rates[0][1] if perf_hit_rates else 0
 
+    # Why is instruction hit rate bar's size 66? Because it is 101 - (length of
+    # the report text).
+    #
+    # Where did the 101 came from? It is the length of a case report line.
+    ihr_bar_size = 66
+
     if perf_hit_rates:
         print("\ninstruction hit rate")
     for i, (
@@ -1932,13 +2068,6 @@ def main(args):
     ) in enumerate(perf_hit_rates):
         share_of_total = (counter / total_hits) * 100.0
 
-        # Why 66? Because it is 101 - (length of the report text).
-        #
-        # Where did the 101 came from? It is the length of a case report line.
-        bar_size = 66
-        bar_size = math.ceil(bar_size * (counter / highest_share))
-        bar = "#" * bar_size
-
         fillchar = " "
         op_connecting_char = " "
         cr_connecting_char = " "
@@ -1946,14 +2075,11 @@ def main(args):
             fillchar = "–" if (i % 2) else " "
             op_connecting_char = ">" if (i % 2) else " "
             cr_connecting_char = "<" if (i % 2) else " "
-        opcode = (f"{opcode} {op_connecting_char}").ljust(18, fillchar)
-        counter = (f"{cr_connecting_char} {counter}").rjust(6, fillchar)
 
-        hit_report = "{}{}  {:5.2f}% {}".format(
-            opcode,
-            counter,
+        hit_report = "{}{}  {:5.2f}%".format(
+            (f"{opcode} {op_connecting_char}").ljust(18, fillchar),
+            (f"{cr_connecting_char} {counter}").rjust(6, fillchar),
             share_of_total,
-            bar,
         )
         if colored is not None:
             fg = i % 2
@@ -1968,7 +2094,8 @@ def main(args):
 
             hit_report = fg + bg + hit_report + colored.attr("reset")
 
-        print(f"  {hit_report}")
+        bar = draw_bar(ihr_bar_size, (counter / highest_share))
+        print(f"  {hit_report} {bar}")
 
     return run_exit_code
 
