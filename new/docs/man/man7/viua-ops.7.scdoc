@@ -295,8 +295,8 @@ unsigned integer.
 The instructions will abort execution unless both of the aforementioned
 conditions are satisified.
 
-*NOTE*: The *earw* register has no effect on the bit arithmetic instructions;
-they always work on full-width values.
+*NOTE*: Unless specified otherwise, the *earw* register has no effect on the bit
+arithmetic instructions and they always work on full-width values.
 
 
 ## Shifts
