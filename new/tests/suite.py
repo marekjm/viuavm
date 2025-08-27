@@ -8,6 +8,7 @@ import math
 import os
 import re
 import random
+import shutil
 import selectors
 import subprocess
 import sys
@@ -53,6 +54,35 @@ AVG_COLOUR = "chartreuse_2a"
 MED_COLOUR = "chartreuse_3b"
 MIN_COLOUR = "dark_slate_gray_2"
 MAX_COLOUR = "red_1"
+
+
+# The test suite is designed to output report lines with width of at most 80
+# characters. Where did the 80 came from? It is the "standard" terminal width.
+REPORT_LINE_WIDTH = max(
+    80,
+    shutil.get_terminal_size(
+        (
+            80,
+            0,
+        )
+    )[0],
+)
+
+
+TWO_DOT_PUNCTUATION = "\u205a"  # change of speaker
+VERTICAL_FOUR_DOTS = "\u205e"  # legal, but undesirable word break
+CIRCLED_DIVISION_SIGN = "\u2298"
+MULTIPLICATION_X = "\u2715"
+VERTICAL_ELLIPSIS = "\u22ee"
+MIDLINE_HORIZONTAL_ELLIPSIS = "\u22ef"
+UP_RIGHT_DIAGONAL_ELLIPSIS = "\u22f0"
+DOWN_RIGHT_DIAGONAL_ELLIPSIS = "\u22f1"
+
+SUBSET = "\u2282"
+DEGREE = "\u00b0"
+CYLINDRICITY = "\u232d"
+
+BOX_DRAWINGS_LIGHT_HORIZONTAL = "\u2500"
 
 
 def format_run_time_us(run_time):
@@ -1667,7 +1697,33 @@ def main(args):
     }
 
     print("running cases")
-    print(f"  from {CASES_DIR}")
+
+    def print_header(*, sep_above=False, sep_below=False, sep_prefix=""):
+        sep_prefix = f" {sep_prefix} " if sep_prefix else " "
+        separator_line = REPORT_LINE_WIDTH - len(sep_prefix)
+        separator_line = BOX_DRAWINGS_LIGHT_HORIZONTAL * separator_line
+        separator_line = f"{sep_prefix}{separator_line}"
+
+        if sep_above:
+            print(separator_line)
+
+        print(
+            "  {} {} [{}]  {}: {} {}  {} @ {}".format(
+                colorise(CASE_RUNTIME_COLOUR, f"0{DEGREE}".rjust(pad_case_no + 1)),
+                colorise("white", "case name".ljust(pad_case_name)),
+                colorise(CASE_RUNTIME_COLOUR, "stat"),
+                colorise(CASE_RUNTIME_COLOUR, "run time"),
+                colorise(CASE_RUNTIME_COLOUR, "ops"),
+                SUBSET,
+                colorise(CASE_RUNTIME_COLOUR, "vm time"),
+                colorise(CASE_RUNTIME_COLOUR, "vm freq Hz"),
+            )
+        )
+
+        if sep_below:
+            print(separator_line)
+
+    print_header(sep_below=True, sep_prefix=f"(from {CASES_DIR})")
     for case_no, (
         case_name,
         test_program,
@@ -1675,8 +1731,10 @@ def main(args):
         error_stream = io.StringIO()
 
         print(
-            "    case {}. of {}: ".format(
-                colorise("white", str(case_no).rjust(pad_case_no)),
+            "  {} {} ".format(
+                colorise(
+                    CASE_RUNTIME_COLOUR, f"{case_no}{DEGREE}".rjust(pad_case_no + 1)
+                ),
                 colorise("white", case_name.ljust(pad_case_name)),
             ),
             end="",
@@ -1756,8 +1814,20 @@ def main(args):
 
         run_list[tag].append(case_name)
 
+        perf_report = (
+            (
+                "{} {} {} @ {}".format(
+                    colorise(CASE_RUNTIME_COLOUR, "{:3}".format(perf["ops"])),
+                    SUBSET,
+                    colorise(CASE_RUNTIME_COLOUR, perf["run_time"].rjust(8)),
+                    colorise(CASE_RUNTIME_COLOUR, perf["freq"].rjust(10)),
+                )
+            )
+            if (result and perf)
+            else (11 * " ")
+        )
         print(
-            "{}[{}] {}  {}".format(
+            "{}[{}] {}: {}".format(
                 (
                     PROGRESS_INDICATOR_ERASER
                     if (PROGRESS_INDICATORS and not skipped)
@@ -1770,17 +1840,7 @@ def main(args):
                     if run_time
                     else ""
                 ),
-                (
-                    (
-                        "perf: {} ops in {} at {}".format(
-                            colorise(CASE_RUNTIME_COLOUR, "{:3}".format(perf["ops"])),
-                            colorise(CASE_RUNTIME_COLOUR, perf["run_time"].rjust(8)),
-                            colorise(CASE_RUNTIME_COLOUR, perf["freq"].rjust(10)),
-                        )
-                    )
-                    if (result and perf)
-                    else (11 * " ")
-                ),
+                perf_report,
             )
         )
 
@@ -1793,6 +1853,8 @@ def main(args):
             traceback.print_exception(
                 internal_test_suite_failure, limit=None, chain=True
             )
+
+    print_header(sep_above=True)
 
     global SUITE_STOP_TIMEPOINT
     SUITE_STOP_TIMEPOINT = datetime.datetime.now()
@@ -1811,8 +1873,9 @@ def main(args):
         run_color = "red"
         run_exit_code = 1
 
+    suite_run_time = SUITE_STOP_TIMEPOINT - SUITE_START_TIMEPOINT
     print(
-        "run {} test case{} with {}% success rate".format(
+        "\nrun {} test case{} with {}% success rate".format(
             colorise("white", (len(cases) or "no")),
             ("s" if (len(cases) != 1) else ""),
             colorise(
@@ -1821,10 +1884,8 @@ def main(args):
             ),
         )
     )
-
-    suite_run_time = SUITE_STOP_TIMEPOINT - SUITE_START_TIMEPOINT
     print(
-        "\nsuite run time was {}".format(
+        "suite run time was {}".format(
             colorise(
                 "white",
                 format_run_time(suite_run_time).strip(),
@@ -1991,11 +2052,11 @@ def main(args):
         key=lambda i: i[1],
         reverse=True,
     )
-    toolchain_time_bar_size = 101 - 24
+    toolchain_time_bar_size = REPORT_LINE_WIDTH - 24
     print("\ntoolchain time")
     for tool_name, time_spent in toolchain_times:
         print(
-            "  {:3} {} {:6.2f}% {}".format(
+            "  {:3} {} {:5.2f}% {}".format(
                 tool_name,
                 format_run_time(time_spent),
                 ((time_spent / time_spent_total) * 100),
@@ -2004,7 +2065,7 @@ def main(args):
         )
 
     print(
-        "\nperf counter     {}    /  {}     ({} ~        {}):".format(
+        "\nperf counter      {}    /  {}     ({} ~        {}):".format(
             colorise(AVG_COLOUR, "average"),
             colorise(MED_COLOUR, "median"),
             colorise(MIN_COLOUR, "min".ljust(11)),
@@ -2012,7 +2073,7 @@ def main(args):
         )
     )
     print(
-        "  ops executed: {}     / {}     ({} ~ {})".format(
+        "  ops executed:  {}     / {}     ({} ~ {})".format(
             colorise(AVG_COLOUR, "{:7.2f}".format(avg(perf_ops))),
             colorise(MED_COLOUR, "{:7.2f}".format(med(perf_ops))),
             colorise("white", f"{min(perf_ops):7.2f}".ljust(11)) if perf_ops else "--",
@@ -2020,7 +2081,7 @@ def main(args):
         )
     )
     print(
-        "  VM run time:  {}   / {}   ({} ~ {})".format(
+        "  VM run time:   {}   / {}   ({} ~ {})".format(
             colorise(AVG_COLOUR, format_run_time_us(perf_time_avg)),
             colorise(MED_COLOUR, format_run_time_us(perf_time_med)),
             (
@@ -2032,7 +2093,7 @@ def main(args):
         )
     )
     print(
-        "  VM CPU freq:  {} / {} ({} ~ {})".format(
+        "  VM frequency:  {} / {} ({} ~ {})".format(
             colorise(AVG_COLOUR, format_freq(perf_freq_avg)),
             colorise(MED_COLOUR, format_freq(perf_freq_med)),
             (
@@ -2054,11 +2115,7 @@ def main(args):
     perf_hit_rates = sorted(perf_hit_rates.items(), key=lambda x: x[1], reverse=True)
     highest_share = perf_hit_rates[0][1] if perf_hit_rates else 0
 
-    # Why is instruction hit rate bar's size 66? Because it is 101 - (length of
-    # the report text).
-    #
-    # Where did the 101 came from? It is the length of a case report line.
-    ihr_bar_size = 66
+    ihr_bar_size = REPORT_LINE_WIDTH - 35
 
     if perf_hit_rates:
         print("\ninstruction hit rate")
@@ -2076,7 +2133,7 @@ def main(args):
             op_connecting_char = ">" if (i % 2) else " "
             cr_connecting_char = "<" if (i % 2) else " "
 
-        hit_report = "{}{}  {:5.2f}%".format(
+        hit_report = "{}{} {:5.2f}%".format(
             (f"{opcode} {op_connecting_char}").ljust(18, fillchar),
             (f"{cr_connecting_char} {counter}").rjust(6, fillchar),
             share_of_total,
