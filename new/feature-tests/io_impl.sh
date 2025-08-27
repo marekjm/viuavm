@@ -10,7 +10,7 @@ if [[ ${impl} == "auto" ]]; then
         Linux)
             impl=io_uring
             ;;
-        FreeBSD)
+        FreeBSD|NetBSD)
             impl=classic
             ;;
         *)
