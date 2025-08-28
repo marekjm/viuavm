@@ -1306,6 +1306,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
             "no check file",
             None,
             None,
+            None,
         )
 
     # All files describing a test share a common base path eg, "tests/asm/foo".
@@ -1368,6 +1369,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
                     ("failed to assemble: " + " ".join(asm_args)),
                     count_runtime(),
                     None,
+                    None,
                 )
 
         extra_relocatable_files.append(extra_relocatable)
@@ -1387,6 +1389,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
                         Status.Normal,
                         False,
                         f"could not locate dependency: {dep}",
+                        None,
                         None,
                         None,
                     )
@@ -1439,6 +1442,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
                 ("failed to assemble: " + " ".join(asm_args)),
                 count_runtime(),
                 None,
+                None,
             )
 
     # The extra relocatables (including "standard library" moduels) are only
@@ -1455,6 +1459,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
                 False,
                 ("failed to link: " + " ".join(ld_args)),
                 count_runtime(),
+                None,
                 None,
             )
 
@@ -1515,6 +1520,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
             "failed to disassemble",
             count_runtime(),
             None,
+            None,
         )
 
     indicate_progress(start_timepoint, "as")
@@ -1528,6 +1534,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
                 ("failed to reassemble: " + " ".join(asm_args)),
                 count_runtime(),
                 None,
+                None,
             )
 
     indicate_progress(start_timepoint, "ld")
@@ -1540,6 +1547,7 @@ def test_case_impl(case_log, case_name, test_program, errors):
                 False,
                 ("failed to relink: " + " ".join(ld_args)),
                 count_runtime(),
+                None,
                 None,
             )
 
@@ -1564,6 +1572,7 @@ def test_case(case_name, test_program, errors):
             Status.Skip,
             False,
             skip_reason,
+            None,
             None,
             None,
         )
