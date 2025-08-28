@@ -20,6 +20,7 @@
 #ifndef VIUA_SUPPORT_NUMBER_H
 #define VIUA_SUPPORT_NUMBER_H
 
+#include <charconv>
 #include <exception>
 #include <string>
 #include <string_view>
@@ -39,21 +40,6 @@ auto sign_extend(
     }
 }
 
-namespace {
-template<typename T>
-auto ston_int_impl(
-    std::string const& n,
-    int const base)
-    -> std::conditional_t<std::is_signed_v<T>, int64_t, uint64_t>
-{
-    if constexpr (std::is_signed_v<T>) {
-        return std::stoll(n, nullptr, base);
-    } else {
-        return std::stoull(n, nullptr, base);
-    }
-}
-}  // namespace
-
 template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
 auto ston(
     std::string n) -> T
@@ -65,37 +51,52 @@ auto ston(
             return std::stod(n);
         }
     } else {
-        auto base = 10;
-        {
-            auto view = std::string_view{ n };
-            auto const is_negative =
-                std::is_signed_v<T> and view.starts_with("-");
-            if (is_negative) {
-                view.remove_prefix(1);
-            }
-            if (view.starts_with("0x")) {
-                base = 16;
-            } else if (view.starts_with("0o")) {
-                base = 8;
+        auto view = std::string_view{ n };
 
-                /*
-                 * Octal literals in Viua assembly begin with "0o", but C++
-                 * converters take octals beginning with "0". We need to drop
-                 * the "o".
-                 */
-                n.erase(1 + static_cast<size_t>(is_negative), 1);
-            } else if (view.starts_with("0b")) {
-                base = 2;
-            }
+        auto const is_negative = view.starts_with("-");
+        if (is_negative and not std::is_signed_v<T>) {
+            throw std::logic_error{ "ston" };
+        }
+        if (is_negative) {
+            view.remove_prefix(1);
         }
 
-        auto const full   = ston_int_impl<T>(n, base);
-        auto const wanted = static_cast<T>(full);
+        constexpr auto default_base = 10;
+        auto base                   = default_base;
+        if (view.starts_with("0x")) {
+            base = 16;
 
-        if (wanted != full) {
+            /*
+             * std::from_chars does not accept the 0x prefix if the base is set
+             * explicitly.
+             */
+            n.erase(static_cast<size_t>(is_negative), 2);
+        } else if (view.starts_with("0o")) {
+            base = 8;
+
+            /*
+             * Octal literals in Viua assembly begin with "0o", but C++
+             * converters take octals beginning with "0". We need to drop
+             * the "o".
+             */
+            n.erase(1 + static_cast<size_t>(is_negative), 1);
+        } else if (view.starts_with("0b")) {
+            base = 2;
+        }
+
+        auto value        = T{};
+        auto const first  = n.c_str();
+        auto const last   = first + n.size();
+        auto const result = std::from_chars(first, last, value, base);
+
+        if (result.ec == std::errc::invalid_argument) {
+            throw std::invalid_argument{ "ston" };
+        }
+        if (result.ec == std::errc::result_out_of_range) {
             throw std::out_of_range{ "ston" };
         }
-        return wanted;
+
+        return value;
     }
 }
 

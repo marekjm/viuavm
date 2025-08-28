@@ -2189,8 +2189,9 @@ auto expand_li(
     ast::Instruction const& raw,
     bool const force_full = false) -> Text
 {
-    auto const& raw_value  = raw.operands.at(1).ingredients.front();
-    auto const is_unsigned = (raw_value.text.back() == 'u');
+    auto const& raw_value    = raw.operands.at(1).ingredients.front();
+    auto max_unsigned_symbol = false;
+    auto const is_unsigned   = (raw_value.text.back() == 'u');
     if (is_unsigned and raw_value.text.starts_with('-')
         and raw_value.text != "-1u") {
         using viua::libs::errors::compile_time::Cause;
@@ -2202,10 +2203,15 @@ auto expand_li(
                 "it is used a symbol for maximum unsigned "
                 "value");
     }
+    if (is_unsigned and raw_value.text == "-1u") {
+        max_unsigned_symbol = true;
+    }
 
     auto value = uint64_t{};
     try {
-        if (is_unsigned) {
+        if (max_unsigned_symbol) {
+            value = static_cast<uint64_t>(-1);
+        } else if (is_unsigned) {
             value = viua::support::ston<uint64_t>(raw_value.text);
         } else {
             auto const tmp = viua::support::ston<int64_t>(raw_value.text);
