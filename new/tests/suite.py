@@ -186,6 +186,9 @@ SUITE_START_TIMEPOINT: datetime.datetime = None
 SUITE_STOP_TIMEPOINT: datetime.datetime = None
 
 
+SHOW_PERFORMANCE_DETAILS = getenv_bool("SHOW_PERFORMANCE_DETAILS", default="false")
+
+
 def indicate_progress(start_timepoint, message, *, erase=True):
     if not PROGRESS_INDICATORS:
         return
@@ -212,6 +215,7 @@ EBREAK_GLOBALS_LINE = re.compile(r"([a-z_][a-zA-Z0-9_]*) = (is|iu|fl|db) (.*)")
 EBREAK_ENVIRONMENT_LINE = re.compile(r"\[([a-z_][a-zA-Z0-9_]*)\] (.+)")
 PERF_OPS_AND_RUNTIME = re.compile(r"\[vm:perf\] executed ops (\d+), run time (.+)")
 PERF_HIT_RATE = re.compile(r"\[vm:perf:hit-rate\] (\d+) (.+)")
+PERF_TIMER = re.compile(r"\[vm:perf:timer\] (\d+)us (.+)")
 PERF_APPROX_FREQ = re.compile(r"\[vm:perf\] approximate frequency (.+ [kMG]?Hz)")
 
 
@@ -935,6 +939,9 @@ def run_and_capture(start_timepoint, interpreter, executable, *, args=(), stdin=
         "run_time": None,
         "freq": None,
         "hit-rate": {},
+        "timers": {
+            "ops": {},
+        },
     }
 
     for each in lines[::-1]:
@@ -947,6 +954,10 @@ def run_and_capture(start_timepoint, interpreter, executable, *, args=(), stdin=
             counter = int(m.group(1))
             opcode = m.group(2)
             perf["hit-rate"][opcode] = counter
+        elif m := PERF_TIMER.fullmatch(each):
+            microseconds = int(m.group(1))
+            opcode = m.group(2)
+            perf["timers"]["ops"][opcode] = microseconds
         else:
             break
 
@@ -1788,6 +1799,7 @@ def main(args):
                                 vm_time,
                                 freq,
                                 perf["hit-rate"],
+                                perf["timers"],
                             )
                         )
 
@@ -2111,19 +2123,137 @@ def main(args):
             perf_hit_rates.setdefault(opcode, 0)
             perf_hit_rates[opcode] += counter
 
-    total_hits = sum(perf_hit_rates.values())
-    perf_hit_rates = sorted(perf_hit_rates.items(), key=lambda x: x[1], reverse=True)
-    highest_share = perf_hit_rates[0][1] if perf_hit_rates else 0
+    if SHOW_PERFORMANCE_DETAILS:
+        total_hits = sum(perf_hit_rates.values())
+        perf_hit_rates_srt = sorted(
+            perf_hit_rates.items(), key=lambda x: x[1], reverse=True
+        )
+        highest_share = perf_hit_rates_srt[0][1] if perf_hit_rates_srt else 0
 
-    ihr_bar_size = REPORT_LINE_WIDTH - 35
+        ihr_bar_size = REPORT_LINE_WIDTH - 35
 
-    if perf_hit_rates:
-        print("\ninstruction hit rate")
+        if perf_hit_rates:
+            print(
+                "\ninstruction hit rate (total instructions executed: {})".format(
+                    total_hits,
+                )
+            )
+        for i, (
+            opcode,
+            counter,
+        ) in enumerate(perf_hit_rates_srt):
+            share_of_total = (counter / total_hits) * 100.0
+
+            fillchar = " "
+            op_connecting_char = " "
+            cr_connecting_char = " "
+            if colored is None:
+                fillchar = "–" if (i % 2) else " "
+                op_connecting_char = ">" if (i % 2) else " "
+                cr_connecting_char = "<" if (i % 2) else " "
+
+            hit_report = "{}{} {:5.2f}%".format(
+                (f"{opcode} {op_connecting_char}").ljust(18, fillchar),
+                (f"{cr_connecting_char} {counter}").rjust(6, fillchar),
+                share_of_total,
+            )
+            if colored is not None:
+                fg = i % 2
+                bg = int(not fg)
+
+                colors = (
+                    "white",
+                    "black",
+                )
+                fg = colored.fg(colors[fg])
+                bg = colored.bg(colors[bg])
+
+                hit_report = fg + bg + hit_report + colored.attr("reset")
+
+            bar = draw_bar(ihr_bar_size, (counter / highest_share))
+            print(f"  {hit_report} {bar}")
+
+    perf_op_timers = {}
+    for timers in map(lambda x: x[4], perf_stats):
+        for opcode, time in timers["ops"].items():
+            perf_op_timers.setdefault(opcode, 0)
+            perf_op_timers[opcode] += time
+
+    if SHOW_PERFORMANCE_DETAILS:
+        total_op_time = sum(perf_op_timers.values())
+        perf_op_timers_srt = sorted(
+            perf_op_timers.items(), key=lambda x: x[1], reverse=True
+        )
+        highest_share = perf_op_timers_srt[0][1] if perf_op_timers_srt else 0
+
+        otr_bar_size = REPORT_LINE_WIDTH - 40
+
+        if perf_op_timers:
+            print("\ninstruction time averages")
+        for i, (
+            opcode,
+            timer,
+        ) in enumerate(perf_op_timers_srt):
+            share_of_total = (timer / total_op_time) * 100.0
+
+            fillchar = " "
+            op_connecting_char = " "
+            cr_connecting_char = " "
+            if colored is None:
+                fillchar = "–" if (i % 2) else " "
+                op_connecting_char = ">" if (i % 2) else " "
+                cr_connecting_char = "<" if (i % 2) else " "
+
+            timer_str = format_run_time(datetime.timedelta(microseconds=timer))
+
+            hit_report = "{}{} {:5.2f}%".format(
+                (f"{opcode} {op_connecting_char}").ljust(18, fillchar),
+                (f"{cr_connecting_char} {timer_str}").rjust(8, fillchar),
+                share_of_total,
+            )
+            if colored is not None:
+                fg = i % 2
+                bg = int(not fg)
+
+                colors = (
+                    "white",
+                    "black",
+                )
+                fg = colored.fg(colors[fg])
+                bg = colored.bg(colors[bg])
+
+                hit_report = fg + bg + hit_report + colored.attr("reset")
+
+            bar = draw_bar(otr_bar_size, (timer / highest_share))
+            print(f"  {hit_report} {bar}")
+
+    perf_op_impact = {}
+    for opcode, timer in perf_op_timers.items():
+        counter = perf_hit_rates.get(opcode, 0)
+        impact = timer * counter
+        perf_op_impact[opcode] = (
+            impact,
+            counter,
+            timer,
+        )
+
+    total_op_impact = sum(map(lambda x: x[0], perf_op_impact.values()))
+    perf_op_impact = sorted(perf_op_impact.items(), key=lambda x: x[1], reverse=True)
+    highest_share = perf_op_impact[0][1][0] if perf_op_impact else 0
+
+    oit_bar_size = REPORT_LINE_WIDTH - 49
+
+    if perf_op_impact:
+        print(f"\ninstruction impact (hit rate {MULTIPLICATION_X} average time)")
     for i, (
         opcode,
-        counter,
-    ) in enumerate(perf_hit_rates):
-        share_of_total = (counter / total_hits) * 100.0
+        (
+            impact,
+            counter,
+            timer,
+        ),
+    ) in enumerate(perf_op_impact):
+        share_of_total = (impact / total_op_impact) * 100.0
 
         fillchar = " "
         op_connecting_char = " "
@@ -2133,9 +2263,11 @@ def main(args):
             op_connecting_char = ">" if (i % 2) else " "
             cr_connecting_char = "<" if (i % 2) else " "
 
-        hit_report = "{}{} {:5.2f}%".format(
+        timer_str = format_run_time(datetime.timedelta(microseconds=timer))
+
+        hit_report = "{}{} {:7.4f}%".format(
             (f"{opcode} {op_connecting_char}").ljust(18, fillchar),
-            (f"{cr_connecting_char} {counter}").rjust(6, fillchar),
+            f"{cr_connecting_char} {counter:4d} {MULTIPLICATION_X} {timer_str}",
             share_of_total,
         )
         if colored is not None:
@@ -2151,8 +2283,14 @@ def main(args):
 
             hit_report = fg + bg + hit_report + colored.attr("reset")
 
-        bar = draw_bar(ihr_bar_size, (counter / highest_share))
+        bar = draw_bar(oit_bar_size, (impact / highest_share))
         print(f"  {hit_report} {bar}")
+
+    if not SHOW_PERFORMANCE_DETAILS:
+        print()
+        print("  to show detailed performance report:")
+        print("    export SHOW_PERFORMANCE_DETAILS=true")
+        print("  before running tests")
 
     return run_exit_code
 

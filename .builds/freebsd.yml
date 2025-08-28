@@ -18,6 +18,7 @@ environment:
   CXXSTD: c++23
   CXXFLAGS_SANITISER:
   PROGRESS_INDICATORS: false  # do not pollute output in CI
+  SHOW_PERFORMANCE_DETAILS: true  # produce detailed report in CI
 tasks:
   - build-preset-debug: |
       cd viuavm/new

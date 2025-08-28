@@ -37,6 +37,7 @@ struct Performance_counters {
     time_point_type death{};
 
     std::map<uint16_t, uint64_t> ops_counter;
+    std::map<uint16_t, std::chrono::microseconds> ops_timer;
 
     inline auto start() -> void
     {

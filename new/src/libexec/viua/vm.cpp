@@ -115,13 +115,22 @@ auto run(
 
     using viua::vm::PREEMPTION_THRESHOLD;
     for (auto i = size_t{ 0 }; i < PREEMPTION_THRESHOLD and ip_ok(); ++i) {
-        if (proc.stack.ip) {
-            auto const opcode = static_cast<viua::arch::opcode_type>(
-                *proc.stack.ip & viua::arch::ops::OPCODE_OPC_MASK);
-            ++proc.core->perf_counters.ops_counter[opcode];
-        }
+        auto const record_performance_data = static_cast<bool>(proc.stack.ip);
+        auto const perf_opcode =
+            record_performance_data
+                ? std::optional{ static_cast<viua::arch::opcode_type>(
+                      viua::carve_just_opcode_out(*proc.stack.ip)) }
+                : std::nullopt;
+        auto const perf_timer = std::chrono::steady_clock::now();
 
         proc.stack.ip = viua::vm::ins::execute(proc.stack, proc.stack.ip);
+
+        if (perf_opcode.has_value()) {
+            ++proc.core->perf_counters.ops_counter[*perf_opcode];
+            proc.core->perf_counters.ops_timer[*perf_opcode] +=
+                std::chrono::duration_cast<std::chrono::microseconds>(
+                    std::chrono::steady_clock::now() - perf_timer);
+        }
 
         ++proc.core->perf_counters.total_ops_executed;
     }
@@ -189,6 +198,27 @@ auto run(
             viua::TRACE_STREAM
                 << std::format("[vm:perf:hit-rate] {} {}",
                                counter,
+                               viua::arch::ops::to_string(opcode))
+                << viua::TRACE_STREAM.endl;
+        }
+
+        for (auto const [opcode, timer] : core.perf_counters.ops_timer) {
+            auto const counter = core.perf_counters.ops_counter.at(opcode);
+
+            /*
+             * The reports from ebreak are be detailed and take a long time to
+             * generate, but we do not really care about it. So let's skip
+             * reporting times for ebreak instructions since they are
+             * irrelevant.
+             */
+            using viua::arch::ops::OPCODE;
+            if (static_cast<OPCODE>(opcode) == OPCODE::EBREAK) {
+                continue;
+            }
+
+            viua::TRACE_STREAM
+                << std::format("[vm:perf:timer] {} {}",
+                               (timer / counter),
                                viua::arch::ops::to_string(opcode))
                 << viua::TRACE_STREAM.endl;
         }
