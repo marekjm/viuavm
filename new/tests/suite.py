@@ -1902,24 +1902,6 @@ def main(args):
         run_exit_code = 1
 
     suite_run_time = SUITE_STOP_TIMEPOINT - SUITE_START_TIMEPOINT
-    print(
-        "\nrun {} test case{} with {}% success rate".format(
-            colorise("white", (len(cases) or "no")),
-            ("s" if (len(cases) != 1) else ""),
-            colorise(
-                run_color,
-                "{:5.2f}".format((success_cases / len(cases)) * 100),
-            ),
-        )
-    )
-    print(
-        "suite run time was {}".format(
-            colorise(
-                "white",
-                format_run_time(suite_run_time).strip(),
-            ),
-        )
-    )
 
     # If all tests failed, then we do not have anything in the run statistics
     # lists. This breaks the code in many places, so let's just put dummy values
@@ -2307,6 +2289,25 @@ def main(args):
         print("  to show detailed performance report:")
         print("    export SHOW_PERFORMANCE_DETAILS=true")
         print("  before running tests")
+
+    print(
+        "\nrun {} test case{} with {}% success rate".format(
+            colorise("white", (len(cases) or "no")),
+            ("s" if (len(cases) != 1) else ""),
+            colorise(
+                run_color,
+                "{:5.2f}".format((success_cases / len(cases)) * 100),
+            ),
+        )
+    )
+    print(
+        "suite run time was {}".format(
+            colorise(
+                "white",
+                format_run_time(suite_run_time).strip(),
+            ),
+        )
+    )
 
     return run_exit_code
 
