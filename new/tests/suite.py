@@ -215,7 +215,14 @@ EBREAK_GLOBALS_LINE = re.compile(r"([a-z_][a-zA-Z0-9_]*) = (is|iu|fl|db) (.*)")
 EBREAK_ENVIRONMENT_LINE = re.compile(r"\[([a-z_][a-zA-Z0-9_]*)\] (.+)")
 PERF_OPS_AND_RUNTIME = re.compile(r"\[vm:perf\] executed ops (\d+), run time (.+)")
 PERF_HIT_RATE = re.compile(r"\[vm:perf:hit-rate\] (\d+) (.+)")
-PERF_TIMER = re.compile(r"\[vm:perf:timer\] (\d+)us (.+)")
+
+# Why use ".?s" instead of just "us"?
+#
+# First, because the C++ standard library implementation used on FreeBSD prints
+# "µs" for microseconds instead of "us" and "." handles both cases.
+# Second, if I am engaging in regex shenanigans I may as well use ".?" to handle
+# a case where an instruction takes more than a second to execute on average.
+PERF_TIMER = re.compile(r"\[vm:perf:timer\] (\d+).?s (.+)")
 PERF_APPROX_FREQ = re.compile(r"\[vm:perf\] approximate frequency (.+ [kMG]?Hz)")
 
 
