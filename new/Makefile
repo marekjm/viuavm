@@ -269,6 +269,10 @@ install: all-silent $(prefix)
 		-m 644 \
 		-D --target-directory $(DESTDIR)$(mandir)/man5 \
 		$(BUILD_MANDIR)/man5/*.5
+	$(install) \
+		-m 644 \
+		-D --target-directory $(DESTDIR)$(mandir)/man7 \
+		$(BUILD_MANDIR)/man7/*.7
 
 # This is to fix CI on Sourcehut. For some reason, Make evaluates the
 #

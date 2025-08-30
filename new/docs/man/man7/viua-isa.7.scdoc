@@ -255,7 +255,7 @@ Bits 63-32 are reserved and have unspecified value.
 An instruction with a one-way (single - *S*) register access.
 
 ```
- 63                   32│31 24│23     8
+ 63                   24│23 16│15     0
 ┌───────────────────────┼─────┼────────┐
 │                       │ rgr │ opcode │
 └───────────────────────┴─────┴────────┘
@@ -312,9 +312,9 @@ Every memory instruction has a _unit_ embedded in its opcode:
 
 This _unit_ appears as a part of an instruction's name.
 
-For example, the *lm* (load memory, not actually usable as assembler will reject
-the base unit-less form) instruction may be written as *lb* (load byte), or as
-*lq* (load quad-word).
+For example, the *lm* (load memory, not actually usable as the assembler will
+reject the base unit-less form) instruction may be written as eg, *lb* (load
+byte), or *lq* (load quad-word).
 
 ## Struct layout considerations
 
@@ -461,7 +461,7 @@ An instruction with one-way register access, and a 32-bit wide immediate (hence
 └─────────────────┴─────┴─────┴────────┘
 ```
 
-Bits 63-32 are reserved and have unspecified value.
+Bits 31-24 are reserved and have unspecified value.
 
 One of the most useful I-format instructions is *lui* ie, the Load Upper
 Intermediate, which may be familiar to people who have some RISC-V background.
