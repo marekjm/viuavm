@@ -65,23 +65,19 @@ auto ston(
         auto base                   = default_base;
         if (view.starts_with("0x")) {
             base = 16;
-
-            /*
-             * std::from_chars does not accept the 0x prefix if the base is set
-             * explicitly.
-             */
-            n.erase(static_cast<size_t>(is_negative), 2);
         } else if (view.starts_with("0o")) {
             base = 8;
-
-            /*
-             * Octal literals in Viua assembly begin with "0o", but C++
-             * converters take octals beginning with "0". We need to drop
-             * the "o".
-             */
-            n.erase(1 + static_cast<size_t>(is_negative), 1);
         } else if (view.starts_with("0b")) {
             base = 2;
+        }
+
+        /*
+         * std::from_chars does not accept prefixes (0x, 0b, 0o) if the base is
+         * set explicitly. Since we do set the base explicitly, we have to erase
+         * the prefix.
+         */
+        if (base != default_base) {
+            n.erase(static_cast<size_t>(is_negative), 2);
         }
 
         auto value        = T{};
