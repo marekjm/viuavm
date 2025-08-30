@@ -1106,6 +1106,7 @@ def test_case_impl_checks(
             f"crashed with non-zero return: {r_exit}{during_rerun}",
             count_runtime(),
             None,
+            None,
         )
 
     if check_kind == "ebreak":
@@ -1120,6 +1121,7 @@ def test_case_impl_checks(
                 f"empty ebreak file{during_rerun}",
                 count_runtime(),
                 None,
+                None,
             )
 
         if ebreak is None:
@@ -1128,6 +1130,7 @@ def test_case_impl_checks(
                 False,
                 f"program did not emit ebreak{during_rerun}",
                 count_runtime(),
+                None,
                 None,
             )
 
@@ -1144,6 +1147,7 @@ def test_case_impl_checks(
                 f"{e.to_string()}{during_rerun}",
                 count_runtime(),
                 None,
+                None,
             )
         except Bad_ebreak_script as e:
             return (
@@ -1151,6 +1155,7 @@ def test_case_impl_checks(
                 False,
                 f"bad ebreak script, error on line {e.args[0]}{during_rerun}",
                 count_runtime(),
+                None,
                 None,
             )
     elif check_kind == "abort":
@@ -1165,6 +1170,7 @@ def test_case_impl_checks(
                 f"empty abort file{during_rerun}",
                 count_runtime(),
                 None,
+                None,
             )
 
         if abort_report is None:
@@ -1173,6 +1179,7 @@ def test_case_impl_checks(
                 False,
                 f"program did not abort{during_rerun}",
                 count_runtime(),
+                None,
                 None,
             )
 
@@ -1198,6 +1205,7 @@ def test_case_impl_checks(
                 f"unexpected IP{during_rerun}",
                 count_runtime(),
                 None,
+                None,
             )
         if (want_value := abort_test[1]) != (live_value := abort_report["instruction"]):
             leader = f"    aborted instruction"
@@ -1220,6 +1228,7 @@ def test_case_impl_checks(
                 False,
                 f"unexpected instruction{during_rerun}",
                 count_runtime(),
+                None,
                 None,
             )
         if (want_value := abort_test[2]) != (live_value := abort_report["message"]):
@@ -1244,6 +1253,7 @@ def test_case_impl_checks(
                 f"unexpected abort message{during_rerun}",
                 count_runtime(),
                 None,
+                None,
             )
     elif check_kind == "stdout":
         stdout_test = f"{base_path}.stdout"
@@ -1257,6 +1267,7 @@ def test_case_impl_checks(
                 False,
                 f"empty stdout file{during_rerun}",
                 count_runtime(),
+                None,
                 None,
             )
 
@@ -1277,6 +1288,7 @@ def test_case_impl_checks(
                 False,
                 f"bad stdout{during_rerun}",
                 count_runtime(),
+                None,
                 None,
             )
 
@@ -1635,6 +1647,35 @@ def prepare_dependencies(cases_dir):
         )
 
 
+def report_suite_totals(run_time, cases_run, cases_successful, cases_skipped):
+    run_color: str = None
+    if cases_successful == cases_run:
+        run_color = "green"
+    elif (cases_successful + cases_skipped) == cases_run:
+        run_color = "yellow"
+    else:
+        run_color = "red"
+
+    print(
+        "\nrun {} test case{} with {}% success rate".format(
+            colorise("white", (cases_run or "no")),
+            ("s" if cases_run != 1 else ""),
+            colorise(
+                run_color,
+                "{:.2f}".format((cases_successful / cases_run) * 100),
+            ),
+        )
+    )
+    print(
+        "suite run time was {}".format(
+            colorise(
+                "white",
+                format_run_time(run_time).strip(),
+            ),
+        )
+    )
+
+
 def main(args):
     DEFAULT_CASES_DIR = "./tests/asm"
     CASES_DIR = os.environ.get("VIUA_VM_TEST_CASES_DIR", DEFAULT_CASES_DIR)
@@ -1735,7 +1776,7 @@ def main(args):
             print(separator_line)
 
         print(
-            "  {} {} [{}]  {}: {} {}  {} @ {}".format(
+            "  {} {} [{}]  {}  {} {}  {} @ {}".format(
                 colorise(CASE_RUNTIME_COLOUR, f"0{DEGREE}".rjust(pad_case_no + 1)),
                 colorise("white", "case name".ljust(pad_case_name)),
                 colorise(CASE_RUNTIME_COLOUR, "stat"),
@@ -1770,11 +1811,6 @@ def main(args):
 
         rc = lambda: test_case(case_name, test_program, error_stream)
 
-        result, symptom, run_time = (
-            False,
-            None,
-            None,
-        )
         tag_color: str = None
         tag: str = None
 
@@ -1839,6 +1875,7 @@ def main(args):
             tag = "bork"
             tag_color = "purple_1b"
             symptom = "internal test suite failure"
+            perf = None
 
         run_list[tag].append(case_name)
 
@@ -1855,7 +1892,7 @@ def main(args):
             else (11 * " ")
         )
         print(
-            "{}[{}] {}: {}".format(
+            "{}[{}] {}  {}".format(
                 (
                     PROGRESS_INDICATOR_ERASER
                     if (PROGRESS_INDICATORS and not skipped)
@@ -1891,17 +1928,15 @@ def main(args):
         with open(os.path.join(CACHE_DIR, result_tag), "w") as ofstream:
             ofstream.write("\n".join(tagged_cases))
 
-    run_color: str = None
     run_exit_code: int = 0
-    if success_cases == len(cases):
-        run_color = "green"
-    elif (success_cases + skip_cases) == len(cases):
-        run_color = "yellow"
-    else:
-        run_color = "red"
+    if success_cases != len(cases):
         run_exit_code = 1
 
     suite_run_time = SUITE_STOP_TIMEPOINT - SUITE_START_TIMEPOINT
+
+    if not success_cases:
+        report_suite_totals(suite_run_time, len(cases), success_cases, skip_cases)
+        return run_exit_code
 
     # If all tests failed, then we do not have anything in the run statistics
     # lists. This breaks the code in many places, so let's just put dummy values
@@ -2290,24 +2325,7 @@ def main(args):
         print("    export SHOW_PERFORMANCE_DETAILS=true")
         print("  before running tests")
 
-    print(
-        "\nrun {} test case{} with {}% success rate".format(
-            colorise("white", (len(cases) or "no")),
-            ("s" if (len(cases) != 1) else ""),
-            colorise(
-                run_color,
-                "{:5.2f}".format((success_cases / len(cases)) * 100),
-            ),
-        )
-    )
-    print(
-        "suite run time was {}".format(
-            colorise(
-                "white",
-                format_run_time(suite_run_time).strip(),
-            ),
-        )
-    )
+    report_suite_totals(suite_run_time, len(cases), success_cases, skip_cases)
 
     return run_exit_code
 
