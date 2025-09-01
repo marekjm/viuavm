@@ -209,7 +209,7 @@ EBREAK_LINE_PRIMITIVE = re.compile(
 )
 EBREAK_LINE_SPECIAL = re.compile(r"\[(fptr|sbrk)\] (is|iu|fl|db) (.*)")
 EBREAK_MEMORY_LINE = re.compile(
-    r"([0-9a-f]{16}--[0-9a-f]{2})  ((?:[0-9a-f]{2} ){16})\| (.{16})"
+    r"([0-9a-f]{16}-[0-9a-f]{2}) ((?: [0-9a-f]{8}){4}) \| (.{16})"
 )
 EBREAK_GLOBALS_LINE = re.compile(r"([a-z_][a-zA-Z0-9_]*) = (is|iu|fl|db) (.*)")
 EBREAK_ENVIRONMENT_LINE = re.compile(r"\[([a-z_][a-zA-Z0-9_]*)\] (.+)")
@@ -1816,6 +1816,11 @@ def main(args):
 
         internal_test_suite_failure: Exception = None
         skipped = False
+
+        result = None
+        perf = None
+        run_time = datetime.timedelta()
+
         try:
             if type(result := rc()) is tuple:
                 status, result, symptom, run_time, perf, toolchain_perf = result
@@ -1875,7 +1880,6 @@ def main(args):
             tag = "bork"
             tag_color = "purple_1b"
             symptom = "internal test suite failure"
-            perf = None
 
         run_list[tag].append(case_name)
 

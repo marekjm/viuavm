@@ -162,11 +162,11 @@ auto dump_memory(
         viua::TRACE_STREAM << "    ";
         viua::TRACE_STREAM
             << std::setw(16)
-            << (MEM_FIRST_STACK_BREAK - ((line + 1) * MEM_LINE_SIZE) + 1)
-            << "--" << std::setw(2)
+            << (MEM_FIRST_STACK_BREAK - ((line + 1) * MEM_LINE_SIZE) + 1) << "-"
+            << std::setw(2)
             << ((MEM_FIRST_STACK_BREAK - (line * MEM_LINE_SIZE))
                 & 0x00'00'00'00'00'00'00'ff)
-            << "  ";
+            << " ";
 
         auto const& page = memory.front();
         auto at          = [&page, line](size_t const n) -> uint8_t
@@ -175,10 +175,12 @@ auto dump_memory(
                      - (line * MEM_LINE_SIZE + n));
         };
         for (auto i = MEM_LINE_SIZE; i; --i) {
-            viua::TRACE_STREAM << std::setw(2) << static_cast<int>(at(i - 1))
-                               << ' ';
+            if ((i % 4) == 0) {
+                viua::TRACE_STREAM << ' ';
+            }
+            viua::TRACE_STREAM << std::setw(2) << static_cast<int>(at(i - 1));
         }
-        viua::TRACE_STREAM << "| ";
+        viua::TRACE_STREAM << " | ";
         for (auto i = MEM_LINE_SIZE; i; --i) {
             auto const c = at(i - 1);
             viua::TRACE_STREAM << (isprint(c) ? static_cast<char>(c) : '.');
