@@ -161,10 +161,12 @@ const auto VOID          = std::regex{ "^\\bvoid\\b" };
 const auto ZERO_SIGNED   = std::regex{ "^\\bzero\\b" };
 const auto ZERO_UNSIGNED = std::regex{ "^\\buzero\\b" };
 
-const auto LITERAL_ATOM = std::regex{ pattern::LITERAL_ATOM };
-const auto LITERAL_INTEGER =
-    std::regex{ "^[-+]?(?:0x[a-f0-9]+|0o[0-7]+|0b[01]+|0|[1-9][0-9]*)u?" };
-const auto LITERAL_FLOAT = std::regex{ "^-?(?:0|[1-9][0-9]*)?\\.[0-9]+" };
+const auto LITERAL_ATOM        = std::regex{ pattern::LITERAL_ATOM };
+const auto LITERAL_INTEGER_HEX = std::regex{ "^-?0x[0-9a-f][0-9a-f']*u?" };
+const auto LITERAL_INTEGER_OCT = std::regex{ "^-?0o[0-7]['0-7]*u?" };
+const auto LITERAL_INTEGER_BIN = std::regex{ "^-?0b[01]['01]*u?" };
+const auto LITERAL_INTEGER_DEC = std::regex{ "^-?(?:0|[1-9]['0-9]*)u?" };
+const auto LITERAL_FLOAT       = std::regex{ "^-?(?:0|[1-9][0-9]*)?\\.[0-9]+" };
 
 const auto COMMA           = std::regex{ "^," };
 const auto ELLIPSIS        = std::regex{ "^\\.\\.\\." };
@@ -390,7 +392,16 @@ auto lex(
         if (try_match(LITERAL_FLOAT, TOKEN::LITERAL_FLOAT)) {
             continue;
         }
-        if (try_match(LITERAL_INTEGER, TOKEN::LITERAL_INTEGER)) {
+        if (try_match(LITERAL_INTEGER_HEX, TOKEN::LITERAL_INTEGER)) {
+            continue;
+        }
+        if (try_match(LITERAL_INTEGER_OCT, TOKEN::LITERAL_INTEGER)) {
+            continue;
+        }
+        if (try_match(LITERAL_INTEGER_BIN, TOKEN::LITERAL_INTEGER)) {
+            continue;
+        }
+        if (try_match(LITERAL_INTEGER_DEC, TOKEN::LITERAL_INTEGER)) {
             continue;
         }
 

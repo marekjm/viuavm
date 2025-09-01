@@ -80,6 +80,11 @@ auto ston(
             n.erase(static_cast<size_t>(is_negative), 2);
         }
 
+        /*
+         * Syntax supports ' as digit separator, but std::from_chars does not.
+         */
+        std::erase(n, '\'');
+
         auto value        = T{};
         auto const first  = n.c_str();
         auto const last   = first + n.size();
