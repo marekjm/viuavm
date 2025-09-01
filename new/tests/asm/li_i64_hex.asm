@@ -11,8 +11,8 @@
     li $2.l, 0x1
 
     ; As the final test, let's see if loading maximums works.
-    li $3.l, 0x7fffffffffffffff
-    li $4.l, -0x8000000000000000
+    li $3.l,  0x7fff'ffff'ffff'ffff
+    li $4.l, -0x8000'0000'0000'0000
 
     ebreak
     return
