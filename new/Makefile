@@ -212,7 +212,10 @@ test_prefix?=$(BUILD_PREFIX)
 test_exec_prefix?=$(test_prefix)
 test: all
 	test_prefix=$(test_prefix) test_exec_prefix=$(test_exec_prefix) \
-		$(python3) ./tests/suite.py $(TESTS)
+		$(python3) ./tests/suite.py $(tests)
+
+list-test:
+	@basename --suffix=.asm --multiple $(shell ls -1 tests/asm/*.asm) | sort
 
 .PHONY: clean-test
 clean-test:
