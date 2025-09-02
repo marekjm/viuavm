@@ -75,6 +75,8 @@ using size_type = arithmetic_type::size_type;
 
 auto operator<<(arithmetic_type const, size_t const) -> arithmetic_type;
 
+auto operator==(arithmetic_type const, arithmetic_type const) -> bool;
+
 /*
  * Sign-extend by default. Use the optional expander value to override.
  */
@@ -145,9 +147,12 @@ struct signed_type {
 };
 auto operator<(signed_type const, zero_type const) -> bool;
 auto operator>(signed_type const, zero_type const) -> bool;
+auto operator==(signed_type const, zero_type const) -> bool;
 
 auto operator<(signed_type const, signed_type const) -> bool;
 auto operator==(signed_type const, signed_type const) -> bool;
+
+auto operator++(signed_type) -> signed_type;
 
 
 struct unsigned_type {
@@ -231,7 +236,6 @@ auto dec(arithmetic_type) -> arithmetic_type;
 auto add(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
 auto sub(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
 auto mul(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
-auto div(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
 }  // namespace bits
 
 namespace fixed {
@@ -240,6 +244,7 @@ auto make_arithmetic(int64_t const, size_t const) -> signed_type;
 auto operator+(signed_type const, signed_type const) -> signed_type;
 auto operator-(signed_type const, signed_type const) -> signed_type;
 auto operator*(signed_type const, signed_type const) -> signed_type;
+auto operator/(signed_type const, signed_type const) -> signed_type;
 }  // namespace fixed
 
 namespace saturating {
@@ -248,6 +253,7 @@ auto make_arithmetic(int64_t const, size_t const) -> signed_type;
 auto operator+(signed_type const, signed_type const) -> signed_type;
 auto operator-(signed_type const, signed_type const) -> signed_type;
 auto operator*(signed_type const, signed_type const) -> signed_type;
+auto operator/(signed_type const, signed_type const) -> signed_type;
 }  // namespace saturating
 
 #if 0

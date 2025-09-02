@@ -205,6 +205,53 @@ auto calculate_mul(
 {
     return (lhs * rhs);
 }
+
+auto calculate_div(
+    Stack& stack,
+    viua::arch::opcode_type const style,
+    int64_t const lhs,
+    int64_t const rhs) -> int64_t
+{
+    using namespace viua::arithmetic;
+
+    auto const arithmetic_width = stack.proc->arithmetic_width;
+    auto const arithmetic_lhs =
+        signed_type{ extend(arithmetic_type{ lhs }, arithmetic_width) };
+    auto const arithmetic_rhs =
+        signed_type{ extend(arithmetic_type{ rhs }, arithmetic_width) };
+
+    switch (style) {
+        using namespace viua::arch::ops::OPCODE_FLAGS;
+        case ARITHMETIC_STYLE_WRAP:
+            {
+                using namespace viua::arithmetic::fixed;
+                return static_cast<int64_t>(arithmetic_lhs / arithmetic_rhs);
+            }
+        case ARITHMETIC_STYLE_TRAP:
+            {
+                using namespace viua::arithmetic::fixed;
+                return static_cast<int64_t>(arithmetic_lhs / arithmetic_rhs);
+            }
+        case ARITHMETIC_STYLE_SATURATE:
+            {
+                using namespace viua::arithmetic::saturating;
+                return static_cast<int64_t>(arithmetic_lhs / arithmetic_rhs);
+            }
+    }
+
+    throw viua::vm::abort_execution{
+        stack, "broken environment: bad arithmetic style for subtraction"
+    };
+}
+
+auto calculate_div(
+    Stack&,
+    viua::arch::opcode_type const,
+    uint64_t const lhs,
+    uint64_t const rhs) -> uint64_t
+{
+    return (lhs / rhs);
+}
 }  // namespace
 
 namespace viua::vm::ins {
@@ -500,7 +547,7 @@ auto execute(
     }
 }
 
-auto execute(
+auto native_div(
     DIV const op,
     Stack& stack,
     ip_type const) -> void
@@ -536,6 +583,44 @@ auto execute(
     throw abort_execution{
         stack, "unsupported operand types for arithmetic operation"
     };
+}
+auto styled_div(
+    DIV const op,
+    viua::arch::opcode_type const style,
+    Stack& stack,
+    ip_type const) -> void
+{
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
+    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
+
+    auto const lhs_i64 = lhs.holds<register_type::int_type>();
+    auto const lhs_u64 = lhs.holds<register_type::uint_type>();
+
+    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
+        out = calculate_div(stack, style, *lhs.get<int64_t>(), *v);
+        return;
+    }
+    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
+        out = calculate_div(stack, style, *lhs.get<uint64_t>(), *v);
+        return;
+    }
+
+    throw abort_execution{
+        stack, "unsupported operand types for styled arithmetic operation"
+    };
+}
+auto execute(
+    DIV const op,
+    Stack& stack,
+    ip_type const ip) -> void
+{
+    auto const style = viua::carve_flags_out(op.instruction.opcode);
+    if (style == viua::arch::ops::OPCODE_FLAGS::ARITHMETIC_STYLE_NATIVE) {
+        return native_div(op, stack, ip);
+    } else {
+        return styled_div(op, style, stack, ip);
+    }
 }
 
 auto execute(

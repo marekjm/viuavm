@@ -72,6 +72,25 @@ auto operator<<(
     std::copy(v.n.begin(), v.n.end(), std::back_inserter(a.n));
     return a;
 }
+
+auto operator==(
+    arithmetic_type const lhs,
+    arithmetic_type const rhs) -> bool
+{
+    if (lhs.size() != rhs.size()) {
+        throw std::runtime_error{ std::format(
+            "aeq: mismatched bit widths: {} < {}",
+            to_string(lhs, false, DEFAULT_SEPARATOR),
+            to_string(rhs, false, DEFAULT_SEPARATOR)) };
+    }
+
+    for (auto i = size_type{ 0 }; i < lhs.size(); ++i) {
+        if (lhs[i] != rhs[i]) {
+            return false;
+        }
+    }
+    return true;
+}
 }  // namespace viua::arithmetic
 
 
@@ -182,6 +201,12 @@ auto operator>(
 {
     return ((not(v < zero_type{})) and static_cast<bool>(v));
 }
+auto operator==(
+    signed_type const v,
+    zero_type const) -> bool
+{
+    return not static_cast<bool>(v);
+}
 
 auto operator<(
     signed_type const lhs,
@@ -241,7 +266,7 @@ auto operator==(
     signed_type const rhs) -> bool
 {
     if (lhs.size() != rhs.size()) {
-        throw std::runtime_error{ "lt: mismatched bit widths" };
+        throw std::runtime_error{ "eq: mismatched bit widths" };
     }
 
     for (auto i = size_type{ 0 }; i < lhs.size(); ++i) {
@@ -317,6 +342,68 @@ auto operator*(
     signed_type const rhs) -> signed_type
 {
     return signed_type{ extend(bits::mul(lhs.n, rhs.n), lhs.size()) };
+}
+
+auto operator/(
+    signed_type const lhs,
+    signed_type const rhs) -> signed_type
+{
+    auto const minimum = signed_type::min(lhs.size());
+    auto const maximum = signed_type::max(lhs.size());
+    auto const one = signed_type{ extend(arithmetic_type{ 1 }, rhs.size()) };
+    auto const minus_one =
+        signed_type{ arithmetic_type::of_size(lhs.size(), true) };
+    auto const negative_lhs = lhs < zero_type{};
+    auto const negative_rhs = rhs < zero_type{};
+    auto const minimum_lhs  = lhs == minimum;
+    auto const minimum_rhs  = rhs == minimum;
+
+    if (rhs == zero_type{}) {
+        return signed_type::zero(lhs.size());
+    }
+    if (lhs == zero_type{}) {
+        return signed_type::zero(lhs.size());
+    }
+    if (minimum_lhs and (rhs == one)) {
+        return minimum;
+    }
+    if (minimum_lhs and (rhs == maximum)) {
+        return minus_one;
+    }
+    if (minimum_rhs and minimum_lhs) {
+        return signed_type{ 1 };
+    }
+    if (minimum_rhs) {
+        return signed_type::zero(lhs.size());
+    }
+
+    auto working_lhs =
+        negative_lhs ? signed_type{ take_twos_complement(lhs.n) } : lhs;
+    auto const working_rhs =
+        negative_rhs ? signed_type{ take_twos_complement(rhs.n) } : rhs;
+
+    if (working_rhs == zero_type{}) {
+        return signed_type::zero(lhs.size());
+    }
+    if (working_lhs == zero_type{}) {
+        return signed_type::zero(lhs.size());
+    }
+
+    auto result = arithmetic_type::zero(lhs.size());
+
+    while (not(working_lhs < working_rhs)) {
+        result      = bits::inc(result);
+        working_lhs = working_lhs - working_rhs;
+    }
+
+    auto const negative_result = negative_lhs xor negative_rhs;
+    auto const end_result =
+        extend((negative_result ? take_twos_complement(std::move(result))
+                                : std::move(result)),
+               lhs.size(),
+               negative_result);
+
+    return signed_type{ end_result };
 }
 }  // namespace viua::arithmetic::fixed
 
@@ -618,7 +705,7 @@ auto operator*(
     auto const car = signed_type{ extend(raw.n, lhs.size() + 1) };
     auto const val = signed_type{ extend(raw.n, lhs.size()) };
 
-    if constexpr (true) {
+    if constexpr (DEBUG_SATURATING) {
         std::println("saturating operator*:");
         std::println("  lhs: {}", to_string(lhs, false, DEFAULT_SEPARATOR));
         std::println("  rhs: {}", to_string(rhs, false, DEFAULT_SEPARATOR));
@@ -680,6 +767,48 @@ auto operator*(
      */
     return expect_negative ? signed_type::min(lhs.size())
                            : signed_type::max(lhs.size());
+}
+
+auto operator/(
+    signed_type const lhs,
+    signed_type const rhs) -> signed_type
+{
+    if (rhs == zero_type{}) {
+        return signed_type::zero(lhs.size());
+    }
+    if (lhs == zero_type{}) {
+        return signed_type::zero(lhs.size());
+    }
+
+    auto const minus_one =
+        signed_type{ extend(arithmetic_type{ -1 }, lhs.size()) };
+    auto const minimum        = signed_type::min(lhs.size());
+    auto const would_overflow = ((rhs == minus_one) and (lhs == minimum))
+                                or ((lhs == minus_one) and (rhs == minimum));
+    if (would_overflow) {
+        return signed_type::max(lhs.size());
+    }
+
+    auto const negative_lhs = lhs < zero_type{};
+    auto const negative_rhs = rhs < zero_type{};
+    auto working_lhs =
+        negative_lhs ? signed_type{ take_twos_complement(lhs.n) } : lhs;
+    auto const working_rhs =
+        negative_rhs ? signed_type{ take_twos_complement(rhs.n) } : rhs;
+
+    auto result = arithmetic_type::of_size(1);
+
+    while (not(working_lhs < working_rhs)) {
+        result      = bits::inc(result);
+        working_lhs = working_lhs - working_rhs;
+    }
+
+    auto const negative_result = negative_lhs xor negative_rhs;
+
+    return signed_type{ extend(
+        (negative_result ? take_twos_complement(result) : std::move(result)),
+        lhs.size(),
+        negative_result) };
 }
 }  // namespace viua::arithmetic::saturating
 
