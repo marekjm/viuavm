@@ -255,57 +255,6 @@ auto operator-(signed_type const, signed_type const) -> signed_type;
 auto operator*(signed_type const, signed_type const) -> signed_type;
 auto operator/(signed_type const, signed_type const) -> signed_type;
 }  // namespace saturating
-
-#if 0
-
-auto clip(arithmetic_type const, size_type const) -> arithmetic_type;
-
-auto invert(arithmetic_type) -> arithmetic_type;
-auto zero(arithmetic_type const) -> arithmetic_type;
-
-auto is_zero(arithmetic_type const) -> bool;
-auto is_negative(arithmetic_type const) -> bool;
-auto highest_bit_set(arithmetic_type const) -> std::optional<size_type>;
-
-namespace bits {
-auto shr(arithmetic_type const, size_type const) -> arithmetic_type;
-auto shl(arithmetic_type const, size_type const) -> arithmetic_type;
-
-auto inc(arithmetic_type) -> arithmetic_type;
-auto dec(arithmetic_type) -> arithmetic_type;
-
-auto add(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
-auto sub(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
-auto mul(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
-auto div(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
-
-auto eq(arithmetic_type const, arithmetic_type const) -> bool;
-auto lt(arithmetic_type const, arithmetic_type const) -> bool;
-auto lte(arithmetic_type const, arithmetic_type const) -> bool;
-}
-
-namespace fixed {
-using with_carry_type = std::pair<bool, arithmetic_type>;
-
-auto inc(arithmetic_type) -> with_carry_type;
-auto dec(arithmetic_type) -> with_carry_type;
-
-auto add(arithmetic_type const, arithmetic_type const) -> with_carry_type;
-auto sub(arithmetic_type const, arithmetic_type const) -> with_carry_type;
-auto mul(arithmetic_type const, arithmetic_type const) -> with_carry_type;
-auto div(arithmetic_type const, arithmetic_type const) -> with_carry_type;
-}
-
-namespace saturating {
-auto inc(arithmetic_type) -> arithmetic_type;
-auto dec(arithmetic_type) -> arithmetic_type;
-
-auto add(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
-auto sub(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
-auto mul(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
-auto div(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
-}
-#endif
 }  // namespace arithmetic
 }  // namespace viua
 
