@@ -773,30 +773,54 @@ auto operator/(
     signed_type const lhs,
     signed_type const rhs) -> signed_type
 {
-    if (rhs == zero_type{}) {
+    auto const minimum = signed_type::min(lhs.size());
+    auto const maximum = signed_type::max(lhs.size());
+    auto const one = signed_type{ extend(arithmetic_type{ 1 }, rhs.size()) };
+    auto const minus_one =
+        signed_type{ arithmetic_type::of_size(lhs.size(), true) };
+    auto const negative_lhs = lhs < zero_type{};
+    auto const negative_rhs = rhs < zero_type{};
+    auto const minimum_lhs  = lhs == minimum;
+    auto const minimum_rhs  = rhs == minimum;
+
+    if ((rhs == zero_type{}) and (lhs == zero_type{})) {
         return signed_type::zero(lhs.size());
+    }
+    if (rhs == zero_type{}) {
+        return (lhs < zero_type{}) ? minimum : maximum;
     }
     if (lhs == zero_type{}) {
         return signed_type::zero(lhs.size());
     }
-
-    auto const minus_one =
-        signed_type{ extend(arithmetic_type{ -1 }, lhs.size()) };
-    auto const minimum        = signed_type::min(lhs.size());
-    auto const would_overflow = ((rhs == minus_one) and (lhs == minimum))
-                                or ((lhs == minus_one) and (rhs == minimum));
-    if (would_overflow) {
-        return signed_type::max(lhs.size());
+    if (minimum_lhs and (rhs == minus_one)) {
+        return maximum;
+    }
+    if (minimum_lhs and (rhs == one)) {
+        return minimum;
+    }
+    if (minimum_lhs and (rhs == maximum)) {
+        return minus_one;
+    }
+    if (minimum_rhs and minimum_lhs) {
+        return signed_type{ 1 };
+    }
+    if (minimum_rhs) {
+        return signed_type::zero(lhs.size());
     }
 
-    auto const negative_lhs = lhs < zero_type{};
-    auto const negative_rhs = rhs < zero_type{};
     auto working_lhs =
         negative_lhs ? signed_type{ take_twos_complement(lhs.n) } : lhs;
     auto const working_rhs =
         negative_rhs ? signed_type{ take_twos_complement(rhs.n) } : rhs;
 
-    auto result = arithmetic_type::of_size(1);
+    if (working_rhs == zero_type{}) {
+        return signed_type::zero(lhs.size());
+    }
+    if (working_lhs == zero_type{}) {
+        return signed_type::zero(lhs.size());
+    }
+
+    auto result = arithmetic_type::zero(lhs.size());
 
     while (not(working_lhs < working_rhs)) {
         result      = bits::inc(result);
@@ -804,11 +828,13 @@ auto operator/(
     }
 
     auto const negative_result = negative_lhs xor negative_rhs;
+    auto const end_result =
+        extend((negative_result ? take_twos_complement(std::move(result))
+                                : std::move(result)),
+               lhs.size(),
+               negative_result);
 
-    return signed_type{ extend(
-        (negative_result ? take_twos_complement(result) : std::move(result)),
-        lhs.size(),
-        negative_result) };
+    return signed_type{ end_result };
 }
 }  // namespace viua::arithmetic::saturating
 
