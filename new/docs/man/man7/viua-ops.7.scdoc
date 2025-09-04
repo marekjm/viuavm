@@ -119,6 +119,8 @@ be used for the $_lhs_ operand.
 *div*[.*native*] $_dst_, $_lhs_, $_rhs_
 	Divide $_lhs_ by $_rhs_, and store the output in $_dst_.
 
+	For a discussion of how division by zero is handled, see *Division by zero*.
+
 *mod* _dst_, _lhs_, _rhs_
 	Calculate ($_lhs_ modulo $_rhs_), and store the output in $_dst_.
 
@@ -209,9 +211,67 @@ For example, to execute saturating addition one would write:
 
 Styles other than .*native* take into account the state of the *earw*
 environment register (manipulated using the *earithmeticwidth* instruction), and
-can be made to work on integers of specific width; eg, on 8-bit or 42-bit
-integers (the width does not have to be a multiple of 8).
+can be made to work on integers of specific width; eg, on 8-bit, 17-bit, or
+42-bit integers (the width does not have to be a power of 2).
 
+Selected arithmetic style influences the result of division by zero.
+See *Division by zero* for more information.
+
+
+## Division by zero
+
+The result of division by zero depends on the arithmetic style used for the
+operation.
+The following table describes the behaviour of the virtual machine when such a
+situation is encountered:
+
+[[ arithmetic style
+:< result is...
+|  *native*
+:  platform-depdenent
+|  *wrap*
+:  0
+|  *trap*
+:  division by zero exception
+|  *saturate*
+:  saturated to left-hand sign
+
+The "saturated to sign" for saturating style means that if the left-hand side is
+negative the result will be the minimum representable value, if the left-hand
+side is positive the result will be the maximum representable value, and if the
+left-hand side is zero the result will be zero.
+
+For example, using *signed* 8-bit integers:
+
+[] dividend
+:] result of division by zero
+|  -1
+:  -128
+|  0
+:  0
+|  1
+:  127
+
+And using *unsigned* 8-bit integers:
+
+[] dividend
+:] result of division by zero
+|  0
+:  0
+|  1
+:  255
+
+Even though the machine's behaviour is deterministic in the presence of zero on
+the right-hand side (as long as styled arithmetic is used), care should be taken
+whenever such a situation may arise.
+In particular, the *div.native* instruction should be treated with extreme
+suspicion, unless one is sure that the underlying platform provides reasonable
+behaviour for division by zero.
+Defensive programming is always advised.
+
+If behaviour not covered by either wrapping or saturating style is required, the
+*div.trap* instruction should be used, and the behaviour defined by the supplied
+handler.
 
 ## Floating-point constructors
 
