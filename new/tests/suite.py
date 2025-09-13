@@ -1697,6 +1697,24 @@ def main(args):
             run_only_these_cases.remove("@fail")
             with open(os.path.join(CACHE_DIR, "fail"), "r") as ifstream:
                 run_only_these_cases.update(ifstream.read().splitlines())
+
+        if invalid_test_cases := (run_only_these_cases - set(d.keys())):
+            case_name = invalid_test_cases.pop()
+            sys.stderr.write(
+                "{}: no such test case: {}\n".format(
+                    colorise("red", "error"),
+                    colorise("white", case_name),
+                )
+            )
+            case_source_path = os.path.join(CASES_DIR, f"{case_name}.asm")
+            sys.stderr.write(
+                "{}: ...because source file does not exist: {}\n".format(
+                    colorise("blue", "note"),
+                    colorise("white", case_source_path),
+                )
+            )
+            return 1
+
         cases = list(
             map(
                 lambda each: (
