@@ -318,17 +318,15 @@ auto unsigned_type::in_range(
      * the highest set bit. If this bit is higher than the expected width we
      * have an out of range number.
      */
-    return most_significant_one() < width;
+    return highest_one() < width;
 }
 
-auto unsigned_type::most_significant_one() const -> std::optional<size_type>
+auto unsigned_type::highest_one() const -> std::optional<size_type>
 {
     auto const the_one = std::find(n.rbegin(), n.rend(), true);
-    if (the_one == n.rend()) {
-        return std::nullopt;
-    } else {
-        return std::distance(the_one, n.rend()) - 1;
-    }
+    return (the_one == n.rend())
+               ? std::nullopt
+               : std::optional{ std::distance(the_one, n.rend()) - 1 };
 }
 
 auto unsigned_type::max(

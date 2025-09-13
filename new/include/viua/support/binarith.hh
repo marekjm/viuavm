@@ -211,7 +211,11 @@ struct unsigned_type {
     auto size() const -> size_type;
     auto in_range(size_type const) const -> bool;
 
-    auto most_significant_one() const -> std::optional<size_type>;
+    /*
+     * See https://github.com/rust-lang/rust/pull/144971 and
+     * https://doc.rust-lang.org/std/primitive.u64.html#method.isolate_most_significant_one
+     */
+    auto highest_one() const -> std::optional<size_type>;
 };
 
 
