@@ -215,12 +215,41 @@ auto calculate_sub(
 }
 
 auto calculate_sub(
-    Stack&,
-    viua::arch::opcode_type const,
+    Stack& stack,
+    viua::arch::opcode_type const style,
     uint64_t const lhs,
     uint64_t const rhs) -> uint64_t
 {
-    return (lhs - rhs);
+    using namespace viua::arithmetic;
+
+    auto const arithmetic_width = stack.proc->arithmetic_width;
+    auto const arithmetic_lhs =
+        unsigned_type{ extend(arithmetic_type{ lhs }, arithmetic_width) };
+    auto const arithmetic_rhs =
+        unsigned_type{ extend(arithmetic_type{ rhs }, arithmetic_width) };
+
+    switch (style) {
+        using namespace viua::arch::ops::OPCODE_FLAGS;
+        case ARITHMETIC_STYLE_WRAP:
+            {
+                using namespace viua::arithmetic::fixed;
+                return static_cast<uint64_t>(arithmetic_lhs - arithmetic_rhs);
+            }
+        case ARITHMETIC_STYLE_TRAP:
+            {
+                using namespace viua::arithmetic::fixed;
+                return static_cast<uint64_t>(arithmetic_lhs - arithmetic_rhs);
+            }
+        case ARITHMETIC_STYLE_SATURATE:
+            {
+                using namespace viua::arithmetic::saturating;
+                return static_cast<uint64_t>(arithmetic_lhs - arithmetic_rhs);
+            }
+    }
+
+    throw viua::vm::abort_execution{
+        stack, "broken environment: bad arithmetic style for subtraction"
+    };
 }
 
 auto calculate_mul(

@@ -346,6 +346,22 @@ auto unsigned_type::zero(
 {
     return unsigned_type{ arithmetic_type::zero(size) };
 }
+
+auto operator==(
+    unsigned_type const lhs,
+    unsigned_type const rhs) -> bool
+{
+    if (lhs.size() != rhs.size()) {
+        throw std::runtime_error{ "eq: mismatched bit widths" };
+    }
+
+    for (auto i = size_type{ 0 }; i < lhs.size(); ++i) {
+        if (lhs[i] != rhs[i]) {
+            return false;
+        }
+    }
+    return true;
+}
 }  // namespace viua::arithmetic
 
 
@@ -455,6 +471,13 @@ auto operator+(
     unsigned_type const rhs) -> unsigned_type
 {
     return unsigned_type{ extend(bits::add(lhs.n, rhs.n), lhs.size()) };
+}
+
+auto operator-(
+    unsigned_type const lhs,
+    unsigned_type const rhs) -> unsigned_type
+{
+    return unsigned_type{ extend(bits::sub(lhs.n, rhs.n), lhs.size()) };
 }
 }  // namespace viua::arithmetic::fixed
 
@@ -907,6 +930,26 @@ auto operator+(
     auto const oversize = raw.size() > lhs.size();
 
     return oversize ? unsigned_type::max(lhs.size())
+                    : unsigned_type{ extend(raw, lhs.size()) };
+}
+
+auto operator-(
+    unsigned_type const lhs,
+    unsigned_type const rhs) -> unsigned_type
+{
+    /*
+     * Check for the (X - X) case and return early to simplify the rest of the
+     * function.
+     */
+    if (lhs == rhs) {
+        return unsigned_type::zero(lhs.size());
+    }
+
+    auto const raw = bits::sub(lhs.n, rhs.n);
+
+    auto const oversize = (raw.size() > lhs.size());
+
+    return oversize ? unsigned_type::min(lhs.size())
                     : unsigned_type{ extend(raw, lhs.size()) };
 }
 }  // namespace viua::arithmetic::saturating

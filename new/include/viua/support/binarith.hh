@@ -167,6 +167,7 @@ auto operator++(signed_type) -> signed_type;
 
 
 struct unsigned_type {
+    using bit_type   = arithmetic_type::bit_type;
     using value_type = arithmetic_type;
     using size_type  = value_type::size_type;
 
@@ -208,6 +209,12 @@ struct unsigned_type {
 
     explicit operator bool() const;
 
+    inline auto operator[](
+        size_type const i) const -> bit_type
+    {
+        return n[i];
+    }
+
     auto size() const -> size_type;
     auto in_range(size_type const) const -> bool;
 
@@ -217,6 +224,7 @@ struct unsigned_type {
      */
     auto highest_one() const -> std::optional<size_type>;
 };
+auto operator==(unsigned_type const, unsigned_type const) -> bool;
 
 
 inline constexpr auto DEFAULT_SEPARATOR = std::pair{ 4, '\'' };
@@ -266,6 +274,7 @@ auto operator*(signed_type const, signed_type const) -> signed_type;
 auto operator/(signed_type const, signed_type const) -> signed_type;
 
 auto operator+(unsigned_type const, unsigned_type const) -> unsigned_type;
+auto operator-(unsigned_type const, unsigned_type const) -> unsigned_type;
 }  // namespace fixed
 
 namespace saturating {
@@ -278,6 +287,7 @@ auto operator*(signed_type const, signed_type const) -> signed_type;
 auto operator/(signed_type const, signed_type const) -> signed_type;
 
 auto operator+(unsigned_type const, unsigned_type const) -> unsigned_type;
+auto operator-(unsigned_type const, unsigned_type const) -> unsigned_type;
 }  // namespace saturating
 }  // namespace arithmetic
 }  // namespace viua
