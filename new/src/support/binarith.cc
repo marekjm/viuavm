@@ -291,6 +291,45 @@ auto unsigned_type::size() const -> size_type
 {
     return n.size();
 }
+auto unsigned_type::in_range(
+    size_type const width) const -> bool
+{
+    if (width == 0) {
+        return false;
+    }
+
+    /*
+     * A smaller sized integer is always representable in a bigger sized
+     * integer.
+     */
+    if (size() <= width) {
+        return true;
+    }
+
+    /*
+     * A zero is always a zero, so we can take the easy way out if one is found.
+     */
+    if (not static_cast<bool>(*this)) {
+        return true;
+    }
+
+    /*
+     * If the expected width is smaller than the current width, we have to check
+     * the highest set bit. If this bit is higher than the expected width we
+     * have an out of range number.
+     */
+    return most_significant_one() < width;
+}
+
+auto unsigned_type::most_significant_one() const -> std::optional<size_type>
+{
+    auto const the_one = std::find(n.rbegin(), n.rend(), true);
+    if (the_one == n.rend()) {
+        return std::nullopt;
+    } else {
+        return std::distance(the_one, n.rend()) - 1;
+    }
+}
 
 auto unsigned_type::max(
     size_type const size) -> unsigned_type
@@ -321,6 +360,13 @@ auto make_arithmetic(
     size_t const width) -> signed_type
 {
     return signed_type{ extend(arithmetic_type{ v }, width) };
+}
+
+auto make_arithmetic(
+    uint64_t const v,
+    size_t const width) -> unsigned_type
+{
+    return unsigned_type{ extend(arithmetic_type{ v }, width, false) };
 }
 
 auto operator+(
@@ -405,6 +451,13 @@ auto operator/(
 
     return signed_type{ end_result };
 }
+
+auto operator+(
+    unsigned_type const lhs,
+    unsigned_type const rhs) -> unsigned_type
+{
+    return unsigned_type{ extend(bits::add(lhs.n, rhs.n), lhs.size()) };
+}
 }  // namespace viua::arithmetic::fixed
 
 
@@ -438,6 +491,16 @@ auto make_arithmetic(
      */
     return (raw.sign() == 1) ? signed_type::max(width)
                              : signed_type::min(width);
+}
+
+auto make_arithmetic(
+    uint64_t const v,
+    size_t const width) -> unsigned_type
+{
+    auto const raw = unsigned_type{ arithmetic_type{ v } };
+
+    return raw.in_range(width) ? unsigned_type{ extend(raw.n, width, false) }
+                               : unsigned_type::max(width);
 }
 
 auto operator+(
@@ -835,6 +898,18 @@ auto operator/(
                negative_result);
 
     return signed_type{ end_result };
+}
+
+auto operator+(
+    unsigned_type const lhs,
+    unsigned_type const rhs) -> unsigned_type
+{
+    auto const raw = bits::add(lhs.n, rhs.n);
+
+    auto const oversize = raw.size() > lhs.size();
+
+    return oversize ? unsigned_type::max(lhs.size())
+                    : unsigned_type{ extend(raw, lhs.size()) };
 }
 }  // namespace viua::arithmetic::saturating
 

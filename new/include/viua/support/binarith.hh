@@ -37,6 +37,8 @@ struct arithmetic_type {
     using value_type = std::vector<bit_type>;
     using size_type  = value_type::size_type;
 
+    using const_reverse_iterator = value_type::const_reverse_iterator;
+
     value_type n{};
 
     arithmetic_type()
@@ -63,6 +65,15 @@ struct arithmetic_type {
         size_type const i) const -> bit_type
     {
         return n[i];
+    }
+
+    inline auto rbegin() const -> const_reverse_iterator
+    {
+        return n.rbegin();
+    }
+    inline auto rend() const -> const_reverse_iterator
+    {
+        return n.rend();
     }
 
     auto size() const -> size_type;
@@ -198,6 +209,9 @@ struct unsigned_type {
     explicit operator bool() const;
 
     auto size() const -> size_type;
+    auto in_range(size_type const) const -> bool;
+
+    auto most_significant_one() const -> std::optional<size_type>;
 };
 
 
@@ -240,20 +254,26 @@ auto mul(arithmetic_type const, arithmetic_type const) -> arithmetic_type;
 
 namespace fixed {
 auto make_arithmetic(int64_t const, size_t const) -> signed_type;
+auto make_arithmetic(uint64_t const, size_t const) -> unsigned_type;
 
 auto operator+(signed_type const, signed_type const) -> signed_type;
 auto operator-(signed_type const, signed_type const) -> signed_type;
 auto operator*(signed_type const, signed_type const) -> signed_type;
 auto operator/(signed_type const, signed_type const) -> signed_type;
+
+auto operator+(unsigned_type const, unsigned_type const) -> unsigned_type;
 }  // namespace fixed
 
 namespace saturating {
 auto make_arithmetic(int64_t const, size_t const) -> signed_type;
+auto make_arithmetic(uint64_t const, size_t const) -> unsigned_type;
 
 auto operator+(signed_type const, signed_type const) -> signed_type;
 auto operator-(signed_type const, signed_type const) -> signed_type;
 auto operator*(signed_type const, signed_type const) -> signed_type;
 auto operator/(signed_type const, signed_type const) -> signed_type;
+
+auto operator+(unsigned_type const, unsigned_type const) -> unsigned_type;
 }  // namespace saturating
 }  // namespace arithmetic
 }  // namespace viua
