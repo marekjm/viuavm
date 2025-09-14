@@ -186,9 +186,25 @@ auto calculate_sub(
 
     auto const arithmetic_width = stack.proc->arithmetic_width;
     auto const arithmetic_lhs =
-        signed_type{ extend(arithmetic_type{ lhs }, arithmetic_width) };
+        make_arithmetic(lhs, arithmetic_width, style)
+            .or_else(
+                [&stack]() -> std::optional<signed_type>
+                {
+                    throw viua::vm::abort_execution{
+                        stack, "cannot make arithmetic value with bad style"
+                    };
+                })
+            .value();
     auto const arithmetic_rhs =
-        signed_type{ extend(arithmetic_type{ rhs }, arithmetic_width) };
+        make_arithmetic(rhs, arithmetic_width, style)
+            .or_else(
+                [&stack]() -> std::optional<signed_type>
+                {
+                    throw viua::vm::abort_execution{
+                        stack, "cannot make arithmetic value with bad style"
+                    };
+                })
+            .value();
 
     switch (style) {
         using namespace viua::arch::ops::OPCODE_FLAGS;
