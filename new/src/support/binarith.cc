@@ -347,6 +347,28 @@ auto unsigned_type::zero(
     return unsigned_type{ arithmetic_type::zero(size) };
 }
 
+auto operator<(
+    unsigned_type const lhs,
+    unsigned_type const rhs) -> bool
+{
+    if (lhs.size() != rhs.size()) {
+        throw std::runtime_error{ "lt: mismatched bit widths" };
+    }
+
+    for (auto i = lhs.size(); i > 0; --i) {
+        auto const lb = lhs.n.at(i - 1);
+        auto const rb = rhs.n.at(i - 1);
+
+        if (lb < rb) {
+            return true;
+        }
+        if (lb > rb) {
+            return false;
+        }
+    }
+
+    return false;
+}
 auto operator==(
     unsigned_type const lhs,
     unsigned_type const rhs) -> bool
@@ -944,13 +966,11 @@ auto operator-(
     if (lhs == rhs) {
         return unsigned_type::zero(lhs.size());
     }
+    if (lhs < rhs) {
+        return unsigned_type::min(lhs.size());
+    }
 
-    auto const raw = bits::sub(lhs.n, rhs.n);
-
-    auto const oversize = (raw.size() > lhs.size());
-
-    return oversize ? unsigned_type::min(lhs.size())
-                    : unsigned_type{ extend(raw, lhs.size()) };
+    return unsigned_type{ extend(bits::sub(lhs.n, rhs.n), lhs.size()) };
 }
 }  // namespace viua::arithmetic::saturating
 

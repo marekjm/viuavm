@@ -224,6 +224,7 @@ struct unsigned_type {
      */
     auto highest_one() const -> std::optional<size_type>;
 };
+auto operator<(unsigned_type const, unsigned_type const) -> bool;
 auto operator==(unsigned_type const, unsigned_type const) -> bool;
 
 
