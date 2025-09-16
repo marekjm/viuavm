@@ -276,6 +276,7 @@ auto operator/(signed_type const, signed_type const) -> signed_type;
 
 auto operator+(unsigned_type const, unsigned_type const) -> unsigned_type;
 auto operator-(unsigned_type const, unsigned_type const) -> unsigned_type;
+auto operator*(unsigned_type const, unsigned_type const) -> unsigned_type;
 }  // namespace fixed
 
 namespace saturating {
@@ -289,6 +290,7 @@ auto operator/(signed_type const, signed_type const) -> signed_type;
 
 auto operator+(unsigned_type const, unsigned_type const) -> unsigned_type;
 auto operator-(unsigned_type const, unsigned_type const) -> unsigned_type;
+auto operator*(unsigned_type const, unsigned_type const) -> unsigned_type;
 }  // namespace saturating
 }  // namespace arithmetic
 }  // namespace viua

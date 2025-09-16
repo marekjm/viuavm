@@ -501,6 +501,13 @@ auto operator-(
 {
     return unsigned_type{ extend(bits::sub(lhs.n, rhs.n), lhs.size()) };
 }
+
+auto operator*(
+    unsigned_type const lhs,
+    unsigned_type const rhs) -> unsigned_type
+{
+    return unsigned_type{ extend(bits::mul(lhs.n, rhs.n), lhs.size()) };
+}
 }  // namespace viua::arithmetic::fixed
 
 
@@ -971,6 +978,22 @@ auto operator-(
     }
 
     return unsigned_type{ extend(bits::sub(lhs.n, rhs.n), lhs.size()) };
+}
+
+auto operator*(
+    unsigned_type const lhs,
+    unsigned_type const rhs) -> unsigned_type
+{
+    if (not static_cast<bool>(lhs)) {
+        return unsigned_type::zero(lhs.size());
+    }
+    if (not static_cast<bool>(rhs)) {
+        return unsigned_type::zero(lhs.size());
+    }
+
+    auto const raw = unsigned_type{ bits::mul(lhs.n, rhs.n) };
+    return raw.in_range(lhs.size()) ? unsigned_type{ extend(raw.n, lhs.size()) }
+                                    : unsigned_type::max(lhs.size());
 }
 }  // namespace viua::arithmetic::saturating
 
