@@ -226,6 +226,7 @@ struct unsigned_type {
 };
 auto operator<(unsigned_type const, unsigned_type const) -> bool;
 auto operator==(unsigned_type const, unsigned_type const) -> bool;
+auto operator==(unsigned_type const, zero_type const) -> bool;
 
 
 inline constexpr auto DEFAULT_SEPARATOR = std::pair{ 4, '\'' };
@@ -277,6 +278,7 @@ auto operator/(signed_type const, signed_type const) -> signed_type;
 auto operator+(unsigned_type const, unsigned_type const) -> unsigned_type;
 auto operator-(unsigned_type const, unsigned_type const) -> unsigned_type;
 auto operator*(unsigned_type const, unsigned_type const) -> unsigned_type;
+auto operator/(unsigned_type const, unsigned_type const) -> unsigned_type;
 }  // namespace fixed
 
 namespace saturating {
@@ -291,6 +293,7 @@ auto operator/(signed_type const, signed_type const) -> signed_type;
 auto operator+(unsigned_type const, unsigned_type const) -> unsigned_type;
 auto operator-(unsigned_type const, unsigned_type const) -> unsigned_type;
 auto operator*(unsigned_type const, unsigned_type const) -> unsigned_type;
+auto operator/(unsigned_type const, unsigned_type const) -> unsigned_type;
 }  // namespace saturating
 }  // namespace arithmetic
 }  // namespace viua

@@ -415,12 +415,57 @@ auto calculate_div(
 }
 
 auto calculate_div(
-    Stack&,
-    viua::arch::opcode_type const,
+    Stack& stack,
+    viua::arch::opcode_type const style,
     uint64_t const lhs,
     uint64_t const rhs) -> uint64_t
 {
-    return (lhs / rhs);
+    using namespace viua::arithmetic;
+
+    auto const arithmetic_width = stack.proc->arithmetic_width;
+    auto const arithmetic_lhs =
+        make_arithmetic(lhs, arithmetic_width, style)
+            .or_else(
+                [&stack]() -> std::optional<unsigned_type>
+                {
+                    throw viua::vm::abort_execution{
+                        stack, "cannot make arithmetic value with bad style"
+                    };
+                })
+            .value();
+    auto const arithmetic_rhs =
+        make_arithmetic(rhs, arithmetic_width, style)
+            .or_else(
+                [&stack]() -> std::optional<unsigned_type>
+                {
+                    throw viua::vm::abort_execution{
+                        stack, "cannot make arithmetic value with bad style"
+                    };
+                })
+            .value();
+
+    switch (style) {
+        using namespace viua::arch::ops::OPCODE_FLAGS;
+        case ARITHMETIC_STYLE_WRAP:
+            {
+                using namespace viua::arithmetic::fixed;
+                return static_cast<uint64_t>(arithmetic_lhs / arithmetic_rhs);
+            }
+        case ARITHMETIC_STYLE_TRAP:
+            {
+                using namespace viua::arithmetic::fixed;
+                return static_cast<uint64_t>(arithmetic_lhs / arithmetic_rhs);
+            }
+        case ARITHMETIC_STYLE_SATURATE:
+            {
+                using namespace viua::arithmetic::saturating;
+                return static_cast<uint64_t>(arithmetic_lhs / arithmetic_rhs);
+            }
+    }
+
+    throw viua::vm::abort_execution{
+        stack, "broken environment: bad arithmetic style for subtraction"
+    };
 }
 }  // namespace
 

@@ -384,6 +384,12 @@ auto operator==(
     }
     return true;
 }
+auto operator==(
+    unsigned_type const lhs,
+    zero_type const) -> bool
+{
+    return not static_cast<bool>(lhs);
+}
 }  // namespace viua::arithmetic
 
 
@@ -507,6 +513,30 @@ auto operator*(
     unsigned_type const rhs) -> unsigned_type
 {
     return unsigned_type{ extend(bits::mul(lhs.n, rhs.n), lhs.size()) };
+}
+
+auto operator/(
+    unsigned_type const lhs,
+    unsigned_type const rhs) -> unsigned_type
+{
+    auto const maximum = unsigned_type::max(lhs.size());
+
+    if (rhs == zero_type{}) {
+        return unsigned_type::zero(lhs.size());
+    }
+    if (lhs == zero_type{}) {
+        return unsigned_type::zero(lhs.size());
+    }
+
+    auto working_lhs = lhs;
+    auto result      = arithmetic_type::zero(lhs.size());
+
+    while (not(working_lhs < rhs)) {
+        result      = bits::inc(result);
+        working_lhs = working_lhs - rhs;
+    }
+
+    return unsigned_type{ result };
 }
 }  // namespace viua::arithmetic::fixed
 
@@ -994,6 +1024,34 @@ auto operator*(
     auto const raw = unsigned_type{ bits::mul(lhs.n, rhs.n) };
     return raw.in_range(lhs.size()) ? unsigned_type{ extend(raw.n, lhs.size()) }
                                     : unsigned_type::max(lhs.size());
+}
+
+auto operator/(
+    unsigned_type const lhs,
+    unsigned_type const rhs) -> unsigned_type
+{
+    auto const maximum = unsigned_type::max(lhs.size());
+
+    if ((rhs == zero_type{}) and (lhs == zero_type{})) {
+        return unsigned_type::zero(lhs.size());
+    }
+    if (rhs == zero_type{}) {
+        return (lhs == zero_type{}) ? unsigned_type::zero(lhs.size()) : maximum;
+    }
+    if (lhs == zero_type{}) {
+        return unsigned_type::zero(lhs.size());
+    }
+
+    auto working_lhs = lhs;
+
+    auto result = arithmetic_type::zero(lhs.size());
+
+    while (not(working_lhs < rhs)) {
+        result      = bits::inc(result);
+        working_lhs = working_lhs - rhs;
+    }
+
+    return unsigned_type{ result };
 }
 }  // namespace viua::arithmetic::saturating
 
