@@ -21,6 +21,7 @@
 
 #include <optional>
 #include <print>
+#include <type_traits>
 
 #include <viua/arch/arch.h>
 #include <viua/support/binarith.hh>
@@ -30,11 +31,14 @@
 namespace {
 using viua::vm::Stack;
 
+template<typename T,
+         typename A = std::conditional<std::is_signed_v<T>,
+                                       viua::arithmetic::signed_type,
+                                       viua::arithmetic::unsigned_type>::type>
 auto make_arithmetic(
-    int64_t const v,
+    T const v,
     size_t const width,
-    viua::arch::opcode_type const style)
-    -> std::optional<viua::arithmetic::signed_type>
+    viua::arch::opcode_type const style) -> std::optional<A>
 {
     switch (style) {
         using namespace viua::arch::ops::OPCODE_FLAGS;
@@ -45,34 +49,19 @@ auto make_arithmetic(
         case ARITHMETIC_STYLE_SATURATE:
             return viua::arithmetic::saturating::make_arithmetic(v, width);
     }
-
     return std::nullopt;
 }
 
-auto make_arithmetic(
-    uint64_t const v,
-    size_t const width,
-    viua::arch::opcode_type const style)
-    -> std::optional<viua::arithmetic::unsigned_type>
-{
-    switch (style) {
-        using namespace viua::arch::ops::OPCODE_FLAGS;
-        case ARITHMETIC_STYLE_WRAP:
-            return viua::arithmetic::fixed::make_arithmetic(v, width);
-        case ARITHMETIC_STYLE_TRAP:
-            return viua::arithmetic::fixed::make_arithmetic(v, width);
-        case ARITHMETIC_STYLE_SATURATE:
-            return viua::arithmetic::saturating::make_arithmetic(v, width);
-    }
-
-    return std::nullopt;
-}
-
-auto calculate_add(
+namespace impl {
+template<typename T,
+         typename A = std::conditional<std::is_signed_v<T>,
+                                       viua::arithmetic::signed_type,
+                                       viua::arithmetic::unsigned_type>::type>
+auto add(
     Stack& stack,
     viua::arch::opcode_type const style,
-    int64_t const lhs,
-    int64_t const rhs) -> int64_t
+    T const lhs,
+    T const rhs) -> T
 {
     using namespace viua::arithmetic;
 
@@ -80,7 +69,7 @@ auto calculate_add(
     auto const arithmetic_lhs =
         make_arithmetic(lhs, arithmetic_width, style)
             .or_else(
-                [&stack]() -> std::optional<signed_type>
+                [&stack] -> std::optional<A>
                 {
                     throw viua::vm::abort_execution{
                         stack, "cannot make arithmetic value with bad style"
@@ -90,7 +79,7 @@ auto calculate_add(
     auto const arithmetic_rhs =
         make_arithmetic(rhs, arithmetic_width, style)
             .or_else(
-                [&stack]() -> std::optional<signed_type>
+                [&stack] -> std::optional<A>
                 {
                     throw viua::vm::abort_execution{
                         stack, "cannot make arithmetic value with bad style"
@@ -103,17 +92,17 @@ auto calculate_add(
         case ARITHMETIC_STYLE_WRAP:
             {
                 using namespace viua::arithmetic::fixed;
-                return static_cast<int64_t>(arithmetic_lhs + arithmetic_rhs);
+                return static_cast<T>(arithmetic_lhs + arithmetic_rhs);
             }
         case ARITHMETIC_STYLE_TRAP:
             {
                 using namespace viua::arithmetic::fixed;
-                return static_cast<int64_t>(arithmetic_lhs + arithmetic_rhs);
+                return static_cast<T>(arithmetic_lhs + arithmetic_rhs);
             }
         case ARITHMETIC_STYLE_SATURATE:
             {
                 using namespace viua::arithmetic::saturating;
-                return static_cast<int64_t>(arithmetic_lhs + arithmetic_rhs);
+                return static_cast<T>(arithmetic_lhs + arithmetic_rhs);
             }
     }
 
@@ -122,11 +111,15 @@ auto calculate_add(
     };
 }
 
-auto calculate_add(
+template<typename T,
+         typename A = std::conditional<std::is_signed_v<T>,
+                                       viua::arithmetic::signed_type,
+                                       viua::arithmetic::unsigned_type>::type>
+auto sub(
     Stack& stack,
     viua::arch::opcode_type const style,
-    uint64_t const lhs,
-    uint64_t const rhs) -> uint64_t
+    T const lhs,
+    T const rhs) -> T
 {
     using namespace viua::arithmetic;
 
@@ -134,7 +127,7 @@ auto calculate_add(
     auto const arithmetic_lhs =
         make_arithmetic(lhs, arithmetic_width, style)
             .or_else(
-                [&stack]() -> std::optional<unsigned_type>
+                [&stack] -> std::optional<A>
                 {
                     throw viua::vm::abort_execution{
                         stack, "cannot make arithmetic value with bad style"
@@ -144,7 +137,7 @@ auto calculate_add(
     auto const arithmetic_rhs =
         make_arithmetic(rhs, arithmetic_width, style)
             .or_else(
-                [&stack]() -> std::optional<unsigned_type>
+                [&stack] -> std::optional<A>
                 {
                     throw viua::vm::abort_execution{
                         stack, "cannot make arithmetic value with bad style"
@@ -157,30 +150,34 @@ auto calculate_add(
         case ARITHMETIC_STYLE_WRAP:
             {
                 using namespace viua::arithmetic::fixed;
-                return static_cast<uint64_t>(arithmetic_lhs + arithmetic_rhs);
+                return static_cast<T>(arithmetic_lhs - arithmetic_rhs);
             }
         case ARITHMETIC_STYLE_TRAP:
             {
                 using namespace viua::arithmetic::fixed;
-                return static_cast<uint64_t>(arithmetic_lhs + arithmetic_rhs);
+                return static_cast<T>(arithmetic_lhs - arithmetic_rhs);
             }
         case ARITHMETIC_STYLE_SATURATE:
             {
                 using namespace viua::arithmetic::saturating;
-                return static_cast<uint64_t>(arithmetic_lhs + arithmetic_rhs);
+                return static_cast<T>(arithmetic_lhs - arithmetic_rhs);
             }
     }
 
     throw viua::vm::abort_execution{
-        stack, "broken environment: bad arithmetic style for addition"
+        stack, "broken environment: bad arithmetic style for subtraction"
     };
 }
 
-auto calculate_sub(
+template<typename T,
+         typename A = std::conditional<std::is_signed_v<T>,
+                                       viua::arithmetic::signed_type,
+                                       viua::arithmetic::unsigned_type>::type>
+auto mul(
     Stack& stack,
     viua::arch::opcode_type const style,
-    int64_t const lhs,
-    int64_t const rhs) -> int64_t
+    T const lhs,
+    T const rhs) -> T
 {
     using namespace viua::arithmetic;
 
@@ -188,7 +185,7 @@ auto calculate_sub(
     auto const arithmetic_lhs =
         make_arithmetic(lhs, arithmetic_width, style)
             .or_else(
-                [&stack]() -> std::optional<signed_type>
+                [&stack] -> std::optional<A>
                 {
                     throw viua::vm::abort_execution{
                         stack, "cannot make arithmetic value with bad style"
@@ -198,7 +195,7 @@ auto calculate_sub(
     auto const arithmetic_rhs =
         make_arithmetic(rhs, arithmetic_width, style)
             .or_else(
-                [&stack]() -> std::optional<signed_type>
+                [&stack] -> std::optional<A>
                 {
                     throw viua::vm::abort_execution{
                         stack, "cannot make arithmetic value with bad style"
@@ -211,30 +208,34 @@ auto calculate_sub(
         case ARITHMETIC_STYLE_WRAP:
             {
                 using namespace viua::arithmetic::fixed;
-                return static_cast<int64_t>(arithmetic_lhs - arithmetic_rhs);
+                return static_cast<T>(arithmetic_lhs * arithmetic_rhs);
             }
         case ARITHMETIC_STYLE_TRAP:
             {
                 using namespace viua::arithmetic::fixed;
-                return static_cast<int64_t>(arithmetic_lhs - arithmetic_rhs);
+                return static_cast<T>(arithmetic_lhs * arithmetic_rhs);
             }
         case ARITHMETIC_STYLE_SATURATE:
             {
                 using namespace viua::arithmetic::saturating;
-                return static_cast<int64_t>(arithmetic_lhs - arithmetic_rhs);
+                return static_cast<T>(arithmetic_lhs * arithmetic_rhs);
             }
     }
 
     throw viua::vm::abort_execution{
-        stack, "broken environment: bad arithmetic style for subtraction"
+        stack, "broken environment: bad arithmetic style for multiplication"
     };
 }
 
-auto calculate_sub(
+template<typename T,
+         typename A = std::conditional<std::is_signed_v<T>,
+                                       viua::arithmetic::signed_type,
+                                       viua::arithmetic::unsigned_type>::type>
+auto div(
     Stack& stack,
     viua::arch::opcode_type const style,
-    uint64_t const lhs,
-    uint64_t const rhs) -> uint64_t
+    T const lhs,
+    T const rhs) -> T
 {
     using namespace viua::arithmetic;
 
@@ -242,7 +243,7 @@ auto calculate_sub(
     auto const arithmetic_lhs =
         make_arithmetic(lhs, arithmetic_width, style)
             .or_else(
-                [&stack]() -> std::optional<unsigned_type>
+                [&stack] -> std::optional<A>
                 {
                     throw viua::vm::abort_execution{
                         stack, "cannot make arithmetic value with bad style"
@@ -252,7 +253,7 @@ auto calculate_sub(
     auto const arithmetic_rhs =
         make_arithmetic(rhs, arithmetic_width, style)
             .or_else(
-                [&stack]() -> std::optional<unsigned_type>
+                [&stack] -> std::optional<A>
                 {
                     throw viua::vm::abort_execution{
                         stack, "cannot make arithmetic value with bad style"
@@ -265,208 +266,25 @@ auto calculate_sub(
         case ARITHMETIC_STYLE_WRAP:
             {
                 using namespace viua::arithmetic::fixed;
-                return static_cast<uint64_t>(arithmetic_lhs - arithmetic_rhs);
+                return static_cast<T>(arithmetic_lhs / arithmetic_rhs);
             }
         case ARITHMETIC_STYLE_TRAP:
             {
                 using namespace viua::arithmetic::fixed;
-                return static_cast<uint64_t>(arithmetic_lhs - arithmetic_rhs);
+                return static_cast<T>(arithmetic_lhs / arithmetic_rhs);
             }
         case ARITHMETIC_STYLE_SATURATE:
             {
                 using namespace viua::arithmetic::saturating;
-                return static_cast<uint64_t>(arithmetic_lhs - arithmetic_rhs);
+                return static_cast<T>(arithmetic_lhs / arithmetic_rhs);
             }
     }
 
     throw viua::vm::abort_execution{
-        stack, "broken environment: bad arithmetic style for subtraction"
+        stack, "broken environment: bad arithmetic style for division"
     };
 }
-
-auto calculate_mul(
-    Stack& stack,
-    viua::arch::opcode_type const style,
-    int64_t const lhs,
-    int64_t const rhs) -> int64_t
-{
-    using namespace viua::arithmetic;
-
-    auto const arithmetic_width = stack.proc->arithmetic_width;
-    auto const arithmetic_lhs =
-        signed_type{ extend(arithmetic_type{ lhs }, arithmetic_width) };
-    auto const arithmetic_rhs =
-        signed_type{ extend(arithmetic_type{ rhs }, arithmetic_width) };
-
-    switch (style) {
-        using namespace viua::arch::ops::OPCODE_FLAGS;
-        case ARITHMETIC_STYLE_WRAP:
-            {
-                using namespace viua::arithmetic::fixed;
-                return static_cast<int64_t>(arithmetic_lhs * arithmetic_rhs);
-            }
-        case ARITHMETIC_STYLE_TRAP:
-            {
-                using namespace viua::arithmetic::fixed;
-                return static_cast<int64_t>(arithmetic_lhs * arithmetic_rhs);
-            }
-        case ARITHMETIC_STYLE_SATURATE:
-            {
-                using namespace viua::arithmetic::saturating;
-                return static_cast<int64_t>(arithmetic_lhs * arithmetic_rhs);
-            }
-    }
-
-    throw viua::vm::abort_execution{
-        stack, "broken environment: bad arithmetic style for subtraction"
-    };
-}
-
-auto calculate_mul(
-    Stack& stack,
-    viua::arch::opcode_type const style,
-    uint64_t const lhs,
-    uint64_t const rhs) -> uint64_t
-{
-    using namespace viua::arithmetic;
-
-    auto const arithmetic_width = stack.proc->arithmetic_width;
-    auto const arithmetic_lhs =
-        make_arithmetic(lhs, arithmetic_width, style)
-            .or_else(
-                [&stack]() -> std::optional<unsigned_type>
-                {
-                    throw viua::vm::abort_execution{
-                        stack, "cannot make arithmetic value with bad style"
-                    };
-                })
-            .value();
-    auto const arithmetic_rhs =
-        make_arithmetic(rhs, arithmetic_width, style)
-            .or_else(
-                [&stack]() -> std::optional<unsigned_type>
-                {
-                    throw viua::vm::abort_execution{
-                        stack, "cannot make arithmetic value with bad style"
-                    };
-                })
-            .value();
-
-    switch (style) {
-        using namespace viua::arch::ops::OPCODE_FLAGS;
-        case ARITHMETIC_STYLE_WRAP:
-            {
-                using namespace viua::arithmetic::fixed;
-                return static_cast<uint64_t>(arithmetic_lhs * arithmetic_rhs);
-            }
-        case ARITHMETIC_STYLE_TRAP:
-            {
-                using namespace viua::arithmetic::fixed;
-                return static_cast<uint64_t>(arithmetic_lhs * arithmetic_rhs);
-            }
-        case ARITHMETIC_STYLE_SATURATE:
-            {
-                using namespace viua::arithmetic::saturating;
-                return static_cast<uint64_t>(arithmetic_lhs * arithmetic_rhs);
-            }
-    }
-
-    throw viua::vm::abort_execution{
-        stack, "broken environment: bad arithmetic style for subtraction"
-    };
-}
-
-auto calculate_div(
-    Stack& stack,
-    viua::arch::opcode_type const style,
-    int64_t const lhs,
-    int64_t const rhs) -> int64_t
-{
-    using namespace viua::arithmetic;
-
-    auto const arithmetic_width = stack.proc->arithmetic_width;
-    auto const arithmetic_lhs =
-        signed_type{ extend(arithmetic_type{ lhs }, arithmetic_width) };
-    auto const arithmetic_rhs =
-        signed_type{ extend(arithmetic_type{ rhs }, arithmetic_width) };
-
-    switch (style) {
-        using namespace viua::arch::ops::OPCODE_FLAGS;
-        case ARITHMETIC_STYLE_WRAP:
-            {
-                using namespace viua::arithmetic::fixed;
-                return static_cast<int64_t>(arithmetic_lhs / arithmetic_rhs);
-            }
-        case ARITHMETIC_STYLE_TRAP:
-            {
-                using namespace viua::arithmetic::fixed;
-                return static_cast<int64_t>(arithmetic_lhs / arithmetic_rhs);
-            }
-        case ARITHMETIC_STYLE_SATURATE:
-            {
-                using namespace viua::arithmetic::saturating;
-                return static_cast<int64_t>(arithmetic_lhs / arithmetic_rhs);
-            }
-    }
-
-    throw viua::vm::abort_execution{
-        stack, "broken environment: bad arithmetic style for subtraction"
-    };
-}
-
-auto calculate_div(
-    Stack& stack,
-    viua::arch::opcode_type const style,
-    uint64_t const lhs,
-    uint64_t const rhs) -> uint64_t
-{
-    using namespace viua::arithmetic;
-
-    auto const arithmetic_width = stack.proc->arithmetic_width;
-    auto const arithmetic_lhs =
-        make_arithmetic(lhs, arithmetic_width, style)
-            .or_else(
-                [&stack]() -> std::optional<unsigned_type>
-                {
-                    throw viua::vm::abort_execution{
-                        stack, "cannot make arithmetic value with bad style"
-                    };
-                })
-            .value();
-    auto const arithmetic_rhs =
-        make_arithmetic(rhs, arithmetic_width, style)
-            .or_else(
-                [&stack]() -> std::optional<unsigned_type>
-                {
-                    throw viua::vm::abort_execution{
-                        stack, "cannot make arithmetic value with bad style"
-                    };
-                })
-            .value();
-
-    switch (style) {
-        using namespace viua::arch::ops::OPCODE_FLAGS;
-        case ARITHMETIC_STYLE_WRAP:
-            {
-                using namespace viua::arithmetic::fixed;
-                return static_cast<uint64_t>(arithmetic_lhs / arithmetic_rhs);
-            }
-        case ARITHMETIC_STYLE_TRAP:
-            {
-                using namespace viua::arithmetic::fixed;
-                return static_cast<uint64_t>(arithmetic_lhs / arithmetic_rhs);
-            }
-        case ARITHMETIC_STYLE_SATURATE:
-            {
-                using namespace viua::arithmetic::saturating;
-                return static_cast<uint64_t>(arithmetic_lhs / arithmetic_rhs);
-            }
-    }
-
-    throw viua::vm::abort_execution{
-        stack, "broken environment: bad arithmetic style for subtraction"
-    };
-}
+}  // namespace impl
 }  // namespace
 
 namespace viua::vm::ins {
@@ -585,11 +403,11 @@ auto styled_add(
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
 
     if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
-        out = calculate_add(stack, style, *lhs.get<int64_t>(), *v);
+        out = impl::add(stack, style, *lhs.get<int64_t>(), *v);
         return;
     }
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
-        out = calculate_add(stack, style, *lhs.get<uint64_t>(), *v);
+        out = impl::add(stack, style, *lhs.get<uint64_t>(), *v);
         return;
     }
 
@@ -661,11 +479,11 @@ auto styled_sub(
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
 
     if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
-        out = calculate_sub(stack, style, *lhs.get<int64_t>(), *v);
+        out = impl::sub(stack, style, *lhs.get<int64_t>(), *v);
         return;
     }
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
-        out = calculate_sub(stack, style, *lhs.get<uint64_t>(), *v);
+        out = impl::sub(stack, style, *lhs.get<uint64_t>(), *v);
         return;
     }
 
@@ -737,11 +555,11 @@ auto styled_mul(
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
 
     if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
-        out = calculate_mul(stack, style, *lhs.get<int64_t>(), *v);
+        out = impl::mul(stack, style, *lhs.get<int64_t>(), *v);
         return;
     }
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
-        out = calculate_mul(stack, style, *lhs.get<uint64_t>(), *v);
+        out = impl::mul(stack, style, *lhs.get<uint64_t>(), *v);
         return;
     }
 
@@ -813,11 +631,11 @@ auto styled_div(
     auto const lhs_u64 = lhs.holds<register_type::uint_type>();
 
     if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
-        out = calculate_div(stack, style, *lhs.get<int64_t>(), *v);
+        out = impl::div(stack, style, *lhs.get<int64_t>(), *v);
         return;
     }
     if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
-        out = calculate_div(stack, style, *lhs.get<uint64_t>(), *v);
+        out = impl::div(stack, style, *lhs.get<uint64_t>(), *v);
         return;
     }
 
@@ -941,17 +759,17 @@ auto styled_arithmetic_immediate_op(
     auto const lhs_u64 = lhs.template holds<register_type::uint_type>();
 
     if (lhs_i64) {
-        out = calculate_add(stack,
-                            style,
-                            *lhs.template get<int64_t>(),
-                            static_cast<int64_t>(immediate));
+        out = impl::add(stack,
+                        style,
+                        *lhs.template get<int64_t>(),
+                        static_cast<int64_t>(immediate));
         return;
     }
     if (lhs_u64) {
-        out = calculate_add(stack,
-                            style,
-                            *lhs.template get<uint64_t>(),
-                            static_cast<uint64_t>(immediate));
+        out = impl::add(stack,
+                        style,
+                        *lhs.template get<uint64_t>(),
+                        static_cast<uint64_t>(immediate));
         return;
     }
 
