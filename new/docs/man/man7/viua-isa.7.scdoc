@@ -52,6 +52,26 @@ Registers are organised in sets.
 :  *uzero*
 :  wired to unsigned zero for arithmetic types, invalid for other types
 
+
+## Special purpose registers
+
+A special register is accessed using its label eg,
+
+- *void* means an empty register
+- *zero* means a signed 0
+- *uzero* means an unsigned 0
+
+The *void* register can be used as a destination register.
+Any value written to it will be discarded.
+
+Neither *zero* nor *uzero* register can be used as a destination register.
+Any attempt to write to them will raise an exception.
+
+The *zero* and *uzero* registers may be used wherever an integer zero value is
+an appropriate input.
+
+## General purpose registers
+
 A general purpose register is accessed using the following notation:
 
 ```
@@ -63,15 +83,6 @@ where _I_ is the index of a register, and _S_ is the register set label eg,
 - $1.l means register 1 from local register set
 - $0.p means register 0 from parameter register set
 - $2.a means register 2 from argument register set
-
-A special register is accessed using its label eg,
-
-- *void* means an empty register
-- *zero* means a signed 0
-- *uzero* means an unsigned 0
-
-
-## General purpose registers
 
 There are three general-purpose register sets:
 
@@ -88,19 +99,15 @@ eg,
 
 ```
 frame $4.a
+; ...
+call void, foo
 ```
 
 The example above allocates a frame with 4 registers in the *argument* register
 set. The program then sets the registers as appropriate, and issues a *call*
-instruction eg,
-
-```
-call void, foo
-```
-
-In the example above, the *call* instruction uses the allocated frame for a call
-to the foo function. Inside foo, the callee, the *argument* register set
-allocated by the caller is visible as the *parameter* register set. Why?
+instruction that uses the allocated frame for a call to the foo function. Inside
+foo, the callee, the *argument* register set allocated by the caller is visible
+as the *parameter* register set. Why?
 
 Arguments are the *actual parameters* ie, what the caller actually gives to the
 callee.

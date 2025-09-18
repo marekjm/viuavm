@@ -22,7 +22,10 @@ The following style is used in the instruction descriptions:
 :  the special register *void*
 |  *zero*
 :  
-:  the special register *zero*
+:  special register hardwired to *signed* zero
+|  *uzero*
+:  
+:  special register hardwired to *unsigned* zero
 |  $_reg_
 :  $0.a
 :  a general-purpose register
