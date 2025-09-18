@@ -64,7 +64,7 @@ The instructions controlling the execution environment.
 	Environment break.
 	By default dumps the state of the process.
 
-*earithmeticwidth* $_dst_|*void*, $_src_|*zero*++
+*earithmeticwidth* $_dst_|*void*, $_src_
 *earithmeticwidth* $_dst_, *void*
 	Manipulates the *earw* (arithmetic width) environment register.
 	Stores its current value in $_dst_ (if not *void*), and replaces it with the
@@ -72,8 +72,8 @@ The instructions controlling the execution environment.
 
 	If *void* is supplied instead of $_src_, the current value is not replaced.
 
-	If *zero* is supplied instead of $_src_, the current value is set to the
-	default value.
+	If $_src_ holds the value 0 (either signed or unsigned), the *earw* register
+	is set to the default value.
 
 
 # REGISTER MANAGEMENT

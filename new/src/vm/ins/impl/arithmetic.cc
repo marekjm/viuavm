@@ -307,14 +307,17 @@ auto execute(
         return;
     }
 
-    auto const new_width = in.cast_to<uint64_t>();
-    if (not new_width.has_value()) {
+    auto const val = in.cast_to<uint64_t>();
+    if (not val.has_value()) {
         throw abort_execution{ stack,
                                "invalid input operand for earithmeticwidth in "
                                    + op.instruction.in.to_string() };
     }
 
-    stack.proc->arithmetic_width = static_cast<uint8_t>(*new_width);
+    auto const candidate_width = static_cast<uint8_t>(*val);
+    stack.proc->arithmetic_width = candidate_width
+        ? candidate_width
+        : 64u;
 }
 }  // namespace viua::vm::ins
 
