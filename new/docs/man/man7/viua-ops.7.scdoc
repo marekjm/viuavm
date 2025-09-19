@@ -124,8 +124,9 @@ be used for the $_lhs_ operand.
 
 	For a discussion of how division by zero is handled, see *Division by zero*.
 
-*mod* _dst_, _lhs_, _rhs_
+*mod* $_dst_, $_lhs_, $_rhs_
 	Calculate ($_lhs_ modulo $_rhs_), and store the output in $_dst_.
+	Only signed and unsigned integers are supported.
 
 
 ## Arithmetic with an immediate value

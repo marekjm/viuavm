@@ -586,6 +586,9 @@ The following instructions are available:
 |  diviu
 :  U
 :  divide by (unsigned) immediate
+|  mod
+:  T
+:  obtain the remainder of signed a division
 |  earithmeticwidth
 :  D
 :  limit bit width of some operations
