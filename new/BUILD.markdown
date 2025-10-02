@@ -1,9 +1,63 @@
 # Building instructions
 
-The compilation process is automated using GNU Make, and in its simples form
+The compilation process is automated using GNU Make, and in its simplest form
 looks like this:
 
     ]$ make -j
+
+--------------------------------------------------------------------------------
+
+## System requirements
+
+Before you can compile the toolchain you have to ensure that your system meets a
+few requirements.
+
+
+### Compiler
+
+Both GCC and Clang can be used to compile the toolchain, as long as they
+implement C++23.
+
+
+### Operating system
+
+The following are supported:
+
+ - Linux/glibc
+ - Linux/musl
+ - FreeBSD
+
+
+### Libraries
+
+Common libraries:
+
+ - libb2: https://blake2.net/
+ - libblake3: https://github.com/BLAKE3-team/BLAKE3
+ - libmd: https://www.hadrons.org/software/libmd/
+ - libuuid: https://github.com/util-linux/util-linux
+
+Linux libraries:
+
+ - liburing: https://git.kernel.dk/cgit/liburing (default, but not necessary if
+   you decide to use the "classic" I/O implementation)
+
+There are no special library requirements for FreeBSD.
+
+--------------------------------------------------------------------------------
+
+## I/O implementations
+
+The VM can use two APIs to implement I/O:
+
+ - classic POSIX I/O
+ - `io_uring` (default on Linux, unavailable on FreeBSD)
+
+The build will automatically select the implementation for the current platform,
+but you can override the default choice with the `io_impl` flag:
+
+    ]$ make io_impl=classic -j
+    ]$ make io_impl=io_uring -j
 
 --------------------------------------------------------------------------------
 
