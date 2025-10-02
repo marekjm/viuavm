@@ -41,13 +41,6 @@ The above code can be assembled and run using the following commands:
 ]$ ./build/libexec/viua/dis readme.elf
 ```
 
-In case of bugs, or when step by step execution is useful, a simple debugger is
-also available:
-
-```
-]$ ./build/libexec/viua/repl
-```
-
 ## Tools
 
 A set of tools is provided for programmers to interact and use the VM. These
@@ -59,7 +52,6 @@ are:
 - `ld`: the linker
 - `readelf`: a `readelf(1)` specific to Viua ELFs (the usual one is still useful
   as Viua ELFs are valid ELF files)
-- `repl`: a primitive debugger
 
 --------------------------------------------------------------------------------
 
