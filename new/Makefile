@@ -224,7 +224,7 @@ clean-test:
 	find ./tests -type f -name '*.asm~' -delete
 	find ./tests -type f -name '*.log' -delete
 	find ./tests -type d -name '.cache' -print0 |\
-		xargs -0 -I CACHE_DIR find CACHE_DIR -type f -delete
+		xargs -0 -I CACHE_DIR -r find CACHE_DIR -type f -delete
 	find ./tests -type d -name '.cache' -delete
 
 # For clean and mostlyclean use
@@ -300,7 +300,7 @@ format:
 	(\
 		find $(headerdir) -type f -name '*.h' -or -name '*.hh' ;\
 		find $(sourcedir) -type f -name '*.cpp' -or -name '*.cc' \
-	) | xargs --max-args 1 --max-procs 0 clang-format -i
+	) | xargs --max-args 1 --max-procs 0 -r clang-format -i
 	black --quiet tests/suite.py
 	yamlfmt $(shell git rev-parse --show-toplevel)/.builds/*
 
