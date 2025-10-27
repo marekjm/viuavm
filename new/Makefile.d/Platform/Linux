@@ -6,5 +6,8 @@ PLATFORM_LIBS=\
 	-lmd \
 	-luuid
 
+PLATFORM_MACROS=\
+	-DVIUA_LINUX
+
 install=install
 python3=python3

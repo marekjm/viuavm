@@ -6,6 +6,9 @@ PLATFORM_LIBS=\
 	-lmd \
 	-luuid
 
+PLATFORM_MACROS=\
+	-DVIUA_FREEBSD
+
 PLATFORM_INCLUDE_FLAGS=\
 	-I /usr/local/include
 

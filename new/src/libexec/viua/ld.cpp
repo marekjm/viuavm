@@ -30,7 +30,6 @@
 #include <sha.h>
 #include <sha256.h>
 #include <sha512.h>
-#include <uuid/uuid.h>
 
 #include <algorithm>
 #include <array>
@@ -51,6 +50,7 @@
 #include <viua/support/print.hh>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
+#include <viua/support/uuid.hh>
 #include <viua/vm/elf.h>
 
 
@@ -114,10 +114,10 @@ auto emit_elf(
             using enum Build_id_hash;
             case UUID:
                 /*
-                 * See uuid_generate(3) for more information, and to learn why
-                 * 16 is used here.
+                 * See uuid_generate(3) for more information; on OpenBSD you
+                 * should consult uuid_create(3) instead.
                  */
-                build_id.resize(16);
+                build_id.resize(sizeof(viua::uuid::value_type));
                 break;
             case SHA1:
                 build_id.resize(SHA_DIGEST_LENGTH);
@@ -639,11 +639,8 @@ auto emit_elf(
             using enum Build_id_hash;
             case UUID:
                 {
-                    uuid_t uu;
-                    uuid_generate_random(uu);
-                    std::array<char, 36 + 1> hr{};
-                    uuid_unparse(uu, hr.data());
-                    memcpy(build_id.data(), &uu, sizeof(uu));
+                    auto const uu = viua::uuid{};
+                    memcpy(build_id.data(), &uu.id, sizeof(uu.id));
                     break;
                 }
             case SHA1:

@@ -4,6 +4,12 @@
 PLATFORM_LIBS=\
     -L /usr/local/lib
 
+# The NT_GNU_BUILD_ID has to be defined ad-hoc, because it is not included in
+# the elf.h header supplied by OpenBSD, but we need it to record BuildID
+# information.
+PLATFORM_MACROS=\
+	-DVIUA_OPENBSD
+
 PLATFORM_INCLUDE_FLAGS=\
 	-I /usr/local/include
 

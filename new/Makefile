@@ -138,6 +138,7 @@ CXXFLAGS=\
 		 -std=$(CXXSTD) \
 		 -DINSTALL_PREFIX='"$(prefix)"' \
 		 $(FEATURE_DETECT_FLAGS) \
+		 $(PLATFORM_MACROS) \
 		 $(CXXFLAGS_OPTIMISATION) \
 		 $(CXXFLAGS_DEBUG) \
 		 $(CXXFLAGS_SANITISER) \
@@ -455,7 +456,8 @@ $(BUILD_EXEDIR)/ld: \
 	$(BUILD_PREFIX)/support/errno.o \
 	$(BUILD_PREFIX)/support/fdio.o \
 	$(BUILD_PREFIX)/support/string.o \
-	$(BUILD_PREFIX)/support/tty.o
+	$(BUILD_PREFIX)/support/tty.o \
+	$(BUILD_PREFIX)/support/uuid.o
 
 VM_INSTRUCTION_IMPL=\
 	$(BUILD_PREFIX)/vm/ins/impl/memory.o \
