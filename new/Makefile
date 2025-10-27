@@ -156,8 +156,6 @@ CXXLIBS=\
 		$(PLATFORM_LIBS) \
 		-lb2 \
 		$(LIBS_BLAKE3) \
-		-lmd \
-		-luuid \
 		$(LIBS_IO_IMPL)
 
 

@@ -1,4 +1,10 @@
 # vim:ft=make:
 
+# libmd and libuuid must be in PLATFORM_LIBS because they are not consistent
+# across platforms. OpenBSD puts the relevant functions (kind of) in its libc.
+PLATFORM_LIBS=\
+	-lmd \
+	-luuid
+
 install=install
 python3=python3

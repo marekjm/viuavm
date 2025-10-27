@@ -2,7 +2,9 @@
 
 # FreeBSD install some libraries into /usr/local instead of into /usr.
 PLATFORM_LIBS=\
-    -L /usr/local/lib
+    -L /usr/local/lib \
+	-lmd \
+	-luuid
 
 PLATFORM_INCLUDE_FLAGS=\
 	-I /usr/local/include
