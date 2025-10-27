@@ -81,8 +81,6 @@ auto elf_osabi_to_string(
             return "Linux";
         case ELFOSABI_SOLARIS:
             return "Solaris";
-        case ELFOSABI_AIX:
-            return "IBM AIX";
         case ELFOSABI_IRIX:
             return "IRIX";
         case ELFOSABI_FREEBSD:
@@ -290,8 +288,6 @@ auto p_type_to_string(
             return "SHLIB";
         case PT_PHDR:
             return "PHDR";
-        case PT_GNU_STACK:
-            return "GNU_STACK";
         default:
             return std::to_string(p_type);
     }
