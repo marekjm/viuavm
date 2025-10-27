@@ -8,7 +8,8 @@ PLATFORM_LIBS=\
 # the elf.h header supplied by OpenBSD, but we need it to record BuildID
 # information.
 PLATFORM_MACROS=\
-	-DVIUA_OPENBSD
+	-DVIUA_OPENBSD \
+	-DNT_GNU_BUILD_ID=3
 
 PLATFORM_INCLUDE_FLAGS=\
 	-I /usr/local/include
