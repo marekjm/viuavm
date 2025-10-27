@@ -455,6 +455,7 @@ $(BUILD_EXEDIR)/ld: \
 	$(BUILD_PREFIX)/support/elf.o \
 	$(BUILD_PREFIX)/support/errno.o \
 	$(BUILD_PREFIX)/support/fdio.o \
+	$(BUILD_PREFIX)/support/sha.o \
 	$(BUILD_PREFIX)/support/string.o \
 	$(BUILD_PREFIX)/support/tty.o \
 	$(BUILD_PREFIX)/support/uuid.o

@@ -27,9 +27,6 @@
 #if defined(VIUA_PLATFORM_HAS_FEATURE_BLAKE3)
 #include <blake3.h>
 #endif
-#include <sha.h>
-#include <sha256.h>
-#include <sha512.h>
 
 #include <algorithm>
 #include <array>
@@ -48,6 +45,7 @@
 #include <viua/support/errno.h>
 #include <viua/support/fdio.h>
 #include <viua/support/print.hh>
+#include <viua/support/sha.hh>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
 #include <viua/support/uuid.hh>
@@ -120,13 +118,13 @@ auto emit_elf(
                 build_id.resize(sizeof(viua::uuid::value_type));
                 break;
             case SHA1:
-                build_id.resize(SHA_DIGEST_LENGTH);
+                build_id.resize(viua::SHA1::digest_size);
                 break;
             case SHA256:
-                build_id.resize(SHA256_DIGEST_LENGTH);
+                build_id.resize(viua::SHA256::digest_size);
                 break;
             case SHA512:
-                build_id.resize(SHA512_DIGEST_LENGTH);
+                build_id.resize(viua::SHA512::digest_size);
                 break;
             case BLAKE2B:
                 build_id.resize(build_id_size.value_or(BLAKE2B_OUTBYTES * 8)
@@ -645,29 +643,17 @@ auto emit_elf(
                 }
             case SHA1:
                 {
-                    SHA1_CTX context;
-                    SHA1_Init(&context);
-                    SHA1_Update(
-                        &context, output_buffer.data(), output_buffer.size());
-                    SHA1_Final(build_id.data(), &context);
+                    build_id = viua::SHA1().update(output_buffer).get();
                     break;
                 }
             case SHA256:
                 {
-                    SHA256_CTX context;
-                    SHA256_Init(&context);
-                    SHA256_Update(
-                        &context, output_buffer.data(), output_buffer.size());
-                    SHA256_Final(build_id.data(), &context);
+                    build_id = viua::SHA256().update(output_buffer).get();
                     break;
                 }
             case SHA512:
                 {
-                    SHA512_CTX context;
-                    SHA512_Init(&context);
-                    SHA512_Update(
-                        &context, output_buffer.data(), output_buffer.size());
-                    SHA512_Final(build_id.data(), &context);
+                    build_id = viua::SHA512().update(output_buffer).get();
                     break;
                 }
             case BLAKE2B:
