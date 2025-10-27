@@ -1,0 +1,11 @@
+# vim:ft=make:
+
+# OpenBSD install some libraries into /usr/local instead of into /usr.
+PLATFORM_LIBS=\
+    -L /usr/local/lib
+
+PLATFORM_INCLUDE_FLAGS=\
+	-I /usr/local/include
+
+install=ginstall
+python3=python3.12
