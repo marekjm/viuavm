@@ -1,0 +1,5 @@
+of #last
+[1.l] db 0x1.0147ae147ae14p+1 2.01
+[2.l] db 0x0p+0 0
+[3.l] db inf inf
+[4.l] db inf inf
