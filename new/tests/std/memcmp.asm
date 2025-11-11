@@ -24,7 +24,14 @@
     lb $6.l, $5.l, 0
     cast $6.l, uint
 
-    cmp $8.l, $4.l, $6.l
+    lt $9.l, $4.l, $6.l
+    muli $9.l, $9.l, -1
+    gt $10.l, $4.l, $6.l
+    moveif $8.l, $9.l, $10.l
+    add $8.l, zero, $8.l  ; Cast to signed integer to produce a value of the
+                          ; type that memcmp(3) is supposed to return. The
+                          ; comparison instructions produce unsigned integers.
+
     if $8.l, "std::memcmp::epilogue"
 
     ; increase counter and repeat

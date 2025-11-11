@@ -379,6 +379,7 @@ enum class OPCODE : opcode_type
     IO_WAIT     = (FORMAT_T | 0x00'15),
     IO_SHUTDOWN = (FORMAT_T | 0x00'16),
     IO_CTL      = (FORMAT_T | 0x00'17),
+    MOVEIF      = (FORMAT_T | 0x00'18),
 
     CALL             = (FORMAT_D | 0x00'01),
     BITNOT           = (FORMAT_D | 0x00'02),
@@ -463,6 +464,7 @@ enum class OPCODE_T : opcode_type
     Make_entry(IO_WAIT),
     Make_entry(IO_SHUTDOWN),
     Make_entry(IO_CTL),
+    Make_entry(MOVEIF),
 };
 enum class OPCODE_D : opcode_type
 {

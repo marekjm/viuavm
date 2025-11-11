@@ -103,6 +103,7 @@ auto execute(
                     Work(T, IO_WAIT);
                     Work(T, IO_SHUTDOWN);
                     Work(T, IO_CTL);
+                    Work(T, MOVEIF);
                 }
                 break;
             }

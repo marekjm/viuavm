@@ -92,6 +92,7 @@ Work_instruction(DIVI);
 Work_instruction(DIVIU);
 
 Flow_instruction(IF);
+Work_instruction(MOVEIF);
 
 Work_instruction(EBREAK);
 Work_instruction(ECALL);

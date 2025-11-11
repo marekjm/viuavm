@@ -179,4 +179,26 @@ auto execute(
 
     return target;
 }
+
+auto execute(
+    MOVEIF const op,
+    Stack& stack,
+    ip_type const) -> void
+{
+    auto const condition = immutable_proxy(stack, op.instruction.lhs);
+
+    auto const move_lhs =
+        (not condition.holds<void>()) and *condition.cast_to<bool>();
+
+    if ((not move_lhs) and immutable_proxy(stack, op.instruction.rhs).holds<void>()) {
+        throw abort_execution{ stack, "invalid rhs operand to moveif instruction" };
+    }
+
+    auto move_from = move_lhs
+        ? mutable_proxy(stack, op.instruction.lhs)
+        : mutable_proxy(stack, op.instruction.rhs);
+
+    mutable_proxy(stack, op.instruction.out) = std::move(*move_from.target);
+    move_from.reset();
+}
 }  // namespace viua::vm::ins

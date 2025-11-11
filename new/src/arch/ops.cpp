@@ -148,6 +148,8 @@ auto to_string_impl(
             return "swap";
         case OPCODE::IF:
             return "if";
+        case OPCODE::MOVEIF:
+            return "moveif";
         case OPCODE::IO_SUBMIT:
             return "io_submit";
         case OPCODE::IO_WAIT:
@@ -296,6 +298,8 @@ auto parse_opcode(
         return static_cast<opcode_type>(OPCODE::SWAP);
     } else if (sv == "if") {
         return static_cast<opcode_type>(OPCODE::IF);
+    } else if (sv == "moveif") {
+        return static_cast<opcode_type>(OPCODE::MOVEIF);
     } else if (sv == "io_submit") {
         return static_cast<opcode_type>(OPCODE::IO_SUBMIT);
     } else if (sv == "io_wait") {

@@ -495,6 +495,14 @@ struct IF : Instruction {
         : instruction{ i }
     {}
 };
+struct MOVEIF : Instruction {
+    viua::arch::ops::T instruction;
+
+    MOVEIF(
+        viua::arch::ops::T i)
+        : instruction{ i }
+    {}
+};
 
 struct IO_SUBMIT : Instruction {
     viua::arch::ops::T instruction;
