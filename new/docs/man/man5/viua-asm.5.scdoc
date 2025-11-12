@@ -388,6 +388,8 @@ toolchain.
 
 ; *if*
 
+; *moveif*
+
 ; *frame*
 
 ; *call*

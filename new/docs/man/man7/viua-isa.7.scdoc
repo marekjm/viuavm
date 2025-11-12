@@ -686,6 +686,9 @@ The following instructions are available:
 |  if
 :  D
 :  take a conditional branch
+|  moveif
+:  T
+:  conditionally move values
 |  gts
 :  D
 :  store value in the Global Table

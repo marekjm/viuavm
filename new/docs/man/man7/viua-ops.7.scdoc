@@ -448,6 +448,12 @@ Control flow instructions.
 	See the description of the *atxtp* instruction to learn how to create a
 	pointer usable as the $_address_ operand.
 
+*moveif* $_result_, $_lhs_|void, $_rhs_
+	Move the value from $_lhs_ into $_result_ if the value is true; otherwise,
+	move the value from $_rhs_.
+
+	If $_lhs_ is *void*, unconditionally move $_rhs_ into $_result_.
+
 *frame* $_argcount_.a++
 *frame* $_argcount_.l
 	Allocate a frame.
