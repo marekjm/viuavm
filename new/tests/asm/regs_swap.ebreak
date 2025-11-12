@@ -1,0 +1,9 @@
+ebreak 0 in process [fe80::42]
+of #last
+[1.l] is 000000000000002a 42
+[2.l] is 000000000000029a 666
+
+ebreak 1 in process [fe80::42]
+of #last
+[1.l] is 000000000000029a 666
+[2.l] is 000000000000002a 42
