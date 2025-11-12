@@ -177,7 +177,6 @@ inline auto const OPCODE_NAMES = std::set<std::string_view>{
 
     "lui",
     "luiu",
-    "lli",
     "float",
     "double",
 

@@ -72,30 +72,6 @@ auto execute(
     out      = static_cast<uint64_t>(op.instruction.immediate) << 32;
 }
 auto execute(
-    LLI const op,
-    Stack& stack,
-    ip_type const) -> void
-{
-    auto out = mutable_proxy(stack, op.instruction.out);
-
-    constexpr auto LOW_32  = uint64_t{ 0x00'00'00'00'ff'ff'ff'ff };
-    constexpr auto HIGH_32 = uint64_t{ 0xff'ff'ff'ff'00'00'00'00 };
-
-    if (auto const v = out.get<uint64_t>(); v) {
-        auto const high = (HIGH_32 & *v);
-        auto const low  = (LOW_32 & op.instruction.immediate);
-        out             = (high | low);
-    } else if (auto const v = out.get<int64_t>(); v) {
-        auto const high = (HIGH_32 & *v);
-        auto const low  = (LOW_32 & op.instruction.immediate);
-        out             = static_cast<int64_t>(high | low);
-    } else {
-        throw abort_execution{ stack,
-                               "unsupported operand type for lli operation: "
-                                   + std::string{ out.type_name() } };
-    }
-}
-auto execute(
     CAST const op,
     Stack& stack,
     ip_type const) -> void

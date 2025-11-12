@@ -2272,7 +2272,7 @@ auto expand_li(
      * In any case, for long immediates the sequence of
      *
      *      lui $x, <high-word>
-     *      lli $x, <low-word>
+     *      addi $x, <low-word>
      *
      * is emitted which is cheap and executed without releasing the virtual CPU.
      */

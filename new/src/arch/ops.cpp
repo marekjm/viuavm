@@ -116,8 +116,6 @@ auto to_string_impl(
             return "lui";
         case OPCODE::LUIU:
             return "luiu";
-        case OPCODE::LLI:
-            return "lli";
         case OPCODE::ADDI:
             return "addi";
         case OPCODE::ADDIU:
@@ -264,8 +262,6 @@ auto parse_opcode(
         return static_cast<opcode_type>(OPCODE::LUI);
     } else if (sv == "luiu") {
         return static_cast<opcode_type>(OPCODE::LUIU);
-    } else if (sv == "lli") {
-        return static_cast<opcode_type>(OPCODE::LLI);
     } else if (sv == "addi") {
         return static_cast<opcode_type>(OPCODE::ADDI);
     } else if (sv == "addiu") {

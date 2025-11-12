@@ -124,7 +124,6 @@ auto execute(
                 {
                     Work(I, LUI);
                     Work(I, LUIU);
-                    Work(I, LLI);
                     Work(I, FLOAT);
                     Work(I, CAST);
                     Work(I, ARODP);

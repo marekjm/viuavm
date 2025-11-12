@@ -403,12 +403,10 @@ enum class OPCODE : opcode_type
 
     LUI  = (FORMAT_I | 0x00'01),
     LUIU = (FORMAT_I | LUI | OPCODE_FLAGS::UNSIGNED),
-    // FIXME remove the lli instruction, use addi/addiu instead
-    LLI   = (FORMAT_I | 0x00'02),
-    FLOAT = (FORMAT_I | 0x00'03),
-    CAST  = (FORMAT_I | 0x00'04),
-    ARODP = (FORMAT_I | 0x00'05),
-    ATXTP = (FORMAT_I | 0x00'06),
+    FLOAT = (FORMAT_I | 0x00'02),
+    CAST  = (FORMAT_I | 0x00'03),
+    ARODP = (FORMAT_I | 0x00'04),
+    ATXTP = (FORMAT_I | 0x00'05),
 
     ADDI  = (FORMAT_U | 0x00'01),
     ADDIU = (FORMAT_U | ADDI | OPCODE_FLAGS::UNSIGNED),
@@ -493,7 +491,6 @@ enum class OPCODE_I : opcode_type
 {
     Make_entry(LUI),
     Make_entry(LUIU),
-    Make_entry(LLI),
     Make_entry(FLOAT),
     Make_entry(CAST),
     Make_entry(ARODP),

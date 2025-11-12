@@ -73,7 +73,6 @@ Flow_instruction(RETURN);
 
 Work_instruction(LUI);
 Work_instruction(LUIU);
-Work_instruction(LLI);
 Work_instruction(CAST);
 Work_instruction(ARODP);
 Work_instruction(ATXTP);
