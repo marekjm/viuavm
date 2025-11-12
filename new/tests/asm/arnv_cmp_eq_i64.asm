@@ -37,7 +37,6 @@
     ;   - eq:  equals
     ;   - lt:  less-than
     ;   - gt:  greater-than
-    ;   - cmp: compare 
     ;
     ; All the other comparisons can be synthesised from the above. For example,
     ; a "greater-than or equal" comparison can be written as:
@@ -48,33 +47,6 @@
     ;
     ; The eq, lt, and gt operations return an unsigned integer flag representing
     ; the result: 1 if the comparison yields truth, 0 otherwise.
-    ;
-    ; The cmp instruction does something different: it returns a signed integer
-    ; flag representing the relationship between two values. The flag is a -1 if
-    ; the left-hand operand is less than the right-hand operand; 1 if the
-    ; left-hand operand is greater than the right-hand operand; and 0 if both
-    ; operands are equal.
-    ;
-    ; The behaviour of cmp could be emulated using the following sequence:
-    ;
-    ;       ; First, let's get the results of base comparisons.
-    ;       lt $lt, $lhs, $rhs
-    ;       gt $gt, $lhs, $rhs
-    ;
-    ;       ; Then, turn a possible less-than 1 into a -1.
-    ;       muli $lt, $lt, -1
-    ;
-    ;       ; The moveor instruction moves its left-hand side operand if it is
-    ;       ; non-zero, otherwise it moves the right-hand side operand.
-    ;       ;
-    ;       ; Therefore, if $lt is non-zero then -1 is moved to $result;
-    ;       ; otherwise the value of $gt is moved. Since $gt contains a 1 if the
-    ;       ; values have a greater-than relationship and 0 otherwise, we end up
-    ;       ; with the desired number in $result.
-    ;       moveor $result, $lt, $gt
-    ;
-    ; Well, after having thought about this, I think the cmp instruction is
-    ; pretty useless and can be removed.
 
     li $2.l, 0
     eq $3.l, $1.l, $2.l

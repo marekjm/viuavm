@@ -195,63 +195,6 @@ auto execute(
     out = (cmp_result > 0);
 }
 auto execute(
-    CMP const op,
-    Stack& stack,
-    ip_type const) -> void
-{
-    auto cmp_result = std::partial_ordering::unordered;
-
-    auto const out = mutable_proxy(stack, op.instruction.out);
-    auto const lhs = immutable_proxy(stack, op.instruction.lhs);
-    auto const rhs = immutable_proxy(stack, op.instruction.rhs);
-
-    auto const lhs_i64  = lhs.holds<register_type::int_type>();
-    auto const lhs_u64  = lhs.holds<register_type::uint_type>();
-    auto const lhs_f32  = lhs.holds<register_type::float_type>();
-    auto const lhs_f64  = lhs.holds<register_type::double_type>();
-    auto const lhs_ptr  = lhs.holds<register_type::pointer_type>();
-    auto const lhs_atom = lhs.holds<register_type::atom_type>();
-    auto const lhs_pid  = lhs.holds<register_type::pid_type>();
-
-    if (auto const v = rhs.cast_to<int64_t>(); lhs_i64 and v) {
-        cmp_result = (*lhs.get<int64_t>() <=> *v);
-    }
-    if (auto const v = rhs.cast_to<uint64_t>(); lhs_u64 and v) {
-        cmp_result = (*lhs.get<uint64_t>() <=> *v);
-    }
-    if (auto const v = rhs.cast_to<float>(); lhs_f32 and v) {
-        cmp_result = (*lhs.get<float>() <=> *v);
-    }
-    if (auto const v = rhs.cast_to<double>(); lhs_f64 and v) {
-        cmp_result = (*lhs.get<double>() <=> *v);
-    }
-    if (auto const v = rhs.get<register_type::pointer_type>(); lhs_ptr and v) {
-        cmp_result = (lhs.get<register_type::pointer_type>()->ptr <=> v->ptr);
-    }
-    if (auto const v = rhs.get<register_type::atom_type>(); lhs_atom and v) {
-        cmp_result = (lhs.get<register_type::atom_type>()->key <=> v->key);
-    }
-    if (auto const v = rhs.get<register_type::pid_type>(); lhs_pid and v) {
-        auto const lhs_pid = *lhs.get<register_type::pid_type>();
-        auto const rhs_pid = *v;
-        auto const r =
-            memcmp(&lhs_pid.s6_addr, &rhs_pid.s6_addr, sizeof(lhs_pid.s6_addr));
-        if (r < 0) {
-            cmp_result = std::partial_ordering::less;
-        } else if (r > 0) {
-            cmp_result = std::partial_ordering::greater;
-        } else {
-            cmp_result = std::partial_ordering::equivalent;
-        }
-    }
-
-    if (cmp_result == std::partial_ordering::unordered) {
-        throw abort_execution{ stack, "cannot cmp unordered values" };
-    }
-
-    out = (cmp_result < 0) ? -1 : (0 < cmp_result) ? 1 : 0;
-}
-auto execute(
     AND const op,
     Stack& stack,
     ip_type const) -> void

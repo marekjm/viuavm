@@ -96,7 +96,6 @@ auto execute(
                     Work(T, EQ);
                     Work(T, GT);
                     Work(T, LT);
-                    Work(T, CMP);
                     Work(T, AND);
                     Work(T, OR);
                     Work(T, IO_SUBMIT);

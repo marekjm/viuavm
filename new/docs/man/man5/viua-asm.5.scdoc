@@ -380,8 +380,6 @@ toolchain.
 
 ; *eq*, *lt*, *gt*
 
-; *cmp*
-
 ; *and*, *or*
 
 ; *not*

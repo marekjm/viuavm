@@ -56,7 +56,6 @@ Work_instruction(BITAREV);
 Work_instruction(EQ);
 Work_instruction(LT);
 Work_instruction(GT);
-Work_instruction(CMP);
 Work_instruction(AND);
 Work_instruction(OR);
 Work_instruction(NOT);

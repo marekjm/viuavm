@@ -166,7 +166,6 @@ inline auto const OPCODE_NAMES = std::set<std::string_view>{
     "eq",
     "lt",
     "gt",
-    "cmp",
 
     "and",
     "or",

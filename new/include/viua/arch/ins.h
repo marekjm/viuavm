@@ -226,14 +226,6 @@ struct GT : Instruction {
         : instruction{ i }
     {}
 };
-struct CMP : Instruction {
-    viua::arch::ops::T instruction;
-
-    CMP(
-        viua::arch::ops::T i)
-        : instruction{ i }
-    {}
-};
 struct AND : Instruction {
     viua::arch::ops::T instruction;
 

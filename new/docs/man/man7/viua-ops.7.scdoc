@@ -315,23 +315,6 @@ Logic instructions.
 	$_lhs_ the instruction aborts execution.
 	Output is always a signed integer.
 
-*cmp* $_dst_, $_lhs_, $_rhs_
-	Compare $_lhs_ with $_rhs_, and store result in $_dst_ according
-	to the following table:
-
-	If the value in $_rhs_ cannot be interpreted as a value of the type of
-	$_lhs_ the instruction aborts execution.
-	Output is always a signed integer.
-
-[] $_dst_
-:[ condition
-|  -1
-:  left-hand < right-hand
-|  0
-:  left-hand = right-hand
-|  1
-:  left-hand > right-hand
-
 *and* $_dst_, $_lhs_, $_rhs_
 	Execute $_lhs_ logical-and $_rhs_, and store the result in $_dst_.
 

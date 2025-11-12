@@ -98,8 +98,6 @@ auto to_string_impl(
             return "lt";
         case OPCODE::GT:
             return "gt";
-        case OPCODE::CMP:
-            return "cmp";
         case OPCODE::AND:
             return "and";
         case OPCODE::OR:
@@ -248,8 +246,6 @@ auto parse_opcode(
         return static_cast<opcode_type>(OPCODE::LT);
     } else if (sv == "gt") {
         return static_cast<opcode_type>(OPCODE::GT);
-    } else if (sv == "cmp") {
-        return static_cast<opcode_type>(OPCODE::CMP);
     } else if (sv == "and") {
         return static_cast<opcode_type>(OPCODE::AND);
     } else if (sv == "or") {

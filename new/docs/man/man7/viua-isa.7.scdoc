@@ -634,10 +634,6 @@ The following instructions are available:
 |  gt
 :  T
 :  lhs > rhs
-|  cmp
-:  T
-:  compare two values, returning -1 for less-than, 0 for equal-to, and 1 for
-   greater-than relation
 |  and
 :  T
 :  logical "and"
