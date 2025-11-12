@@ -404,6 +404,9 @@ EBREAK_SELECT = re.compile(r"^ebreak (-?\d+) in proc(?:ess)? (\[[a-f0-9:]+\])")
 EBREAK_LINE_PRIMITIVE = re.compile(
     r"\[(\d+)\.([lap])\] (is|iu|fl|db|ptr|atom|pid) (.*)"
 )
+EBREAK_LINE_VOID = re.compile(
+    r"\[(\d+)\.([lap])\] void"
+)
 
 
 class Missing_value(Exception):
@@ -558,6 +561,48 @@ def walk_ebreak_test(errors, want_ebreak, live_ebreak):
                     )
                 )
                 raise Unexpected_value()
+
+            continue
+
+        if void_slot := EBREAK_LINE_VOID.fullmatch(line):
+            m = void_slot
+            index = int(m.group(1))
+            register_set = m.group(2)
+
+            ebreak = live_ebreak[pid][ebreak_index]["backtrace"]
+            live_frame = ebreak[frame]
+
+            want_type = "void"
+
+            if index in live_frame["registers"][register_set]:
+                live_cell = live_frame["registers"][register_set][index]
+                live_type, live_value = live_cell
+
+                leader = f"    register {index}.{register_set}"
+                errors.write(
+                    "{} contains {} = {}\n".format(
+                        leader,
+                        colorise(
+                            "red", live_type.ljust(max(len(want_type), len(live_type)))
+                        ),
+                        live_value,
+                    )
+                )
+                errors.write(
+                    "{} expected {}\n".format(
+                        (len(leader) * " "),
+                        colorise(
+                            "green", want_type.ljust(max(len(want_type), len(live_type)))
+                        ),
+                    )
+                )
+                errors.write(
+                    "{}          {}\n".format(
+                        (len(leader) * " "),
+                        colorise("red", (max(len(want_type), len(live_type)) * "^")),
+                    )
+                )
+                raise Unexpected_type()
 
             continue
 
