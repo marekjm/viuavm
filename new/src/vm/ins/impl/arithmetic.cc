@@ -21,7 +21,6 @@
 
 #include <cmath>
 #include <optional>
-#include <print>
 #include <type_traits>
 
 #include <viua/arch/arch.h>
