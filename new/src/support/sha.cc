@@ -28,7 +28,8 @@ SHA1::SHA1()
     SHA1_Init(&ctx);
 #endif
 }
-auto SHA1::update(std::string_view data) -> SHA1&
+auto SHA1::update(
+    std::string_view data) -> SHA1&
 {
     auto const ptr = reinterpret_cast<uint8_t const*>(data.data());
 #if defined(VIUA_OPENBSD)
@@ -38,9 +39,11 @@ auto SHA1::update(std::string_view data) -> SHA1&
 #endif
     return *this;
 }
-auto SHA1::update(std::vector<uint8_t> const& v) -> SHA1&
+auto SHA1::update(
+    std::vector<uint8_t> const& v) -> SHA1&
 {
-    auto sv = std::string_view{reinterpret_cast<char const*>(v.data()), v.size()};
+    auto sv =
+        std::string_view{ reinterpret_cast<char const*>(v.data()), v.size() };
     return update(sv);
 }
 
@@ -55,7 +58,7 @@ auto SHA1::get() -> digest_type
 #endif
     return d;
 }
-}
+}  // namespace viua
 
 namespace viua {
 SHA256::SHA256()
@@ -66,7 +69,8 @@ SHA256::SHA256()
     SHA1_Init(&ctx);
 #endif
 }
-auto SHA256::update(std::string_view data) -> SHA256&
+auto SHA256::update(
+    std::string_view data) -> SHA256&
 {
     auto const ptr = reinterpret_cast<uint8_t const*>(data.data());
 #if defined(VIUA_OPENBSD)
@@ -76,9 +80,11 @@ auto SHA256::update(std::string_view data) -> SHA256&
 #endif
     return *this;
 }
-auto SHA256::update(std::vector<uint8_t> const& v) -> SHA256&
+auto SHA256::update(
+    std::vector<uint8_t> const& v) -> SHA256&
 {
-    auto sv = std::string_view{reinterpret_cast<char const*>(v.data()), v.size()};
+    auto sv =
+        std::string_view{ reinterpret_cast<char const*>(v.data()), v.size() };
     return update(sv);
 }
 
@@ -93,7 +99,7 @@ auto SHA256::get() -> digest_type
 #endif
     return d;
 }
-}
+}  // namespace viua
 
 namespace viua {
 SHA512::SHA512()
@@ -104,7 +110,8 @@ SHA512::SHA512()
     SHA1_Init(&ctx);
 #endif
 }
-auto SHA512::update(std::string_view data) -> SHA512&
+auto SHA512::update(
+    std::string_view data) -> SHA512&
 {
     auto const ptr = reinterpret_cast<uint8_t const*>(data.data());
 #if defined(VIUA_OPENBSD)
@@ -114,9 +121,11 @@ auto SHA512::update(std::string_view data) -> SHA512&
 #endif
     return *this;
 }
-auto SHA512::update(std::vector<uint8_t> const& v) -> SHA512&
+auto SHA512::update(
+    std::vector<uint8_t> const& v) -> SHA512&
 {
-    auto sv = std::string_view{reinterpret_cast<char const*>(v.data()), v.size()};
+    auto sv =
+        std::string_view{ reinterpret_cast<char const*>(v.data()), v.size() };
     return update(sv);
 }
 
@@ -131,4 +140,4 @@ auto SHA512::get() -> digest_type
 #endif
     return d;
 }
-}
+}  // namespace viua

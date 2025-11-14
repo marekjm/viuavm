@@ -22,9 +22,9 @@
 
 #include <stdint.h>
 #if defined(VIUA_OPENBSD)
-#include <sys/types.h>
 #include <sha1.h>
 #include <sha2.h>
+#include <sys/types.h>
 #else
 #include <sha.h>
 #include <sha256.h>
@@ -40,9 +40,9 @@ struct SHA1 {
     using context_type = SHA1_CTX;
 
 #if defined(VIUA_OPENBSD)
-    inline static constexpr auto digest_size = size_t{SHA1_DIGEST_LENGTH};
+    inline static constexpr auto digest_size = size_t{ SHA1_DIGEST_LENGTH };
 #else
-    inline static constexpr auto digest_size = size_t{SHA_DIGEST_LENGTH};
+    inline static constexpr auto digest_size = size_t{ SHA_DIGEST_LENGTH };
 #endif
     using digest_type = std::vector<uint8_t>;
 
@@ -59,9 +59,9 @@ struct SHA256 {
     using context_type = SHA1_CTX;
 
 #if defined(VIUA_OPENBSD)
-    inline static constexpr auto digest_size = size_t{SHA1_DIGEST_LENGTH};
+    inline static constexpr auto digest_size = size_t{ SHA1_DIGEST_LENGTH };
 #else
-    inline static constexpr auto digest_size = size_t{SHA_DIGEST_LENGTH};
+    inline static constexpr auto digest_size = size_t{ SHA_DIGEST_LENGTH };
 #endif
     using digest_type = std::vector<uint8_t>;
 
@@ -78,9 +78,9 @@ struct SHA512 {
     using context_type = SHA1_CTX;
 
 #if defined(VIUA_OPENBSD)
-    inline static constexpr auto digest_size = size_t{SHA1_DIGEST_LENGTH};
+    inline static constexpr auto digest_size = size_t{ SHA1_DIGEST_LENGTH };
 #else
-    inline static constexpr auto digest_size = size_t{SHA_DIGEST_LENGTH};
+    inline static constexpr auto digest_size = size_t{ SHA_DIGEST_LENGTH };
 #endif
     using digest_type = std::vector<uint8_t>;
 

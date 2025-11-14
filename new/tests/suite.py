@@ -404,9 +404,7 @@ EBREAK_SELECT = re.compile(r"^ebreak (-?\d+) in proc(?:ess)? (\[[a-f0-9:]+\])")
 EBREAK_LINE_PRIMITIVE = re.compile(
     r"\[(\d+)\.([lap])\] (is|iu|fl|db|ptr|atom|pid) (.*)"
 )
-EBREAK_LINE_VOID = re.compile(
-    r"\[(\d+)\.([lap])\] void"
-)
+EBREAK_LINE_VOID = re.compile(r"\[(\d+)\.([lap])\] void")
 
 
 class Missing_value(Exception):
@@ -592,7 +590,8 @@ def walk_ebreak_test(errors, want_ebreak, live_ebreak):
                     "{} expected {}\n".format(
                         (len(leader) * " "),
                         colorise(
-                            "green", want_type.ljust(max(len(want_type), len(live_type)))
+                            "green",
+                            want_type.ljust(max(len(want_type), len(live_type))),
                         ),
                     )
                 )

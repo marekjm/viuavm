@@ -402,8 +402,8 @@ enum class OPCODE : opcode_type
     DOUBLE = (FORMAT_S | 0x00'04),
     SELF   = (FORMAT_S | 0x00'05),
 
-    LUI  = (FORMAT_I | 0x00'01),
-    LUIU = (FORMAT_I | LUI | OPCODE_FLAGS::UNSIGNED),
+    LUI   = (FORMAT_I | 0x00'01),
+    LUIU  = (FORMAT_I | LUI | OPCODE_FLAGS::UNSIGNED),
     FLOAT = (FORMAT_I | 0x00'02),
     CAST  = (FORMAT_I | 0x00'03),
     ARODP = (FORMAT_I | 0x00'04),

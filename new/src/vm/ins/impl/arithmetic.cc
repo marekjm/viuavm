@@ -314,10 +314,8 @@ auto execute(
                                    + op.instruction.in.to_string() };
     }
 
-    auto const candidate_width = static_cast<uint8_t>(*val);
-    stack.proc->arithmetic_width = candidate_width
-        ? candidate_width
-        : 64u;
+    auto const candidate_width   = static_cast<uint8_t>(*val);
+    stack.proc->arithmetic_width = candidate_width ? candidate_width : 64u;
 }
 }  // namespace viua::vm::ins
 
@@ -693,7 +691,7 @@ auto execute(
     ip_type const) -> void
 {
     auto const out = mutable_proxy(stack, op.instruction.out);
-    auto const in = immutable_proxy(stack, op.instruction.in);
+    auto const in  = immutable_proxy(stack, op.instruction.in);
 
     if (auto const v = in.get<register_type::double_type>(); v) {
         out = std::sqrt(*v);
@@ -708,9 +706,7 @@ auto execute(
         return;
     }
 
-    throw abort_execution{
-        stack, "unsupported operand types for sqrt"
-    };
+    throw abort_execution{ stack, "unsupported operand types for sqrt" };
 }
 
 template<typename Op>
