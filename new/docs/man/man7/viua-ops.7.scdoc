@@ -128,6 +128,13 @@ be used for the $_lhs_ operand.
 	Calculate ($_lhs_ modulo $_rhs_), and store the output in $_dst_.
 	Only signed and unsigned integers are supported.
 
+*sqrt* $_dst_, $_op_
+	Calculate the square root of $_op_ and put the result in $_dst_.
+
+	Produced value has the same type as the input value for floating-point
+	types.
+	For integer types, the output type is always *double*.
+
 
 ## Arithmetic with an immediate value
 

@@ -364,6 +364,8 @@ toolchain.
 
 ; *mod*
 
+; *sqrt*
+
 ## Bit operations
 
 ; *bitshl*, *bitshr*

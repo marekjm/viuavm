@@ -116,6 +116,14 @@ struct MOD : Instruction {
         : instruction{ i }
     {}
 };
+struct SQRT : Instruction {
+    viua::arch::ops::D instruction;
+
+    SQRT(
+        viua::arch::ops::D i)
+        : instruction{ i }
+    {}
+};
 struct BITSHL : Instruction {
     viua::arch::ops::T instruction;
 

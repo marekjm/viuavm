@@ -72,6 +72,8 @@ auto to_string_impl(
             return "div";
         case OPCODE::MOD:
             return "mod";
+        case OPCODE::SQRT:
+            return "sqrt";
         case OPCODE::BITSHL:
             return "bitshl";
         case OPCODE::BITSHR:
@@ -218,6 +220,8 @@ auto parse_opcode(
         return static_cast<opcode_type>(OPCODE::DIV);
     } else if (sv == "mod") {
         return static_cast<opcode_type>(OPCODE::MOD);
+    } else if (sv == "sqrt") {
+        return static_cast<opcode_type>(OPCODE::SQRT);
     } else if (sv == "bitshl") {
         return static_cast<opcode_type>(OPCODE::BITSHL);
     } else if (sv == "bitshr") {

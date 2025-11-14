@@ -589,6 +589,9 @@ The following instructions are available:
 |  mod
 :  T
 :  obtain the remainder of signed a division
+|  sqrt
+:  D
+:  calculate square root of a value
 |  earithmeticwidth
 :  D
 :  limit bit width of some operations

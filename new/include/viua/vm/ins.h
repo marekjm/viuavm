@@ -40,6 +40,7 @@ Work_instruction(SUB);
 Work_instruction(MUL);
 Work_instruction(DIV);
 Work_instruction(MOD);
+Work_instruction(SQRT);
 
 Work_instruction(BITSHL);
 Work_instruction(BITSHR);

@@ -19,6 +19,7 @@
 
 #include <stdint.h>
 
+#include <cmath>
 #include <optional>
 #include <print>
 #include <type_traits>
@@ -684,6 +685,32 @@ auto execute(
 
     throw abort_execution{
         stack, "unsupported operand types for arithmetic operation"
+    };
+}
+
+auto execute(
+    SQRT const op,
+    Stack& stack,
+    ip_type const) -> void
+{
+    auto const out = mutable_proxy(stack, op.instruction.out);
+    auto const in = immutable_proxy(stack, op.instruction.in);
+
+    if (auto const v = in.get<register_type::double_type>(); v) {
+        out = std::sqrt(*v);
+        return;
+    }
+    if (auto const v = in.get<register_type::float_type>(); v) {
+        out = std::sqrt(*v);
+        return;
+    }
+    if (auto const v = in.cast_to<register_type::double_type>(); v) {
+        out = std::sqrt(*v);
+        return;
+    }
+
+    throw abort_execution{
+        stack, "unsupported operand types for sqrt"
     };
 }
 

@@ -394,6 +394,7 @@ enum class OPCODE : opcode_type
     EARITHMETICWIDTH = (FORMAT_D | 0x00'0c),
     BITREV           = (FORMAT_D | 0x00'0d),
     BITAREV          = (FORMAT_D | 0x00'0e),
+    SQRT             = (FORMAT_D | 0x00'0f),
 
     FRAME  = (FORMAT_S | 0x00'01),
     RETURN = (FORMAT_S | 0x00'02),
@@ -478,6 +479,7 @@ enum class OPCODE_D : opcode_type
     Make_entry(EARITHMETICWIDTH),
     Make_entry(BITREV),
     Make_entry(BITAREV),
+    Make_entry(SQRT),
 };
 enum class OPCODE_S : opcode_type
 {

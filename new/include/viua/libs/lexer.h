@@ -150,6 +150,7 @@ inline auto const OPCODE_NAMES = std::set<std::string_view>{
     "mul",
     "div",
     "mod",
+    "sqrt",
 
     "bitshl",
     "bitshr",

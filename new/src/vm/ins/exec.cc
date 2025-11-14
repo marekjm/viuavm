@@ -220,6 +220,8 @@ auto execute(
 
                     Work(D, BITREV);
                     Work(D, BITAREV);
+
+                    Work(D, SQRT);
                 }
                 break;
             }
