@@ -498,7 +498,7 @@ auto demangle_addiu(
 
     using enum viua::arch::ops::OPCODE;
     for (auto i = size_t{ 0 }; i < text.size(); ++i) {
-        if (m(i, ADDIU) or m(i, ADDIU)) {
+        if (m(i, ADDIU)) {
             using viua::arch::ops::S;
             using viua::arch::ops::U;
             auto const addi = U::decode(ins_at(i));
@@ -509,6 +509,54 @@ auto demangle_addiu(
                              std::nullopt,
                              std::nullopt,
                              std::format("addi {}, {}, {}u",
+                                         addi.out.to_string(),
+                                         addi.in.to_string(),
+                                         std::to_string(addi.immediate)));
+            continue;
+        }
+        if (m(i, SUBIU)) {
+            using viua::arch::ops::S;
+            using viua::arch::ops::U;
+            auto const addi = U::decode(ins_at(i));
+
+            auto idx          = text.at(i).index;
+            idx.physical_span = idx.physical;
+            tmp.emplace_back(idx,
+                             std::nullopt,
+                             std::nullopt,
+                             std::format("subi {}, {}, {}u",
+                                         addi.out.to_string(),
+                                         addi.in.to_string(),
+                                         std::to_string(addi.immediate)));
+            continue;
+        }
+        if (m(i, MULIU)) {
+            using viua::arch::ops::S;
+            using viua::arch::ops::U;
+            auto const addi = U::decode(ins_at(i));
+
+            auto idx          = text.at(i).index;
+            idx.physical_span = idx.physical;
+            tmp.emplace_back(idx,
+                             std::nullopt,
+                             std::nullopt,
+                             std::format("muli {}, {}, {}u",
+                                         addi.out.to_string(),
+                                         addi.in.to_string(),
+                                         std::to_string(addi.immediate)));
+            continue;
+        }
+        if (m(i, DIVIU)) {
+            using viua::arch::ops::S;
+            using viua::arch::ops::U;
+            auto const addi = U::decode(ins_at(i));
+
+            auto idx          = text.at(i).index;
+            idx.physical_span = idx.physical;
+            tmp.emplace_back(idx,
+                             std::nullopt,
+                             std::nullopt,
+                             std::format("divi {}, {}, {}u",
                                          addi.out.to_string(),
                                          addi.in.to_string(),
                                          std::to_string(addi.immediate)));
