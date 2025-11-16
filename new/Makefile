@@ -256,7 +256,7 @@ install: all-silent $(prefix)
 	$(install) \
 		-m 755 \
 		-D --target-directory $(DESTDIR)$(exedir) \
-		$(BUILD_EXEDIR)/*
+		$(shell find $(BUILD_EXEDIR) -type f -not -name '*.*')
 	$(install) \
 		-m 755 \
 		-D --target-directory $(DESTDIR)$(bindir) \
