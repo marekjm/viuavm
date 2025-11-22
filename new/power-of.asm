@@ -61,11 +61,57 @@
     return $1.l
 
 
+.symbol pown
+.label pown
+    if $1.p, pown_nonzero
+
+    div $0.l, $0.p, $0.p
+    return $0.l
+
+.label pown_nonzero
+    copy $0.l, $0.p
+    li $1.l, 1u
+
+.label pown_loop
+    eq $2.l, $1.l, $1.p
+    if $2.l, pown_epilogue
+
+    mul $0.l, $0.l, $0.p
+    addi $1.l, $1.l, 1u
+
+    if void, pown_loop
+
+.label pown_epilogue
+    return $0.l
+
+
 .symbol [[entry_point]] main
 .label main
-    frame $1.a
-    li $0.a, 9u
-    call $2.l, make_e_fl
+    ; frame $1.a
+    ; li $0.a, 9u
+    ; call $2.l, make_e_fl
+    ; ebreak
+
+    frame $2.a
+    li $0.a, -2
+    li $1.a, 3u
+    call $1.l, pown
+
+    frame $2.a
+    li $0.a, 2u
+    li $1.a, 3u
+    call $2.l, pown
+
+    frame $2.a
+    float $0.a, 1.41
+    li $1.a, 3u
+    call $3.l, pown
+
+    frame $2.a
+    double $0.a, 3.14159
+    li $1.a, 3u
+    call $4.l, pown
+
     ebreak
 
     return
