@@ -61,29 +61,39 @@
     return $1.l
 
 
-.symbol pown
-.label pown
-    if $1.p, pown_nonzero
+; See https://www.wolframalpha.com/input?i=taylor+ln%28x%29
+.symbol ln
+.label ln
+    float $1.l, 1.0
+    eq $1.l, $1.l, $0.p
+    if $1.l, ln_error_of_1
 
-    div $0.l, $0.p, $0.p
+    subi $1.l, $0.p, 1u
+    li $2.l, 1u
+    lt $2.l, $1.l, $2.l
+    if $2.l, ln_lt_1
+    if void, ln_gt_1
+
+.label ln_error_of_1
+    float $0.l, 0.0
     return $0.l
+.label ln_lt_1
+.label ln_gt_1
+    halt
 
-.label pown_nonzero
-    copy $0.l, $0.p
-    li $1.l, 1u
 
-.label pown_loop
-    eq $2.l, $1.l, $1.p
-    if $2.l, pown_epilogue
+.symbol ln_base_impl
+.label ln_base_impl
+    li $1.l, -1  ; Constant -1 -- DO NOT TOUCH!
 
-    mul $0.l, $0.l, $0.p
-    addi $1.l, $1.l, 1u
+    li $2.l, 1u  ; k
 
-    if void, pown_loop
+    li $3.l, -1  ; accumulator for (-1)**k
 
-.label pown_epilogue
-    return $0.l
+    add $4.l, $1.l, $0.p  ; accumulator for (-1 + x)**k
 
+
+; a**b = power-of(a, b) = power-of(e, (b * ln(a)))
 
 .symbol [[entry_point]] main
 .label main
@@ -111,6 +121,31 @@
     double $0.a, 3.14159
     li $1.a, 3u
     call $4.l, pown
+
+    frame $2.a
+    double $0.a, 3.14159
+    li $1.a, 0u
+    call $4.l, pown
+
+    frame $1.a
+    li $0.a, -1
+    call $5.l, abs
+
+    frame $1.a
+    li $0.a, 0u
+    call $6.l, abs
+
+    frame $1.a
+    li $0.a, 1
+    call $7.l, abs
+
+    frame $1.a
+    float $0.a, 1.41
+    call $8.l, abs
+
+    frame $1.a
+    double $0.a, -3.14159
+    call $9.l, abs
 
     ebreak
 
