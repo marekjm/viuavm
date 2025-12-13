@@ -5,23 +5,22 @@
     ; The zero of the appropriate type has to be calculated in all cases so we
     ; may as well do it first.
     mul $0.l, $0.p, zero
+    mul $0.l, $0.l, $0.l  ; Turn a possible -0.0 into a 0.0
 
-    ; And if the parameter is zero we can just return the zero immediately.
-    if $0.p, sign_nonzero
-    return $0.l
-
-.label sign_nonzero
+    ; Make a 1 of the appropriate type.
     gt $1.l, $0.p, zero
-    if $1.l, sign_positive
+    add $1.l, $0.l, $1.l
 
-.label sign_negative
-    subi $0.l, $0.l, 1
-    if void, sign_epilogue
+    ; Make a -1 of the appropriate type.
+    lt $2.l, $0.p, zero
+    sub $2.l, $0.l, $2.l
 
-.label sign_positive
-    addi $0.l, $0.l, 1
+    ; return = ($0.p > 0) ? 1 : 0
+    moveif $0.l, $1.l, $0.l
 
-.label sign_epilogue
+    ; return = return ? return : -1
+    moveif $0.l, $0.l, $2.l
+
     return $0.l
 
 
