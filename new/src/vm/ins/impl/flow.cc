@@ -200,6 +200,5 @@ auto execute(
                               : mutable_proxy(stack, op.instruction.rhs);
 
     mutable_proxy(stack, op.instruction.out) = std::move(*move_from.target);
-    move_from.reset();
 }
 }  // namespace viua::vm::ins
