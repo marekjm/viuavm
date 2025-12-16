@@ -1,5 +1,13 @@
 .section ".text"
 
+;
+; Exponentiation (power of) functions.
+;
+
+; pown: b -> n -> b
+;   where
+;       b: any arithmetic type
+;       n: any non-negative integer
 .symbol pown
 .label pown
     if $1.p, pown_exp_nonzero
@@ -29,6 +37,10 @@
     return $0.l
 
 
+; powz: b -> n -> b
+;   where
+;       b: any arithmetic type
+;       n: any integer
 .symbol powz
 .label powz
     copy $2.l, $1.p
