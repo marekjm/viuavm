@@ -1,0 +1,63 @@
+---
+image: openbsd/7.8
+packages:
+  - llvm-21.1.2p0
+  - coreutils  # they are better than their BSD counterparts
+  - gmake
+  - libb2  # for BLAKE2 in code
+  - scdoc
+  - m4
+sources:
+  - https://git.sr.ht/~maelkum/viuavm
+  - https://github.com/BLAKE2/BLAKE2
+environment:
+  CC: clang-21
+  CXX: clang++-21
+  CXXSTD: c++23
+  CXXFLAGS_SANITISER:
+  PROGRESS_INDICATORS: false  # do not pollute output in CI
+  SHOW_PERFORMANCE_DETAILS: true  # produce detailed report in CI
+tasks:
+  - b2sum: |
+      cd BLAKE2/b2sum
+      gmake NO_OPENMP=1
+      doas gmake PREFIX=/usr/local install
+  - build-preset-debug: |
+      cd viuavm/new
+      gmake clean
+      gmake PRESET=debug io_impl=classic --jobs 2
+  - install-preset-debug: |
+      cd viuavm/new
+      gmake prefix=ci-debug install
+  - test-preset-debug: |
+      cd viuavm/new
+      gmake test_prefix=ci-debug test
+      PATH=./ci-debug/bin:$PATH USE_TOOLCHAIN_SCRIPT=true gmake test_prefix=ci-debug test
+  - build-preset-test: |
+      cd viuavm/new
+      gmake clean
+      gmake PRESET=test io_impl=classic --jobs 2
+  - install-preset-test: |
+      cd viuavm/new
+      gmake prefix=ci-test install
+  - test-preset-test: |
+      cd viuavm/new
+      gmake test_prefix=ci-test test
+      PATH=./ci-test/bin:$PATH USE_TOOLCHAIN_SCRIPT=true gmake test_prefix=ci-test test
+  - build-preset-release: |
+      cd viuavm/new
+      gmake clean
+      gmake PRESET=release io_impl=classic --jobs 2
+  - install-preset-release: |
+      cd viuavm/new
+      gmake prefix=ci-release install
+  - test-preset-release: |
+      cd viuavm/new
+      gmake test_prefix=ci-release test
+      PATH=./ci-release/bin:$PATH USE_TOOLCHAIN_SCRIPT=true gmake test_prefix=ci-release test
+      PATH=./ci-release/bin:$PATH viua help viua.1 >/dev/null
+      PATH=./ci-release/bin:$PATH viua help asm.1 >/dev/null
+      PATH=./ci-release/bin:$PATH viua help ld.1 >/dev/null
+      PATH=./ci-release/bin:$PATH viua help dis.1 >/dev/null
+      PATH=./ci-release/bin:$PATH viua help vm.1 >/dev/null
+      PATH=./ci-release/bin:$PATH viua help asm.5 >/dev/null

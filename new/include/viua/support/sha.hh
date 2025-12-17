@@ -22,9 +22,14 @@
 
 #include <stdint.h>
 #if defined(VIUA_OPENBSD)
+/*
+ * <sys/types.h> MUST be included BEFORE the SHA headers, or you will get
+ * compilation errors about unknown types.
+ */
+#include <sys/types.h>
+
 #include <sha1.h>
 #include <sha2.h>
-#include <sys/types.h>
 #else
 #include <sha.h>
 #include <sha256.h>
