@@ -1,30 +1,6 @@
 .section ".text"
 
-; A function to calculate an absolute value of its parameter.
-; absn() takes any arithmetic value as its parameter, and outputs an unsigned
-; integer.
-.symbol absn
-.label absn
-.begin
-    ; Establish whether the parameter is greater than zero. This will dictate
-    ; whether we have to multiply it by -1 or 1 to get the absolute value.
-    gt $2.l, $0.p, zero
-
-    ; If the parameter is greater than zero we can jump straight to the
-    ; epilogue. Otherwise we have to replace the multiplier with -1 to turn the
-    ; non-positive value into a non-negative one.
-    if $2.l, absn_epilogue
-    li $2.l, -1
-
-.label absn_epilogue
-    ; Obtain the absolute value.
-    mul.native $1.l, $2.l, $0.p
-
-    ; Convert the result to an unsigned integer.
-    add $1.l, uzero, $1.l
-
-    return $1.l
-.end
+.symbol [[extern]] absn
 
 .symbol [[entry_point]] main
 .label main
