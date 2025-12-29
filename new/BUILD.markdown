@@ -26,6 +26,7 @@ The following are supported:
  - Linux/glibc
  - Linux/musl
  - FreeBSD
+ - OpenBSD
 
 
 ### Libraries
@@ -42,7 +43,10 @@ Linux libraries:
  - liburing: https://git.kernel.dk/cgit/liburing (default, but not necessary if
    you decide to use the "classic" I/O implementation)
 
-There are no special library requirements for FreeBSD.
+There are no special library requirements for FreeBSD or OpenBSD.
+
+OpenBSD requires manual compilation and installation of the b2sum tool before
+the VM can be compiled.
 
 --------------------------------------------------------------------------------
 
