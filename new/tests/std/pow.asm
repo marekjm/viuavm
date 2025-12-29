@@ -69,3 +69,16 @@
 
 .label powz_epilogue
     return $0.l
+
+
+; powr: b -> n -> b
+;   where
+;       b: any arithmetic type
+;       n: real number
+;
+; In this case a "real number" means the highest precision floating point type
+; available ie, the best approximation of a number belonging to the R set we can
+; provide.
+.symbol powr
+.label powr
+    return zero  ; FIXME not implemented
