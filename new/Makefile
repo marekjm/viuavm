@@ -180,6 +180,7 @@ all: all-silent
 all-silent: \
 	man \
 	$(BUILD_EXEDIR)/readelf \
+	$(BUILD_EXEDIR)/repl \
 	$(BUILD_EXEDIR)/dis \
 	$(BUILD_EXEDIR)/asm \
 	$(BUILD_EXEDIR)/ld \
@@ -497,20 +498,20 @@ $(BUILD_EXEDIR)/binarith: \
 
 $(BUILD_EXEDIR)/repl: \
 	$(BUILD_PREFIX)/libexec/common.o \
-	$(BUILD_PREFIX)/arch/ra.o \
-	$(BUILD_PREFIX)/arch/ops.o \
+	$(BUILD_PREFIX)/support/errno.o \
+	$(BUILD_PREFIX)/support/fdio.o \
+	$(BUILD_PREFIX)/support/tty.o \
+	$(BUILD_PREFIX)/support/string.o \
 	$(BUILD_PREFIX)/vm/backtrace.o \
+	$(BUILD_PREFIX)/vm/io/impl/$(io_impl).o \
+	$(BUILD_PREFIX)/vm/io/sched.o \
 	$(BUILD_PREFIX)/vm/core.o \
 	$(BUILD_PREFIX)/vm/elf.o \
+	$(BUILD_PREFIX)/vm/ins/proxy.o \
+	$(BUILD_PREFIX)/vm/ins/exec.o \
 	$(VM_INSTRUCTION_IMPL) \
-	$(BUILD_PREFIX)/support/fdio.o \
-	$(BUILD_PREFIX)/support/string.o \
-	$(BUILD_PREFIX)/support/tty.o \
-	$(BUILD_PREFIX)/tools/libs/errors/compile_time.o \
-	$(BUILD_PREFIX)/tools/libs/stage.o \
-	$(BUILD_PREFIX)/tools/libs/lexer.o \
-	$(BUILD_PREFIX)/tools/libs/parser.o \
 	$(BUILD_PREFIX)/runtime/pid.o \
+	$(VM_OPERATION_TYPE_IMPL) \
 	3rd-party/linenoise/linenoise.o \
 	3rd-party/linenoise/encodings/utf8.o
 

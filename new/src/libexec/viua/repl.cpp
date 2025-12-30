@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2022 Marek Marecki
+ *  Copyright (C) 2022, 2025 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -29,18 +29,33 @@
 #include <linenoise/encodings/utf8.h>
 #include <linenoise/linenoise.h>
 
+#include <viua/arch/arch.h>
 #include <viua/arch/ins.h>
 #include <viua/arch/ops.h>
-#include <viua/libs/parser.h>
-#include <viua/libs/stage.h>
+#include <viua/libexec/common.hh>
 #include <viua/support/fdstream.h>
 #include <viua/support/memory.h>
 #include <viua/support/tty.h>
+#include <viua/support/errno.h>
+#include <viua/support/fdstream.h>
+#include <viua/support/print.hh>
+#include <viua/support/string.h>
+#include <viua/support/tty.h>
 #include <viua/vm/core.h>
+#include <viua/vm/elf.h>
 #include <viua/vm/ins.h>
 
-struct Global_state {
-    viua::vm::Core core{};
+#if defined(VIUAVM_IO_IMPL_CLASSIC)
+#include <viua/vm/io/impl/classic.hh>
+#elif defined(VIUAVM_IO_IMPL_IO_URING)
+#include <viua/vm/io/impl/io_uring.hh>
+#else
+#error "no I/O implementation selected"
+#endif
+
+
+struct Interpreter_state {
+    std::unique_ptr<viua::vm::Core> core{};
 
     using pid_type = viua::runtime::PID;
     std::unique_ptr<pid_type> selected_pid;
@@ -48,17 +63,24 @@ struct Global_state {
 
     std::string last_input;
     bool crash_on_internal{ false };
+
+    using io_type = viua::vm::io::impl::VIUAVM_IO_IMPL::IO;
+    Interpreter_state(io_type&);
 };
 
+Interpreter_state::Interpreter_state(io_type& io)
+    : core{std::make_unique<viua::vm::Core>(io)}
+{}
+
 namespace {
-auto REPL_STATE = viua::view_ptr<Global_state>{};
+auto REPL_STATE = viua::view_ptr<Interpreter_state>{};
 }
 
 /*
  * Utility namespace.
  */
 namespace {
-auto split_on_space(
+auto split_on_space[[maybe_unused]](
     std::string_view sv) -> std::vector<std::string_view>
 {
     auto parts = std::vector<std::string_view>{};
@@ -90,6 +112,7 @@ auto completion(
     candidates.clear();
 
     candidates.push_back("quit");
+#if 0
     candidates.push_back("repl");
     candidates.push_back("repl pid-base");
     candidates.push_back("repl abort-internal");
@@ -107,6 +130,7 @@ auto completion(
     candidates.push_back("down");
     candidates.push_back("eval");
     candidates.push_back("eval asm");
+#endif
 
     for (auto const& each : candidates) {
         if (not each.starts_with(buf)) {
@@ -116,6 +140,7 @@ auto completion(
         linenoiseAddCompletion(lc, each.c_str());
     }
 
+#if 0
     auto const sv    = std::string_view{ buf };
     auto const parts = split_on_space(sv);
     if (parts.empty()) {
@@ -201,7 +226,7 @@ auto completion(
     if (*p(0) == "actor" and p(1).has_value() and *p(1) == "new") {
         auto const stem   = p(2).value_or("");
         auto const prefix = std::string{ "actor new " };
-        for (auto const& [mod_name, mod] : REPL_STATE->core.modules) {
+        for (auto const& [mod_name, mod] : REPL_STATE->core->modules) {
             for (auto const& [fn_off, fn] : mod.elf.function_table()) {
                 auto const fn_id = (mod_name.empty() ? "" : (mod_name + "::"))
                                    + std::get<0>(fn);
@@ -215,9 +240,10 @@ auto completion(
     for (auto const& each : runtime_candidates) {
         linenoiseAddCompletion(lc, each.c_str());
     }
+#endif
 }
 
-auto hints_impl(
+auto hints_impl[[maybe_unused]](
     char const* buf,
     int* const color,
     int* const bold) -> char const*
@@ -228,7 +254,7 @@ auto hints_impl(
 
     return nullptr;
 }
-auto hints(
+auto hints[[maybe_unused]](
     char const* buf,
     int* const color,
     int* const bold) -> char*
@@ -245,9 +271,22 @@ auto TRACE_STREAM = viua::support::fdstream{ 2 };
  * designated as the main module.
  */
 constexpr auto MAIN_MODULE_MNEMONIC = "main";
+
+
+/*
+ * Load a module, mapping a file path to a module name in the interpreter's
+ * global state.
+ *
+ * The function returns true when it encounters an error, allowing for the
+ * following exit early-style pattern:
+ *
+ *      if (load_module(...)) {
+ *          report_error(...);
+ *      }
+ */
 auto load_module(
     std::string_view const name,
-    std::filesystem::path elf_path) -> void
+    std::filesystem::path elf_path) -> bool
 {
     using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_CYAN;
@@ -265,33 +304,25 @@ auto load_module(
      * make much sense.
      */
     if (not std::filesystem::exists(elf_path)) {
-        std::cerr << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
-                  << ": file does not exist: " << esc(2, COLOR_FG_WHITE)
-                  << elf_path.native() << esc(2, ATTR_RESET) << "\n";
-        return;
+        viua::support::errorln("file does not exist: {}{}{}",
+                               esc(2, COLOR_FG_WHITE),
+                               elf_path.native(),
+                               esc(2, ATTR_RESET));
+        return true;
     }
     {
         struct stat statbuf{};
         if (stat(elf_path.c_str(), &statbuf) == -1) {
             auto const saved_errno = errno;
-            auto const errname     = strerrorname_np(saved_errno);
-            auto const errdesc     = strerrordesc_np(saved_errno);
+            auto const errname     = viua::support::errno_name(saved_errno);
+            auto const errdesc     = viua::support::errno_desc(saved_errno);
 
-            std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                      << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                      << esc(2, ATTR_RESET);
-            if (errname) {
-                std::cerr << ": " << errname;
-            }
-            std::cerr << ": " << (errdesc ? errdesc : "unknown error") << "\n";
-            return;
+            viua::support::errorln(elf_path, "{}: {}", errname, errdesc);
+            return true;
         }
         if ((statbuf.st_mode & S_IFMT) != S_IFREG) {
-            std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                      << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                      << esc(2, ATTR_RESET);
-            std::cerr << ": not a regular file\n";
-            return;
+            viua::support::errorln(elf_path, "not a regular file");
+            return true;
         }
     }
 
@@ -302,65 +333,52 @@ auto load_module(
     auto const elf_fd = open(elf_path.c_str(), O_RDONLY);
     if (elf_fd == -1) {
         auto const saved_errno = errno;
-        auto const errname     = strerrorname_np(saved_errno);
-        auto const errdesc     = strerrordesc_np(saved_errno);
+        auto const errname     = viua::support::errno_name(saved_errno);
+        auto const errdesc     = viua::support::errno_desc(saved_errno);
 
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_RED) << "error"
-                  << esc(2, ATTR_RESET);
-        if (errname) {
-            std::cerr << ": " << errname;
-        }
-        std::cerr << ": " << (errdesc ? errdesc : "unknown error") << "\n";
-        return;
+        viua::support::errorln(elf_path, "{}: {}", errname, errdesc);
+        return true;
     }
 
     using Module   = viua::vm::elf::Loaded_elf;
     auto const mod = Module::load(elf_fd);
 
-    if (auto const f = mod.find_fragment(".rodata"); not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no strings fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .rodata section found\n";
-        return;
+    if (auto const f = mod.find_fragment(".rodata");
+        not f.has_value()) {
+        viua::support::errorln(elf_path, "no strings fragment found");
+        viua::support::noteln(elf_path, "no .rodata section found");
+        return true;
     }
-    if (auto const f = mod.find_fragment(".symtab"); not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no function table fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .symtab section found\n";
-        return;
+    if (auto const f = mod.find_fragment(".symtab");
+        not f.has_value()) {
+        viua::support::errorln(elf_path, "no function table fragment found");
+        viua::support::noteln(elf_path, "no .symtab section found");
+        return true;
+    }
+    if (auto const f = mod.find_fragment(".strtab");
+        not f.has_value()) {
+        viua::support::errorln(elf_path, "no string table fragment found");
+        viua::support::noteln(elf_path, "no .strtab section found");
+        return true;
     }
     if (auto const f = mod.find_fragment(".text"); not f.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                  << "error" << esc(2, ATTR_RESET)
-                  << ": no text fragment found\n";
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native()
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET) << ": no .text section found\n";
-        return;
+        viua::support::errorln(elf_path, "no text fragment found");
+        viua::support::noteln(elf_path, "no .text section found");
+        return true;
     }
 
     if (auto const ep = mod.entry_point(); ep.has_value()) {
-        std::cerr << esc(2, COLOR_FG_WHITE) << elf_path.native() << ": "
-                  << esc(2, ATTR_RESET) << esc(2, COLOR_FG_CYAN) << "note"
-                  << esc(2, ATTR_RESET)
-                  << ": an entry point is defined for this module\n";
+        viua::support::noteln(elf_path, "an entry point is defined for this module");
     }
 
-    REPL_STATE->core.modules.emplace(
+    REPL_STATE->core->modules.emplace(
         ((name == MAIN_MODULE_MNEMONIC) ? "" : name),
         viua::vm::Module{ elf_path, mod });
+
+    return false;
 }
 
+#if 0
 auto evaluate_asm_expression(
     std::string const source_text) -> void
 {
@@ -750,6 +768,7 @@ auto repl_eval(
 
     return true;
 }
+#endif
 auto repl_main() -> void
 {
     constexpr auto DEFAULT_PROMPT = "(viua) ";
@@ -760,6 +779,7 @@ auto repl_main() -> void
         auto const line = std::string{ raw_line };
         free(raw_line);
 
+        /*
         auto const useful_line =
             std::string_view{ line.empty() ? REPL_STATE->last_input : line };
         if (auto const parts = split_on_space(useful_line); not parts.empty()) {
@@ -768,6 +788,7 @@ auto repl_main() -> void
             }
             REPL_STATE->last_input = useful_line;
         }
+        */
     }
 }
 
@@ -784,60 +805,19 @@ auto main(
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    auto args = std::vector<std::string>{ (argv + 1), (argv + argc) };
-    auto verbosity_level = 0;
-    {
-        auto show_version = false;
-        auto show_help    = false;
-
-        auto i = decltype(args)::size_type{};
-        for (; i < args.size(); ++i) {
-            auto const& each = args.at(i);
-            if (each == "--") {
-                // explicit separator of options and operands
-                ++i;
-                break;
-            }
-
-            /*
-             * Common options.
-             */
-            else if (each == "-v" or each == "--verbose") {
-                ++verbosity_level;
-            } else if (each == "--version") {
-                show_version = true;
-            } else if (each == "--help") {
-                show_help = true;
-            } else if (each.front() == '-') {
-                std::cerr << esc(2, COLOR_FG_RED) << "error"
-                          << esc(2, ATTR_RESET) << ": unknown option: " << each
-                          << "\n";
-                return 1;
-            } else {
-                // input files start here
-                break;
-            }
-        }
-
-        args = std::vector<std::string>{ args.begin() + i, args.end() };
-
-        if (show_version) {
-            if (verbosity_level) {
-                std::cout << "Viua VM ";
-            }
-            std::cout
-                << (verbosity_level ? VIUAVM_VERSION_FULL : VIUAVM_VERSION)
-                << "\n";
-            return 0;
-        }
-        if (show_help) {
-            if (execlp("man", "man", "1", "viua-repl", nullptr) == -1) {
-                std::cerr << esc(2, COLOR_FG_RED) << "error"
-                          << esc(2, ATTR_RESET)
-                          << ": man(1) page not installed or not found\n";
-                return 1;
-            }
-        }
+    using viua::libexec::Args;
+    auto const args = viua::libexec::args_or_exit("repl",
+                                                  argc,
+                                                  argv,
+                                                  {
+                                                      VIUA_TOOL_COMMON_OPTIONS,
+                                                  });
+    if (args.args.empty()) {
+        std::println(stderr,
+                     "{}error{}: no executable to load",
+                     esc(2, COLOR_FG_RED),
+                     esc(2, ATTR_RESET));
+        return 1;
     }
 
     {
@@ -855,14 +835,29 @@ auto main(
         linenoiseSetHintsCallback(hints);
     }
 
-    std::cout << esc(1, COLOR_FG_WHITE) << "Viua REPL (debugger) "
+    std::cerr << esc(1, COLOR_FG_WHITE) << "Viua REPL (debugger) "
               << esc(1, ATTR_RESET) << VIUAVM_VERSION << "\n";
 
-    auto state = std::make_unique<Global_state>();
-    REPL_STATE = std::experimental::make_observer(state.get());
 
-    if (not args.empty()) {
-        load_module(MAIN_MODULE_MNEMONIC, args.front());
+    auto io = viua::vm::io::impl::VIUAVM_IO_IMPL::IO{};
+    {
+        /*
+         * Watch all standard streams (input, output, and error). Any function
+         * which creates a file descriptor MUST register it in the I/O
+         * scheduler.
+         */
+        io.watch(0);
+        io.watch(1);
+        io.watch(2);
+    }
+
+    auto state = Interpreter_state{io};
+    REPL_STATE = viua::view_ptr{&state};
+
+    if (not args.args.empty()) {
+        if (load_module(MAIN_MODULE_MNEMONIC, args.args.front())) {
+            return 2;
+        }
     }
 
     repl_main();
