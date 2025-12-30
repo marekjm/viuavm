@@ -64,7 +64,7 @@ struct Loaded_elf {
         -> std::pair<std::string, size_t>;
     auto name_function_at(size_t const offset) const -> std::string_view;
     auto function_table() const
-        -> std::map<size_t, std::pair<std::string, size_t>>;
+        -> std::map<size_t, std::pair<std::string, Elf64_Sym>>;
 
     auto load_symtab() -> void;
 

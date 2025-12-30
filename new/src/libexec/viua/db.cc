@@ -80,7 +80,7 @@ auto REPL_STATE = viua::view_ptr<Interpreter_state>{};
  * Utility namespace.
  */
 namespace {
-auto split_on_space[[maybe_unused]](
+auto split_on_space(
     std::string_view sv) -> std::vector<std::string_view>
 {
     auto parts = std::vector<std::string_view>{};
@@ -769,6 +769,110 @@ auto repl_eval(
     return true;
 }
 #endif
+
+auto repl_eval(std::vector<std::string_view> const parts) -> bool
+{
+    auto const p = [&parts](size_t const n) -> std::optional<std::string_view>
+    {
+        return (n < parts.size()) ? std::optional{ parts.at(n) } : std::nullopt;
+    };
+
+    auto const leader = parts.front();
+    if (leader == "quit") {
+        return false;
+    }
+
+    /*
+     * NEEDED COMMANDS
+     * ---------------
+     *
+     *  - show: inspect interpreter's state
+     *
+     *  - info address _symbol_: "Describe where data for _symbol_ is stored"
+     *  - info symbol _addr_: "Print the name of the symbol which is stored at
+     *    the address _addr_"
+     *  - info scope: "List all the variables local to the lexical scope", but
+     *    in Viua it will print all non-void registers
+     *  - info functions: list all defined functions
+     *  - info variables: not implemented, but will be useful once memory
+     *    tracking is ready
+     *  - info main: Print name of the entry point function of the program
+     *  - info modules: Print information about loaded modules
+     *
+     * What is the difference between "show" and "info"? The "show" commands
+     * show state of the interpreter, while the "info" commands show state of
+     * the program being interpreted.
+     *
+     *  - [b]reak: set a breakpoint
+     *  - stepi: step a single instruction, optionally more
+     *  - print: print value of an expression (memory location or register)
+     *  - up: "select and print stack frame that called this one"
+     *  - [d]own: "select and print stack frame called by this one"
+     *  - [f]rame: "select and print a stack frame"
+     *
+     * For arguments see GDB's manual.
+     */
+
+    if (leader == "show") {
+        if (not p(1)) {
+            return true;
+        }
+    } else if (leader == "info") {
+        if (not p(1)) {
+            return true;
+        }
+
+        auto const piece = p(1).value();
+        if (piece == "main") {
+            auto const& mod = REPL_STATE->core->modules.at("");
+            if (auto const& ep = mod.elf.entry_point(); ep.has_value()) {
+                std::println("{}", mod.elf.name_function_at(ep.value()));
+                std::println("{} [.text+0x{:016x}]", mod.elf_path.string(), ep.value());
+            } else {
+                std::println("no entry point defined in main module");
+            }
+        } else if (piece == "functions") {
+            auto const& mod = REPL_STATE->core->modules.at("");
+            std::println("File {}:", mod.elf_path.string());
+            for (auto const& [offset, fn_desc] : mod.elf.function_table()) {
+                auto const& [fn_name, fn_sym] = fn_desc;
+
+                auto const is_jump_label =
+                    (ELF64_ST_BIND(fn_sym.st_info) == STB_LOCAL)
+                    and (fn_sym.st_other == STV_HIDDEN);
+                if (is_jump_label) {
+                    continue;
+                }
+
+                std::println("  [.text+0x{:016x}] {}"
+                    , offset
+                    , fn_name
+                    );
+            }
+        } else if (piece == "jumps") {
+            auto const& mod = REPL_STATE->core->modules.at("");
+            std::println("File {}:", mod.elf_path.string());
+            for (auto const& [offset, fn_desc] : mod.elf.function_table()) {
+                auto const& [fn_name, fn_sym] = fn_desc;
+
+                auto const is_jump_label =
+                    (ELF64_ST_BIND(fn_sym.st_info) == STB_LOCAL)
+                    and (fn_sym.st_other == STV_HIDDEN);
+                if (not is_jump_label) {
+                    continue;
+                }
+
+                std::println("  [.text+0x{:016x}] {}"
+                    , offset
+                    , fn_name
+                    );
+            }
+        }
+    }
+
+    return true;
+}
+
 auto repl_main() -> void
 {
     constexpr auto DEFAULT_PROMPT = "(viua) ";
@@ -779,7 +883,6 @@ auto repl_main() -> void
         auto const line = std::string{ raw_line };
         free(raw_line);
 
-        /*
         auto const useful_line =
             std::string_view{ line.empty() ? REPL_STATE->last_input : line };
         if (auto const parts = split_on_space(useful_line); not parts.empty()) {
@@ -788,7 +891,6 @@ auto repl_main() -> void
             }
             REPL_STATE->last_input = useful_line;
         }
-        */
     }
 }
 

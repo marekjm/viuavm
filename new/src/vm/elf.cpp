@@ -285,10 +285,10 @@ auto Loaded_elf::name_function_at(
     return "";
 }
 auto Loaded_elf::function_table() const
-    -> std::map<size_t, std::pair<std::string, size_t>>
+    -> std::map<size_t, std::pair<std::string, Elf64_Sym>>
 {
     auto const& raw = find_fragment(".symtab")->get();
-    auto ft         = std::map<size_t, std::pair<std::string, size_t>>{};
+    auto ft         = std::map<size_t, std::pair<std::string, Elf64_Sym>>{};
 
     auto const entries = raw.data.size() / sizeof(Elf64_Sym);
     for (auto i = size_t{ 0 }; i < entries; ++i) {
@@ -300,7 +300,7 @@ auto Loaded_elf::function_table() const
             continue;
         }
 
-        ft[offset] = { std::string{ str_at(sym.st_name) }, sym.st_value };
+        ft[offset] = { std::string{ str_at(sym.st_name) }, sym };
     }
 
     return ft;
