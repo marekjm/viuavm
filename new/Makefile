@@ -180,7 +180,7 @@ all: all-silent
 all-silent: \
 	man \
 	$(BUILD_EXEDIR)/readelf \
-	$(BUILD_EXEDIR)/repl \
+	$(BUILD_EXEDIR)/db \
 	$(BUILD_EXEDIR)/dis \
 	$(BUILD_EXEDIR)/asm \
 	$(BUILD_EXEDIR)/ld \
@@ -402,7 +402,7 @@ endif
 	$(BUILD_EXEDIR)/asm.o \
 	$(BUILD_EXEDIR)/ld.o \
 	$(BUILD_EXEDIR)/vm.o \
-	$(BUILD_EXEDIR)/repl.o
+	$(BUILD_EXEDIR)/db.o
 
 $(BUILD_EXEDIR)/readelf: \
 	$(BUILD_PREFIX)/libexec/common.o \
@@ -496,7 +496,7 @@ $(BUILD_EXEDIR)/vm: \
 $(BUILD_EXEDIR)/binarith: \
 	$(BUILD_PREFIX)/support/binarith.o
 
-$(BUILD_EXEDIR)/repl: \
+$(BUILD_EXEDIR)/db: \
 	$(BUILD_PREFIX)/libexec/common.o \
 	$(BUILD_PREFIX)/support/errno.o \
 	$(BUILD_PREFIX)/support/fdio.o \
