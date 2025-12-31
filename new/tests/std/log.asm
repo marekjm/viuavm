@@ -5,15 +5,49 @@
 ;
 
 
-; ln: x -> r
+.symbol [[extern]] absr
+
+; ln: x -> n -> r
 ;   where
 ;       x: any arithmetic type
+;       n: number of iterations as a signed integer
 ;       r: real type
 ;
 ; Calculate the natural logarithm ie, a logarithm with the base of e.
 .symbol ln
 .label ln
-    return zero
+    ; x'
+    frame $1.a
+    subi $0.a, $0.p, 1
+    call $1.l, absr
+
+    li $2.l, 1
+    eq $3.l, $1.l, $2.l
+    if $3.l, ln_of_2
+
+    lt $3.l, $1.l, $2.l
+    if $3.l, ln_of_lt1
+
+.label ln_of_gt1
+    frame $2.a
+    copy $0.a, $0.p
+    copy $1.a, $1.p
+    call $0.l, ln_gt1
+    return $0.l
+
+.label ln_of_2
+    frame $2.a
+    copy $0.a, $0.p
+    copy $1.a, $1.p
+    call $0.l, ln2
+    return $0.l
+
+.label ln_of_lt1
+    frame $2.a
+    copy $0.a, $0.p
+    copy $1.a, $1.p
+    call $0.l, ln_lt1
+    return $0.l
 
 
 ; ln2: r
@@ -23,7 +57,7 @@
 ; Natural logarithm of 2, hardcoded.
 .symbol ln2
 .label ln2
-    double $0.l, 0.693'147'180'559'945'309'417'232'121'458
+    double $0.l, 0.693147180559945309417232121458
     return $0.l
 
 
@@ -32,6 +66,7 @@
 .symbol [[extern]] powz
 
 
+; Same signature as ln.
 .symbol ln_lt1
 .label ln_lt1
     ; The accumulator
@@ -84,7 +119,7 @@
     call $6.l, pown
 
     mul $6.l, $4.l, $6.l
-    div $6.l, $6.l, 2.l
+    div $6.l, $6.l, $2.l
     add $1.l, $1.l, $6.l
 
     ; Update sign
@@ -101,6 +136,7 @@
     return $0.l
 
 
+; Same signature as ln.
 .symbol ln_gt1
 .label ln_gt1
     ; The accumulator
@@ -150,17 +186,24 @@
     frame $2.a
     copy $0.a, $5.l
     muli $1.a, $2.l, -1
-    call $6.l, powz
+    call $7.l, powz
 
-    mul $6.l, $4.l, $6.l
-    div $6.l, $6.l, 2.l
-    add $1.l, $1.l, $6.l
+    ; sign * x'
+    mul $8.l, $4.l, $7.l
 
-    ; Update sign
+    ; ... / k
+    div $9.l, $8.l, $2.l
+
+    ; Add the intermediate result to the accumulator.
+    add $1.l, $1.l, $9.l
+
+    ; Flip the sign
     muli $4.l, $4.l, -1
 
     ; Update k
     addi $2.l, $2.l, 1
+
+    ebreak
 
     if void, ln_gt1_loop
 
@@ -169,11 +212,13 @@
     frame $2.a
     copy $0.a, $5.l
     copy $1.a, $1.p
-    call $6.l, ln
+    call $10.l, ln
 
     ; And the final return value is
     ;
     ;   ln(x') - accumulator
-    sub $0.l, $6.l, $1.l
+    sub $0.l, $10.l, $1.l
+
+    ebreak
 
     return $0.l
