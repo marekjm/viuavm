@@ -33,11 +33,9 @@
 #include <viua/arch/ins.h>
 #include <viua/arch/ops.h>
 #include <viua/libexec/common.hh>
-#include <viua/support/fdstream.h>
-#include <viua/support/memory.h>
-#include <viua/support/tty.h>
 #include <viua/support/errno.h>
 #include <viua/support/fdstream.h>
+#include <viua/support/memory.h>
 #include <viua/support/number.h>
 #include <viua/support/print.hh>
 #include <viua/support/string.h>
@@ -70,8 +68,9 @@ struct Interpreter_state {
     Interpreter_state(io_type&);
 };
 
-Interpreter_state::Interpreter_state(io_type& io)
-    : core{std::make_unique<viua::vm::Core>(io)}
+Interpreter_state::Interpreter_state(
+    io_type& io)
+    : core{ std::make_unique<viua::vm::Core>(io) }
 {}
 
 namespace {
@@ -245,7 +244,7 @@ auto completion(
 #endif
 }
 
-auto hints_impl[[maybe_unused]](
+auto hints_impl [[maybe_unused]] (
     char const* buf,
     int* const color,
     int* const bold) -> char const*
@@ -256,7 +255,7 @@ auto hints_impl[[maybe_unused]](
 
     return nullptr;
 }
-auto hints[[maybe_unused]](
+auto hints [[maybe_unused]] (
     char const* buf,
     int* const color,
     int* const bold) -> char*
@@ -345,20 +344,17 @@ auto load_module(
     using Module   = viua::vm::elf::Loaded_elf;
     auto const mod = Module::load(elf_fd);
 
-    if (auto const f = mod.find_fragment(".rodata");
-        not f.has_value()) {
+    if (auto const f = mod.find_fragment(".rodata"); not f.has_value()) {
         viua::support::errorln(elf_path, "no strings fragment found");
         viua::support::noteln(elf_path, "no .rodata section found");
         return true;
     }
-    if (auto const f = mod.find_fragment(".symtab");
-        not f.has_value()) {
+    if (auto const f = mod.find_fragment(".symtab"); not f.has_value()) {
         viua::support::errorln(elf_path, "no function table fragment found");
         viua::support::noteln(elf_path, "no .symtab section found");
         return true;
     }
-    if (auto const f = mod.find_fragment(".strtab");
-        not f.has_value()) {
+    if (auto const f = mod.find_fragment(".strtab"); not f.has_value()) {
         viua::support::errorln(elf_path, "no string table fragment found");
         viua::support::noteln(elf_path, "no .strtab section found");
         return true;
@@ -370,7 +366,8 @@ auto load_module(
     }
 
     if (auto const ep = mod.entry_point(); ep.has_value()) {
-        viua::support::noteln(elf_path, "an entry point is defined for this module");
+        viua::support::noteln(
+            elf_path, "an entry point is defined for this module");
     }
 
     REPL_STATE->core->modules.emplace(
@@ -772,7 +769,9 @@ auto repl_eval(
 }
 #endif
 
-auto repl_eval(Interpreter_state& state, std::vector<std::string_view> const parts) -> bool
+auto repl_eval(
+    Interpreter_state& state,
+    std::vector<std::string_view> const parts) -> bool
 {
     auto const p = [&parts](size_t const n) -> std::optional<std::string_view>
     {
@@ -829,20 +828,24 @@ auto repl_eval(Interpreter_state& state, std::vector<std::string_view> const par
 
             auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
             if (not proc) {
-                std::println("actor {} does not exist", REPL_STATE->selected_pid->to_string());
+                std::println("actor {} does not exist",
+                             REPL_STATE->selected_pid->to_string());
                 return true;
             }
 
             auto const& stack = proc->stack;
-            auto const frame_index = p(2).transform([](std::string_view const i)
-                {
-                    return viua::support::ston<size_t>(std::string{i});
-                }).or_else([&state]()
-                {
-                    return state.selected_frame;
-                }).value_or(stack.frames.size() - 1);
+            auto const frame_index =
+                p(2).transform(
+                        [](std::string_view const i)
+                        {
+                            return viua::support::ston<size_t>(
+                                std::string{ i });
+                        })
+                    .or_else([&state]() { return state.selected_frame; })
+                    .value_or(stack.frames.size() - 1);
             if (frame_index >= stack.frames.size()) {
-                std::println("selected frame index #{} is too big", frame_index);
+                std::println(
+                    "selected frame index #{} is too big", frame_index);
                 return true;
             }
 
@@ -871,7 +874,8 @@ auto repl_eval(Interpreter_state& state, std::vector<std::string_view> const par
             auto const& mod = REPL_STATE->core->modules.at("");
             if (auto const& ep = mod.elf.entry_point(); ep.has_value()) {
                 std::println("{}", mod.elf.name_function_at(ep.value()));
-                std::println("{} [.text+0x{:016x}]", mod.elf_path.string(), ep.value());
+                std::println(
+                    "{} [.text+0x{:016x}]", mod.elf_path.string(), ep.value());
             } else {
                 std::println("no entry point defined in main module");
             }
@@ -888,10 +892,7 @@ auto repl_eval(Interpreter_state& state, std::vector<std::string_view> const par
                     continue;
                 }
 
-                std::println("  [.text+0x{:016x}] {}"
-                    , offset
-                    , fn_name
-                    );
+                std::println("  [.text+0x{:016x}] {}", offset, fn_name);
             }
         } else if (piece == "jumps") {
             auto const& mod = REPL_STATE->core->modules.at("");
@@ -906,10 +907,7 @@ auto repl_eval(Interpreter_state& state, std::vector<std::string_view> const par
                     continue;
                 }
 
-                std::println("  [.text+0x{:016x}] {}"
-                    , offset
-                    , fn_name
-                    );
+                std::println("  [.text+0x{:016x}] {}", offset, fn_name);
             }
         }
     } else if (leader == "actor") {
@@ -956,7 +954,8 @@ auto repl_eval(Interpreter_state& state, std::vector<std::string_view> const par
 
         auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
         if (not proc) {
-            std::println("actor {} does not exist", REPL_STATE->selected_pid->to_string());
+            std::println("actor {} does not exist",
+                         REPL_STATE->selected_pid->to_string());
             return true;
         }
 
@@ -986,7 +985,8 @@ auto repl_eval(Interpreter_state& state, std::vector<std::string_view> const par
 
         auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
         if (not proc) {
-            std::println("actor {} does not exist", REPL_STATE->selected_pid->to_string());
+            std::println("actor {} does not exist",
+                         REPL_STATE->selected_pid->to_string());
             return true;
         }
 
@@ -1006,7 +1006,8 @@ auto repl_eval(Interpreter_state& state, std::vector<std::string_view> const par
 
         auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
         if (not proc) {
-            std::println("actor {} does not exist", REPL_STATE->selected_pid->to_string());
+            std::println("actor {} does not exist",
+                         REPL_STATE->selected_pid->to_string());
             return true;
         }
 
@@ -1026,7 +1027,8 @@ auto repl_eval(Interpreter_state& state, std::vector<std::string_view> const par
 
         auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
         if (not proc) {
-            std::println("actor {} does not exist", REPL_STATE->selected_pid->to_string());
+            std::println("actor {} does not exist",
+                         REPL_STATE->selected_pid->to_string());
             return true;
         }
 
@@ -1046,7 +1048,8 @@ auto repl_eval(Interpreter_state& state, std::vector<std::string_view> const par
 
         auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
         if (not proc) {
-            std::println("actor {} does not exist", REPL_STATE->selected_pid->to_string());
+            std::println("actor {} does not exist",
+                         REPL_STATE->selected_pid->to_string());
             return true;
         }
 
@@ -1136,8 +1139,8 @@ auto main(
         io.watch(2);
     }
 
-    auto state = Interpreter_state{io};
-    REPL_STATE = viua::view_ptr{&state};
+    auto state = Interpreter_state{ io };
+    REPL_STATE = viua::view_ptr{ &state };
 
     if (not args.args.empty()) {
         if (load_module(MAIN_MODULE_MNEMONIC, args.args.front())) {
