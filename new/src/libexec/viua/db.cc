@@ -38,9 +38,11 @@
 #include <viua/support/tty.h>
 #include <viua/support/errno.h>
 #include <viua/support/fdstream.h>
+#include <viua/support/number.h>
 #include <viua/support/print.hh>
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
+#include <viua/vm/backtrace.h>
 #include <viua/vm/core.h>
 #include <viua/vm/elf.h>
 #include <viua/vm/ins.h>
@@ -770,7 +772,7 @@ auto repl_eval(
 }
 #endif
 
-auto repl_eval(std::vector<std::string_view> const parts) -> bool
+auto repl_eval(Interpreter_state& state, std::vector<std::string_view> const parts) -> bool
 {
     auto const p = [&parts](size_t const n) -> std::optional<std::string_view>
     {
@@ -816,6 +818,48 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
     if (leader == "show") {
         if (not p(1)) {
             return true;
+        }
+
+        auto const subject = p(1).value();
+        if (subject == "frame") {
+            if (not REPL_STATE->selected_pid) {
+                std::println("no selected actor");
+                return true;
+            }
+
+            auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
+            if (not proc) {
+                std::println("actor {} does not exist", REPL_STATE->selected_pid->to_string());
+                return true;
+            }
+
+            auto const& stack = proc->stack;
+            auto const frame_index = p(2).transform([](std::string_view const i)
+                {
+                    return viua::support::ston<size_t>(std::string{i});
+                }).or_else([&state]()
+                {
+                    return state.selected_frame;
+                }).value_or(stack.frames.size() - 1);
+            if (frame_index >= stack.frames.size()) {
+                std::println("selected frame index #{} is too big", frame_index);
+                return true;
+            }
+
+            std::println("frame #{}", frame_index);
+
+            auto const& frame = stack.frames.at(frame_index);
+
+            viua::vm::backtrace::dump_registers(
+                frame.parameters, stack.proc->atoms, "p");
+            viua::vm::backtrace::dump_registers(
+                frame.registers, stack.proc->atoms, "l");
+        } else if (subject == "actor") {
+            if (REPL_STATE->selected_pid) {
+                std::println("actor {}", REPL_STATE->selected_pid->to_string());
+            } else {
+                std::println("no selected actor");
+            }
         }
     } else if (leader == "info") {
         if (not p(1)) {
@@ -868,6 +912,145 @@ auto repl_eval(std::vector<std::string_view> const parts) -> bool
                     );
             }
         }
+    } else if (leader == "actor") {
+        if (*p(1) == "new" and p(2).has_value()) {
+            if (REPL_STATE->core->modules.empty()) {
+                std::println("no modules loaded");
+                return true;
+            }
+
+            auto const fn_id = *p(2);
+            auto const mod_name =
+                std::string{ (fn_id.rfind("::") == std::string::npos)
+                                 ? ""
+                                 : fn_id.substr(0, fn_id.rfind("::")) };
+            auto const fn_name = (fn_id.rfind("::") == std::string::npos)
+                                     ? fn_id
+                                     : fn_id.substr(fn_id.rfind("::") + 2);
+
+            if (not REPL_STATE->core->modules.count(mod_name)) {
+                std::println("module {} does not exist", mod_name);
+                return true;
+            }
+            auto const& mod = REPL_STATE->core->modules.at(mod_name);
+
+            for (auto const& each : mod.elf.function_table()) {
+                if (fn_name != std::get<0>(std::get<1>(each))) {
+                    continue;
+                }
+
+                auto const fn_addr = (std::get<1>(std::get<1>(each)).st_value
+                                      / sizeof(viua::arch::instruction_type));
+                auto pid           = REPL_STATE->core->spawn(mod_name, fn_addr);
+                REPL_STATE->selected_pid =
+                    std::make_unique<viua::runtime::PID>(pid);
+
+                break;
+            }
+        }
+    } else if (leader == "stepi") {
+        if (not REPL_STATE->selected_pid) {
+            std::println("no selected actor");
+            return true;
+        }
+
+        auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
+        if (not proc) {
+            std::println("actor {} does not exist", REPL_STATE->selected_pid->to_string());
+            return true;
+        }
+
+        auto const limit = std::stoull(std::string{ p(1).value_or("1") });
+
+        REPL_STATE->selected_frame.reset();
+
+        try {
+            for (auto i = size_t{ 0 }; i < limit; ++i) {
+                if (not proc->module.ip_in_valid_range(proc->stack.ip)) {
+                    throw viua::vm::abort_execution{
+                        proc->stack, "ip outside of valid range"
+                    };
+                }
+                proc->stack.ip =
+                    viua::vm::ins::execute(proc->stack, proc->stack.ip);
+            }
+        } catch (viua::vm::abort_execution const& e) {
+            std::println("aborted execution: {}", e.what());
+            return true;
+        }
+    } else if (leader == "up") {
+        if (not REPL_STATE->selected_pid) {
+            std::println("no selected actor");
+            return true;
+        }
+
+        auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
+        if (not proc) {
+            std::println("actor {} does not exist", REPL_STATE->selected_pid->to_string());
+            return true;
+        }
+
+        auto const user_frame_index =
+            REPL_STATE->selected_frame.value_or(0) + 1;
+        if (user_frame_index >= proc->stack.frames.size()) {
+            std::println("frame {} does not exist", user_frame_index);
+            return true;
+        }
+
+        REPL_STATE->selected_frame = user_frame_index;
+    } else if (leader == "down") {
+        if (not REPL_STATE->selected_pid) {
+            std::println("no selected actor");
+            return true;
+        }
+
+        auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
+        if (not proc) {
+            std::println("actor {} does not exist", REPL_STATE->selected_pid->to_string());
+            return true;
+        }
+
+        auto const user_frame_index =
+            REPL_STATE->selected_frame.value_or(0) - 1;
+        if (user_frame_index >= proc->stack.frames.size()) {
+            std::println("frame {} does not exist", user_frame_index);
+            return true;
+        }
+
+        REPL_STATE->selected_frame = user_frame_index;
+    } else if (leader == "frame") {
+        if (not REPL_STATE->selected_pid) {
+            std::println("no selected actor");
+            return true;
+        }
+
+        auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
+        if (not proc) {
+            std::println("actor {} does not exist", REPL_STATE->selected_pid->to_string());
+            return true;
+        }
+
+        auto const user_frame_index =
+            REPL_STATE->selected_frame.value_or(0) - 1;
+        if (user_frame_index >= proc->stack.frames.size()) {
+            std::println("frame {} does not exist", user_frame_index);
+            return true;
+        }
+
+        REPL_STATE->selected_frame = user_frame_index;
+    } else if (leader == "backtrace" or leader == "bt") {
+        if (not REPL_STATE->selected_pid) {
+            std::println("no selected actor");
+            return true;
+        }
+
+        auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
+        if (not proc) {
+            std::println("actor {} does not exist", REPL_STATE->selected_pid->to_string());
+            return true;
+        }
+
+        viua::vm::backtrace::print_backtrace(proc->stack);
     }
 
     return true;
@@ -886,7 +1069,7 @@ auto repl_main() -> void
         auto const useful_line =
             std::string_view{ line.empty() ? REPL_STATE->last_input : line };
         if (auto const parts = split_on_space(useful_line); not parts.empty()) {
-            if (not repl_eval(parts)) {
+            if (not repl_eval(*REPL_STATE, parts)) {
                 break;
             }
             REPL_STATE->last_input = useful_line;
