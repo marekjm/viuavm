@@ -54,12 +54,28 @@
 #endif
 
 
+struct Breakpoint {
+    size_t offset;
+    std::optional<std::string> symbol;
+
+    auto to_string() const -> std::string;
+};
+auto Breakpoint::to_string() const -> std::string
+{
+    return std::format(
+        "[.text+0x{:016x}]{}",
+        (offset * sizeof(viua::arch::instruction_type)),
+        symbol.transform([](auto const s) { return " " + s; }).value_or(""));
+}
+
 struct Interpreter_state {
     std::unique_ptr<viua::vm::Core> core{};
 
     using pid_type = viua::runtime::PID;
     std::unique_ptr<pid_type> selected_pid;
     std::optional<size_t> selected_frame;
+
+    std::vector<Breakpoint> breakpoints;
 
     std::string last_input;
     bool crash_on_internal{ false };
@@ -863,6 +879,11 @@ auto repl_eval(
             } else {
                 std::println("no selected actor");
             }
+        } else if (subject == "breakpoints") {
+            for (auto i = size_t{ 0 }; i < state.breakpoints.size(); ++i) {
+                auto const& b = state.breakpoints.at(i);
+                std::println("{: 2} {}", i, b.to_string());
+            }
         }
     } else if (leader == "info") {
         if (not p(1)) {
@@ -892,7 +913,8 @@ auto repl_eval(
                     continue;
                 }
 
-                std::println("  [.text+0x{:016x}] {}", offset, fn_name);
+                std::println(
+                    "  [.text+0x{:016x}] {}", fn_sym.st_value, fn_name);
             }
         } else if (piece == "jumps") {
             auto const& mod = REPL_STATE->core->modules.at("");
@@ -977,6 +999,129 @@ auto repl_eval(
             std::println("aborted execution: {}", e.what());
             return true;
         }
+    } else if (leader == "run" or leader == "r") {
+        if (not REPL_STATE->selected_pid) {
+            std::println("no selected actor");
+            return true;
+        }
+
+        auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
+        if (not proc) {
+            std::println("actor {} does not exist",
+                         REPL_STATE->selected_pid->to_string());
+            return true;
+        }
+
+        REPL_STATE->selected_frame.reset();
+
+        try {
+            while (proc->module.ip_in_valid_range(proc->stack.ip)) {
+                /*
+                 * FIXME breakpoints
+                 *
+                 * This is terribly inefficient and not what a real, PROPER
+                 * debugger does. A real, PROPER debugger would place a
+                 * breakpoint instruction at the breakpoint address and
+                 * transparently execute the intended instruction when
+                 * continuing.
+                 */
+                {
+                    auto const offset = static_cast<size_t>(
+                        proc->stack.ip - proc->module.ip_base);
+                    auto const& bs = state.breakpoints;
+                    auto const b   = std::find_if(bs.begin(),
+                                                bs.end(),
+                                                [offset](auto const b)
+                                                { return offset == b.offset; });
+
+                    if (b != bs.end()) {
+                        std::println("hit breakpoint #{} at {}",
+                                     std::distance(b, bs.end()),
+                                     b->to_string());
+                        return true;
+                    }
+                }
+
+                proc->stack.ip =
+                    viua::vm::ins::execute(proc->stack, proc->stack.ip);
+            }
+            if (not proc->module.ip_in_valid_range(proc->stack.ip)) {
+                throw viua::vm::abort_execution{ proc->stack,
+                                                 "ip outside of valid range" };
+            }
+        } catch (viua::vm::abort_execution const& e) {
+            std::println("aborted execution: {}", e.what());
+            return true;
+        }
+    } else if (leader == "continue" or leader == "c") {
+        if (not REPL_STATE->selected_pid) {
+            std::println("no selected actor");
+            return true;
+        }
+
+        auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
+        if (not proc) {
+            std::println("actor {} does not exist",
+                         REPL_STATE->selected_pid->to_string());
+            return true;
+        }
+
+        REPL_STATE->selected_frame.reset();
+
+        try {
+            /*
+             * Execute the first instruction ignoring any breakpoints, as long
+             * as the instruction pointer is in a valid range.
+             * If breakpoints were considered here it would be impossible to
+             * just "continue" running the program, you would have to manually
+             * step over the breaking instruction.
+             */
+            if (not proc->module.ip_in_valid_range(proc->stack.ip)) {
+                throw viua::vm::abort_execution{ proc->stack,
+                                                 "ip outside of valid range" };
+            } else {
+                proc->stack.ip =
+                    viua::vm::ins::execute(proc->stack, proc->stack.ip);
+            }
+
+            while (proc->module.ip_in_valid_range(proc->stack.ip)) {
+                /*
+                 * FIXME breakpoints
+                 *
+                 * This is terribly inefficient and not what a real, PROPER
+                 * debugger does. A real, PROPER debugger would place a
+                 * breakpoint instruction at the breakpoint address and
+                 * transparently execute the intended instruction when
+                 * continuing.
+                 */
+                {
+                    auto const offset = static_cast<size_t>(
+                        proc->stack.ip - proc->module.ip_base);
+                    auto const& bs = state.breakpoints;
+                    auto const b   = std::find_if(bs.begin(),
+                                                bs.end(),
+                                                [offset](auto const b)
+                                                { return offset == b.offset; });
+
+                    if (b != bs.end()) {
+                        std::println("hit breakpoint #{} at {}",
+                                     std::distance(b, bs.end()),
+                                     b->to_string());
+                        return true;
+                    }
+                }
+
+                proc->stack.ip =
+                    viua::vm::ins::execute(proc->stack, proc->stack.ip);
+            }
+            if (not proc->module.ip_in_valid_range(proc->stack.ip)) {
+                throw viua::vm::abort_execution{ proc->stack,
+                                                 "ip outside of valid range" };
+            }
+        } catch (viua::vm::abort_execution const& e) {
+            std::println("aborted execution: {}", e.what());
+            return true;
+        }
     } else if (leader == "up") {
         if (not REPL_STATE->selected_pid) {
             std::println("no selected actor");
@@ -1054,6 +1199,77 @@ auto repl_eval(
         }
 
         viua::vm::backtrace::print_backtrace(proc->stack);
+    } else if (leader == "break" or leader == "b") {
+        if (not p(1).has_value()) {
+            if (not REPL_STATE->selected_pid) {
+                std::println("no selected actor");
+                return true;
+            }
+
+            auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
+            auto const b    = Breakpoint{
+                static_cast<size_t>(proc->stack.ip - proc->module.ip_base),
+                std::nullopt
+            };
+            std::println("breakpoint on {}", b.to_string());
+
+            state.breakpoints.push_back(b);
+
+            return true;
+        }
+
+        if (not REPL_STATE->selected_pid) {
+            std::println("no selected actor");
+            return true;
+        }
+
+        auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
+
+        auto const raw = std::string{ p(1).value() };
+        std::println("attempting to set breakpoint at {}", raw);
+
+        auto fns = std::map<std::string, size_t>{};
+        for (auto const& entry : proc->module.elf.function_table()) {
+            fns.emplace(entry.second.first,
+                        (entry.second.second.st_value
+                         / sizeof(viua::arch::instruction_type)));
+        }
+
+        auto const b_symbol =
+            fns.contains(raw) ? raw : std::optional<std::string>{};
+
+        std::println("breakpoint symbol: {}", b_symbol.value_or("<none>"));
+
+        auto b_address = std::optional<size_t>{};
+        if (b_symbol.has_value()) {
+            b_address = fns.at(b_symbol.value());
+        }
+        if (not b_address.has_value()) {
+            try {
+                b_address = viua::support::ston<size_t>(raw);
+            } catch (std::out_of_range const&) {
+                std::println("not a valid integer: {}", raw);
+                return true;
+            }
+        }
+
+        if (not b_address.has_value()) {
+            std::println("invalid location for breakpoint at {}", raw);
+            return true;
+        }
+
+        if (not proc->module.offset_in_valid_range(b_address.value())) {
+            std::println(
+                "location for breakpoint at {} is not in valid text range",
+                raw);
+            return true;
+        }
+
+        state.breakpoints.emplace_back(b_address.value(), b_symbol);
+
+        std::println("set breakpoint #{} at {}",
+                     state.breakpoints.size() - 1,
+                     state.breakpoints.back().to_string());
     }
 
     return true;

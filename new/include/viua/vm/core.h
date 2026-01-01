@@ -92,6 +92,11 @@ struct Module {
     {
         return (ip > ip_base) and (ip < (ip_base + text.size()));
     }
+    inline auto offset_in_valid_range(
+        size_t const off) const -> bool
+    {
+        return ip_in_valid_range(ip_base + off);
+    }
 };
 
 template<typename>
