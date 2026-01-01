@@ -785,6 +785,79 @@ auto repl_eval(
 }
 #endif
 
+namespace {
+auto make_breakpoint(
+    Interpreter_state const& state,
+    std::optional<std::string_view> const spec) -> std::optional<Breakpoint>
+{
+    if (not spec.has_value()) {
+        if (not state.selected_pid) {
+            std::println("no selected actor");
+            return std::nullopt;
+        }
+
+        auto const proc = state.core->find(*state.selected_pid);
+        return Breakpoint{ static_cast<size_t>(proc->stack.ip
+                                               - proc->module.ip_base),
+                           std::nullopt };
+    } else {
+        /*
+         * Breakpoints with explicitly given location can be specified in
+         * several ways:
+         *
+         *  - a raw address: 0x08
+         *  - a symbol name: main
+         *  - an offset into .text: main+1, foo.elf+2
+         *
+         * The code has to disambiguate and convert all of these forms into the
+         * canonical representation ie, an offset into a .text segment.
+         */
+
+        auto const raw = std::string{ spec.value() };
+
+        try {
+            /*
+             * Let's start with a raw address.
+             */
+            return Breakpoint{
+                (viua::support::ston<size_t>(raw)
+                 / sizeof(viua::arch::instruction_type)),
+                std::nullopt,
+            };
+        } catch (std::invalid_argument const&) {
+            /*
+             * If the location is not convertible to a raw address, assume it is
+             * a symbolic name and continue.
+             */
+        } catch (...) {
+            /*
+             * Otherwise, treat it as an error and abort.
+             */
+            return std::nullopt;
+        }
+
+        auto const& mod = state.core->modules.at("");
+
+        auto fns = std::map<std::string, size_t>{};
+        for (auto const& entry : mod.elf.function_table()) {
+            fns.emplace(entry.second.first,
+                        (entry.second.second.st_value
+                         / sizeof(viua::arch::instruction_type)));
+        }
+
+        if (not fns.contains(raw)) {
+            std::println("symbol not found: {}", raw);
+            return std::nullopt;
+        }
+
+        return Breakpoint{
+            fns.at(raw),
+            raw,
+        };
+    }
+}
+}  // namespace
+
 auto repl_eval(
     Interpreter_state& state,
     std::vector<std::string_view> const parts) -> bool
@@ -1200,76 +1273,18 @@ auto repl_eval(
 
         viua::vm::backtrace::print_backtrace(proc->stack);
     } else if (leader == "break" or leader == "b") {
-        if (not p(1).has_value()) {
-            if (not REPL_STATE->selected_pid) {
-                std::println("no selected actor");
-                return true;
-            }
+        auto const b = make_breakpoint(state, p(1));
 
-            auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
-            auto const b    = Breakpoint{
-                static_cast<size_t>(proc->stack.ip - proc->module.ip_base),
-                std::nullopt
-            };
-            std::println("breakpoint on {}", b.to_string());
+        if (b.has_value()) {
+            state.breakpoints.push_back(b.value());
 
-            state.breakpoints.push_back(b);
-
-            return true;
+            std::println("set breakpoint #{} at {}",
+                         state.breakpoints.size() - 1,
+                         state.breakpoints.back().to_string());
+        } else {
+            std::println("failed to set breakpoint at location {}",
+                         p(1).value_or("<anonymous>"));
         }
-
-        if (not REPL_STATE->selected_pid) {
-            std::println("no selected actor");
-            return true;
-        }
-
-        auto const proc = REPL_STATE->core->find(*REPL_STATE->selected_pid);
-
-        auto const raw = std::string{ p(1).value() };
-        std::println("attempting to set breakpoint at {}", raw);
-
-        auto fns = std::map<std::string, size_t>{};
-        for (auto const& entry : proc->module.elf.function_table()) {
-            fns.emplace(entry.second.first,
-                        (entry.second.second.st_value
-                         / sizeof(viua::arch::instruction_type)));
-        }
-
-        auto const b_symbol =
-            fns.contains(raw) ? raw : std::optional<std::string>{};
-
-        std::println("breakpoint symbol: {}", b_symbol.value_or("<none>"));
-
-        auto b_address = std::optional<size_t>{};
-        if (b_symbol.has_value()) {
-            b_address = fns.at(b_symbol.value());
-        }
-        if (not b_address.has_value()) {
-            try {
-                b_address = viua::support::ston<size_t>(raw);
-            } catch (std::out_of_range const&) {
-                std::println("not a valid integer: {}", raw);
-                return true;
-            }
-        }
-
-        if (not b_address.has_value()) {
-            std::println("invalid location for breakpoint at {}", raw);
-            return true;
-        }
-
-        if (not proc->module.offset_in_valid_range(b_address.value())) {
-            std::println(
-                "location for breakpoint at {} is not in valid text range",
-                raw);
-            return true;
-        }
-
-        state.breakpoints.emplace_back(b_address.value(), b_symbol);
-
-        std::println("set breakpoint #{} at {}",
-                     state.breakpoints.size() - 1,
-                     state.breakpoints.back().to_string());
     }
 
     return true;
