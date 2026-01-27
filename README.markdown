@@ -1,10 +1,7 @@
-# Viua VM ![Latest Release](https://img.shields.io/github/tag/marekjm/viuavm.svg)
+# Viua VM
 
 [![builds.sr.ht status](https://builds.sr.ht/~maelkum.svg?search=viuavm)](https://builds.sr.ht/~maelkum?search=viuavm)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/581/badge)](https://bestpractices.coreinfrastructure.org/projects/581)
-
-![License](https://img.shields.io/github/license/marekjm/viuavm.svg)
-
 
 > A register-based, parallel virtual machine programmable in custom assembly lookalike language with
 > strong emphasis on reliability, predictability, and concurrency.
