@@ -59,9 +59,9 @@ auto U::encode() const -> instruction_type
 auto U::to_string() const -> std::string
 {
     auto const as_unsigned = (opcode & viua::arch::ops::OPCODE_FLAGS::UNSIGNED);
-    auto imm_str           = as_unsigned
-                                 ? std::to_string(immediate)
-                                 : std::to_string(static_cast<int32_t>(immediate));
+    auto imm_str = as_unsigned
+                       ? std::to_string(immediate)
+                       : std::to_string(static_cast<int32_t>(immediate));
     return (viua::arch::ops::to_string(opcode) + " " + out.to_string() + ", "
             + in.to_string() + ", " + imm_str);
 }

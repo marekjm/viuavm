@@ -1103,7 +1103,7 @@ auto repl_eval(
                     auto const offset = static_cast<size_t>(
                         proc->stack.ip - proc->module.ip_base);
                     auto const& bs = state.breakpoints;
-                    auto const b   = std::find_if(bs.begin(),
+                    auto const b = std::find_if(bs.begin(),
                                                 bs.end(),
                                                 [offset](auto const b)
                                                 { return offset == b.offset; });
@@ -1172,7 +1172,7 @@ auto repl_eval(
                     auto const offset = static_cast<size_t>(
                         proc->stack.ip - proc->module.ip_base);
                     auto const& bs = state.breakpoints;
-                    auto const b   = std::find_if(bs.begin(),
+                    auto const b = std::find_if(bs.begin(),
                                                 bs.end(),
                                                 [offset](auto const b)
                                                 { return offset == b.offset; });

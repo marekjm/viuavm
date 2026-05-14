@@ -166,7 +166,7 @@ const auto LITERAL_INTEGER_HEX = ctre::starts_with<"-?0x[0-9a-f][0-9a-f']*u?">;
 const auto LITERAL_INTEGER_OCT = ctre::starts_with<"-?0o[0-7]['0-7]*u?">;
 const auto LITERAL_INTEGER_BIN = ctre::starts_with<"-?0b[01]['01]*u?">;
 const auto LITERAL_INTEGER_DEC = ctre::starts_with<"-?(?:0|[1-9]['0-9]*)u?">;
-const auto LITERAL_FLOAT       = ctre::starts_with<"-?(?:0|[1-9][0-9]*)?\\.[0-9]+">;
+const auto LITERAL_FLOAT = ctre::starts_with<"-?(?:0|[1-9][0-9]*)?\\.[0-9]+">;
 
 const auto COMMA           = ctre::starts_with<",">;
 const auto ELLIPSIS        = ctre::starts_with<"\\.\\.\\.">;
@@ -237,12 +237,10 @@ auto lex(
     auto offset    = size_t{};
 
     auto const consume = [&lexemes, &source_text, &line, &character, &offset](
-        std::string&& v, TOKEN const t) -> void
+                             std::string&& v, TOKEN const t) -> void
     {
         lexemes.emplace_back(
-            std::move(v),
-            t,
-            Location{ line, character, offset });
+            std::move(v), t, Location{ line, character, offset });
 
 
         auto const consumed_chars = lexemes.back().text.size();

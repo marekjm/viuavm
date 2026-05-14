@@ -33,8 +33,8 @@ auto execute(
     Stack& stack,
     ip_type const) -> void
 {
-    auto const key = immutable_proxy(stack, op.instruction.out)
-                         .get<register_type::atom_type>();
+    auto const key   = immutable_proxy(stack, op.instruction.out)
+                           .get<register_type::atom_type>();
     auto const value = immutable_proxy(stack, op.instruction.in);
 
     if (not key.has_value()) {

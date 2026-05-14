@@ -85,7 +85,7 @@ auto emit_elf(
 {
     auto output_buffer = std::vector<uint8_t>{};
     auto const save    = [&output_buffer](
-                          void const* const data, size_t const size)
+                             void const* const data, size_t const size)
     {
         auto const tail = output_buffer.size();
         output_buffer.resize(tail + size);
@@ -492,7 +492,7 @@ auto emit_elf(
         auto const elf_size = sizeof(Elf64_Ehdr)
                               + (elf_pheaders * sizeof(Elf64_Phdr))
                               + (elf_sheaders * sizeof(Elf64_Shdr));
-        auto text_offset = std::optional<size_t>{};
+        auto text_offset    = std::optional<size_t>{};
         {
             auto offset_accumulator = size_t{ 0 };
             for (auto& [segment, section] : elf_headers) {
@@ -936,7 +936,7 @@ auto main(
         args.get<std::set<std::string_view>>("dump").value_or(
             std::set<std::string_view>{});
     auto const dump_strtab = dump_what.contains("strtab");
-    auto const comment     = args.get<std::string_view>("comment")
+    auto const comment = args.get<std::string_view>("comment")
                              .or_else([] -> std::optional<std::string_view>
                                       { return VIUAVM_VERSION_FULL; })
                              .transform([](auto v) { return std::string{ v }; })

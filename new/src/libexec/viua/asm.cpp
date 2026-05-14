@@ -615,14 +615,14 @@ auto consume_token_of(
 auto look_ahead [[maybe_unused]] (
     viua::libs::lexer::TOKEN const tk,
     viua::support::vector_view<viua::libs::lexer::Lexeme> const& lexemes)
--> bool
+    -> bool
 {
     return (not lexemes.empty()) and (lexemes.front() == tk);
 }
 auto look_ahead [[maybe_unused]] (
     std::set<viua::libs::lexer::TOKEN> const ts,
     viua::support::vector_view<viua::libs::lexer::Lexeme> const& lexemes)
--> bool
+    -> bool
 {
     return (not lexemes.empty()) and (ts.count(lexemes.front().token) != 0);
 }
@@ -3260,7 +3260,7 @@ auto make_reloc_table(
         using enum viua::arch::elf::R_VIUA;
         auto const into_rodata = (op == OPCODE::ATOM) or (op == OPCODE::DOUBLE)
                                  or (op == OPCODE::ARODP);
-        auto const type = into_rodata ? R_VIUA_OBJECT : R_VIUA_JUMP_SLOT;
+        auto const type        = into_rodata ? R_VIUA_OBJECT : R_VIUA_JUMP_SLOT;
 
         auto const reloc_to_section_ptr =
             op == OPCODE::ARODP or op == OPCODE::ATXTP;
@@ -3331,7 +3331,7 @@ auto make_reloc_table(
         Elf64_Rel rel;
         rel.r_offset = i * sizeof(viua::arch::instruction_type);
         rel.r_info   = ELF64_R_INFO(static_cast<uint64_t>(symtab_entry_index),
-                                  static_cast<uint8_t>(type));
+                                    static_cast<uint8_t>(type));
         reloc_table.push_back(rel);
     };
 
@@ -3688,7 +3688,7 @@ auto emit_elf(
         auto const elf_size = sizeof(Elf64_Ehdr)
                               + (elf_pheaders * sizeof(Elf64_Phdr))
                               + (elf_sheaders * sizeof(Elf64_Shdr));
-        auto text_offset = std::optional<size_t>{};
+        auto text_offset    = std::optional<size_t>{};
         {
             auto offset_accumulator = size_t{ 0 };
             for (auto& [segment, section] : elf_headers) {

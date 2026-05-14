@@ -96,7 +96,7 @@ auto execute(
 
     auto const fr_return = (stack.ip + 1);
     auto const fr_entry  = (stack.proc->module.ip_base
-                           + (fn_addr / sizeof(viua::arch::instruction_type)));
+                            + (fn_addr / sizeof(viua::arch::instruction_type)));
 
     stack.frames.emplace_back(
         viua::arch::MAX_REGISTER_INDEX, fr_entry, fr_return);
