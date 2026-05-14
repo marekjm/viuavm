@@ -125,9 +125,7 @@ auto get_symbol_name(
 auto match_atom(
     std::string_view sv) -> bool
 {
-    std::regex re{ viua::libs::lexer::pattern::LITERAL_ATOM };
-    std::cmatch m;
-    return std::regex_match(sv.data(), m, re);
+    return ctre::match<viua::libs::lexer::pattern::LITERAL_ATOM>(sv);
 }
 
 auto is_jump_label(

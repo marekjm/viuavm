@@ -29,6 +29,8 @@
 #include <string_view>
 #include <vector>
 
+#include <ctre/single-header/ctre-unicode.hpp>
+
 namespace viua::libs::lexer {
 struct Location {
     size_t line{};
@@ -257,7 +259,7 @@ inline auto const OPCODE_NAMES = std::set<std::string_view>{
 };
 
 namespace pattern {
-constexpr auto LITERAL_ATOM = "^[A-Za-z_][A-Za-z0-9_]*\\b";
+constexpr auto LITERAL_ATOM = ctll::fixed_string{"[A-Za-z_][A-Za-z0-9_]*\\b"};
 }
 
 auto lex(std::string_view) -> std::vector<Lexeme>;

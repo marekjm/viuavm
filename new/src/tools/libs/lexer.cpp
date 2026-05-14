@@ -25,6 +25,8 @@
 #include <string_view>
 #include <vector>
 
+#include <ctre/single-header/ctre-unicode.hpp>
+
 #include <viua/libs/errors/compile_time.h>
 #include <viua/libs/lexer.h>
 #include <viua/libs/stage.h>
@@ -134,21 +136,19 @@ auto to_string(
     assert(0);
 }
 
-const auto COMMENT = std::regex{ "^[;#].*" };
+const auto WHITESPACE = ctre::starts_with<"^[ \t]+">;
 
-const auto WHITESPACE = std::regex{ "^[ \t]+" };
+const auto COMMENT = ctre::multiline_starts_with<"[;#].*">;
 
-const auto DIR_TEXT    = std::regex{ "^\\.text\\b" };
-const auto DIR_RODATA  = std::regex{ "^\\.rodata\\b" };
-const auto DIR_SECTION = std::regex{ "^\\.section\\b" };
+const auto DIR_TEXT    = ctre::starts_with<"\\.text\\b">;
+const auto DIR_RODATA  = ctre::starts_with<"\\.rodata\\b">;
+const auto DIR_SECTION = ctre::starts_with<"\\.section\\b">;
 
-const auto DIR_SYMBOL = std::regex{ "^\\.symbol\\b" };
-const auto DIR_LABEL  = std::regex{ "^\\.label\\b" };
-const auto DIR_BEGIN  = std::regex{ "^\\.begin\\b" };
-const auto DIR_END    = std::regex{ "^\\.end\\b" };
-const auto DIR_OBJECT = std::regex{ "^\\.object\\b" };
-
-const auto SECTION_NAME = std::regex{ "^(\\.[A-Za-z][A-Za-z0-9_]+)+\\b" };
+const auto DIR_SYMBOL = ctre::starts_with<"\\.symbol\\b">;
+const auto DIR_LABEL  = ctre::starts_with<"\\.label\\b">;
+const auto DIR_BEGIN  = ctre::starts_with<"\\.begin\\b">;
+const auto DIR_END    = ctre::starts_with<"\\.end\\b">;
+const auto DIR_OBJECT = ctre::starts_with<"\\.object\\b">;
 
 /*
  * The regex for register indexes will catch ANYTHING up until word boundary,
@@ -157,29 +157,29 @@ const auto SECTION_NAME = std::regex{ "^(\\.[A-Za-z][A-Za-z0-9_]+)+\\b" };
  * accepted valid names the errors could get weird, and it would be much more
  * difficult to provide sane diagnostics.
  */
-const auto VOID          = std::regex{ "^\\bvoid\\b" };
-const auto ZERO_SIGNED   = std::regex{ "^\\bzero\\b" };
-const auto ZERO_UNSIGNED = std::regex{ "^\\buzero\\b" };
+const auto VOID          = ctre::starts_with<"void\\b">;
+const auto ZERO_SIGNED   = ctre::starts_with<"zero\\b">;
+const auto ZERO_UNSIGNED = ctre::starts_with<"uzero\\b">;
 
-const auto LITERAL_ATOM        = std::regex{ pattern::LITERAL_ATOM };
-const auto LITERAL_INTEGER_HEX = std::regex{ "^-?0x[0-9a-f][0-9a-f']*u?" };
-const auto LITERAL_INTEGER_OCT = std::regex{ "^-?0o[0-7]['0-7]*u?" };
-const auto LITERAL_INTEGER_BIN = std::regex{ "^-?0b[01]['01]*u?" };
-const auto LITERAL_INTEGER_DEC = std::regex{ "^-?(?:0|[1-9]['0-9]*)u?" };
-const auto LITERAL_FLOAT       = std::regex{ "^-?(?:0|[1-9][0-9]*)?\\.[0-9]+" };
+const auto LITERAL_ATOM        = ctre::starts_with<pattern::LITERAL_ATOM>;
+const auto LITERAL_INTEGER_HEX = ctre::starts_with<"-?0x[0-9a-f][0-9a-f']*u?">;
+const auto LITERAL_INTEGER_OCT = ctre::starts_with<"-?0o[0-7]['0-7]*u?">;
+const auto LITERAL_INTEGER_BIN = ctre::starts_with<"-?0b[01]['01]*u?">;
+const auto LITERAL_INTEGER_DEC = ctre::starts_with<"-?(?:0|[1-9]['0-9]*)u?">;
+const auto LITERAL_FLOAT       = ctre::starts_with<"-?(?:0|[1-9][0-9]*)?\\.[0-9]+">;
 
-const auto COMMA           = std::regex{ "^," };
-const auto ELLIPSIS        = std::regex{ "^\\.\\.\\." };
-const auto DOT             = std::regex{ "^\\." };
-const auto EQ              = std::regex{ "^=" };
-const auto AT              = std::regex{ "^@" };
-const auto DOLLAR          = std::regex{ "^\\$" };
-const auto STAR            = std::regex{ "^\\*" };
-const auto ATTR_LIST_OPEN  = std::regex{ "^\\[\\[" };
-const auto ATTR_LIST_CLOSE = std::regex{ "^\\]\\]" };
+const auto COMMA           = ctre::starts_with<",">;
+const auto ELLIPSIS        = ctre::starts_with<"\\.\\.\\.">;
+const auto DOT             = ctre::starts_with<"\\.">;
+const auto EQ              = ctre::starts_with<"=">;
+const auto AT              = ctre::starts_with<"@">;
+const auto DOLLAR          = ctre::starts_with<"\\$">;
+const auto STAR            = ctre::starts_with<"\\*">;
+const auto ATTR_LIST_OPEN  = ctre::starts_with<"\\[\\[">;
+const auto ATTR_LIST_CLOSE = ctre::starts_with<"\\]\\]">;
 
 const auto OPCODE =
-    std::regex{ "^[a-z_]+(?:\\.(?:native|saturate|wrap|trap))?\\b" };
+    ctre::starts_with<"[a-z_]+(?:\\.(?:native|saturate|wrap|trap))?\\b">;
 
 namespace {
 auto match_lookbehind [[maybe_unused]] (
@@ -236,19 +236,19 @@ auto lex(
     auto character = size_t{};
     auto offset    = size_t{};
 
-    auto const try_match = [&lexemes, &source_text, &line, &character, &offset](
-                               std::regex const& re, TOKEN const tt) -> bool
+    auto const consume = [&lexemes, &source_text, &line, &character, &offset](
+        std::string&& v, TOKEN const t) -> void
     {
-        std::cmatch m;
-        if (regex_search(source_text.data(), m, re)) {
-            lexemes.emplace_back(
-                m.str(), tt, Location{ line, character, offset });
+        lexemes.emplace_back(
+            std::move(v),
+            t,
+            Location{ line, character, offset });
 
-            character += lexemes.back().text.size();
-            offset += lexemes.back().text.size();
-            source_text.remove_prefix(lexemes.back().text.size());
-        }
-        return (not m.empty());
+
+        auto const consumed_chars = lexemes.back().text.size();
+        character += consumed_chars;
+        offset += consumed_chars;
+        source_text.remove_prefix(consumed_chars);
     };
 
     while (not source_text.empty()) {
@@ -358,71 +358,89 @@ auto lex(
             continue;
         }
 
-        if (try_match(WHITESPACE, TOKEN::WHITESPACE)) {
+        if (auto const m = WHITESPACE(source_text)) {
+            consume(m.to_string(), TOKEN::WHITESPACE);
             continue;
         }
-        if (try_match(COMMENT, TOKEN::COMMENT)) {
+        if (auto const m = COMMENT(source_text)) {
+            consume(m.to_string(), TOKEN::COMMENT);
             continue;
         }
-        if (try_match(DIR_TEXT, TOKEN::SWITCH_TO_TEXT)) {
+        if (auto const m = DIR_TEXT(source_text)) {
+            consume(m.to_string(), TOKEN::SWITCH_TO_TEXT);
             continue;
         }
-        if (try_match(DIR_RODATA, TOKEN::SWITCH_TO_RODATA)) {
+        if (auto const m = DIR_RODATA(source_text)) {
+            consume(m.to_string(), TOKEN::SWITCH_TO_RODATA);
             continue;
         }
-        if (try_match(DIR_SECTION, TOKEN::SWITCH_TO_SECTION)) {
+        if (auto const m = DIR_SECTION(source_text)) {
+            consume(m.to_string(), TOKEN::SWITCH_TO_SECTION);
             continue;
         }
-        if (try_match(DIR_SYMBOL, TOKEN::DECLARE_SYMBOL)) {
+        if (auto const m = DIR_SYMBOL(source_text)) {
+            consume(m.to_string(), TOKEN::DECLARE_SYMBOL);
             continue;
         }
-        if (try_match(DIR_LABEL, TOKEN::DEFINE_LABEL)) {
+        if (auto const m = DIR_LABEL(source_text)) {
+            consume(m.to_string(), TOKEN::DEFINE_LABEL);
             continue;
         }
-        if (try_match(DIR_BEGIN, TOKEN::BEGIN)) {
+        if (auto const m = DIR_BEGIN(source_text)) {
+            consume(m.to_string(), TOKEN::BEGIN);
             continue;
         }
-        if (try_match(DIR_END, TOKEN::END)) {
+        if (auto const m = DIR_END(source_text)) {
+            consume(m.to_string(), TOKEN::END);
             continue;
         }
-        if (try_match(DIR_OBJECT, TOKEN::ALLOCATE_OBJECT)) {
-            continue;
-        }
-
-        if (try_match(LITERAL_FLOAT, TOKEN::LITERAL_FLOAT)) {
-            continue;
-        }
-        if (try_match(LITERAL_INTEGER_HEX, TOKEN::LITERAL_INTEGER)) {
-            continue;
-        }
-        if (try_match(LITERAL_INTEGER_OCT, TOKEN::LITERAL_INTEGER)) {
-            continue;
-        }
-        if (try_match(LITERAL_INTEGER_BIN, TOKEN::LITERAL_INTEGER)) {
-            continue;
-        }
-        if (try_match(LITERAL_INTEGER_DEC, TOKEN::LITERAL_INTEGER)) {
+        if (auto const m = DIR_OBJECT(source_text)) {
+            consume(m.to_string(), TOKEN::ALLOCATE_OBJECT);
             continue;
         }
 
-        if (try_match(VOID, TOKEN::VOID)) {
+        if (auto const m = LITERAL_FLOAT(source_text)) {
+            consume(m.to_string(), TOKEN::LITERAL_FLOAT);
+            continue;
+        }
+        if (auto const m = LITERAL_INTEGER_HEX(source_text)) {
+            consume(m.to_string(), TOKEN::LITERAL_INTEGER);
+            continue;
+        }
+        if (auto const m = LITERAL_INTEGER_OCT(source_text)) {
+            consume(m.to_string(), TOKEN::LITERAL_INTEGER);
+            continue;
+        }
+        if (auto const m = LITERAL_INTEGER_BIN(source_text)) {
+            consume(m.to_string(), TOKEN::LITERAL_INTEGER);
+            continue;
+        }
+        if (auto const m = LITERAL_INTEGER_DEC(source_text)) {
+            consume(m.to_string(), TOKEN::LITERAL_INTEGER);
             continue;
         }
 
-        if (try_match(ZERO_SIGNED, TOKEN::ZERO_SIGNED)) {
-            continue;
-        }
-        if (try_match(ZERO_UNSIGNED, TOKEN::ZERO_UNSIGNED)) {
+        if (auto const m = VOID(source_text)) {
+            consume(m.to_string(), TOKEN::VOID);
             continue;
         }
 
-        if (try_match(OPCODE, TOKEN::OPCODE)) {
+        if (auto const m = ZERO_SIGNED(source_text)) {
+            consume(m.to_string(), TOKEN::ZERO_SIGNED);
+            continue;
+        }
+        if (auto const m = ZERO_UNSIGNED(source_text)) {
+            consume(m.to_string(), TOKEN::ZERO_UNSIGNED);
+            continue;
+        }
+
+        if (auto const m = OPCODE(source_text)) {
+            consume(m.to_string(), TOKEN::OPCODE);
             auto const not_really_an_opcode =
                 not OPCODE_NAMES.contains(lexemes.back().text);
             auto const looks_atomish = [&lexemes]() -> bool
             {
-                std::smatch m;
-                return std::regex_match(lexemes.back().text, m, LITERAL_ATOM);
+                return ctre::match<pattern::LITERAL_ATOM>(lexemes.back().text);
             }();
             if (not_really_an_opcode and looks_atomish) {
                 auto lx = std::move(lexemes.back());
@@ -432,36 +450,46 @@ auto lex(
             }
             continue;
         }
-        if (try_match(LITERAL_ATOM, TOKEN::LITERAL_ATOM)) {
+        if (auto const m = LITERAL_ATOM(source_text)) {
+            consume(m.to_string(), TOKEN::LITERAL_ATOM);
             continue;
         }
 
-        if (try_match(ATTR_LIST_OPEN, TOKEN::ATTR_LIST_OPEN)) {
+        if (auto const m = ATTR_LIST_OPEN(source_text)) {
+            consume(m.to_string(), TOKEN::ATTR_LIST_OPEN);
             continue;
         }
-        if (try_match(ATTR_LIST_CLOSE, TOKEN::ATTR_LIST_CLOSE)) {
+        if (auto const m = ATTR_LIST_CLOSE(source_text)) {
+            consume(m.to_string(), TOKEN::ATTR_LIST_CLOSE);
             continue;
         }
 
-        if (try_match(COMMA, TOKEN::COMMA)) {
+        if (auto const m = COMMA(source_text)) {
+            consume(m.to_string(), TOKEN::COMMA);
             continue;
         }
-        if (try_match(ELLIPSIS, TOKEN::ELLIPSIS)) {
+        if (auto const m = ELLIPSIS(source_text)) {
+            consume(m.to_string(), TOKEN::ELLIPSIS);
             continue;
         }
-        if (try_match(EQ, TOKEN::EQ)) {
+        if (auto const m = EQ(source_text)) {
+            consume(m.to_string(), TOKEN::EQ);
             continue;
         }
-        if (try_match(DOT, TOKEN::DOT)) {
+        if (auto const m = DOT(source_text)) {
+            consume(m.to_string(), TOKEN::DOT);
             continue;
         }
-        if (try_match(DOLLAR, TOKEN::DOLLAR)) {
+        if (auto const m = DOLLAR(source_text)) {
+            consume(m.to_string(), TOKEN::DOLLAR);
             continue;
         }
-        if (try_match(STAR, TOKEN::STAR)) {
+        if (auto const m = STAR(source_text)) {
+            consume(m.to_string(), TOKEN::STAR);
             continue;
         }
-        if (try_match(AT, TOKEN::AT)) {
+        if (auto const m = AT(source_text)) {
+            consume(m.to_string(), TOKEN::AT);
             continue;
         }
 

@@ -5,3 +5,6 @@
 [submodule "new/3rd-party/linenoise"]
 	path = new/3rd-party/linenoise
 	url = https://github.com/yhirose/linenoise
+[submodule "new/3rd-party/ctre"]
+	path = new/3rd-party/ctre
+	url = https://git.sr.ht/~maelkum/compile-time-regular-expressions
