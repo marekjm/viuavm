@@ -23,7 +23,6 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <tuple>
 
 #include <viua/arch/arch.h>
 #include <viua/arch/ops.h>

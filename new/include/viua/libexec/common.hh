@@ -22,13 +22,11 @@
 
 #include <stdint.h>
 
-#include <functional>
 #include <map>
 #include <optional>
 #include <set>
 #include <stdexcept>
 #include <string_view>
-#include <type_traits>
 #include <variant>
 #include <vector>
 
