@@ -79,7 +79,7 @@ endif
 CXXFLAGS_INCLUDE=\
 				 $(PLATFORM_INCLUDE_FLAGS) \
 				 -I$(headerdir) \
-				 -I./3rd-party
+				 -isystem ./3rd-party
 
 
 ################################################################################
