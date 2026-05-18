@@ -208,11 +208,18 @@ list-preset:
 list-platform:
 	@cd Makefile.d/Platform ; ls -1 | grep -v README | sort
 
+
 test_prefix?=$(BUILD_PREFIX)
 test_exec_prefix?=$(test_prefix)
 test: all
 	test_prefix=$(test_prefix) test_exec_prefix=$(test_exec_prefix) \
 		$(python3) ./tests/suite.py $(tests)
+
+# The standard target is "check", but Viua has used "test" ever since its
+# inception. Both names are provided for compatibility. It is the target name
+# given by
+# https://www.gnu.org/software/make/manual/html_node/Standard-Targets.html
+check: test
 
 list-test:
 	@basename --suffix=.asm --multiple $(shell ls -1 tests/asm/*.asm) | sort
@@ -304,6 +311,8 @@ format:
 	black --quiet tests/suite.py
 	yamlfmt $(shell git rev-parse --show-toplevel)/.builds/*
 
+# I use scdoc(1) instead of GNU Info.
+info: man
 man: \
 	$(BUILD_MANDIR)/man1/viua-asm.1 \
 	$(BUILD_MANDIR)/man1/viua-ld.1 \
@@ -314,6 +323,14 @@ man: \
 	$(BUILD_MANDIR)/man7/viua-isa.7 \
 	$(BUILD_MANDIR)/man7/viua-ops.7 \
 	$(BUILD_MANDIR)/man1/viua.1
+
+# In https://www.gnu.org/software/make/manual/html_node/Standard-Targets.html it
+# is stated that the following targets "should always exist, but any or all can
+# be a no-op".
+dvi:
+html:
+pdf:
+ps:
 
 $(BUILD_MANDIR)/%: docs/man/%.scdoc docs/man/common/*.scdoc docs/man/viua.m4
 	@mkdir -p $(shell dirname $@)
