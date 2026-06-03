@@ -1,0 +1,120 @@
+VIUA-DB(1) "Viua VM PUT_VIUAVM_VERSION_HERE" "Viua VM Manual"
+
+# NAME
+
+viua-db - the Viua VM debugger
+
+# SYNOPSIS
+
+*viua db* _executable_ [_args_...]
+
+# DESCRIPTION
+
+Debug programs running on Viua VM.
+
+# OPTIONS
+
+include(common/tool-options.scdoc)
+
+None.
+
+# DEBUGGER COMMANDS
+
+## Show commands
+
+Show commands display information about run-time state of the program and the
+debugger, as well the program's dynamic values eg, actors, stack backtraces,
+frames, registers.
+
+These commands are *read-only* and *never* affect the state of the debugger or
+the program.
+See *Alter commands* and *Execution commands* to learn how to affect the state
+of the debugger and the prorgam.
+
+*show frame* [_n_]
+	Present information about _n_-th frame.
+	Frame *0* is the bottom-most frame on the stack.
+
+*show actor*
+	Present currently selected actor.
+
+*show breakpoints*
+	List set breakpoints.
+
+*backtrace*, *bt*
+	Present a backtrace of the currently selected actor.
+
+## Info commands
+
+Info commands display information about static state of the program ie, anything
+that can be known about the program without running it.
+
+These commands are *read-only* and *never* affect the state of the program.
+
+*info main*
+	Present information about the main function of the _executable_.
+
+*info functions*
+	Present information about functions in the debugged program.
+
+*info jumps*
+	Present information about jumps in the debugged program.
+
+## Execution commands
+
+These commands control execution of the debugged program.
+
+*actor new* _fn_
+	Create a new actor using function _fn_.
+
+*stepi* [_n_]
+	Execute (step through) _n_ instructions.
+	By default *stepi* command executes a single instruction.
+
+*run*, *r*
+	Run the program until it exits, or until a breakpoint is hit.
+
+*continue*, *c*
+	Continue running the program after a breakpoint has been hit, ignoring the
+	breakpoint set at the current instruction.
+
+## Alter commands
+
+Alter state of the debugger or the program.
+
+*frame* _n_++
+*up* [_n_]++
+*down* [_n_]
+	Use *frame* to set the frame to inspect.
+	Use *up* or *down* to move between frames on a stack.
+
+*break* [_addr_], *b* [_addr_]
+	Set a breakpoint at _addr_ (by default at the current position).
+
+# EXIT STATUS
+
+|[ 0
+:< Successful program execution
+|  1
+:  Invalid input
+
+# FILES
+
+|[ _executable__
+:< The executable to debug.
+
+The linker opens its input files read-only.
+
+# SEE ALSO
+
+*viua-vm*(1),
+*viua-dis*(1),
+*viua-readelf*(1).
+
+*gdb*(1),
+*readelf*(1),
+*elf*(5).
+
+include(common/footer.scdoc)
+
+; vim:ft=scdoc:

@@ -315,8 +315,9 @@ format:
 info: man
 man: \
 	$(BUILD_MANDIR)/man1/viua-asm.1 \
-	$(BUILD_MANDIR)/man1/viua-ld.1 \
+	$(BUILD_MANDIR)/man1/viua-db.1 \
 	$(BUILD_MANDIR)/man1/viua-dis.1 \
+	$(BUILD_MANDIR)/man1/viua-ld.1 \
 	$(BUILD_MANDIR)/man1/viua-readelf.1 \
 	$(BUILD_MANDIR)/man1/viua-vm.1 \
 	$(BUILD_MANDIR)/man5/viua-asm.5 \

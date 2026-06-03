@@ -1326,7 +1326,7 @@ auto main(
     constexpr auto esc = send_escape_seq;
 
     using viua::libexec::Args;
-    auto const args = viua::libexec::args_or_exit("repl",
+    auto const args = viua::libexec::args_or_exit("db",
                                                   argc,
                                                   argv,
                                                   {
