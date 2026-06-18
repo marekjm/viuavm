@@ -649,7 +649,7 @@ For *aa* and *ad* instructions all _unit_ values are useful.
 
 	Use the special -1u case to load maximal value of an unsigned integer:
 
-		li #4.l, -1u
+		li $4.l, -1u
 
 
 # SEE ALSO
