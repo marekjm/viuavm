@@ -51,5 +51,26 @@
     li $1.a, -1
     call $7.l, min_unsafe
 
+    ; Sherlock Holmes and the Case of Hidden Overflow
+    ; This is weirdly similar to the -1 case above, but this time the function
+    ; will (accidentally) work correctly since -2 will be turned into 1u, which
+    ; is less than the maximum unsigned value, and so will be returned.
+    ;
+    ; In general, I think the max/min functions are a good place for either:
+    ;
+    ;  - leaving the problem to the compiler for a higher-level language which
+    ;    will enforce proper typing rules
+    ;  - adding static analysis to Viua's assembler
+    ;  - using styled arithmetic to avoid undefined behaviour of the underlying
+    ;    platform
+    ;
+    ; But this is something to worry about in the future.
+    ; Right now, the correctness of the code is left as an exercise for the
+    ; reader (ha! a classic).
+    frame $2.a
+    li $0.a, 0xffffffffffffffffu
+    li $1.a, -2
+    call $8.l, min_unsafe
+
     ebreak
     return
