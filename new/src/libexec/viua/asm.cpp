@@ -3248,11 +3248,13 @@ auto find_entry_point(
 }
 
 auto make_reloc_table(
-    Text const& text) -> std::vector<Elf64_Rel>
+    Text const& text,
+    std::vector<Elf64_Sym> const& symtab
+) -> std::vector<Elf64_Rel>
 {
     auto reloc_table = std::vector<Elf64_Rel>{};
 
-    auto const push_reloc = [&text, &reloc_table](size_t const i) -> void
+    auto const push_reloc = [&text, &reloc_table, &symtab](size_t const i) -> void
     {
         using viua::arch::ops::OPCODE;
         auto const op = viua::carve_just_opcode_out(text.at(i));
@@ -3271,16 +3273,19 @@ auto make_reloc_table(
         auto symtab_entry_index = uint32_t{};
         if (reloc_to_section_ptr) {
             using viua::arch::ops::I;
+
             symtab_entry_index =
                 static_cast<uint32_t>(I::decode(text.at(i)).immediate);
+            auto const& entry = symtab.at(symtab_entry_index);
 
             std::println(
                 "recording relocation for .symtab entry {} against section "
-                "pointer to [.{}+0x{:016x}] at {}th instruction",
+                "pointer to [.{}+0x{:016x}] at {}th instruction [.text+0x{:016x}]",
                 symtab_entry_index,
                 (into_rodata ? "rodata" : "text"),
-                (i * sizeof(viua::arch::instruction_type)),
-                i);
+                entry.st_value,
+                i,
+                (i * sizeof(viua::arch::instruction_type)));
         } else if (reloc_to_long_addr) {
             using viua::arch::ops::I;
             using viua::arch::ops::U;
@@ -3296,14 +3301,16 @@ auto make_reloc_table(
             auto const lo = U::decode(text.at(i - 1)).immediate;
 
             symtab_entry_index = static_cast<uint32_t>(hi | lo);
+            auto const& entry = symtab.at(symtab_entry_index);
 
             std::println(
                 "recording relocation for .symtab entry {} using long address "
-                "to [.{}+0x{:016x}] at {}th instruction",
+                "to [.{}+0x{:016x}] at {}th instruction [.text+0x{:016x}]",
                 symtab_entry_index,
                 (into_rodata ? "rodata" : "text"),
-                (i * sizeof(viua::arch::instruction_type)),
-                i);
+                entry.st_value,
+                i,
+                (i * sizeof(viua::arch::instruction_type)));
         } else {
             /*
              * Well, it is not really a reloc after all.
@@ -4070,7 +4077,7 @@ auto main(
     /*
      * ELF emission.
      */
-    auto const reloc_table = make_reloc_table(text);
+    auto const reloc_table = make_reloc_table(text, symbol_table);
     emit_elf(output_path,
              (entry_point_fn.has_value()
                   ? std::optional{ symbol_table
