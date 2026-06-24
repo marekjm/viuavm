@@ -58,7 +58,7 @@
     ; FIXME Points to stack. Using .rodata directly does not work.
     sd $3.l, $5.l, 3
 
-    ; Echo standard input to standard output.
+    ; Request "Hello, World!\n" to be written to standard output.
     io_submit $7.l, $5.l, void
     io_wait void, $7.l, void
 
