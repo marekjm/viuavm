@@ -50,10 +50,6 @@ auto ins_to_string(
     auto const opcode = viua::carve_opcode_out(ip);
     auto const format = viua::carve_format_out(opcode);
 
-    std::println("got format: {:04x} ({})",
-                 static_cast<uint16_t>(format),
-                 to_string(format));
-
     switch (format) {
         using enum viua::arch::ops::FORMAT;
         case N:
