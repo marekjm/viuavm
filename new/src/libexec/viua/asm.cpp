@@ -1660,7 +1660,7 @@ auto save_objects(
                     symbol.st_shndx = 0;
 
                     std::println(stdout,
-                                 "allocated {} bytes() of double (anonymous) "
+                                 "allocated {} byte(s) of double (anonymous) "
                                  "at [.rodata+0x{:016x}]",
                                  symbol.st_size,
                                  symbol.st_value);
