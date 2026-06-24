@@ -22,24 +22,35 @@
     call $1.l, absr
 
     li $2.l, 1
-    eq $3.l, $1.l, $2.l
-    if $3.l, ln_of_2
 
+    ; Watch out here. Floating point numbers are funky as hell, so here be tiny
+    ; little dragons, because we are only encountering the mildest form of
+    ; floating point fuckery: these numbers cannot be compared directly ie, the
+    ; typical
+    ;
+    ;   x == y
+    ;
+    ; should be treated with extreme suspicion.
+    ;
+    ; The only comparisons you can trust for floting point numbers are relative.
+    ; Therefore, we rely on the lt and gt operators, and fall-through to the
+    ; default, "the number appear to be equal", case.
     lt $3.l, $1.l, $2.l
     if $3.l, ln_of_lt1
+
+    gt $3.l, $1.l, $2.l
+    if $3.l, ln_of_gt1
+
+.label ln_of_2
+    frame $0.a
+    call $0.l, ln2
+    return $0.l
 
 .label ln_of_gt1
     frame $2.a
     copy $0.a, $0.p
     copy $1.a, $1.p
     call $0.l, ln_gt1
-    return $0.l
-
-.label ln_of_2
-    frame $2.a
-    copy $0.a, $0.p
-    copy $1.a, $1.p
-    call $0.l, ln2
     return $0.l
 
 .label ln_of_lt1
@@ -49,7 +60,6 @@
     call $0.l, ln_lt1
     return $0.l
 
-
 ; ln2: r
 ;   where
 ;       r: real type
@@ -57,7 +67,11 @@
 ; Natural logarithm of 2, hardcoded.
 .symbol ln2
 .label ln2
-    double $0.l, 0.693147180559945309417232121458
+    ; HERE BE DRAGONS (IEEE 754 floating-point dragons)
+    ;
+    ; 64-bit floats in decimal representation have precision of 15 decimal
+    ; places. DO NOT try to be clever and use more.
+    double $0.l, 0.693147180559945
     return $0.l
 
 
