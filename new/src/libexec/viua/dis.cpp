@@ -293,7 +293,6 @@ auto demangle_symbol_load(
     }
     if (m(i + 1, DOUBLE) and S::decode(ins_at(i + 1)).out == out) {
         auto ins = raw.at(i + 1);
-        cooked.pop_back();
 
         auto const sv = view_data(rodata, immediate);
         auto x        = double{};
@@ -303,8 +302,12 @@ auto demangle_symbol_load(
         ss << std::fixed
            << std::setprecision(std::numeric_limits<double>::digits10) << x;
 
-        cooked.emplace_back(
-            ins.with_text(("double " + out.to_string() + ", " + ss.str())));
+        auto tt =
+            ins.with_text(("double " + out.to_string() + ", " + ss.str()));
+        tt.index = cooked.back().index;
+        cooked.pop_back();
+        tt.index.physical_span = tt.index.physical_span.value() + 1;
+        cooked.emplace_back(tt);
         ++i;
         return;
     }
@@ -418,7 +421,8 @@ auto demangle_canonical_li(
                 std::format(
                     "[[full]] li {}, {}", luiu.out.to_string(), literal));
 
-            // FIXME calls are using ATXTP instead of LUIU
+            // FIXME calls are using ATXTP instead of LUIU, but DOUBLE is not
+            // it uses LUIU to load the address
             if (needs_unsigned) {
                 demangle_symbol_load(
                     text, tmp, i, luiu.out, value, symtab, strtab, rodata);
