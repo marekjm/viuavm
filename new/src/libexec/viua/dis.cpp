@@ -1015,7 +1015,7 @@ auto main(
             }
 
             auto const name = main_module.str_at(sym.st_name);
-            out << ".label: [[extern]] " << name << "\n";
+            out << ".label [[extern]] " << name << "\n";
             extern_object_definitions_present = true;
         }
         if (extern_object_definitions_present) {
