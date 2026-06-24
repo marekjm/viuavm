@@ -1747,6 +1747,12 @@ auto cache_function_labels(
 
     auto active_symbol = viua::view_ptr<Elf64_Sym>{};
 
+    /*
+     * Labels cannot be reused, so duplicates must be detected, and any input
+     * file containing them must be rejected.
+     */
+    auto seen_labels = std::map<std::string, ast::Label const>{};
+
     for (auto const& each : nodes) {
         using viua::libs::lexer::TOKEN;
 
@@ -1786,6 +1792,20 @@ auto cache_function_labels(
             auto const& lab = static_cast<ast::Label&>(*each);
             labeller.reset(&lab);
             active_label = make_name_from_lexeme(lab.name);
+
+            if (seen_labels.contains(active_label)) {
+                using viua::libs::errors::compile_time::Cause;
+                using viua::libs::errors::compile_time::Error;
+                throw Error{ labeller->name,
+                             Cause::None,
+                             "duplicate label: " + quote_fancy(active_label) }
+                    .note("labels cannot be reused")
+                    .chain(Error{
+                        seen_labels.at(active_label).name,
+                        Cause::None,
+                        "" }.note("first defined here"));
+            }
+            seen_labels.insert({ active_label, *labeller.get() });
 
             if (not symbol_map.contains(active_label)) {
                 auto local_sym     = make_symbol(active_label, string_table);
