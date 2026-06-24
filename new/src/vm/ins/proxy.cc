@@ -54,7 +54,7 @@ auto mutable_proxy(
          *
          * The above fancy-sounding mumbo-jumbo is all fine and dandy, but what
          * it means is that both parameter and argument sets is dynamic, not
-         * static, and thus requires a dynamic check. Hence, the nice "if"
+         * static, and thus require a dynamic check. Hence, the nice "if"
          * below this comment.
          */
         if (i >= v.size()) {
