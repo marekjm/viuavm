@@ -1801,9 +1801,8 @@ auto cache_function_labels(
                              "duplicate label: " + quote_fancy(active_label) }
                     .note("labels cannot be reused")
                     .chain(Error{
-                        seen_labels.at(active_label).name,
-                        Cause::None,
-                        "" }.note("first defined here"));
+                        seen_labels.at(active_label).name, Cause::None, "" }
+                               .note("first defined here"));
             }
             seen_labels.insert({ active_label, *labeller.get() });
 
@@ -3269,12 +3268,12 @@ auto find_entry_point(
 
 auto make_reloc_table(
     Text const& text,
-    std::vector<Elf64_Sym> const& symtab
-) -> std::vector<Elf64_Rel>
+    std::vector<Elf64_Sym> const& symtab) -> std::vector<Elf64_Rel>
 {
     auto reloc_table = std::vector<Elf64_Rel>{};
 
-    auto const push_reloc = [&text, &reloc_table, &symtab](size_t const i) -> void
+    auto const push_reloc =
+        [&text, &reloc_table, &symtab](size_t const i) -> void
     {
         using viua::arch::ops::OPCODE;
         auto const op = viua::carve_just_opcode_out(text.at(i));
@@ -3300,7 +3299,8 @@ auto make_reloc_table(
 
             std::println(
                 "recording relocation for .symtab entry {} against section "
-                "pointer to [.{}+0x{:016x}] at {}th instruction [.text+0x{:016x}]",
+                "pointer to [.{}+0x{:016x}] at {}th instruction "
+                "[.text+0x{:016x}]",
                 symtab_entry_index,
                 (into_rodata ? "rodata" : "text"),
                 entry.st_value,
@@ -3321,7 +3321,7 @@ auto make_reloc_table(
             auto const lo = U::decode(text.at(i - 1)).immediate;
 
             symtab_entry_index = static_cast<uint32_t>(hi | lo);
-            auto const& entry = symtab.at(symtab_entry_index);
+            auto const& entry  = symtab.at(symtab_entry_index);
 
             std::println(
                 "recording relocation for .symtab entry {} using long address "
