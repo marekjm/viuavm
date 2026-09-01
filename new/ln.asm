@@ -51,6 +51,11 @@
 
 
 ; lnlt2: R -> R
+;
+;     inf
+;   - SUM [(-1)^k * (-1 + x)^k] / k
+;     k=1
+;
 .symbol lnlt2
 .label lnlt2
     ; this is the accumulator
@@ -59,7 +64,7 @@
     ; this is the k
     li $1.l, 1
 
-    ; this is the limit
+    ; this is the number of evaluations necessary to get a good enough result
     ;
     ; I arrived at 49 through experimentation:
     ;
@@ -78,17 +83,23 @@
     li $2.l, 49
 
 .label lnlt2_loop_begin
+    ; evalue the core formula...
     frame $2.a
     copy $0.a, $0.p  ; x
     copy $1.a, $1.l  ; k
     call $3.l, lnlt2_iter
 
+    ; ...and update the accumulator with the result
     add $0.l, $0.l, $3.l
+
+    ; increase the loop counter, k
     addi $1.l, $1.l, 1
 
+    ; control the loop
     lt $4.l, $1.l, $2.l
     if $4.l, lnlt2_loop_begin
 
+    ; this is the end result
     muli $0.l, $0.l, -1
     return $0.l
 
