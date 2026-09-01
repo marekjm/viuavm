@@ -82,3 +82,42 @@
 .symbol powr
 .label powr
     return zero  ; FIXME not implemented
+
+
+; factorial: a -> a
+;   where
+;       a: any arithmetic type
+.symbol factorial
+.label factorial
+    lt $0.l, $0.p, zero
+    if $0.l, factorial_of_negative
+
+    eq $0.l, $0.p, zero
+    if $0.l, factorial_of_zero
+
+    ; this is the accumulator
+    div $0.l, $0.p, $0.p
+
+    ; this is n
+    copy $1.l, $0.l
+
+.label factorial_loop
+    eq $2.l, $1.l, $0.p
+    if $2.l, factorial_epilogue
+
+    addi $1.l, $1.l, 1
+    mul $0.l, $0.l, $1.l
+    if void, factorial_loop
+
+.label factorial_epilogue
+    return $0.l
+
+.label factorial_of_negative
+    ; return a 0 of the matching type
+    sub $0.l, $0.p, $0.p
+    return $0.l
+
+.label factorial_of_zero
+    ; return a 1 of the matching type
+    addi $0.l, $0.p, 1
+    return $0.l
