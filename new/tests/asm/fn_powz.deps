@@ -1,1 +1,3 @@
+tests/std/abs
+tests/std/log
 tests/std/pow
