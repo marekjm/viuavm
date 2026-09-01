@@ -3,6 +3,7 @@
 
 .symbol [[extern]] absr
 .symbol [[extern]] pown
+.symbol [[extern]] powz
 
 
 ; ln2: f64
@@ -137,10 +138,88 @@
     return $0.l
 
 
+; lngt2: R -> R
+;
+;                  inf
+;   ln(-1 + x) - { SUM [(-1)^k * (-1 + x)^k] / k }
+;                  k=1
+;
 .symbol lngt2
 .label lngt2
-    double $1.l, 2.0
-    return $1.l
+    ; this is the ln(-1 + x)
+    frame $1.a
+    addi $0.a, $0.p, -1
+    call $1.l, ln
+
+    ; this is the accumulator
+    double $0.l, 0.0
+
+    ; this is the k
+    li $2.l, 1
+
+    ; this is the number of evaluations necessary to get a good enough result
+    ; See the comment in lnlt2 to learn why this specific magic number is used.
+    li $3.l, 49
+
+.label lngt2_loop_begin
+    ; evaluate the core formula...
+    frame $2.a
+    copy $0.a, $0.p  ; x
+    copy $1.a, $2.l  ; k
+    call $4.l, lngt2_iter
+
+    ; ...and update the accumulator with the result
+    add $0.l, $0.l, $4.l
+
+    ; increase the loop counter, k
+    addi $2.l, $2.l, 1
+
+    ; control the loop
+    lt $4.l, $2.l, $3.l
+    if $4.l, lngt2_loop_begin
+
+    ; this is the end result
+    ; combine the two ingredients of the overall formula
+    ; this is the ln(-1 + x) part minus the SUM part
+    sub $0.l, $1.l, $0.l
+    return $0.l
+
+
+; lngt2_iter: R -> N -> R
+;
+; A single iteration of the series ie, the following formula:
+;
+;   [(-1)^k * (-1 + x)^(-k)] / k
+;
+.symbol lngt2_iter
+.label lngt2_iter
+    ; this is the x
+    copy $1.l, $0.p
+
+    ; this is the k
+    copy $2.l, $1.p
+
+    ; this is the -k
+    muli $3.l, $2.l, -1
+
+    ; this is the (-1)^k
+    frame $2.a
+    double $0.a, -1.0
+    copy $1.a, $2.l
+    call $4.l, pown
+
+    ; this is the (-1 + x)^(-k)
+    frame $2.a
+    addi $0.a, $1.l, -1
+    copy $1.a, $3.l
+    call $5.l, powz
+
+    ; this is the numerator
+    mul $6.l, $4.l, $5.l
+
+    ; this is the end result
+    div $0.l, $6.l, $2.l
+    return $0.l
 
 
 .symbol [[entry_point]] main
