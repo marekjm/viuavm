@@ -59,13 +59,35 @@
     ; this is the k
     li $1.l, 1
 
+    ; this is the limit
+    ;
+    ; I arrived at 49 through experimentation:
+    ;
+    ;   - 15 decimal digits is the precision of IEEE 754
+    ;   - 15 evaluations of the core formula do not yield a good enough result
+    ;   - 30 evaluations ie, precision times 2, still do not yield a good enough
+    ;     result
+    ;   - 60 evaluations it, precision times 4, yield a good enough result
+    ;   - 90 evaluations do not yield a better result than 60 evaluations
+    ;   - 48 evaluations do not yield a worse result than 60 evaluations
+    ;
+    ; Therefore, we can stop at 48 evaluations, because at this point doing more
+    ; work will not improve the output of the function.
+    ; The limit is set to 49 because to make exponentiation work we start
+    ; counting from 1, not 0.
+    li $2.l, 49
+
+.label lnlt2_loop_begin
     frame $2.a
     copy $0.a, $0.p  ; x
     copy $1.a, $1.l  ; k
-    call $2.l, lnlt2_iter
+    call $3.l, lnlt2_iter
 
-    add $0.l, $0.l, $2.l
+    add $0.l, $0.l, $3.l
     addi $1.l, $1.l, 1
+
+    lt $4.l, $1.l, $2.l
+    if $4.l, lnlt2_loop_begin
 
     ; ebreak
 
@@ -80,10 +102,10 @@
 ;
 .symbol lnlt2_iter
 .label lnlt2_iter
-    ; This is the x.
+    ; this is the x
     copy $1.l, $0.p
 
-    ; This is the k.
+    ; this is the k
     copy $2.l, $1.p
 
     ; this is the (-1)^k
