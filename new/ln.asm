@@ -6,19 +6,6 @@
 .symbol [[extern]] powz
 
 
-; ln2: f64
-;
-; Natural logarithm of 2, hardcoded.
-.symbol ln2
-.label ln2
-    ; HERE BE DRAGONS (IEEE 754 floating-point dragons)
-    ;
-    ; 64-bit floats in decimal representation have precision of 15 decimal
-    ; places. DO NOT try to be clever and use more.
-    double $0.l, 0.693147180559945
-    return $0.l
-
-
 ; ln: t -> t
 .symbol ln
 .label ln
@@ -34,9 +21,7 @@
     lt $2.l, $0.l, $1.l
     if $2.l, ln_of_lt2
 
-    frame $0.a
-    call $1.l, ln2
-    return $1.l
+    if void, ln_of_eq2
 
 .label ln_of_gt2
     frame $1.a
@@ -49,6 +34,15 @@
     copy $0.a, $0.p
     call $1.l, lnlt2
     return $1.l
+
+; natural logarithm of 2, hardcoded.
+.label ln_of_eq2
+    ; HERE BE DRAGONS (IEEE 754 floating-point dragons)
+    ;
+    ; 64-bit floats in decimal representation have precision of 15 decimal
+    ; places. DO NOT try to be clever and use more.
+    double $0.l, 0.693147180559945
+    return $0.l
 
 
 ; lnlt2: R -> R
@@ -224,8 +218,9 @@
 
 .symbol [[entry_point]] main
 .label main
-    frame $0.a
-    call $1.l, ln2
+    frame $1.a
+    double $0.a, 2.0
+    call $1.l, ln
 
     ; frame $1.a
     ; double $0.a, 2.0
