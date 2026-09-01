@@ -4,10 +4,10 @@
 ; Exponentiation (power of) functions.
 ;
 
-; pown: b -> n -> b
+; pown: a -> N -> a
 ;   where
-;       b: any arithmetic type
-;       n: a natural (non-negative) integer
+;       a: any arithmetic type
+;       N: a natural (non-negative) integer
 .symbol pown
 .label pown
     if $1.p, pown_exp_nonzero
@@ -37,10 +37,11 @@
     return $0.l
 
 
-; powz: b -> z -> b
+; powz: a -> Z -> R
 ;   where
-;       b: any arithmetic type
-;       z: an integer
+;       a: any arithmetic type
+;       Z: an integer
+;       R: a real number
 .symbol powz
 .label powz
     copy $2.l, $1.p
@@ -71,10 +72,10 @@
     return $0.l
 
 
-; powr: b -> r -> b
+; powr: a -> R -> R
 ;   where
-;       b: any arithmetic type
-;       r: a real number
+;       a: any arithmetic type
+;       R: a real number
 ;
 ; In this case a "real number" means the highest precision floating point type
 ; available ie, the best approximation of a number belonging to the R set we can
