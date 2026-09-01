@@ -2,6 +2,7 @@
 
 
 .symbol [[extern]] absr
+.symbol [[extern]] pown
 
 
 ; ln2: f64
@@ -49,15 +50,66 @@
     return $1.l
 
 
+; lnlt2: R -> R
+.symbol lnlt2
+.label lnlt2
+    ; this is the accumulator
+    double $0.l, 0.0
+
+    ; this is the k
+    li $1.l, 1
+
+    frame $2.a
+    copy $0.a, $0.p  ; x
+    copy $1.a, $1.l  ; k
+    call $2.l, lnlt2_iter
+
+    add $0.l, $0.l, $2.l
+    addi $1.l, $1.l, 1
+
+    ; ebreak
+
+    muli $0.l, $0.l, -1
+    return $0.l
+
+; lnlt2_iter: R -> N -> R
+;
+; A single iteration of the series ie, the following formula:
+;
+;   [(-1)^k * (-1 + x)^k] / k
+;
+.symbol lnlt2_iter
+.label lnlt2_iter
+    ; This is the x.
+    copy $1.l, $0.p
+
+    ; This is the k.
+    copy $2.l, $1.p
+
+    ; this is the (-1)^k
+    frame $2.a
+    double $0.a, -1.0
+    copy $1.a, $2.l
+    call $3.l, pown
+
+    ; this is the (-1 + x)^k
+    frame $2.a
+    addi $0.a, $1.l, -1
+    copy $1.a, $2.l
+    call $4.l, pown
+
+    ; this is the numerator
+    mul $5.l, $3.l, $4.l
+
+    ; this is the end result
+    div $0.l, $5.l, $2.l
+    ebreak
+    return $0.l
+
+
 .symbol lngt2
 .label lngt2
     double $1.l, 2.0
-    return $1.l
-
-
-.symbol lnlt2
-.label lnlt2
-    double $1.l, -2.0
     return $1.l
 
 

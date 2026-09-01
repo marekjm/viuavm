@@ -7,7 +7,7 @@
 ; pown: b -> n -> b
 ;   where
 ;       b: any arithmetic type
-;       n: any non-negative integer
+;       n: a natural (non-negative) integer
 .symbol pown
 .label pown
     if $1.p, pown_exp_nonzero
@@ -37,10 +37,10 @@
     return $0.l
 
 
-; powz: b -> n -> b
+; powz: b -> z -> b
 ;   where
 ;       b: any arithmetic type
-;       n: any integer
+;       z: an integer
 .symbol powz
 .label powz
     copy $2.l, $1.p
@@ -71,10 +71,10 @@
     return $0.l
 
 
-; powr: b -> n -> b
+; powr: b -> r -> b
 ;   where
 ;       b: any arithmetic type
-;       n: real number
+;       r: a real number
 ;
 ; In this case a "real number" means the highest precision floating point type
 ; available ie, the best approximation of a number belonging to the R set we can
