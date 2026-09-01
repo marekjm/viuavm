@@ -56,7 +56,7 @@ MIN_COLOUR = "dark_slate_gray_2"
 MAX_COLOUR = "red_1"
 
 
-# The test suite is designed to output report lines with width of at most 80
+# The test suite is designed to output report lines with width of at least 80
 # characters. Where did the 80 came from? It is the "standard" terminal width.
 REPORT_LINE_WIDTH = max(
     80,
@@ -67,6 +67,14 @@ REPORT_LINE_WIDTH = max(
         )
     )[0],
 )
+
+
+# Adjust this to the number of digits of the total operations count of the
+# longest test.
+OPS_COUNTER_WIDTH = 5
+
+VM_TIME_WIDTH = 8
+VM_FREQ_WIDTH = 10
 
 
 TWO_DOT_PUNCTUATION = "\u205a"  # change of speaker
@@ -1838,14 +1846,14 @@ def main(args):
             print(separator_line)
 
         print(
-            "  {} {} [{}]  {}  {} {}  {} @ {}".format(
+            "  {} {} [{}]  {}  {} {} {} @ {}".format(
                 colorise(CASE_RUNTIME_COLOUR, f"0{DEGREE}".rjust(pad_case_no + 1)),
                 colorise("white", "case name".ljust(pad_case_name)),
                 colorise(CASE_RUNTIME_COLOUR, "stat"),
                 colorise(CASE_RUNTIME_COLOUR, "run time"),
-                colorise(CASE_RUNTIME_COLOUR, "ops"),
+                colorise(CASE_RUNTIME_COLOUR, "ops".ljust(OPS_COUNTER_WIDTH)),
                 SUBSET,
-                colorise(CASE_RUNTIME_COLOUR, "vm time"),
+                colorise(CASE_RUNTIME_COLOUR, "vm time".rjust(VM_TIME_WIDTH)),
                 colorise(CASE_RUNTIME_COLOUR, "vm freq Hz"),
             )
         )
@@ -1895,7 +1903,9 @@ def main(args):
                             if s.endswith("us"):
                                 return float(s[:-2])
                             elif s.endswith("ms"):
-                                return float(s[:-2]) * 1000
+                                return float(s[:-2]) * 1_000
+                            elif s.endswith("s"):
+                                return float(s[:-1]) * 1_000_000
                             else:
                                 raise
 
@@ -1945,13 +1955,14 @@ def main(args):
 
         run_list[tag].append(case_name)
 
+        ops_counter_fmt = f"{{:{OPS_COUNTER_WIDTH}}}"
         perf_report = (
             (
                 "{} {} {} @ {}".format(
-                    colorise(CASE_RUNTIME_COLOUR, "{:3}".format(perf["ops"])),
+                    colorise(CASE_RUNTIME_COLOUR, ops_counter_fmt.format(perf["ops"])),
                     SUBSET,
-                    colorise(CASE_RUNTIME_COLOUR, perf["run_time"].rjust(8)),
-                    colorise(CASE_RUNTIME_COLOUR, perf["freq"].rjust(10)),
+                    colorise(CASE_RUNTIME_COLOUR, perf["run_time"].rjust(VM_TIME_WIDTH)),
+                    colorise(CASE_RUNTIME_COLOUR, perf["freq"].rjust(VM_FREQ_WIDTH)),
                 )
             )
             if (result and perf)
@@ -2340,7 +2351,7 @@ def main(args):
     perf_op_impact = sorted(perf_op_impact.items(), key=lambda x: x[1], reverse=True)
     highest_share = perf_op_impact[0][1][0] if perf_op_impact else 0
 
-    oit_bar_size = REPORT_LINE_WIDTH - 49
+    oit_bar_size = REPORT_LINE_WIDTH - (45 + OPS_COUNTER_WIDTH)
 
     if perf_op_impact:
         print(f"\ninstruction impact (hit rate {MULTIPLICATION_X} average time)")
@@ -2364,9 +2375,11 @@ def main(args):
 
         timer_str = format_run_time(datetime.timedelta(microseconds=timer))
 
+        counter_fmt = f"{{:{OPS_COUNTER_WIDTH}d}}"
+        counter_str = counter_fmt.format(counter)
         hit_report = "{}{} {:7.4f}%".format(
             (f"{opcode} {op_connecting_char}").ljust(18, fillchar),
-            f"{cr_connecting_char} {counter:4d} {MULTIPLICATION_X} {timer_str}",
+            f"{cr_connecting_char} {counter_str} {MULTIPLICATION_X} {timer_str}",
             share_of_total,
         )
         if colored is not None:
