@@ -6,7 +6,7 @@
 .symbol [[extern]] powz
 
 
-; ln: t -> t
+; ln: R -> R
 .symbol ln
 .label ln
     frame $1.a

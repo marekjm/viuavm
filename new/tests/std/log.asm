@@ -1,72 +1,73 @@
 .section ".text"
 
+
 ;
-; Logarithms
+; Math - Logarithms
 ;
 
 
 .symbol [[extern]] absr
+.symbol [[extern]] pown
+.symbol [[extern]] powz
 
-; ln: x -> n -> r
-;   where
-;       x: any arithmetic type
-;       n: number of iterations as a signed integer
-;       r: real type
-;
-; Calculate the natural logarithm ie, a logarithm with the base of e.
+
+; ln: R -> R
 .symbol ln
 .label ln
-    ; x'
+    ; special case for ln(1) = 0
+    double $0.l, 1.0
+    eq $0.l, $0.l, $0.p
+    not $0.l, $0.l
+    if $0.l, ln_of_ne1
+    double $0.l, 0.0
+    return $0.l
+
+.label ln_of_ne1
+    ; special case for ln(x <= 0) = error
+    double $0.l, 0.0
+    eq $1.l, $0.p, $0.l
+    lt $2.l, $0.p, $0.l
+    or $0.l, $1.l, $2.l
+    not $0.l, $0.l
+    if $0.l, ln_of_in_range
+
+    double $0.l, 0.0
+    div $0.l, $0.l, $0.l
+    return $0.l
+
+.label ln_of_in_range
+    ; this is the |-1 + x|
     frame $1.a
     subi $0.a, $0.p, 1
-    call $1.l, absr
+    call $0.l, absr
 
-    li $2.l, 1
+    li $1.l, 1
 
-    ; Watch out here. Floating point numbers are funky as hell, so here be tiny
-    ; little dragons, because we are only encountering the mildest form of
-    ; floating point fuckery: these numbers cannot be compared directly ie, the
-    ; typical
-    ;
-    ;   x == y
-    ;
-    ; should be treated with extreme suspicion.
-    ;
-    ; The only comparisons you can trust for floting point numbers are relative.
-    ; Therefore, we rely on the lt and gt operators, and fall-through to the
-    ; default, "the number appear to be equal", case.
-    lt $3.l, $1.l, $2.l
-    if $3.l, ln_of_lt1
+    ; maybe |-1 + x| > 1?
+    gt $2.l, $0.l, $1.l
+    if $2.l, ln_of_gt2
 
-    gt $3.l, $1.l, $2.l
-    if $3.l, ln_of_gt1
+    ; maybe |-1 + x| < 1?
+    lt $2.l, $0.l, $1.l
+    if $2.l, ln_of_lt2
 
-.label ln_of_2
-    frame $0.a
-    call $0.l, ln2
-    return $0.l
+    ; must be |-1 + x| = 1
+    if void, ln_of_eq2
 
-.label ln_of_gt1
-    frame $2.a
+.label ln_of_gt2
+    frame $1.a
     copy $0.a, $0.p
-    copy $1.a, $1.p
-    call $0.l, ln_gt1
-    return $0.l
+    call $1.l, lngt2
+    return $1.l
 
-.label ln_of_lt1
-    frame $2.a
+.label ln_of_lt2
+    frame $1.a
     copy $0.a, $0.p
-    copy $1.a, $1.p
-    call $0.l, ln_lt1
-    return $0.l
+    call $1.l, lnlt2
+    return $1.l
 
-; ln2: r
-;   where
-;       r: real type
-;
-; Natural logarithm of 2, hardcoded.
-.symbol ln2
-.label ln2
+; natural logarithm of 2, hardcoded.
+.label ln_of_eq2
     ; HERE BE DRAGONS (IEEE 754 floating-point dragons)
     ;
     ; 64-bit floats in decimal representation have precision of 15 decimal
@@ -75,164 +76,172 @@
     return $0.l
 
 
-; Needed for logarithms expressed as Taylor series.
-.symbol [[extern]] pown
-.symbol [[extern]] powz
+; lnlt2: R -> R
+;
+;     inf
+;   - SUM [(-1)^k * (-1 + x)^k] / k
+;     k=1
+;
+.symbol lnlt2
+.label lnlt2
+    ; this is the accumulator
+    double $0.l, 0.0
 
+    ; this is the k
+    li $1.l, 1
 
-; Same signature as ln.
-.symbol ln_lt1
-.label ln_lt1
-    ; The accumulator
-    double $1.l, 0.0
+    ; this is the number of evaluations necessary to get a good enough result
+    ;
+    ; I arrived at 49 through experimentation:
+    ;
+    ;   - 15 decimal digits is the precision of IEEE 754
+    ;   - 15 evaluations of the core formula do not yield a good enough result
+    ;   - 30 evaluations ie, precision times 2, still do not yield a good enough
+    ;     result
+    ;   - 60 evaluations it, precision times 4, yield a good enough result
+    ;   - 90 evaluations do not yield a better result than 60 evaluations
+    ;   - 48 evaluations do not yield a worse result than 60 evaluations
+    ;
+    ; Therefore, we can stop at 48 evaluations, because at this point doing more
+    ; work will not improve the output of the function.
+    ; The limit is set to 49 because to make exponentiation work we start
+    ; counting from 1, not 0.
+    li $2.l, 49
 
-    ; The loop counter
-    ; Also referred to as the variable k.
-    li $2.l, 1
-
-    ; The loop terminator
-    addi $3.l, $1.p, 1
-
-    ; The sign
-    ;
-    ; Even iterations ie, those where k is even, need a positive sign; wherease
-    ; odd iterations need a negative sign.
-    ; In the algorithm this is expressed as
-    ;
-    ;   -1 ** k
-    ;
-    ; but we can simplify this just flipping the value between -1 and 1 every
-    ; iteration since we know that -1 to the power of X always results in either
-    ; -1 or 1 anyway.
-    ;
-    ; Since we start with an odd-numbered iteration where k = 1, the sign should
-    ; be initalised with -1.
-    li $4.l, -1
-
-    ; The x'
-    ;
-    ; The algorithm is:
-    ;
-    ;    ____ inf  ((-1) ** k) * ((-1 + x) ** k)
-    ;  - \         -----------------------------
-    ;    /___ k=1                k
-    ;
-    ;
-    ; we can extract that (-1 + x) as x' = -1 + x, and we do not have to
-    ; calculate x' every iteration.
-    subi $5.l, $0.p, 1
-
-.label ln_lt1_loop
-    lt $6.l, $2.l, $3.l
-    not $6.l, $6.l
-    if $6.l, ln_lt1_epilogue
-
+.label lnlt2_loop_begin
+    ; evalue the core formula...
     frame $2.a
-    copy $0.a, $5.l
+    copy $0.a, $0.p  ; x
+    copy $1.a, $1.l  ; k
+    call $3.l, lnlt2_iter
+
+    ; ...and update the accumulator with the result
+    add $0.l, $0.l, $3.l
+
+    ; increase the loop counter, k
+    addi $1.l, $1.l, 1
+
+    ; control the loop
+    lt $4.l, $1.l, $2.l
+    if $4.l, lnlt2_loop_begin
+
+    ; this is the end result
+    muli $0.l, $0.l, -1
+    return $0.l
+
+; lnlt2_iter: R -> N -> R
+;
+; A single iteration of the series ie, the following formula:
+;
+;   [(-1)^k * (-1 + x)^k] / k
+;
+.symbol lnlt2_iter
+.label lnlt2_iter
+    ; this is the x
+    copy $1.l, $0.p
+
+    ; this is the k
+    copy $2.l, $1.p
+
+    ; this is the (-1)^k
+    frame $2.a
+    double $0.a, -1.0
     copy $1.a, $2.l
-    call $6.l, pown
+    call $3.l, pown
 
-    mul $6.l, $4.l, $6.l
-    div $6.l, $6.l, $2.l
-    add $1.l, $1.l, $6.l
+    ; this is the (-1 + x)^k
+    frame $2.a
+    addi $0.a, $1.l, -1
+    copy $1.a, $2.l
+    call $4.l, pown
 
-    ; Update sign
-    muli $4.l, $4.l, -1
+    ; this is the numerator
+    mul $5.l, $3.l, $4.l
 
-    ; Update k
-    addi $2.l, $2.l, 1
-
-    if void, ln_lt1_loop
-
-.label ln_lt1_epilogue
-    double $0.l, -1.0
-    mul $0.l, $0.l, $1.l
+    ; this is the end result
+    div $0.l, $5.l, $2.l
     return $0.l
 
 
-; Same signature as ln.
-.symbol ln_gt1
-.label ln_gt1
-    ; The accumulator
-    double $1.l, 0.0
+; lngt2: R -> R
+;
+;                  inf
+;   ln(-1 + x) - { SUM [(-1)^k * (-1 + x)^k] / k }
+;                  k=1
+;
+.symbol lngt2
+.label lngt2
+    ; this is the ln(-1 + x)
+    frame $1.a
+    addi $0.a, $0.p, -1
+    call $1.l, ln
 
-    ; The loop counter
-    ; Also referred to as the variable k.
+    ; this is the accumulator
+    double $0.l, 0.0
+
+    ; this is the k
     li $2.l, 1
 
-    ; The loop terminator
-    addi $3.l, $1.p, 1
+    ; this is the number of evaluations necessary to get a good enough result
+    ; See the comment in lnlt2 to learn why this specific magic number is used.
+    li $3.l, 49
 
-    ; The sign
-    ;
-    ; Even iterations ie, those where k is even, need a positive sign; wherease
-    ; odd iterations need a negative sign.
-    ; In the algorithm this is expressed as
-    ;
-    ;   -1 ** k
-    ;
-    ; but we can simplify this just flipping the value between -1 and 1 every
-    ; iteration since we know that -1 to the power of X always results in either
-    ; -1 or 1 anyway.
-    ;
-    ; Since we start with an odd-numbered iteration where k = 1, the sign should
-    ; be initalised with -1.
-    li $4.l, -1
-
-    ; The x'
-    ;
-    ; The algorithm is:
-    ;
-    ;    ____ inf  ((-1) ** k) * ((-1 + x) ** -k)
-    ;    \         -----------------------------
-    ;    /___ k=1                k
-    ;
-    ;
-    ; we can extract that (-1 + x) as x' = -1 + x, and we do not have to
-    ; calculate x' every iteration.
-    subi $5.l, $0.p, 1
-
-.label ln_gt1_loop
-    lt $6.l, $2.l, $3.l
-    not $6.l, $6.l
-    if $6.l, ln_gt1_epilogue
-
+.label lngt2_loop_begin
+    ; evaluate the core formula...
     frame $2.a
-    copy $0.a, $5.l
-    muli $1.a, $2.l, -1
-    call $7.l, powz
+    copy $0.a, $0.p  ; x
+    copy $1.a, $2.l  ; k
+    call $4.l, lngt2_iter
 
-    ; sign * x'
-    mul $8.l, $4.l, $7.l
+    ; ...and update the accumulator with the result
+    add $0.l, $0.l, $4.l
 
-    ; ... / k
-    div $9.l, $8.l, $2.l
-
-    ; Add the intermediate result to the accumulator.
-    add $1.l, $1.l, $9.l
-
-    ; Flip the sign
-    muli $4.l, $4.l, -1
-
-    ; Update k
+    ; increase the loop counter, k
     addi $2.l, $2.l, 1
 
-    ebreak
+    ; control the loop
+    lt $4.l, $2.l, $3.l
+    if $4.l, lngt2_loop_begin
 
-    if void, ln_gt1_loop
+    ; this is the end result
+    ; combine the two ingredients of the overall formula
+    ; this is the ln(-1 + x) part minus the SUM part
+    sub $0.l, $1.l, $0.l
+    return $0.l
 
-.label ln_gt1_epilogue
-    ; ln(x')
+
+; lngt2_iter: R -> N -> R
+;
+; A single iteration of the series ie, the following formula:
+;
+;   [(-1)^k * (-1 + x)^(-k)] / k
+;
+.symbol lngt2_iter
+.label lngt2_iter
+    ; this is the x
+    copy $1.l, $0.p
+
+    ; this is the k
+    copy $2.l, $1.p
+
+    ; this is the -k
+    muli $3.l, $2.l, -1
+
+    ; this is the (-1)^k
     frame $2.a
-    copy $0.a, $5.l
-    copy $1.a, $1.p
-    call $10.l, ln
+    double $0.a, -1.0
+    copy $1.a, $2.l
+    call $4.l, pown
 
-    ; And the final return value is
-    ;
-    ;   ln(x') - accumulator
-    sub $0.l, $10.l, $1.l
+    ; this is the (-1 + x)^(-k)
+    frame $2.a
+    addi $0.a, $1.l, -1
+    copy $1.a, $3.l
+    call $5.l, powz
 
-    ebreak
+    ; this is the numerator
+    mul $6.l, $4.l, $5.l
 
+    ; this is the end result
+    div $0.l, $6.l, $2.l
     return $0.l
