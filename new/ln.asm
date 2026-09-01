@@ -89,8 +89,6 @@
     lt $4.l, $1.l, $2.l
     if $4.l, lnlt2_loop_begin
 
-    ; ebreak
-
     muli $0.l, $0.l, -1
     return $0.l
 
@@ -125,7 +123,6 @@
 
     ; this is the end result
     div $0.l, $5.l, $2.l
-    ebreak
     return $0.l
 
 
@@ -140,17 +137,17 @@
     frame $0.a
     call $1.l, ln2
 
-    frame $1.a
-    double $0.a, 2.0
-    call $2.l, ln
+    ; frame $1.a
+    ; double $0.a, 2.0
+    ; call $2.l, ln
 
     frame $1.a
     double $0.a, 3.0
     call $3.l, ln
 
-    frame $1.a
-    double $0.a, 0.5
-    call $4.l, ln
+    ; frame $1.a
+    ; double $0.a, 0.5
+    ; call $4.l, ln
 
     ebreak
     return void
