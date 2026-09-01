@@ -71,7 +71,7 @@ REPORT_LINE_WIDTH = max(
 
 # Adjust this to the number of digits of the total operations count of the
 # longest test.
-OPS_COUNTER_WIDTH = 5
+OPS_COUNTER_WIDTH = 6
 
 VM_TIME_WIDTH = 8
 VM_FREQ_WIDTH = 10
@@ -1851,7 +1851,7 @@ def main(args):
                 colorise("white", "case name".ljust(pad_case_name)),
                 colorise(CASE_RUNTIME_COLOUR, "stat"),
                 colorise(CASE_RUNTIME_COLOUR, "run time"),
-                colorise(CASE_RUNTIME_COLOUR, "ops".ljust(OPS_COUNTER_WIDTH)),
+                colorise(CASE_RUNTIME_COLOUR, "ops".center(OPS_COUNTER_WIDTH)),
                 SUBSET,
                 colorise(CASE_RUNTIME_COLOUR, "vm time".rjust(VM_TIME_WIDTH)),
                 colorise(CASE_RUNTIME_COLOUR, "vm freq Hz"),
