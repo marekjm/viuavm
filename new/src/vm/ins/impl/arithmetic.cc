@@ -45,7 +45,7 @@ auto make_arithmetic(
         case ARITHMETIC_STYLE_WRAP:
             return viua::arithmetic::fixed::make_arithmetic(v, width);
         case ARITHMETIC_STYLE_TRAP:
-            return viua::arithmetic::fixed::make_arithmetic(v, width);
+            return viua::arithmetic::trapping::make_arithmetic(v, width);
         case ARITHMETIC_STYLE_SATURATE:
             return viua::arithmetic::saturating::make_arithmetic(v, width);
     }
@@ -96,8 +96,14 @@ auto add(
             }
         case ARITHMETIC_STYLE_TRAP:
             {
-                using namespace viua::arithmetic::fixed;
-                return static_cast<T>(arithmetic_lhs + arithmetic_rhs);
+                using namespace viua::arithmetic::trapping;
+                auto const v = arithmetic_lhs + arithmetic_rhs;
+                if (not v.has_value()) {
+                    throw viua::vm::abort_execution{
+                        stack, "signed addition overflow"
+                    };
+                }
+                return static_cast<T>(v.value());
             }
         case ARITHMETIC_STYLE_SATURATE:
             {
@@ -154,8 +160,14 @@ auto sub(
             }
         case ARITHMETIC_STYLE_TRAP:
             {
-                using namespace viua::arithmetic::fixed;
-                return static_cast<T>(arithmetic_lhs - arithmetic_rhs);
+                using namespace viua::arithmetic::trapping;
+                auto const v = arithmetic_lhs - arithmetic_rhs;
+                if (not v.has_value()) {
+                    throw viua::vm::abort_execution{
+                        stack, "signed subtraction overflow"
+                    };
+                }
+                return static_cast<T>(v.value());
             }
         case ARITHMETIC_STYLE_SATURATE:
             {
@@ -212,8 +224,14 @@ auto mul(
             }
         case ARITHMETIC_STYLE_TRAP:
             {
-                using namespace viua::arithmetic::fixed;
-                return static_cast<T>(arithmetic_lhs * arithmetic_rhs);
+                using namespace viua::arithmetic::trapping;
+                auto const v = arithmetic_lhs * arithmetic_rhs;
+                if (not v.has_value()) {
+                    throw viua::vm::abort_execution{
+                        stack, "signed multiplication overflow"
+                    };
+                }
+                return static_cast<T>(v.value());
             }
         case ARITHMETIC_STYLE_SATURATE:
             {
@@ -270,8 +288,14 @@ auto div(
             }
         case ARITHMETIC_STYLE_TRAP:
             {
-                using namespace viua::arithmetic::fixed;
-                return static_cast<T>(arithmetic_lhs / arithmetic_rhs);
+                using namespace viua::arithmetic::trapping;
+                auto const v = arithmetic_lhs / arithmetic_rhs;
+                if (not v.has_value()) {
+                    throw viua::vm::abort_execution{
+                        stack, "signed division overflow"
+                    };
+                }
+                return static_cast<T>(v.value());
             }
         case ARITHMETIC_STYLE_SATURATE:
             {

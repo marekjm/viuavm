@@ -542,6 +542,464 @@ auto operator/(
 
 
 /*
+ * Implementation of trapping arithmetic.
+ */
+namespace viua::arithmetic::trapping {
+constexpr auto DEBUG_TRAPPING = false;
+
+auto make_arithmetic(
+    int64_t const v,
+    size_t const width) -> std::optional<signed_type>
+{
+    auto const raw = signed_type{ arithmetic_type{ v } };
+    if (not raw.in_range(width)) {
+        return std::nullopt;
+    }
+
+    return signed_type{ extend(raw.n, width) };
+}
+
+auto make_arithmetic(
+    uint64_t const v,
+    size_t const width) -> std::optional<unsigned_type>
+{
+    auto const raw = unsigned_type{ arithmetic_type{ v } };
+    if (not raw.in_range(width)) {
+        return std::nullopt;
+    }
+
+    return unsigned_type{ extend(raw.n, width) };
+}
+
+auto operator+(
+    signed_type const lhs,
+    signed_type const rhs) -> std::optional<signed_type>
+{
+    auto const lhs_is_neg = lhs < zero_type{};
+    auto const lhs_is_zer = not lhs;
+    auto const rhs_is_neg = rhs < zero_type{};
+    auto const rhs_is_zer = not rhs;
+
+    /*
+     * Expect Greater or Equal to Zero only of both sides are non-negative.
+     */
+    auto const expect_gez = (not lhs_is_neg) and (not rhs_is_neg);
+
+    /*
+     * Expect Less Than Zero in several cases.
+     */
+    auto const expect_ltz =
+        /*
+         * ...when the left hand side is negative or zero, and right hand side
+         * is negative. For example:
+         *       0 + -1
+         *      -1 + -1
+         */
+        ((lhs_is_neg or lhs_is_zer) and rhs_is_neg)
+        /*
+         * ...when left hand side is negative, and right hand size is zero.
+         */
+        or (lhs_is_neg and rhs_is_zer)
+        /*
+         * ...when left hand side is negative, right hand side is non-negative,
+         * and the right hand side is less than the twos-complement of left hand
+         * side. For example:
+         *      -2 + 1  (because 1 < abs(-2))
+         */
+        or (lhs_is_neg and (not rhs_is_neg) and (rhs < ~lhs))
+        /*
+         * ...when left hand side is positive, right hand side is negative,
+         * and the left hand side is less than the twos-complement of right hand
+         * side. For example:
+         *      1 + -3  (because 1 < abs(-3))
+         */
+        or ((not lhs_is_neg) and rhs_is_neg and (lhs < ~rhs));
+
+    /*
+     * Raw result of the operation, assuming infinite-width integers.
+     */
+    auto const raw        = signed_type{ bits::add(lhs.n, rhs.n) };
+    auto const raw_is_neg = raw < zero_type{};
+
+    /*
+     * Now let's detect overflow.
+     *
+     * One indicator of possible overflow is an "oversized" result. This,
+     * however, is not always sufficient to prove overflow--and sometimes would
+     * even lead to a false positive--so we catch true overflow separately.
+     *
+     * Detecting overflow is not that difficult. Basically, we have to know what
+     * is the expected sign of the result (this is why we have determined that
+     * earlier), and see if what we got is what we expected. If yes, splendid;
+     * otherwise, we need to fix the situation.
+     */
+    auto const oversize = (raw.size() > lhs.size());
+    auto const overflow =
+        (expect_gez and raw_is_neg) or (expect_ltz and (not raw_is_neg));
+
+
+    if constexpr (DEBUG_TRAPPING) {
+        std::println("saturating+ state:");
+        std::println("  lhs: {} ({})",
+                     to_string(lhs, false, DEFAULT_SEPARATOR),
+                     static_cast<int8_t>(lhs));
+        std::println("  rhs: {} ({})",
+                     to_string(rhs, false, DEFAULT_SEPARATOR),
+                     static_cast<int8_t>(rhs));
+        std::println("  lin: {}", lhs_is_neg);
+        std::println("  rin: {}", rhs_is_neg);
+        std::println("  gez: {}", expect_gez);
+        std::println("  ltz: {}", expect_ltz);
+        std::println("  ovs: {}", oversize);
+        std::println("  ovf: {}", overflow);
+        std::println("  raw: {} ({})",
+                     to_string(raw, false, DEFAULT_SEPARATOR),
+                     static_cast<int8_t>(raw));
+    }
+
+    if (oversize) {
+        auto const clipped        = signed_type{ extend(raw.n, lhs.size()) };
+        auto const clipped_is_neg = clipped < zero_type{};
+
+        if (expect_ltz and not clipped_is_neg) {
+            return std::nullopt;
+        }
+
+        if (expect_gez and clipped_is_neg) {
+            return std::nullopt;
+        }
+
+        return clipped;
+    }
+
+    /*
+     * Both operands are non-negative, so we know what to do in case of
+     * overflow: return the upper limit.
+     */
+    if (overflow and expect_gez) {
+        return std::nullopt;
+    }
+
+    if (overflow and expect_ltz) {
+        return std::nullopt;
+    }
+
+    return raw;
+}
+
+auto operator-(
+    signed_type const lhs,
+    signed_type const rhs) -> std::optional<signed_type>
+{
+    /*
+     * Check for the (X - X) case and return early to simplify the rest of the
+     * function.
+     */
+    if (lhs == rhs) {
+        return signed_type::zero(lhs.size());
+    }
+
+    auto const lhs_is_neg = lhs < zero_type{};
+    auto const rhs_is_neg = rhs < zero_type{};
+
+    /*
+     * Expect Less Than Zero in several cases.
+     */
+    auto const expect_ltz =
+        /*
+         * ...when the left hand side is negative and the right hand side is
+         * zero. For example:
+         *      -1 - 0
+         */
+        (lhs_is_neg and (not rhs))
+        /*
+         * ...when the left hand side is negative, the right hand side is
+         * negative, and the left hand side is less than the right hand side.
+         * For example:
+         *      -3 - -1     (because (-3 + 1) < 0)
+         */
+        or (lhs_is_neg and rhs_is_neg and (lhs < rhs))
+        /*
+         * ...when the left hand side is zero, and the right hand side is
+         * greater than zero. For example:
+         *      0 - 1
+         */
+        or ((not lhs) and (rhs > zero_type{}))
+        /*
+         * ...when the left hand side is non-negative, the right hand side is
+         * non-negative, and the left hand side is less than the right hand
+         * side. For example:
+         *      1 - 2
+         */
+        or ((not lhs_is_neg) and (not rhs_is_neg) and (lhs < rhs))
+        /*
+         * ...when the left hand side is negative, and the right hand side is
+         * non-negative. For example:
+         *      -1 - 1
+         */
+        or (lhs_is_neg and (not rhs_is_neg));
+
+    /*
+     * Expect Greater Than Zero in other cases.
+     */
+    auto const expect_gtz = not expect_ltz;
+
+    /*
+     * Raw result of the operation, assuming infinite-width integers.
+     */
+    auto const raw = signed_type{ bits::sub(lhs.n, rhs.n) };
+
+    /*
+     * Now let's detect overflow.
+     */
+    auto const oversize = (raw.size() > lhs.size());
+    auto const overflow = (expect_gtz and (raw < zero_type{}))
+                          or (expect_ltz and not(raw < zero_type{}));
+
+
+    if constexpr (DEBUG_TRAPPING) {
+        std::println("saturating- state:");
+        std::println("  lhs: {} ({})",
+                     to_string(lhs, false, DEFAULT_SEPARATOR),
+                     static_cast<int8_t>(lhs));
+        std::println("  rhs: {} ({})",
+                     to_string(rhs, false, DEFAULT_SEPARATOR),
+                     static_cast<int8_t>(rhs));
+        std::println("  lin: {}", lhs_is_neg);
+        std::println("  rin: {}", rhs_is_neg);
+        std::println("  gtz: {}", expect_gtz);
+        std::println("  ltz: {}", expect_ltz);
+        std::println("  ovs: {}", oversize);
+        std::println("  ovf: {}", overflow);
+        std::println("  raw: {} ({})",
+                     to_string(raw, false, DEFAULT_SEPARATOR),
+                     static_cast<int8_t>(raw));
+    }
+
+    if (oversize) {
+        auto const clipped = signed_type{ extend(raw.n, lhs.size()) };
+
+        if (expect_ltz and not(clipped < zero_type{})) {
+            return std::nullopt;
+        }
+
+        if (expect_gtz and (clipped < zero_type{})) {
+            return std::nullopt;
+        }
+
+        return clipped;
+    }
+
+    if (overflow and expect_gtz) {
+        return std::nullopt;
+    }
+
+    if (overflow and expect_ltz) {
+        return std::nullopt;
+    }
+
+    return raw;
+}
+
+auto operator*(
+    signed_type const lhs,
+    signed_type const rhs) -> std::optional<signed_type>
+{
+    auto const raw = signed_type{ bits::mul(lhs.n, rhs.n) };
+
+    /*
+     * Detect zero early. Not having to deal with a zero and being able to only
+     * consider negative or positive numbers makes the algorithm surprisingly
+     * simpler. I did not expect it to be so, but someties life can be
+     * surprising.
+     */
+    if (not static_cast<bool>(raw)) {
+        return signed_type::zero(lhs.size());
+    }
+
+    /*
+     * At this point we are sure that we are dealing with non-zero values. First
+     * thing we should do is determine the expected sign of the result, as it is
+     * the easiest (but not foolproof!) way of determining whether or not
+     * overflow happened.
+     */
+    auto const lhs_negative                 = lhs < zero_type{};
+    auto const rhs_negative                 = rhs < zero_type{};
+    auto const expect_negative              = lhs_negative xor rhs_negative;
+    auto const expect_sign [[maybe_unused]] = expect_negative ? -1 : 1;
+
+    /*
+     * Cut the raw value to target size plus one, to detect if a carry happened.
+     * This is another easy (but, again, not foolproof!) way of spotting cases
+     * where we need to saturate.
+     */
+    auto const car = signed_type{ extend(raw.n, lhs.size() + 1) };
+    auto const val = signed_type{ extend(raw.n, lhs.size()) };
+
+    if constexpr (DEBUG_TRAPPING) {
+        std::println("trapping operator*:");
+        std::println("  lhs: {}", to_string(lhs, false, DEFAULT_SEPARATOR));
+        std::println("  rhs: {}", to_string(rhs, false, DEFAULT_SEPARATOR));
+        std::println("  raw: {} ({})",
+                     to_string(raw, false, DEFAULT_SEPARATOR),
+                     static_cast<int16_t>(raw));
+        std::println("  car: {} (in range)",
+                     to_string(car, false, DEFAULT_SEPARATOR),
+                     (car.in_range(lhs.size()) ? "" : "not "));
+        std::println("  val: {}", to_string(val, false, DEFAULT_SEPARATOR));
+        std::println("  sign:");
+        std::println("    lhs: {:2d}", lhs_negative ? -1 : 1);
+        std::println("    rhs: {:2d}", rhs_negative ? -1 : 1);
+        std::println("    exp: {:2d}", expect_negative ? -1 : 1);
+        std::println("    raw: {:2d}", raw.sign());
+        std::println("    car: {:2d}", car.sign());
+        std::println("    val: {:2d}", val.sign());
+    }
+
+    /*
+     * Sometimes, the value is in range, but the sign is incorrect. This can
+     * happen when two negative numbers are multiplied. Consider:
+     *
+     *      -1  *trap8  -128
+     *
+     * The left hand operand (-1) is 1111'1111; and the right hand operand
+     * (-128) is 1000'000. They are both negative, so the expected sign of the
+     * result is positive.
+     *
+     * However, notice what the car and val look like in this case:
+     *
+     *      car  1'1000'0000
+     *      val    1000'0000
+     *
+     * The car is simply sign-extended val! Obviously, this means that car fits
+     * perfectly in our target range, so no overflow happened. This is an
+     * incorrect conclusion, since val is negative while we expect to get a
+     * positive result.
+     *
+     * Thus the need to make sure that the sign of the value actually matches
+     * what we expect, even if the value is seemingly in range.
+     */
+    if (car.in_range(lhs.size()) and (val.sign() == expect_sign)) {
+        return val;
+    }
+
+    /*
+     * Consider the case of:
+     *
+     *      127  *trap8  127
+     */
+    if ((car.sign() == 1) and (val.sign() == expect_sign)) {
+        return val;
+    }
+
+    /*
+     * In case of overflow, signal the failure instead of silently producing a
+     * weird result.
+     */
+    return std::nullopt;
+}
+
+auto operator/(
+    signed_type const lhs,
+    signed_type const rhs) -> std::optional<signed_type>
+{
+    auto const minimum = signed_type::min(lhs.size());
+    auto const maximum = signed_type::max(lhs.size());
+    auto const one = signed_type{ extend(arithmetic_type{ 1 }, rhs.size()) };
+    auto const minus_one =
+        signed_type{ arithmetic_type::of_size(lhs.size(), true) };
+    auto const negative_lhs = lhs < zero_type{};
+    auto const negative_rhs = rhs < zero_type{};
+    auto const minimum_lhs  = lhs == minimum;
+    auto const minimum_rhs  = rhs == minimum;
+
+    if (lhs == zero_type{}) {
+        return std::nullopt;
+    }
+    if (rhs == zero_type{}) {
+        return signed_type::zero(lhs.size());
+    }
+
+    if (minimum_lhs and (rhs == minus_one)) {
+        return std::nullopt;
+    }
+    if (minimum_lhs and (rhs == one)) {
+        return minimum;
+    }
+    if (minimum_lhs and (rhs == maximum)) {
+        return minus_one;
+    }
+    if (minimum_rhs and minimum_lhs) {
+        return signed_type{ 1 };
+    }
+    if (minimum_rhs) {
+        return signed_type::zero(lhs.size());
+    }
+
+    auto working_lhs =
+        negative_lhs ? signed_type{ take_twos_complement(lhs.n) } : lhs;
+    auto const working_rhs =
+        negative_rhs ? signed_type{ take_twos_complement(rhs.n) } : rhs;
+
+    if (working_rhs == zero_type{}) {
+        return signed_type::zero(lhs.size());
+    }
+    if (working_lhs == zero_type{}) {
+        return signed_type::zero(lhs.size());
+    }
+
+    auto result = arithmetic_type::zero(lhs.size());
+
+    while (not(working_lhs < working_rhs)) {
+        result      = bits::inc(result);
+        auto const tmp = working_lhs - working_rhs;
+        if (not tmp.has_value()) {
+            return std::nullopt;
+        }
+        working_lhs = tmp.value();
+    }
+
+    auto const negative_result = negative_lhs xor negative_rhs;
+    auto const end_result =
+        extend((negative_result ? take_twos_complement(std::move(result))
+                                : std::move(result)),
+               lhs.size(),
+               negative_result);
+
+    return signed_type{ end_result };
+}
+
+auto operator+(
+    unsigned_type const,
+    unsigned_type const) -> std::optional<unsigned_type>
+{
+    return std::nullopt;
+}
+
+auto operator-(
+    unsigned_type const,
+    unsigned_type const) -> std::optional<unsigned_type>
+{
+    return std::nullopt;
+}
+
+auto operator*(
+    unsigned_type const,
+    unsigned_type const) -> std::optional<unsigned_type>
+{
+    return std::nullopt;
+}
+
+auto operator/(
+    unsigned_type const,
+    unsigned_type const) -> std::optional<unsigned_type>
+{
+    return std::nullopt;
+}
+}  // namespace viua::arithmetic::trapping
+
+
+/*
  * Implementation of saturating arithmetic.
  */
 namespace viua::arithmetic::saturating {

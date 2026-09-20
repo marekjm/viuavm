@@ -8,6 +8,14 @@ auto main() -> int
     using namespace viua::arithmetic;
     auto const sep = viua::arithmetic::DEFAULT_SEPARATOR;
 
+    auto const to_string_or_overflow = [&sep](std::optional<signed_type> const v) -> std::string
+    {
+         return v.transform([&sep](auto const v) -> std::string
+         {
+            return to_string(v, false, sep);
+         }).value_or("overflow");
+    };
+
     if constexpr (false) {
         auto const one        = signed_type{ int8_t{ 1 } };
         auto const seven      = signed_type{ int8_t{ 7 } };
@@ -91,8 +99,9 @@ auto main() -> int
         std::println();
         std::println("using style: saturating (i{})", one.size());
         auto draw_empty_line = test_pairs[0].first;
+
         for (auto const& [lhs, rhs] : test_pairs) {
-            using namespace viua::arithmetic::saturating;
+            using namespace viua::arithmetic::trapping;
 
             if ((lhs != draw_empty_line) or true) {
                 std::println();
@@ -106,30 +115,30 @@ auto main() -> int
             std::println("  {:4d} + {:4d} = {:>12} ({})",
                          static_cast<int8_t>(l),
                          static_cast<int8_t>(r),
-                         to_string(v, false, sep),
-                         static_cast<int8_t>(v));
+                         to_string_or_overflow(v),
+                         static_cast<int8_t>(v.value_or(0)));
 
             v = l - r;
             std::println("  {:4d} - {:4d} = {:>12} ({})",
                          static_cast<int8_t>(l),
                          static_cast<int8_t>(r),
-                         to_string(v, false, sep),
-                         static_cast<int8_t>(v));
+                         to_string_or_overflow(v),
+                         static_cast<int8_t>(v.value_or(0)));
         }
     }
 
     auto const a = signed_type{ int8_t{ -1 } };
     auto const b = signed_type{ int8_t{ 1 } };
 
-    using namespace viua::arithmetic::fixed;
+    using namespace viua::arithmetic::trapping;
     auto const v = (a * b);
     std::println("{} ({}) * {} ({}) : {} ({})",
                  to_string(a, false, sep),
                  static_cast<int8_t>(a),
                  to_string(b, false, sep),
                  static_cast<int8_t>(b),
-                 to_string(v, false, sep),
-                 static_cast<int8_t>(v));
+                 to_string_or_overflow(v),
+                 static_cast<int8_t>(v.value_or(signed_type::zero(1))));
 
     return 0;
 }
