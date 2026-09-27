@@ -103,6 +103,7 @@ FEATURE_DETECT_FLAGS::=\
 # To change version, edit the VERSION file in the repository's root directory.
 VIUAVM_VERSION:=$(shell sh ./scripts/make_version.sh short)
 VIUAVM_VERSION_FULL:=$(shell sh ./scripts/make_version.sh full)
+VIUAVM_COMPILER_VERSION:=$(shell sh ./scripts/cxx-dumpversion.sh $(CXX))
 VERSION_FLAGS=\
 			  -DVIUAVM_PLATFORM='"$(platform)"' \
 			  -DVIUAVM_VERSION='"$(VIUAVM_VERSION)"' \
@@ -111,7 +112,7 @@ VERSION_FLAGS=\
 			  -DVIUAVM_CXX_PRESET='"$(PRESET)"' \
 			  -DVIUAVM_CXX_OPTIONS='"$(CXXFLAGS_OPTIMISATION) $(CXXFLAGS_DEBUG) $(CXXFLAGS_SANITISER) $(CXXFLAGS_OPTION)"' \
 			  -DCXX='"$(CXX)"' \
-			  -DCXXVERSION='"$(shell $(CXX) -dumpversion)"' \
+			  -DCXXVERSION='"$(VIUAVM_COMPILER_VERSION)"' \
 			  -DCXXSTD='"$(CXXSTD)"'
 
 
