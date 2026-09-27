@@ -13,6 +13,8 @@
 
 .*
 
+compile_commands.json
+
 !.issue
 .issue/*
 !.issue/objects
