@@ -807,6 +807,14 @@ auto operator*(
 {
     auto const raw = signed_type{ bits::mul(lhs.n, rhs.n) };
 
+    auto const one = signed_type{ extend(arithmetic_type{ 1 }, rhs.size()) };
+    if (lhs == one) {
+        return rhs;
+    }
+    if (rhs == one) {
+        return lhs;
+    }
+
     /*
      * Detect zero early. Not having to deal with a zero and being able to only
      * consider negative or positive numbers makes the algorithm surprisingly
@@ -854,33 +862,6 @@ auto operator*(
         std::println("    raw: {:2d}", raw.sign());
         std::println("    car: {:2d}", car.sign());
         std::println("    val: {:2d}", val.sign());
-    }
-
-    /*
-     * Sometimes, the value is in range, but the sign is incorrect. This can
-     * happen when two negative numbers are multiplied. Consider:
-     *
-     *      -1  *trap8  -128
-     *
-     * The left hand operand (-1) is 1111'1111; and the right hand operand
-     * (-128) is 1000'000. They are both negative, so the expected sign of the
-     * result is positive.
-     *
-     * However, notice what the car and val look like in this case:
-     *
-     *      car  1'1000'0000
-     *      val    1000'0000
-     *
-     * The car is simply sign-extended val! Obviously, this means that car fits
-     * perfectly in our target range, so no overflow happened. This is an
-     * incorrect conclusion, since val is negative while we expect to get a
-     * positive result.
-     *
-     * Thus the need to make sure that the sign of the value actually matches
-     * what we expect, even if the value is seemingly in range.
-     */
-    if (car.in_range(lhs.size()) and (val.sign() == expect_sign)) {
-        return val;
     }
 
     /*

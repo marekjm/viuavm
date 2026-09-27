@@ -127,18 +127,73 @@ auto main() -> int
         }
     }
 
-    auto const a = signed_type{ int8_t{ -1 } };
-    auto const b = signed_type{ int8_t{ 1 } };
+    /*
+     * Interesting numbers for testing:
+     *
+     *      zero    ie, 0
+     *      one     ie, 1
+     *      -one    ie, -1
+     *      max     eg, 127 (the upper limit)
+     *      min     eg, -128 (the lower limit)
+     */
+    using overflow_test_type = std::tuple<bool, int8_t, int8_t>;
+    constexpr auto test_pairs_ii = std::array<overflow_test_type, 29>{{
+        { false, 0, 0 },     // zero # zero
+        { false, 0, 1 },     // zero # one
+        { false, 0, -1 },    // zero # -one
+        { false, 0, 127 },   // zero # max
+        { false, 0, -128 },  // zero # min
 
-    using namespace viua::arithmetic::trapping;
-    auto const v = (a * b);
-    std::println("{} ({}) * {} ({}) : {} ({})",
-                 to_string(a, false, sep),
-                 static_cast<int8_t>(a),
-                 to_string(b, false, sep),
-                 static_cast<int8_t>(b),
-                 to_string_or_overflow(v),
-                 static_cast<int8_t>(v.value_or(signed_type::zero(1))));
+        { false, 1, 0 },     // one # zero
+        { false, 1, 1 },     // one # one
+        { false, 1, -1 },    // one # -one
+        { false, 1, 127 },   // one # max
+        { false, 1, -128 },  // one # min
+
+        { false, -1, 0 },     // -one # zero
+        { false, -1, 1 },     // -one # one
+        { false, -1, -1 },    // -one # -one
+        { false, -1, 127 },   // -one # max
+        { true, -1, -128 },  // -one # min
+
+        { false, 127, 0 },     // max # zero
+        { false, 127, 1 },     // max # one
+        { false, 127, -1 },    // max # -one
+        { true, 127, 127 },   // max # max
+        { true, 127, -128 },  // max # min
+
+        { false, -128, 0 },     // min # zero
+        { false, -128, 1 },     // min # one
+        { true, -128, -1 },    // min # -one
+        { true, -128, 127 },   // min # max
+        { true, -128, -128 },  // min # min
+
+        { true, -64, -2 },  // -half # two
+        { true, -69, -3 },
+        { true, -128, -3 },
+        { true, 127, -2 },
+    }};
+    for (auto const& [expect_overflow, a, b] : test_pairs_ii) {
+        auto const lhs = signed_type{ a };
+        auto const rhs = signed_type{ b };
+
+        using namespace viua::arithmetic::trapping;
+        auto const v = (lhs * rhs);
+
+        auto const test_ok = expect_overflow xor v.has_value();
+
+        std::println("[{:^4}]  {} ({:4}) * {} ({:4}) : {}{}",
+                     (test_ok ? "ok" : "fail"),
+                     to_string(lhs, false, sep),
+                     static_cast<int8_t>(lhs),
+                     to_string(rhs, false, sep),
+                     static_cast<int8_t>(rhs),
+                     to_string_or_overflow(v),
+                     v.transform([](auto const x) -> std::string
+                     {
+                        return std::format(" ({})", static_cast<int8_t>(x));
+                     }).value_or(""));
+    }
 
     return 0;
 }
