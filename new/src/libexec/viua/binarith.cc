@@ -8,12 +8,13 @@ auto main() -> int
     using namespace viua::arithmetic;
     auto const sep = viua::arithmetic::DEFAULT_SEPARATOR;
 
-    auto const to_string_or_overflow = [&sep](std::optional<signed_type> const v) -> std::string
+    auto const to_string_or_overflow =
+        [&sep](std::optional<signed_type> const v) -> std::string
     {
-         return v.transform([&sep](auto const v) -> std::string
-         {
-            return to_string(v, false, sep);
-         }).value_or("overflow");
+        return v
+            .transform([&sep](auto const v) -> std::string
+                       { return to_string(v, false, sep); })
+            .value_or("overflow");
     };
 
     if constexpr (false) {
@@ -136,8 +137,8 @@ auto main() -> int
      *      max     eg, 127 (the upper limit)
      *      min     eg, -128 (the lower limit)
      */
-    using overflow_test_type = std::tuple<bool, int8_t, int8_t>;
-    constexpr auto test_pairs_ii = std::array<overflow_test_type, 29>{{
+    using overflow_test_type     = std::tuple<bool, int8_t, int8_t>;
+    constexpr auto test_pairs_ii = std::array<overflow_test_type, 29>{ {
         { false, 0, 0 },     // zero # zero
         { false, 0, 1 },     // zero # one
         { false, 0, -1 },    // zero # -one
@@ -150,29 +151,27 @@ auto main() -> int
         { false, 1, 127 },   // one # max
         { false, 1, -128 },  // one # min
 
-        { false, -1, 0 },     // -one # zero
-        { false, -1, 1 },     // -one # one
-        { false, -1, -1 },    // -one # -one
-        { false, -1, 127 },   // -one # max
+        { false, -1, 0 },    // -one # zero
+        { false, -1, 1 },    // -one # one
+        { false, -1, -1 },   // -one # -one
+        { false, -1, 127 },  // -one # max
         { true, -1, -128 },  // -one # min
 
-        { false, 127, 0 },     // max # zero
-        { false, 127, 1 },     // max # one
-        { false, 127, -1 },    // max # -one
+        { false, 127, 0 },    // max # zero
+        { false, 127, 1 },    // max # one
+        { false, 127, -1 },   // max # -one
         { true, 127, 127 },   // max # max
         { true, 127, -128 },  // max # min
 
-        { false, -128, 0 },     // min # zero
-        { false, -128, 1 },     // min # one
+        { false, -128, 0 },    // min # zero
+        { false, -128, 1 },    // min # one
         { true, -128, -1 },    // min # -one
         { true, -128, 127 },   // min # max
         { true, -128, -128 },  // min # min
 
         { true, -64, -2 },  // -half # two
-        { true, -69, -3 },
-        { true, -128, -3 },
-        { true, 127, -2 },
-    }};
+        { true, -69, -3 },    { true, -128, -3 }, { true, 127, -2 },
+    } };
     for (auto const& [expect_overflow, a, b] : test_pairs_ii) {
         auto const lhs = signed_type{ a };
         auto const rhs = signed_type{ b };
@@ -182,17 +181,18 @@ auto main() -> int
 
         auto const test_ok = expect_overflow xor v.has_value();
 
-        std::println("[{:^4}]  {} ({:4}) * {} ({:4}) : {}{}",
-                     (test_ok ? "ok" : "fail"),
-                     to_string(lhs, false, sep),
-                     static_cast<int8_t>(lhs),
-                     to_string(rhs, false, sep),
-                     static_cast<int8_t>(rhs),
-                     to_string_or_overflow(v),
-                     v.transform([](auto const x) -> std::string
-                     {
-                        return std::format(" ({})", static_cast<int8_t>(x));
-                     }).value_or(""));
+        std::println(
+            "[{:^4}]  {} ({:4}) * {} ({:4}) : {}{}",
+            (test_ok ? "ok" : "fail"),
+            to_string(lhs, false, sep),
+            static_cast<int8_t>(lhs),
+            to_string(rhs, false, sep),
+            static_cast<int8_t>(rhs),
+            to_string_or_overflow(v),
+            v.transform(
+                 [](auto const x) -> std::string
+                 { return std::format(" ({})", static_cast<int8_t>(x)); })
+                .value_or(""));
     }
 
     return 0;

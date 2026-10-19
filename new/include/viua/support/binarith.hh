@@ -283,18 +283,27 @@ auto operator/(unsigned_type const, unsigned_type const) -> unsigned_type;
 
 namespace trapping {
 auto make_arithmetic(int64_t const, size_t const) -> std::optional<signed_type>;
-auto make_arithmetic(uint64_t const, size_t const) -> std::optional<unsigned_type>;
+auto make_arithmetic(uint64_t const, size_t const)
+    -> std::optional<unsigned_type>;
 
-auto operator+(signed_type const, signed_type const) -> std::optional<signed_type>;
-auto operator-(signed_type const, signed_type const) -> std::optional<signed_type>;
-auto operator*(signed_type const, signed_type const) -> std::optional<signed_type>;
-auto operator/(signed_type const, signed_type const) -> std::optional<signed_type>;
+auto operator+(signed_type const, signed_type const)
+    -> std::optional<signed_type>;
+auto operator-(signed_type const, signed_type const)
+    -> std::optional<signed_type>;
+auto operator*(signed_type const, signed_type const)
+    -> std::optional<signed_type>;
+auto operator/(signed_type const, signed_type const)
+    -> std::optional<signed_type>;
 
-auto operator+(unsigned_type const, unsigned_type const) ->std::optional<unsigned_type>;
-auto operator-(unsigned_type const, unsigned_type const) ->std::optional<unsigned_type>;
-auto operator*(unsigned_type const, unsigned_type const) ->std::optional<unsigned_type>;
-auto operator/(unsigned_type const, unsigned_type const) ->std::optional<unsigned_type>;
-}  // namespace fixed
+auto operator+(unsigned_type const, unsigned_type const)
+    -> std::optional<unsigned_type>;
+auto operator-(unsigned_type const, unsigned_type const)
+    -> std::optional<unsigned_type>;
+auto operator*(unsigned_type const, unsigned_type const)
+    -> std::optional<unsigned_type>;
+auto operator/(unsigned_type const, unsigned_type const)
+    -> std::optional<unsigned_type>;
+}  // namespace trapping
 
 namespace saturating {
 auto make_arithmetic(int64_t const, size_t const) -> signed_type;

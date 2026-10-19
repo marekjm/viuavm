@@ -932,7 +932,7 @@ auto operator/(
     auto result = arithmetic_type::zero(lhs.size());
 
     while (not(working_lhs < working_rhs)) {
-        result      = bits::inc(result);
+        result         = bits::inc(result);
         auto const tmp = working_lhs - working_rhs;
         if (not tmp.has_value()) {
             return std::nullopt;

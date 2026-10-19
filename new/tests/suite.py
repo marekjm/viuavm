@@ -1961,7 +1961,9 @@ def main(args):
                 "{} {} {} @ {}".format(
                     colorise(CASE_RUNTIME_COLOUR, ops_counter_fmt.format(perf["ops"])),
                     SUBSET,
-                    colorise(CASE_RUNTIME_COLOUR, perf["run_time"].rjust(VM_TIME_WIDTH)),
+                    colorise(
+                        CASE_RUNTIME_COLOUR, perf["run_time"].rjust(VM_TIME_WIDTH)
+                    ),
                     colorise(CASE_RUNTIME_COLOUR, perf["freq"].rjust(VM_FREQ_WIDTH)),
                 )
             )
