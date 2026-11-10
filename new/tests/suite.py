@@ -305,6 +305,16 @@ class Status(enum.Enum):
     Skip = 1
 
 
+class Case_tag(enum.Enum):
+    Ok = "green"
+    Fail = "yellow"
+    Skip = "red"
+    Bork = "purple_1b"
+
+    def colorise(self):
+        return colorise(self.value, self.name.lower())
+
+
 def make_local(idx):
     return (
         "l",
@@ -1681,19 +1691,16 @@ def prepare_dependencies(cases_dir):
         )
 
         symptom = None
-        tag_color: str = None
-        tag: str = None
+        tag: Case_tag = None
         if asm_return != 0:
-            tag = "fail"
-            tag_color = "red"
+            tag = Case_tag.Fail
             symptom = " ".join(asm_args)
         else:
-            tag = " ok "
-            tag_color = "green"
+            tag = Case_tag.Ok
         print(
             "    dep {}: [{}]".format(
                 colorise("white", base_name),
-                colorise(tag_color, tag)
+                colorise(tag.value, f"{tag.name.lower():^4s}")
                 + ((" => " + colorise("light_red", symptom)) if symptom else ""),
             )
         )
@@ -1709,12 +1716,20 @@ def report_suite_totals(run_time, cases_run, cases_successful, cases_skipped):
         run_color = "red"
 
     print(
-        "\nrun {} test case{} with {}% success rate".format(
+        "\nrun {} test case{} with {}% success rate{}".format(
             colorise("white", (cases_run or "no")),
             ("s" if cases_run != 1 else ""),
             colorise(
                 run_color,
-                "{:.2f}".format((cases_successful / cases_run) * 100),
+                "{:.2f}".format((cases_successful / (cases_run - cases_skipped)) * 100),
+            ),
+            (
+                " (with {} skipped case{})".format(
+                    cases_skipped,
+                    ("s" if cases_skipped > 1 else ""),
+                )
+                if cases_skipped
+                else ""
             ),
         )
     )
@@ -1828,10 +1843,10 @@ def main(args):
     list_of_skip = []
     list_of_bork = []
     run_list = {
-        "ok": list_of_ok,
-        "fail": list_of_fail,
-        "skip": list_of_skip,
-        "bork": list_of_bork,
+        Case_tag.Ok: list_of_ok,
+        Case_tag.Fail: list_of_fail,
+        Case_tag.Skip: list_of_skip,
+        Case_tag.Bork: list_of_bork,
     }
 
     print("running cases")
@@ -1881,8 +1896,7 @@ def main(args):
 
         rc = lambda: test_case(case_name, test_program, error_stream)
 
-        tag_color: str = None
-        tag: str = None
+        tag: Case_tag = None
 
         internal_test_suite_failure: Exception = None
         skipped = False
@@ -1936,21 +1950,17 @@ def main(args):
                         toolchain_perf_stats.append(toolchain_perf)
 
                     if result:
-                        tag = "ok"
-                        tag_color = "green"
+                        tag = Case_tag.Ok
                         success_cases += 1
                     else:
-                        tag = "fail"
-                        tag_color = "red"
+                        tag = Case_tag.Fail
                 elif status == Status.Skip:
-                    tag = "skip"
-                    tag_color = "yellow"
+                    tag = Case_tag.Skip
                     skip_cases += 1
                     skipped = True
         except Exception as e:
             internal_test_suite_failure = e
-            tag = "bork"
-            tag_color = "purple_1b"
+            tag = Case_tag.Bork
             symptom = "internal test suite failure"
 
         run_list[tag].append(case_name)
@@ -1977,7 +1987,7 @@ def main(args):
                     if (PROGRESS_INDICATORS and not skipped)
                     else ""
                 ),
-                colorise(tag_color, f"{tag:^4s}")
+                colorise(tag.value, f"{tag.name.lower():^4s}")
                 + ((" => " + colorise("light_red", symptom)) if symptom else ""),
                 (
                     colorise(CASE_RUNTIME_COLOUR, format_run_time(run_time))
@@ -2004,11 +2014,13 @@ def main(args):
     SUITE_STOP_TIMEPOINT = datetime.datetime.now()
 
     for result_tag, tagged_cases in run_list.items():
-        with open(os.path.join(CACHE_DIR, result_tag), "w") as ofstream:
+        with open(os.path.join(CACHE_DIR, result_tag.name.lower()), "w") as ofstream:
             ofstream.write("\n".join(tagged_cases))
 
+    acceptable_cases = success_cases + skip_cases
+
     run_exit_code: int = 0
-    if success_cases != len(cases):
+    if acceptable_cases != len(cases):
         run_exit_code = 1
 
     suite_run_time = SUITE_STOP_TIMEPOINT - SUITE_START_TIMEPOINT
