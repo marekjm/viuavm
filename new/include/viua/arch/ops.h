@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 
+#include <stdexcept>
 #include <string>
 
 #include <viua/arch/arch.h>

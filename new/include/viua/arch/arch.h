@@ -23,7 +23,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <sstream>
 #include <string>
 
 namespace viua::arch {
